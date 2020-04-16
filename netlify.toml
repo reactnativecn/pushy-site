@@ -1,0 +1,8 @@
+[build]
+  publish = "public"
+  command = "yarn && yarn build"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+	cache-control = "public,max-age=86400"
