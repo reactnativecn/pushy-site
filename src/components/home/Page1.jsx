@@ -11,6 +11,7 @@ import publishIcon from '../../images/internet-1.svg';
 import downloadIcon from '../../images/wifi.svg';
 import strategyIcon from '../../images/strategy.svg';
 import reliableIcon from '../../images/circuit.svg';
+import supportIcon from '../../images/chat.svg';
 
 const { TweenOneGroup } = TweenOne;
 const featuresCN = [
@@ -42,7 +43,7 @@ const featuresCN = [
   {
     title: '技术支持',
     content: ['遇到技术问题？', '工作时间段内小时级别响应'],
-    src: 'https://gw.alipayobjects.com/zos/rmsportal/RpJIQitGbSCHwLMimybX.svg',
+    src: supportIcon,
   },
 ];
 
