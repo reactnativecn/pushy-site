@@ -6,70 +6,43 @@ import Parallax from 'rc-scroll-anim/lib/ScrollParallax';
 import QueueAnim from 'rc-queue-anim';
 import TweenOne from 'rc-tween-one';
 
+import deltaIcon from '../../images/smartphone-3.svg';
+import publishIcon from '../../images/internet-1.svg';
+import downloadIcon from '../../images/wifi.svg';
+import strategyIcon from '../../images/strategy.svg';
+import reliableIcon from '../../images/circuit.svg';
+
 const { TweenOneGroup } = TweenOne;
 const featuresCN = [
   {
-    title: '优雅美观',
-    content: '基于 Ant Design 体系精心设计',
-    src: 'https://gw.alipayobjects.com/zos/rmsportal/VriUmzNjDnjoFoFFZvuh.svg',
-    color: '#13C2C2',
-    shadowColor: 'rgba(19,194,194,.12)',
+    title: '增量更新',
+    content: ['基于 bsdiff 算法创建的kb级别', '超小更新包'],
+    src: deltaIcon,
   },
   {
-    title: '常见设计模式',
-    content: '提炼自中后台应用的典型页面和场景',
-    src: 'https://gw.alipayobjects.com/zos/rmsportal/smwQOoxCjXVbNAKMqvWk.svg',
-    color: '#2F54EB',
-    shadowColor: 'rgba(47,84,235,.12)',
+    title: '快捷发布',
+    content: ['命令行工具 & 网页双端管理', '支持CI部署'],
+    src: publishIcon,
   },
   {
-    title: '最新技术栈',
-    content: '使用 React/dva/antd 等前端前沿技术开发',
-    src: 'https://gw.alipayobjects.com/zos/rmsportal/hBbIHzUsSbSxrhoRFYzi.svg',
-    color: '#F5222D',
-    shadowColor: 'rgba(245,34,45,.12)',
+    title: '极速下载',
+    content: ['基于阿里云高速CDN分发', '全国范围秒速更新'],
+    src: downloadIcon,
   },
   {
-    title: '响应式',
-    content: '针对不同屏幕大小设计',
-    src: 'https://gw.alipayobjects.com/zos/rmsportal/BISfzKcCNCYFmTYcUygW.svg',
-    color: '#1AC44D',
-    shadowColor: 'rgba(26,196,77,.12)',
+    title: '稳定可靠',
+    content: ['自带崩溃回滚机制', '安全可靠'],
+    src: reliableIcon,
   },
   {
-    title: '主题',
-    content: '可配置的主题满足多样化的品牌诉求',
-    src: 'https://gw.alipayobjects.com/zos/rmsportal/XxqEexmShHOofjMYOCHi.svg',
-    color: '#FAAD14',
-    shadowColor: 'rgba(250,173,20,.12)',
+    title: '灵活扩展',
+    content: ['开放定制元信息', '提供灵活自由的更新策略'],
+    src: strategyIcon,
   },
   {
-    title: '国际化',
-    content: '内建业界通用的国际化方案',
-    src: 'https://gw.alipayobjects.com/zos/rmsportal/JsixxWSViARJnQbAAPkI.svg',
-    color: '#722ED1',
-    shadowColor: 'rgba(114,46,209,.12)',
-  },
-  {
-    title: '最佳实践',
-    content: '良好的工程实践助你持续产出高质量代码',
-    src: 'https://gw.alipayobjects.com/zos/rmsportal/pbmKMSFpLurLALLNliUQ.svg',
-    color: '#FA8C16',
-    shadowColor: 'rgba(250,140,22,.12)',
-  },
-  {
-    title: 'Mock 数据',
-    content: '实用的本地数据调试方案',
-    src: 'https://gw.alipayobjects.com/zos/rmsportal/aLQyKyUyssIUhHTZqCIb.svg',
-    color: '#EB2F96',
-    shadowColor: 'rgba(235,45,150,.12)',
-  },
-  {
-    title: 'UI 测试',
-    content: '自动化测试保障前端产品质量',
+    title: '技术支持',
+    content: ['遇到技术问题？', '工作时间段内小时级别响应'],
     src: 'https://gw.alipayobjects.com/zos/rmsportal/RpJIQitGbSCHwLMimybX.svg',
-    color: '#1890FF',
-    shadowColor: 'rgba(24,144,255,.12)',
   },
 ];
 
@@ -178,7 +151,10 @@ class Page1 extends React.Component {
               <img src={item.src} alt="img" style={i === 4 ? { marginLeft: -15 } : {}} />
             </div>
             <h3>{item.title}</h3>
-            <p>{item.content}</p>
+            {item.content.map((t, tkey) => (
+              // eslint-disable-next-line react/no-array-index-key
+              <p key={tkey}>{t}</p>
+            ))}
           </div>
         </li>
       );
@@ -220,6 +196,16 @@ class Page1 extends React.Component {
             <div className="title-line" />
           </div>
           <OverPack>{children}</OverPack>
+          <div style={{ float: 'right', opacity: 0.4, marginRight: '6%' }}>
+            Icons made by{' '}
+            <a href="https://www.flaticon.com/authors/swifticons" title="Swifticons">
+              Swifticons
+            </a>{' '}
+            from{' '}
+            <a href="https://www.flaticon.com/" title="Flaticon">
+              www.flaticon.com
+            </a>
+          </div>
         </div>
       </div>
     );
