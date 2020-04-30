@@ -4,31 +4,41 @@ title: API参考
 type: 开发指南
 ---
 
-## JavaScript API
+### JavaScript 常量
 
-### 常量
+---
 
 #### downloadRootDir
 
 下载的根目录。你可以使用react-native-fs等第三方组件检查其中的内容。
 
+---
+
 #### packageVersion
 
 当前应用原生包的版本。其中android取自`versionName`字段(位于`android/build.gralde`中)。ios取自`CFBundleShortVersionString`字段(位于`ios/项目名/Info.plist`中)。
+
+---
 
 #### currentVersion
 
 当前热更新版本（jsbundle文件）的Hash号。
 
+---
+
 #### isFirstTime
 
 是否更新后的首次启动。当此项为真时，你需要在合适的时候调用`markSuccess()`以确保更新成功。否则应用下一次启动时将会回滚。
+
+---
 
 #### isRolledBack
 
 是否刚刚经历了一次回滚。
 
-### 方法
+### JavaScript 方法
+
+---
 
 #### async function checkUpdate(appKey)
 
@@ -58,18 +68,36 @@ type: 开发指南
     }
 ```
 
+---
+
 #### async function downloadUpdate(info)
 
 下载更新版本。info为checkUpdate函数的返回值，并且仅当`update:true`时实际进行下载。
+
+---
 
 #### function switchVersion(hash) 
 
 立即重启应用，并加载已经下载完毕的版本。
 
+---
+
 #### function switchVersionLater(hash)
 
 在下一次启动应用的时候加载已经下载完毕的版本。
 
+---
+
 #### function markSuccess()
 
 在isFirstTime为true时需在应用成功启动后调用此函数，
+
+---
+
+### Android 方法
+
+待补充
+
+### iOS 方法
+
+待补充

@@ -17,7 +17,7 @@ type: 快速入门
 ```bash
 # 全局安装命令行工具，每台电脑只用装一次
 yarn global add react-native-update-cli
-# 在项目中安装热更新模块，每个项目只用装一次
+# 在项目中安装热更新模块
 yarn add react-native-update
 ```  
 
@@ -81,9 +81,9 @@ pod 'react-native-update', path: '../node_modules/react-native-update'
 
 1. 在XCode中的Project Navigator里,右键点击`Libraries` ➜ `Add Files to [你的工程名]`
 2. 进入`node_modules` ➜ `react-native-update` ➜ `ios 并选中 `RCTPushy.xcodeproj`
-3. 在XCode中的project navigator里,选中你的工程,在 `Build Phases` ➜ `Link Binary With Libraries` 中添加 `libRCTPushy.a`
-4. 继续在`Build Settings`里搜索`Header Search Path`，添加$(SRCROOT)/../node_modules/react-native-update/ios
-5. 在`Build Phases`添加一个`New Run Script Phase`运行脚本，内容如下
+3. 在XCode中的project navigator里,选中你的工程,在 `Build Phases` ➜ `Link Binary With Libraries` 中添加 `libRCTPushy.a`、`libz.tbd`、`libbz2.1.0.tbd`
+5. 继续在`Build Settings`里搜索`Header Search Path`，添加$(SRCROOT)/../node_modules/react-native-update/ios
+6. 在`Build Phases`添加一个`New Run Script Phase`运行脚本，内容如下
 ```
 #!/bin/bash
 set -x
@@ -124,9 +124,7 @@ date +%s > "$DEST/pushy_build_time.txt"
 
 ### iOS
 
-- (RN >= 0.60或者使用CocoaPods集成此步可跳过)在工程target的Build Phases->Link Binary with Libraries中加入`libz.tbd`、`libbz2.1.0.tbd`
-
-- 在你的AppDelegate.m文件中增加如下代码：
+在你的AppDelegate.m文件中增加如下代码：
 
 ```objectivec
 // ... 其它代码

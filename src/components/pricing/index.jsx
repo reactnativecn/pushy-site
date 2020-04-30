@@ -30,6 +30,7 @@ function Pricing() {
                 <li className="pricing__feature">可创建3个应用，每个可保留：</li>
                 <li className="pricing__feature">5个原生包，每个不大于50M</li>
                 <li className="pricing__feature">5个热更包，每个不大于5M</li>
+                {/* <li className="pricing__feature">每日下载更新不超过1万次</li> */}
               </ul>
               <Button
                 shape="round"
@@ -55,6 +56,7 @@ function Pricing() {
                 <li className="pricing__feature">可创建10个应用，每个可保留：</li>
                 <li className="pricing__feature">10个原生包，每个不大于100M</li>
                 <li className="pricing__feature">10个热更包，每个不大于10M</li>
+                {/* <li className="pricing__feature">每日下载更新不超过10万次</li> */}
                 <li className="pricing__feature">提供专人技术支持</li>
               </ul>
               <Button shape="round" type="primary">
@@ -77,6 +79,7 @@ function Pricing() {
                 <li className="pricing__feature">可创建100个应用，每个可保留：</li>
                 <li className="pricing__feature">100个原生包，每个不大于500M</li>
                 <li className="pricing__feature">100个热更包，每个不大于50M</li>
+                {/* <li className="pricing__feature">每日下载更新不超过100万次</li> */}
                 <li className="pricing__feature">提供专人技术支持</li>
               </ul>
               <Button shape="round" type="primary">

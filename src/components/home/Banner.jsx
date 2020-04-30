@@ -30,7 +30,7 @@ function Banner(props) {
         <div className="button-wrapper">
           <Link to="/docs/getting-started">
             <Button style={{ margin: '0 16px' }} type="primary" ghost>
-              立即体验
+              立即免费体验
             </Button>
           </Link>
           <GitHubButton
