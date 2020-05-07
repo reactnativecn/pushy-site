@@ -51,6 +51,18 @@ module.exports = {
 3. 如果是 0.60 以上版本或使用了 cocoapods，在 ios 目录中再次运行 pod install，确保 Podfile 和 Podfile.lock 中都没有'react-native-update'。如果 RN 版本<0.60，则运行`react-native unlink react-native-update`。
 4. 在 js 代码里调用 checkUpdate()方法前，判断 Platform.OS，如果是 ios 平台则直接 return 跳过。
 
+#### XCode编译时报错 "_BZ2_bzRead", referenced from 等
+
+在工程target的Build Phases->Link Binary with Libraries中加入libz.tbd、libbz2.1.0.tbd
+
+#### 热更新成功完成，但是重启后又回滚了是怎么回事？
+
+可以正常更新，但是重启后回滚，一般有两种可能的情况：
+- 没有正确[配置bundleUrl](/docs/getting-started#配置bundle-url)
+- 没有正确[调用markSuccess](/docs/integration#%E9%A6%96%E6%AC%A1%E5%90%AF%E5%8A%A8%E3%80%81%E5%9B%9E%E6%BB%9A)
+  
+如果你确定上述两个步骤都正确无误，请在[issues区](https://github.com/reactnativecn/react-native-pushy/issues)给我们留言反馈。
+
 ### 付费问题
 
 #### 我应该选择哪个业务版本呢？
