@@ -6,7 +6,7 @@
     "url": "https://github.com/sunnylqm/pushy-site"
   },
   "scripts": {
-    "build": "gatsby build",
+    "build": "gatsby build --prefix-paths",
     "start": "gatsby develop"
   },
   "dependencies": {
