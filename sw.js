@@ -27,20 +27,17 @@ workbox.core.clientsClaim();
  */
 self.__precacheManifest = [
   {
-    "url": "webpack-runtime-ba1748044abaa2db70fe.js"
+    "url": "webpack-runtime-6e1f19fbf278d6726fe5.js"
   },
   {
     "url": "framework-374b3b43b7b1cdb030c1.js"
   },
   {
-    "url": "app-a2112e216350c966b026.js"
+    "url": "app-6728377537764a10a9d8.js"
   },
   {
     "url": "offline-plugin-app-shell-fallback/index.html",
-    "revision": "ddf4f464febd478add579efa461a0dbb"
-  },
-  {
-    "url": "component---cache-caches-gatsby-plugin-offline-app-shell-js-fd63b2ded98d7b7a7ff6.js"
+    "revision": "87e30dba7cee5ebae5a1d6651e24fc1f"
   }
 ].concat(self.__precacheManifest || []);
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
@@ -128,12 +125,12 @@ const navigationRoute = new NavigationRoute(async ({ event }) => {
   lastNavigationRequest = event.request.url
 
   let { pathname } = new URL(event.request.url)
-  pathname = pathname.replace(new RegExp(`^`), ``)
+  pathname = pathname.replace(new RegExp(`^https://cdn.jsdelivr.net/gh/reactnativecn/pushy-site@gh-pages`), ``)
 
   // Check for resources + the app bundle
   // The latter may not exist if the SW is updating to a new version
   const resources = await idbKeyval.get(`resources:${pathname}`)
-  if (!resources || !(await caches.match(`/app-a2112e216350c966b026.js`))) {
+  if (!resources || !(await caches.match(`https://cdn.jsdelivr.net/gh/reactnativecn/pushy-site@gh-pages/app-6728377537764a10a9d8.js`))) {
     return await fetch(event.request)
   }
 
@@ -146,7 +143,7 @@ const navigationRoute = new NavigationRoute(async ({ event }) => {
     }
   }
 
-  const offlineShell = `/offline-plugin-app-shell-fallback/index.html`
+  const offlineShell = `https://cdn.jsdelivr.net/gh/reactnativecn/pushy-site@gh-pages/offline-plugin-app-shell-fallback/index.html`
   const offlineShellWithKey = workbox.precaching.getCacheKeyForURL(offlineShell)
   return await caches.match(offlineShellWithKey)
 })
