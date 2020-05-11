@@ -6,6 +6,8 @@ import proxy from './proxy';
 const { REACT_APP_ENV } = process.env;
 
 export default defineConfig({
+  publicPath: 'https://cdn.jsdelivr.net/gh/reactnativecn/pushy-site@gh-pages/admin/',
+  runtimePublicPath: true,
   hash: true,
   antd: {},
   dva: {
