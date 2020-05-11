@@ -1,13 +1,12 @@
 {
-  "name": "pushy-web",
+  "name": "pushy-site",
   "version": "1.0.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sunnylqm/pushy-web"
+    "url": "https://github.com/sunnylqm/pushy-site"
   },
   "scripts": {
     "build": "gatsby build",
-    "serve": "gatsby serve",
     "start": "gatsby develop"
   },
   "dependencies": {
