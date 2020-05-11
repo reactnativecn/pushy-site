@@ -30,8 +30,10 @@ jobs:
 
       - name: Build
         run: |
-          cd site && yarn install && yarn build && cd -
+          cd site && yarn && yarn build && cd -
           mv site/public ./
+          cd admin && yarn && yarn build && cd -
+          mv admin/dist public/admin
           cp .CNAME public/
           cp .nojekyll public/
 
