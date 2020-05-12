@@ -33,7 +33,6 @@ export default defineConfig({
   history: {
     type: 'hash',
   },
-  base: '/admin',
   // umi routes: https://umijs.org/docs/routing
   routes: [
     {
@@ -91,6 +90,6 @@ export default defineConfig({
   ignoreMomentLocale: true,
   proxy: proxy[REACT_APP_ENV || 'dev'],
   manifest: {
-    basePath: '/admin',
+    basePath: '/',
   },
 });
