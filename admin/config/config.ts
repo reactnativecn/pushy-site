@@ -2,9 +2,7 @@
 import { defineConfig } from 'umi';
 import defaultSettings from './defaultSettings';
 import proxy from './proxy';
-
 const { REACT_APP_ENV } = process.env;
-
 const publicPathSetting =
   REACT_APP_ENV === 'dev'
     ? {}
@@ -12,7 +10,6 @@ const publicPathSetting =
         publicPath: 'https://cdn.jsdelivr.net/gh/reactnativecn/pushy-site@gh-pages/admin/',
         runtimePublicPath: true,
       };
-
 export default defineConfig({
   nodeModulesTransform: {
     type: 'none',
@@ -36,6 +33,7 @@ export default defineConfig({
   hash: true,
   antd: {},
   dva: {
+    immer: true,
     hmr: true,
   },
   layout: {
@@ -74,9 +72,14 @@ export default defineConfig({
           path: '/user/login',
           component: './user/login',
         },
+        {
+          name: 'register',
+          icon: 'smile',
+          path: '/user/register',
+          component: './user/register',
+        },
       ],
     },
-
     {
       path: '/welcome',
       name: 'welcome',

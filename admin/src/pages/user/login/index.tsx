@@ -1,4 +1,4 @@
-import { AlipayCircleOutlined, TaobaoCircleOutlined, WeiboCircleOutlined } from '@ant-design/icons';
+// import { AlipayCircleOutlined, TaobaoCircleOutlined, WeiboCircleOutlined } from '@ant-design/icons';
 import { Alert, Checkbox, message } from 'antd';
 import React, { useState } from 'react';
 import { Link, history, useModel, SelectLang } from 'umi';
@@ -8,7 +8,8 @@ import { LoginParamsType, fakeAccountLogin } from '@/services/login';
 import LoginFrom from './components/Login';
 import styles from './style.less';
 
-const { Tab, UserName, Password, Mobile, Captcha, Submit } = LoginFrom;
+// const { Tab, UserName, Password, Mobile, Captcha, Submit } = LoginFrom;
+const { UserName, Password, Submit } = LoginFrom;
 
 const LoginMessage: React.FC<{
   content: string;
@@ -94,33 +95,33 @@ const Login: React.FC<{}> = () => {
 
         <div className={styles.main}>
           <LoginFrom activeKey={type} onTabChange={setType} onSubmit={handleSubmit}>
-            <Tab key="account" tab="账户密码登录">
-              {status === 'error' && loginType === 'account' && !submitting && (
-                <LoginMessage content="账户或密码错误（admin/ant.design）" />
-              )}
+            {/* <Tab key="account" tab="账户密码登录"> */}
+            {status === 'error' && loginType === 'account' && !submitting && (
+              <LoginMessage content="账户或密码错误（admin/ant.design）" />
+            )}
 
-              <UserName
-                name="userName"
-                placeholder="用户名: admin or user"
-                rules={[
-                  {
-                    required: true,
-                    message: '请输入用户名!',
-                  },
-                ]}
-              />
-              <Password
-                name="password"
-                placeholder="密码: ant.design"
-                rules={[
-                  {
-                    required: true,
-                    message: '请输入密码！',
-                  },
-                ]}
-              />
-            </Tab>
-            <Tab key="mobile" tab="手机号登录">
+            <UserName
+              name="userName"
+              placeholder="用户名: admin or user"
+              rules={[
+                {
+                  required: true,
+                  message: '请输入用户名!',
+                },
+              ]}
+            />
+            <Password
+              name="password"
+              placeholder="密码: ant.design"
+              rules={[
+                {
+                  required: true,
+                  message: '请输入密码！',
+                },
+              ]}
+            />
+            {/* </Tab> */}
+            {/* <Tab key="mobile" tab="手机号登录">
               {status === 'error' && loginType === 'mobile' && !submitting && (
                 <LoginMessage content="验证码错误" />
               )}
@@ -151,7 +152,7 @@ const Login: React.FC<{}> = () => {
                   },
                 ]}
               />
-            </Tab>
+            </Tab> */}
             <div>
               <Checkbox checked={autoLogin} onChange={(e) => setAutoLogin(e.target.checked)}>
                 自动登录
@@ -165,7 +166,7 @@ const Login: React.FC<{}> = () => {
               </a>
             </div>
             <Submit loading={submitting}>登录</Submit>
-            <div className={styles.other}>
+            {/* <div className={styles.other}>
               其他登录方式
               <AlipayCircleOutlined className={styles.icon} />
               <TaobaoCircleOutlined className={styles.icon} />
@@ -173,7 +174,7 @@ const Login: React.FC<{}> = () => {
               <Link className={styles.register} to="/user/register">
                 注册账户
               </Link>
-            </div>
+            </div> */}
           </LoginFrom>
         </div>
       </div>
