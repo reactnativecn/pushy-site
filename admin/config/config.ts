@@ -5,9 +5,34 @@ import proxy from './proxy';
 
 const { REACT_APP_ENV } = process.env;
 
+const publicPathSetting =
+  REACT_APP_ENV === 'dev'
+    ? {}
+    : {
+        publicPath: 'https://cdn.jsdelivr.net/gh/reactnativecn/pushy-site@gh-pages/admin/',
+        runtimePublicPath: true,
+      };
+
 export default defineConfig({
-  publicPath: 'https://cdn.jsdelivr.net/gh/reactnativecn/pushy-site@gh-pages/admin/',
-  runtimePublicPath: true,
+  nodeModulesTransform: {
+    type: 'none',
+    exclude: [],
+  },
+  externals: {
+    react: 'window.React',
+    'react-dom': 'window.ReactDOM',
+  },
+  scripts:
+    REACT_APP_ENV === 'dev'
+      ? [
+          'https://gw.alipayobjects.com/os/lib/react/16.13.1/umd/react.development.js',
+          'https://gw.alipayobjects.com/os/lib/react-dom/16.13.1/umd/react-dom.development.js',
+        ]
+      : [
+          'https://gw.alipayobjects.com/os/lib/react/16.13.1/umd/react.production.min.js',
+          'https://gw.alipayobjects.com/os/lib/react-dom/16.13.1/umd/react-dom.production.min.js',
+        ],
+  ...publicPathSetting,
   hash: true,
   antd: {},
   dva: {
@@ -29,6 +54,11 @@ export default defineConfig({
   },
   targets: {
     ie: 11,
+    chrome: 79,
+    firefox: false,
+    safari: false,
+    edge: false,
+    ios: false,
   },
   history: {
     type: 'hash',
