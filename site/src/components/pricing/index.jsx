@@ -88,6 +88,7 @@ function Pricing() {
             </div>
           </div>
           <div style={{ color: '#8b909d', textAlign: 'center' }}>
+            <p>当前价格表自2020年6月1日起开始执行</p>
             <p>
               *注：iOS和Android版本记做不同的应用。
               <br />
