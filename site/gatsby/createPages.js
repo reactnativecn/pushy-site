@@ -46,20 +46,19 @@ module.exports = async ({ graphql, actions }) => {
         if (underScoreCasePath !== path) {
           redirects[underScoreCasePath] = path;
         }
-
         return createPage({
           path,
           component: template,
           context: {
             slug,
             // if is docs page
-            type: slug.includes('docs/') ? '/docs/' : '/blog/'
+            type: slug.includes('docs/') ? '/docs/' : '/blog/',
           },
         });
       };
 
       // Register primary URL.
-      createArticlePage(slug.replace('/index', ''));
+      createArticlePage(`${slug.replace('/index', '')}.html`);
     }
   });
   const indexPage = resolve(__dirname, '../src/pages/index.tsx');
@@ -72,7 +71,7 @@ module.exports = async ({ graphql, actions }) => {
   createRedirect({
     fromPath: '/docs/',
     redirectInBrowser: true,
-    toPath: '/docs/getting-started',
+    toPath: '/docs/getting-started.html',
   });
 
   /*

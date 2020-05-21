@@ -22,7 +22,7 @@ function Banner(props) {
         <img src={logo} style={{ margin: '0 0 25px 20px' }} alt="Pushy" />
         <p>极速热更新框架 for React Native</p>
         <div className="button-wrapper">
-          <Link to="/docs/getting-started">
+          <Link to="/docs/getting-started.html">
             <Button style={{ margin: '0 16px' }} type="primary" ghost>
               立即免费体验
             </Button>

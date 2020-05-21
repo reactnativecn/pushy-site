@@ -35,7 +35,7 @@ function Footer() {
                 <a
                   target="_blank"
                   rel="noopener noreferrer"
-                  href="/docs/faq"
+                  href="/docs/faq.html"
                 >
                   常见问题
                 </a>

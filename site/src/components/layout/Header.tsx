@@ -80,10 +80,10 @@ class Header extends React.Component<HeaderProps, HeaderState> {
           <Link to="/">首页</Link>
         </Menu.Item>
         <Menu.Item key="docs">
-          <Link to="/docs/getting-started">文档</Link>
+          <Link to="/docs/getting-started.html">文档</Link>
         </Menu.Item>
         <Menu.Item key="pricing">
-          <Link to="/pricing">价格</Link>
+          <Link to="/pricing.html">价格</Link>
         </Menu.Item>
         {/* <Menu.Item key="blog">
           <Link to="/blog/">Blog</Link>
