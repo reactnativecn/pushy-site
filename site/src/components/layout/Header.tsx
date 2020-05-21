@@ -3,6 +3,7 @@ import { Link } from 'gatsby';
 import { MenuOutlined } from '@ant-design/icons';
 import { Row, Col, Menu, Button, Popover } from 'antd';
 import logo from '../../images/logo.svg';
+
 interface HeaderProps {
   isMobile: boolean;
   location: {
@@ -114,8 +115,15 @@ class Header extends React.Component<HeaderProps, HeaderState> {
           <Col xxl={20} xl={19} lg={16} md={16} sm={0} xs={0}>
             <div className="header-meta">
               <div className="right-header">
-                <Button shape="round">登录</Button>
-                <Button shape="round" type="primary">
+                <Button shape="round" href="https://update.reactnative.cn/login" target="_blank">
+                  登录
+                </Button>
+                <Button
+                  shape="round"
+                  href="https://update.reactnative.cn/register"
+                  target="_blank"
+                  type="primary"
+                >
                   注册
                 </Button>
               </div>
