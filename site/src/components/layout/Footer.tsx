@@ -21,10 +21,14 @@ function Footer() {
             <div className="footer-center">
               <h2>用户协议</h2>
               <div>
-                <a href="#">用户协议</a>
+                <a target="_blank" href="/agreement/">
+                  用户协议
+                </a>
               </div>
               <div>
-                <a href="#">隐私政策</a>
+                <a target="_blank" href="/agreement/#privacy">
+                  隐私政策
+                </a>
               </div>
             </div>
           </Col>
@@ -32,11 +36,7 @@ function Footer() {
             <div className="footer-center">
               <h2>帮助</h2>
               <div>
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="/docs/faq.html"
-                >
+                <a target="_blank" rel="noopener noreferrer" href="/docs/faq.html">
                   常见问题
                 </a>
               </div>

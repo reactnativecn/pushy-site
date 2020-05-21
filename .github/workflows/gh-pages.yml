@@ -35,6 +35,7 @@ jobs:
           cd admin && yarn && yarn build && cd -
           mv admin/dist public/admin
           cp CNAME public/
+          mv agreement public/agreement
           cp .nojekyll public/
 
       - name: Deploy
