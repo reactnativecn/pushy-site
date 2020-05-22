@@ -37,8 +37,9 @@ export default defineConfig({
     hmr: true,
   },
   layout: {
-    name: 'Ant Design Pro',
+    name: 'Pushy热更新后台',
     locale: true,
+    siderWidth: 208,
   },
   locale: {
     // default zh-CN

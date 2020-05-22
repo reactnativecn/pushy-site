@@ -7,8 +7,8 @@ export default () => (
     copyright="2019 蚂蚁金服体验技术部出品"
     links={[
       {
-        key: 'Ant Design Pro',
-        title: 'Ant Design Pro',
+        key: 'Pushy热更新后台',
+        title: 'Pushy热更新后台',
         href: 'https://pro.ant.design',
         blankTarget: true,
       },

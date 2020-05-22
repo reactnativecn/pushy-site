@@ -13,7 +13,7 @@ export default {
   menu: {
     locale: true,
   },
-  title: 'Ant Design Pro',
+  title: 'Pushy热更新后台',
   pwa: false,
   iconfontUrl: '',
 } as LayoutSettings & {

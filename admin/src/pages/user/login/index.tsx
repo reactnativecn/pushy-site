@@ -1,5 +1,5 @@
 // import { AlipayCircleOutlined, TaobaoCircleOutlined, WeiboCircleOutlined } from '@ant-design/icons';
-import { Alert, Checkbox, message } from 'antd';
+import { Alert, message } from 'antd';
 import React, { useState } from 'react';
 import { Link, history, useModel, SelectLang } from 'umi';
 import { getPageQuery } from '@/utils/utils';
@@ -51,7 +51,7 @@ const Login: React.FC<{}> = () => {
   const [submitting, setSubmitting] = useState(false);
 
   const { refresh } = useModel('@@initialState');
-  const [autoLogin, setAutoLogin] = useState(true);
+  // const [autoLogin, setAutoLogin] = useState(true);
   const [type, setType] = useState<string>('account');
 
   const handleSubmit = async (values: LoginParamsType) => {
@@ -87,10 +87,10 @@ const Login: React.FC<{}> = () => {
           <div className={styles.header}>
             <Link to="/">
               <img alt="logo" className={styles.logo} src={logo} />
-              <span className={styles.title}>Ant Design</span>
+              {/* <span className={styles.title}>Pushy热更新后台</span> */}
             </Link>
           </div>
-          <div className={styles.desc}>Ant Design 是西湖区最具影响力的 Web 设计规范</div>
+          <div className={styles.desc}>极速热更新框架 for React Native</div>
         </div>
 
         <div className={styles.main}>
@@ -102,7 +102,7 @@ const Login: React.FC<{}> = () => {
 
             <UserName
               name="userName"
-              placeholder="用户名: admin or user"
+              placeholder="用户名"
               rules={[
                 {
                   required: true,
@@ -112,7 +112,7 @@ const Login: React.FC<{}> = () => {
             />
             <Password
               name="password"
-              placeholder="密码: ant.design"
+              placeholder="密码"
               rules={[
                 {
                   required: true,
@@ -154,9 +154,9 @@ const Login: React.FC<{}> = () => {
               />
             </Tab> */}
             <div>
-              <Checkbox checked={autoLogin} onChange={(e) => setAutoLogin(e.target.checked)}>
-                自动登录
-              </Checkbox>
+              <Link className={styles.register} to="/user/register">
+                注册账户
+              </Link>
               <a
                 style={{
                   float: 'right',
