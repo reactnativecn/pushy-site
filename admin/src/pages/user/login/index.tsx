@@ -4,9 +4,10 @@ import React, { useState } from 'react';
 import { Link, history, useModel } from 'umi';
 import { getPageQuery } from '@/utils/utils';
 import logo from '@/assets/logo.svg';
-import { LoginParamsType, fakeAccountLogin } from '@/services/login';
+import { LoginParamsType, doLogin } from '@/services/login';
 import LoginFrom from './components/Login';
 import styles from './style.less';
+import md5 from 'md5';
 
 // const { Tab, UserName, Password, Mobile, Captcha, Submit } = LoginFrom;
 const { UserName, Password, Submit } = LoginFrom;
@@ -39,27 +40,25 @@ const replaceGoto = () => {
         redirect = redirect.substr(redirect.indexOf('#') + 1);
       }
     } else {
-      window.location.href = '/';
+      window.location.href = '/dashboard';
       return;
     }
   }
-  history.replace(redirect || '/');
+  history.replace(redirect || '/dashboard');
 };
 
 const Login: React.FC<{}> = () => {
-  const [userLoginState, setUserLoginState] = useState<API.LoginStateType>({});
+  const [loginMessage, setLoginMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const { refresh } = useModel('@@initialState');
-  // const [autoLogin, setAutoLogin] = useState(true);
-  const [type, setType] = useState<string>('account');
 
-  const handleSubmit = async (values: LoginParamsType) => {
+  const handleSubmit = async ({ pwd, ...values }: LoginParamsType) => {
     setSubmitting(true);
     try {
       // 登录
-      const msg = await fakeAccountLogin({ ...values, type });
-      if (msg.status === 'ok') {
+      const resp = await doLogin({ pwd: md5(pwd), ...values });
+      if (resp.ok) {
         message.success('登陆成功！');
         replaceGoto();
         setTimeout(() => {
@@ -68,14 +67,14 @@ const Login: React.FC<{}> = () => {
         return;
       }
       // 如果失败去设置用户错误信息
-      setUserLoginState(msg);
+      if (resp.message) {
+        setLoginMessage(resp.message);
+      }
     } catch (error) {
       message.error('登陆失败，请重试！');
     }
     setSubmitting(false);
   };
-
-  const { status, type: loginType } = userLoginState;
 
   return (
     <div className={styles.container}>
@@ -91,24 +90,22 @@ const Login: React.FC<{}> = () => {
         </div>
 
         <div className={styles.main}>
-          <LoginFrom activeKey={type} onTabChange={setType} onSubmit={handleSubmit}>
+          <LoginFrom onSubmit={handleSubmit}>
             {/* <Tab key="account" tab="账户密码登录"> */}
-            {status === 'error' && loginType === 'account' && !submitting && (
-              <LoginMessage content="账户或密码错误（admin/ant.design）" />
-            )}
+            {loginMessage && <LoginMessage content={loginMessage} />}
 
             <UserName
-              name="userName"
-              placeholder="用户名"
+              name="email"
+              placeholder="注册邮箱"
               rules={[
                 {
                   required: true,
-                  message: '请输入用户名!',
+                  message: '请输入注册邮箱!',
                 },
               ]}
             />
             <Password
-              name="password"
+              name="pwd"
               placeholder="密码"
               rules={[
                 {

@@ -1,7 +1,6 @@
-import { Form, Button, Input, Popover, Progress, message } from 'antd';
+import { Form, Button, Input, Popover, Progress, message, Checkbox } from 'antd';
 import React, { FC, useState, useEffect } from 'react';
-import { Link, connect, history, Dispatch } from 'umi';
-import { StateType } from './model';
+import { Link, history } from 'umi';
 import styles from './style.less';
 
 const FormItem = Form.Item;
@@ -19,11 +18,6 @@ const passwordProgressMap: {
   pass: 'normal',
   poor: 'exception',
 };
-interface RegisterProps {
-  dispatch: Dispatch;
-  userAndregister: StateType;
-  submitting: boolean;
-}
 export interface UserRegisterParams {
   mail: string;
   password: string;
@@ -33,10 +27,8 @@ export interface UserRegisterParams {
   prefix: string;
 }
 
-const Register: FC<RegisterProps> = ({ submitting, dispatch, userAndregister }) => {
-  const [count, setcount]: [number, any] = useState(0);
+const Register: FC<{}> = () => {
   const [visible, setvisible]: [boolean, any] = useState(false);
-  const [prefix, setprefix]: [string, any] = useState('86');
   const [popover, setpopover]: [boolean, any] = useState(false);
   const confirmDirty = false;
   let interval: number | undefined;
@@ -65,21 +57,21 @@ const Register: FC<RegisterProps> = ({ submitting, dispatch, userAndregister }) 
     [],
   );
 
-  const onGetCaptcha = () => {
-    let counts = 59;
-    setcount(counts);
-    interval = window.setInterval(() => {
-      counts -= 1;
-      setcount(counts);
+  // const onGetCaptcha = () => {
+  //   let counts = 59;
+  //   setcount(counts);
+  //   interval = window.setInterval(() => {
+  //     counts -= 1;
+  //     setcount(counts);
 
-      if (counts === 0) {
-        clearInterval(interval);
-      }
-    }, 1000);
-  };
+  //     if (counts === 0) {
+  //       clearInterval(interval);
+  //     }
+  //   }, 1000);
+  // };
 
   const getPasswordStatus = () => {
-    const value = form.getFieldValue('password');
+    const value = form.getFieldValue('pwd');
 
     if (value && value.length > 9) {
       return 'ok';
@@ -93,16 +85,14 @@ const Register: FC<RegisterProps> = ({ submitting, dispatch, userAndregister }) 
   };
 
   const onFinish = (values: { [key: string]: any }) => {
-    dispatch({
-      type: 'userAndregister/submit',
-      payload: { ...values, prefix },
-    });
+    
+    // todo
   };
 
   const checkConfirm = (_: any, value: string) => {
     const promise = Promise;
 
-    if (value && value !== form.getFieldValue('password')) {
+    if (value && value !== form.getFieldValue('pwd')) {
       return promise.reject('两次输入的密码不匹配!');
     }
 
@@ -134,12 +124,8 @@ const Register: FC<RegisterProps> = ({ submitting, dispatch, userAndregister }) 
     return promise.resolve();
   };
 
-  const changePrefix = (value: string) => {
-    setprefix(value);
-  };
-
   const renderPasswordProgress = () => {
-    const value = form.getFieldValue('password');
+    const value = form.getFieldValue('pwd');
     const passwordStatus = getPasswordStatus();
     return value && value.length ? (
       <div className={styles[`progress-${passwordStatus}`]}>
@@ -159,7 +145,18 @@ const Register: FC<RegisterProps> = ({ submitting, dispatch, userAndregister }) 
       <h3>注册</h3>
       <Form form={form} name="UserRegister" onFinish={onFinish}>
         <FormItem
-          name="mail"
+          name="name"
+          rules={[
+            {
+              required: true,
+              message: '请输入用户名！',
+            },
+          ]}
+        >
+          <Input size="large" placeholder="用户名" />
+        </FormItem>
+        <FormItem
+          name="email"
           rules={[
             {
               required: true,
@@ -207,10 +204,10 @@ const Register: FC<RegisterProps> = ({ submitting, dispatch, userAndregister }) 
           visible={visible}
         >
           <FormItem
-            name="password"
+            name="pwd"
             className={
-              form.getFieldValue('password') &&
-              form.getFieldValue('password').length > 0 &&
+              form.getFieldValue('pwd') &&
+              form.getFieldValue('pwd').length > 0 &&
               styles.password
             }
             rules={[
@@ -291,6 +288,23 @@ const Register: FC<RegisterProps> = ({ submitting, dispatch, userAndregister }) 
            </Button>
          </Col>
         </Row> */}
+        <FormItem
+          name="agreement"
+          valuePropName="checked"
+          rules={[
+            {
+              validator: (_, value) =>
+                value ? Promise.resolve() : Promise.reject('请阅读并同意用户协议'),
+            },
+          ]}
+        >
+          <Checkbox>
+            我已阅读并同意
+            <a target="_blank" href="/agreement/">
+              《Pushy热更新用户协议与隐私条款》
+            </a>
+          </Checkbox>
+        </FormItem>
         <FormItem>
           <Button
             size="large"
@@ -310,19 +324,4 @@ const Register: FC<RegisterProps> = ({ submitting, dispatch, userAndregister }) 
   );
 };
 
-export default connect(
-  ({
-    userAndregister,
-    loading,
-  }: {
-    userAndregister: StateType;
-    loading: {
-      effects: {
-        [key: string]: boolean;
-      };
-    };
-  }) => ({
-    userAndregister,
-    submitting: loading.effects['userAndregister/submit'],
-  }),
-)(Register);
+export default Register;

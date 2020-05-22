@@ -9,12 +9,13 @@ import { queryCurrent } from './services/user';
 
 import defaultSettings from '../config/defaultSettings';
 
+const ignoredPages = ['/user/login', '/user/register'];
 export async function getInitialState(): Promise<{
   currentUser?: API.CurrentUser;
   settings?: LayoutSettings;
 }> {
-  // 如果是登录页面，不执行
-  if (history.location.pathname !== '/user/login') {
+  const currentPage = history.location.pathname;
+  if (!ignoredPages.includes(currentPage)) {
     try {
       const currentUser = await queryCurrent();
       return {
@@ -72,6 +73,11 @@ const errorHandler = (error: { response: Response }) => {
     const errorText = codeMessage[response.status] || response.statusText;
     const { status, url } = response;
 
+    if (status === 401) {
+      history.push('/user/login');
+      return;
+    }
+
     notification.error({
       message: `请求错误 ${status}: ${url}`,
       description: errorText,
@@ -87,6 +93,22 @@ const errorHandler = (error: { response: Response }) => {
   throw error;
 };
 
+let token = '';
+try {
+  token = localStorage.getItem('token') || '';
+} catch (e) {}
+
+export function setToken(_token: string) {
+  token = _token;
+  try {
+    localStorage.setItem('token', token);
+  } catch (e) {}
+}
+
 export const request: RequestConfig = {
+  prefix: 'https://update.reactnative.cn/api',
+  headers: {
+    'x-accesstoken': token,
+  },
   errorHandler,
 };

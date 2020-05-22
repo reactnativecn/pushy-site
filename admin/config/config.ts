@@ -41,7 +41,6 @@ export default defineConfig({
     locale: true,
     siderWidth: 208,
   },
-  ignoreMomentLocale: true,
   dynamicImport: {
     loading: '@/components/PageLoading/index',
   },
