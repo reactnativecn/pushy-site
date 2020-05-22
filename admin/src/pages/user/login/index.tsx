@@ -1,7 +1,7 @@
 // import { AlipayCircleOutlined, TaobaoCircleOutlined, WeiboCircleOutlined } from '@ant-design/icons';
 import { Alert, message } from 'antd';
 import React, { useState } from 'react';
-import { Link, history, useModel, SelectLang } from 'umi';
+import { Link, history, useModel } from 'umi';
 import { getPageQuery } from '@/utils/utils';
 import logo from '@/assets/logo.svg';
 import { LoginParamsType, fakeAccountLogin } from '@/services/login';
@@ -79,9 +79,6 @@ const Login: React.FC<{}> = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.lang}>
-        <SelectLang />
-      </div>
       <div className={styles.content}>
         <div className={styles.top}>
           <div className={styles.header}>
