@@ -1,7 +1,11 @@
+/* eslint-disable prefer-promise-reject-errors */
 import { Form, Button, Input, Popover, Progress, message, Checkbox } from 'antd';
 import React, { FC, useState, useEffect } from 'react';
 import { Link, history } from 'umi';
+import md5 from 'md5';
+import { setToken } from '@/app';
 import styles from './style.less';
+import { doRegister } from './service';
 
 const FormItem = Form.Item;
 const passwordStatusMap = {
@@ -19,43 +23,22 @@ const passwordProgressMap: {
   poor: 'exception',
 };
 export interface UserRegisterParams {
-  mail: string;
-  password: string;
-  confirm: string;
-  mobile: string;
-  captcha: string;
-  prefix: string;
+  email: string;
+  pwd: string;
+  name: string;
 }
 
 const Register: FC<{}> = () => {
   const [visible, setvisible]: [boolean, any] = useState(false);
   const [popover, setpopover]: [boolean, any] = useState(false);
   const confirmDirty = false;
-  let interval: number | undefined;
   const [form] = Form.useForm();
-  useEffect(() => {
-    if (!userAndregister) {
-      return;
-    }
-
-    const account = form.getFieldValue('mail');
-
-    if (userAndregister.status === 'ok') {
-      message.success('注册成功！');
-      history.push({
-        pathname: '/user/register-result',
-        state: {
-          account,
-        },
-      });
-    }
-  }, [userAndregister]);
-  useEffect(
-    () => () => {
-      clearInterval(interval);
-    },
-    [],
-  );
+  // useEffect(
+  //   () => () => {
+  //     clearInterval(interval);
+  //   },
+  //   [],
+  // );
 
   // const onGetCaptcha = () => {
   //   let counts = 59;
@@ -84,27 +67,37 @@ const Register: FC<{}> = () => {
     return 'poor';
   };
 
-  const onFinish = (values: { [key: string]: any }) => {
-    
-    // todo
+  const onFinish = async ({ pwd, ...values }: UserRegisterParams) => {
+    const resp = await doRegister({ pwd: md5(pwd), ...values });
+
+    const account = form.getFieldValue('email');
+
+    if (resp.token) {
+      setToken(resp.token);
+      message.success('注册成功！');
+      history.push({
+        pathname: '/user/register-result',
+        state: {
+          account,
+        },
+      });
+    } else {
+      message.error(resp.message);
+    }
   };
 
   const checkConfirm = (_: any, value: string) => {
-    const promise = Promise;
-
     if (value && value !== form.getFieldValue('pwd')) {
-      return promise.reject('两次输入的密码不匹配!');
+      return Promise.reject('两次输入的密码不匹配!');
     }
 
-    return promise.resolve();
+    return Promise.resolve();
   };
 
   const checkPassword = (_: any, value: string) => {
-    const promise = Promise; // 没有值的情况
-
     if (!value) {
       setvisible(!!value);
-      return promise.reject('请输入密码！');
+      return Promise.reject('请输入密码！');
     } // 有值的情况
 
     if (!visible) {
@@ -114,14 +107,14 @@ const Register: FC<{}> = () => {
     setpopover(!popover);
 
     if (value.length < 6) {
-      return promise.reject('');
+      return Promise.reject('');
     }
 
     if (value && confirmDirty) {
       form.validateFields(['confirm']);
     }
 
-    return promise.resolve();
+    return Promise.resolve();
   };
 
   const renderPasswordProgress = () => {
@@ -206,9 +199,7 @@ const Register: FC<{}> = () => {
           <FormItem
             name="pwd"
             className={
-              form.getFieldValue('pwd') &&
-              form.getFieldValue('pwd').length > 0 &&
-              styles.password
+              form.getFieldValue('pwd') && form.getFieldValue('pwd').length > 0 && styles.password
             }
             rules={[
               {
