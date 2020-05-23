@@ -103,7 +103,7 @@ function Pricing() {
             </p>
             <p>
               对于付费业务有疑问？请参考
-              <a href="docs/faq#%E4%BB%98%E8%B4%B9%E9%97%AE%E9%A2%98">常见问题</a>
+              <a href="docs/faq.html#%E4%BB%98%E8%B4%B9%E9%97%AE%E9%A2%98">常见问题</a>
             </p>
           </div>
         </section>
