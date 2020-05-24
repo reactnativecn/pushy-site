@@ -28,9 +28,9 @@ function Pricing() {
               </div>
               <ul className="pricing__feature-list">
                 <li className="pricing__feature">可创建3个应用，每个应用限*：</li>
-                <li className="pricing__feature">5个原生包，每个不大于50M</li>
-                <li className="pricing__feature">5个热更包，每个不大于5M</li>
-                <li className="pricing__feature">每日下载更新不超过5千次</li>
+                <li className="pricing__feature">30个原生包，每个最大30M</li>
+                <li className="pricing__feature">30个热更包，每个最大3M</li>
+                <li className="pricing__feature">每日下载更新最多3千次</li>
               </ul>
               <Button
                 shape="round"
@@ -53,10 +53,10 @@ function Pricing() {
                 </span>
               </div>
               <ul className="pricing__feature-list">
-                <li className="pricing__feature">可创建6个应用，每个应用限*：</li>
-                <li className="pricing__feature">10个原生包，每个不大于100M</li>
-                <li className="pricing__feature">10个热更包，每个不大于10M</li>
-                <li className="pricing__feature">每日下载更新不超过10万次</li>
+                <li className="pricing__feature">可创建5个应用，每个应用限*：</li>
+                <li className="pricing__feature">50个原生包，每个最大50M</li>
+                <li className="pricing__feature">50个热更包，每个最大5M</li>
+                <li className="pricing__feature">每日下载更新最多5万次</li>
                 <li className="pricing__feature">提供专人技术支持</li>
               </ul>
               <Button shape="round" type="primary">
@@ -77,9 +77,9 @@ function Pricing() {
               </div>
               <ul className="pricing__feature-list">
                 <li className="pricing__feature">可创建10个应用，每个应用限*：</li>
-                <li className="pricing__feature">20个原生包，每个不大于200M</li>
-                <li className="pricing__feature">20个热更包，每个不大于20M</li>
-                <li className="pricing__feature">每日下载更新不超过20万次</li>
+                <li className="pricing__feature">100个原生包，每个最大100M</li>
+                <li className="pricing__feature">100个热更包，每个最大10M</li>
+                <li className="pricing__feature">每日下载更新最多10万次</li>
                 <li className="pricing__feature">提供专人技术支持</li>
               </ul>
               <Button shape="round" type="primary">
