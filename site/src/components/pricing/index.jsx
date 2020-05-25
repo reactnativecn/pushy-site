@@ -4,6 +4,10 @@ import { Button } from 'antd';
 import { SmileOutlined, CarOutlined, RocketOutlined } from '@ant-design/icons';
 import './pricing.css';
 
+function gotoPurchase() {
+  window.location.href = 'https://update.reactnative.cn/profile';
+}
+
 function Pricing() {
   return (
     <>
@@ -59,7 +63,7 @@ function Pricing() {
                 <li className="pricing__feature">每日下载更新最多5万次</li>
                 <li className="pricing__feature">提供专人技术支持</li>
               </ul>
-              <Button shape="round" type="primary">
+              <Button shape="round" type="primary" onClick={gotoPurchase}>
                 立即升级
               </Button>
             </div>
@@ -82,7 +86,7 @@ function Pricing() {
                 <li className="pricing__feature">每日下载更新最多10万次</li>
                 <li className="pricing__feature">提供专人技术支持</li>
               </ul>
-              <Button shape="round" type="primary">
+              <Button shape="round" type="primary" onClick={gotoPurchase}>
                 立即升级
               </Button>
             </div>
