@@ -58,7 +58,7 @@ function Pricing() {
               </div>
               <ul className="pricing__feature-list">
                 <li className="pricing__feature">可创建5个应用，每个应用限*：</li>
-                <li className="pricing__feature">50个原生包，每个最大50M</li>
+                <li className="pricing__feature">50个原生包，每个最大100M</li>
                 <li className="pricing__feature">50个热更包，每个最大5M</li>
                 <li className="pricing__feature">每日下载更新最多5万次</li>
                 <li className="pricing__feature">提供专人技术支持</li>
@@ -81,7 +81,7 @@ function Pricing() {
               </div>
               <ul className="pricing__feature-list">
                 <li className="pricing__feature">可创建10个应用，每个应用限*：</li>
-                <li className="pricing__feature">100个原生包，每个最大100M</li>
+                <li className="pricing__feature">100个原生包，每个最大500M</li>
                 <li className="pricing__feature">100个热更包，每个最大10M</li>
                 <li className="pricing__feature">每日下载更新最多10万次</li>
                 <li className="pricing__feature">提供专人技术支持</li>
