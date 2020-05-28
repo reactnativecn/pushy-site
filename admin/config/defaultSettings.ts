@@ -11,7 +11,7 @@ export default {
   fixSiderbar: false,
   colorWeak: false,
   menu: {
-    locale: true,
+    defaultOpenAll: true,
   },
   title: 'Pushy热更新后台',
   pwa: false,

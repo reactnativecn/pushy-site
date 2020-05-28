@@ -38,7 +38,7 @@ export default defineConfig({
   },
   layout: {
     name: 'Pushy热更新后台',
-    locale: true,
+    locale: false,
     siderWidth: 208,
   },
   dynamicImport: {
