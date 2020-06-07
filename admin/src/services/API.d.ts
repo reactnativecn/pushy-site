@@ -2,6 +2,7 @@ declare namespace API {
   export interface CurrentUser {
     name: string;
     email: string;
+    access?: 'user' | 'guest' | 'admin';
   }
 
   export interface LoginStateType {

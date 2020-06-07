@@ -32,10 +32,11 @@ interface LoginType extends React.FC<LoginProps> {
 
 const Login: LoginType = (props) => {
   const { className } = props;
+  const [form] = Form.useForm();
   return (
     <div className={classNames(className, styles.login)}>
       <Form
-        form={props.from}
+        form={props.from || form}
         onFinish={(values) => {
           if (props.onSubmit) {
             props.onSubmit(values as LoginParamsType);
