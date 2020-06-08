@@ -92,7 +92,6 @@ function Pricing() {
             </div>
           </div>
           <div style={{ color: '#8b909d', textAlign: 'center' }}>
-            <p>当前价格表自2020年6月1日起开始执行</p>
             <p>
               如您需要更高配额，我们也提供定制版本或是私有服务器部署，您可将具体需求发送至{' '}
               <a href="mailto:hi@charmlot.com">hi@charmlot.com</a> 我们将第一时间回复。
