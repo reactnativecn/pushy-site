@@ -9,7 +9,7 @@ const EditButton: React.FC<{
 }> = ({
   title,
   filename,
-  sourcePath = 'https://github.com/reactnativecn/pushy-web/edit/master',
+  sourcePath = 'https://github.com/reactnativecn/pushy-site/edit/master',
 }) => (
   <Tooltip title={title}>
     <a

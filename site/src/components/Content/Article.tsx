@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet';
 import { Affix } from 'antd';
 import delegate from 'delegate';
 import moment from 'moment';
-import EditButton from './EditButton';
+// import EditButton from './EditButton';
 import { IFrontmatterData } from '../../templates/docs';
 // import AvatarList from './AvatarList';
 
@@ -65,7 +65,7 @@ export default class Article extends React.PureComponent<ArticleProps> {
           <h1>
             {title}
             {!subtitle || <span className="subtitle">{subtitle}</span>}
-            <EditButton title="在 Github 上编辑此页！" filename={path} />
+            {/* <EditButton title="在 Github 上编辑此页！" filename={path} /> */}
           </h1>
 
           <div className="modifiedTime">
