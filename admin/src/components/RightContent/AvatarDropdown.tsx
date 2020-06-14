@@ -3,12 +3,11 @@ import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons
 import { Avatar, Menu, Spin } from 'antd';
 import { ClickParam } from 'antd/es/menu';
 import { history, useModel } from 'umi';
-import { getPageQuery } from '@/utils/utils';
+import { getPageQuery, setToken } from '@/utils/utils';
 
 import { stringify } from 'querystring';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
-import { setToken } from '@/app';
 
 export interface GlobalHeaderRightProps {
   menu?: boolean;

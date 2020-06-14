@@ -22,3 +22,19 @@ export const isAntDesignProOrDev = (): boolean => {
 };
 
 export const getPageQuery = () => parse(window.location.href.split('?')[1]);
+
+let token = '';
+try {
+  token = localStorage.getItem('token') || '';
+} catch (e) {}
+
+export function getToken() {
+  return token;
+}
+
+export function setToken(_token: string) {
+  token = _token;
+  try {
+    localStorage.setItem('token', token);
+  } catch (e) {}
+}

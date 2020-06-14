@@ -3,9 +3,9 @@ import { Form, Button, Input, Popover, Progress, message, Checkbox } from 'antd'
 import React, { FC, useState, useEffect } from 'react';
 import { Link, history } from 'umi';
 import md5 from 'md5';
-import { setToken } from '@/app';
 import styles from './style.less';
 import { doRegister } from './service';
+import { setToken } from '@/utils/utils';
 
 const FormItem = Form.Item;
 const passwordStatusMap = {
@@ -31,6 +31,7 @@ export interface UserRegisterParams {
 const Register: FC<{}> = () => {
   const [visible, setvisible]: [boolean, any] = useState(false);
   const [popover, setpopover]: [boolean, any] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const confirmDirty = false;
   const [form] = Form.useForm();
   // useEffect(
@@ -68,22 +69,21 @@ const Register: FC<{}> = () => {
   };
 
   const onFinish = async ({ pwd, ...values }: UserRegisterParams) => {
+    setSubmitting(true);
     const resp = await doRegister({ pwd: md5(pwd), ...values });
-
-    const account = form.getFieldValue('email');
-
     if (resp.token) {
       setToken(resp.token);
       message.success('注册成功！');
       history.push({
         pathname: '/user/register-result',
         state: {
-          account,
+          account: values.email,
         },
       });
     } else {
       message.error(resp.message);
     }
+    setSubmitting(false);
   };
 
   const checkConfirm = (_: any, value: string) => {

@@ -8,6 +8,7 @@ import Footer from '@/components/Footer';
 import { queryCurrent } from './services/user';
 
 import defaultSettings from '../config/defaultSettings';
+import { getToken } from './utils/utils';
 
 const ignoredPages = ['/user/login', '/user/register'];
 export async function getInitialState(): Promise<{
@@ -93,22 +94,10 @@ const errorHandler = (error: { response: Response }) => {
   throw error;
 };
 
-let token = '';
-try {
-  token = localStorage.getItem('token') || '';
-} catch (e) {}
-
-export function setToken(_token: string) {
-  token = _token;
-  try {
-    localStorage.setItem('token', token);
-  } catch (e) {}
-}
-
 export const request: RequestConfig = {
   prefix: 'https://update.reactnative.cn/api',
   headers: {
-    'x-accesstoken': token,
+    'x-accesstoken': getToken(),
   },
   errorHandler,
 };
