@@ -59,19 +59,15 @@ const Login: React.FC<{}> = () => {
       // 登录
       const resp = await doLogin({ pwd: md5(pwd), ...values });
       if (resp.ok) {
-        message.success('登陆成功！');
+        message.success('登录成功！');
         replaceGoto();
         setTimeout(() => {
           refresh();
         }, 0);
         return;
       }
-      // 如果失败去设置用户错误信息
-      if (resp.message) {
-        setLoginMessage(resp.message);
-      }
     } catch (error) {
-      message.error('登陆失败，请重试！');
+      setLoginMessage(error.data.message);
     }
     setSubmitting(false);
   };

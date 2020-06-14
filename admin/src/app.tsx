@@ -71,23 +71,23 @@ const codeMessage = {
 const errorHandler = (error: { response: Response }) => {
   const { response } = error;
   if (response && response.status) {
-    const errorText = codeMessage[response.status] || response.statusText;
-    const { status, url } = response;
+    // const errorText = response.statusText || codeMessage[response.status];
+    const { status } = response;
 
     if (status === 401) {
       history.push('/user/login');
       return;
     }
 
-    notification.error({
-      message: `请求错误 ${status}: ${url}`,
-      description: errorText,
-    });
+    // notification.error({
+    //   message: `请求错误 ${status}`,
+    //   description: errorText,
+    // });
   }
 
   if (!response) {
     notification.error({
-      description: '您的网络发生异常，无法连接服务器',
+      description: '网络发生异常，请检查网络连接后重试',
       message: '网络异常',
     });
   }
