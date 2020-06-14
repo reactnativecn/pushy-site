@@ -5,7 +5,7 @@
   "scripts": {
     "analyze": "cross-env ANALYZE=1 umi build",
     "build": "umi build",
-    "dev": "npm run start:dev",
+    "dev": "yarn start:dev",
     "i18n-remove": "pro i18n-remove --locale=zh-CN --write",
     "postinstall": "umi g tmp",
     "start": "umi dev",
@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^4.1.0",
-    "@ant-design/pro-layout": "6.0.0-7",
+    "@ant-design/pro-layout": "6.0.0-8",
     "@ant-design/pro-table": "^2.3.0",
     "antd": "^4.2.4",
     "classnames": "^2.2.6",

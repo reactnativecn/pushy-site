@@ -64,10 +64,10 @@
     umi-utils "^1.5.1"
     yargs-parser "^16.1.0"
 
-"@ant-design/pro-layout@6.0.0-7":
-  version "6.0.0-7"
-  resolved "https://registry.yarnpkg.com/@ant-design/pro-layout/-/pro-layout-6.0.0-7.tgz#c3f35bbf58b1512468b791ac7a20c6faadbe1d16"
-  integrity sha512-R1oz50j6dF9OKN42xBW4t+hCzc1tG5rM5rLbgubO4oy9S/SVpHtyFukvnB/d8DXeusTT9eto+47R3ppbTilbjg==
+"@ant-design/pro-layout@6.0.0-8":
+  version "6.0.0-8"
+  resolved "https://registry.yarnpkg.com/@ant-design/pro-layout/-/pro-layout-6.0.0-8.tgz#4736e6f6567078166ab4d4d1ba7ca3c12176f216"
+  integrity sha512-ijYvZuZHmZX4oP819GRieoMOGYm0zMat//srCcdRNScugXQOch8nMdRcwJojl+rS85x+gMV2T8Dgp94SdYxnlA==
   dependencies:
     "@ant-design/icons" "^4.0.0"
     "@umijs/route-utils" "^1.0.5"
