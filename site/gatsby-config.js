@@ -2,7 +2,7 @@ module.exports = {
   assetPrefix: `https://cdn.jsdelivr.net/gh/reactnativecn/pushy-site@gh-pages/`,
   siteMetadata: {
     title: 'Pushy - React Native热更新',
-    description: '极速热更新框架 for React Native',
+    description: '极速热更新',
     author: 'React Native中文网',
     siteUrl: 'https://pushy.reactnative.cn',
   },

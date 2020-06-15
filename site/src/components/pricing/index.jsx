@@ -12,8 +12,8 @@ function Pricing() {
   return (
     <>
       <Helmet>
-        <title>价格 - Pushy - 极速热更新框架 for React Native</title>
-        <meta name="description" content="价格 - Pushy - 极速热更新框架 for React Native" />
+        <title>价格 - Pushy - 极速热更新</title>
+        <meta name="description" content="价格 - Pushy - 极速热更新" />
       </Helmet>
       <div className="home-wrapper">
         <section className="pricing-section">

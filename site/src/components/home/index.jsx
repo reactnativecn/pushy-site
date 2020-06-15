@@ -11,8 +11,9 @@ function Home(props) {
   return (
     <>
       <Helmet>
-        <title>Pushy - 极速热更新框架 for React Native</title>
-        <meta name="description" content="Pushy - 极速热更新框架 for React Native" />
+        <title>Pushy - 极速热更新</title>
+        <meta name="keywords" content="热更新,hotupdate,免审核" />
+        <meta name="description" content="Pushy - 极速热更新" />
       </Helmet>
       <div className="home-wrapper">
         <Banner {...props} />
