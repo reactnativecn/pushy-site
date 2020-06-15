@@ -58,8 +58,8 @@ module.exports = {
 #### 热更新成功完成，但是重启后又回滚了是怎么回事？
 
 可以正常更新，但是重启后回滚，一般有两种可能的情况：
-- 没有正确[配置bundleUrl](/docs/getting-started#配置bundle-url)
-- 没有正确[调用markSuccess](/docs/integration#%E9%A6%96%E6%AC%A1%E5%90%AF%E5%8A%A8%E3%80%81%E5%9B%9E%E6%BB%9A)
+- 没有正确[配置bundleUrl](/docs/getting-started.html#配置bundle-url)
+- 没有正确[调用markSuccess](/docs/integration.html#%E9%A6%96%E6%AC%A1%E5%90%AF%E5%8A%A8%E3%80%81%E5%9B%9E%E6%BB%9A)
   
 如果你确定上述两个步骤都正确无误，请在[issues区](https://github.com/reactnativecn/react-native-pushy/issues)给我们留言反馈。
 
