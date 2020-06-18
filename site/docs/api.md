@@ -16,7 +16,7 @@ type: 开发指南
 
 #### packageVersion
 
-当前应用原生包的版本。其中android取自`versionName`字段(位于`android/build.gralde`中)。ios取自`CFBundleShortVersionString`字段(位于`ios/项目名/Info.plist`中)。
+当前应用原生包的版本。其中android取自`versionName`字段(位于`android/app/build.gradle`中)。ios取自`CFBundleShortVersionString`字段(位于`ios/项目名/Info.plist`中)。
 
 ---
 
