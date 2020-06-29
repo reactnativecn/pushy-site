@@ -78,7 +78,7 @@ export default class Article extends React.PureComponent<ArticleProps> {
             <Affix className="toc-affix" offsetTop={16}>
               <div
                 dangerouslySetInnerHTML={{
-                  __html: content.toc.replace(/<ul>/g, '<ul class="toc">').replace(/\/#/g, '#'),
+                  __html: content.toc.replace(/<ul>/g, '<ul class="toc">').replace(/\/#/g, '.html#'),
                 }}
               />
             </Affix>
