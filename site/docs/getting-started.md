@@ -47,8 +47,8 @@ pod install
 | 0.34 - 0.45      | 4.x                     |
 
 安装命令示例：
-```
-npm i react-native-update@4.x
+```bash
+yarn add react-native-update@4.x
 ```
 
 如果RN的版本是0.45及以下，你还必须安装[Android NDK](http://androiddevtools.cn)，版本最好选用r10e，并设置环境变量`ANDROID_NDK_HOME`，指向你的NDK根目录(例如`/Users/tdzl2003/Downloads/android-ndk-r10e`)。
@@ -102,15 +102,17 @@ date +%s > "$DEST/pushy_build_time.txt"
 
 <details>
 <summary>RN < 0.60</summary>
-1. 在`android/settings.gradle`中添加如下代码:
+1. 在`android/settings.gradle`中添加如下代码:  
+   
   	```
   	include ':react-native-update'
   	project(':react-native-update').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-update/android')
   	```
 
-2. 在`android/app/build.gradle`的 dependencies 部分增加如下代码:
+2. 在`android/app/build.gradle`的 dependencies 部分增加如下代码:  
+  
   	```
-      implementation project(':react-native-update')
+    implementation project(':react-native-update')
     ```
 
 3. 打开`android/app/src/main/java/[...]/MainApplication.java`,
