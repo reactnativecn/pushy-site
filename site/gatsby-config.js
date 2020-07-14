@@ -48,12 +48,20 @@ module.exports = {
     //     path: `${__dirname}/blog/`,
     //   },
     // },
+    `gatsby-plugin-sharp`,
     {
       resolve: 'gatsby-transformer-remark',
       options: {
         plugins: [
           'gatsby-remark-autolink-headers',
-          'gatsby-remark-img-warpper-p',
+          {
+            resolve: `gatsby-remark-images`,
+            options: {
+              quality: 60,
+              withWebp: true,
+              maxWidth: 590,
+            },
+          },
           {
             resolve: 'gatsby-remark-prismjs',
             options: {

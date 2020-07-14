@@ -4,28 +4,29 @@ title: 常见问题
 type: 其他
 ---
 
-如果本页面没能回答您的疑问，您可以去[issues区](https://github.com/reactnativecn/react-native-pushy/issues)提问或给我们发[邮件](mailto:hi@charmlot.com)。
+如果本页面没能回答您的疑问，您可以去[issues 区](https://github.com/reactnativecn/react-native-pushy/issues)提问或给我们发[邮件](mailto:hi@charmlot.com)。
 
 ### 业务问题
 
 #### 哪些修改可以热更新？哪些不能？
 
 我们把对应用的修改分为两类：
-- 不可热更新 —— 原生修改，即所有需要`编译`后才能生效的修改：
-   - 任何在iOS或者Android目录中的修改、增删。
-   - 任何含有原生代码的第三方组件的更新、修改。
-- 可以热更新 —— 非原生修改，即所有`无需编译`，刷新即可生效的修改：
-   - js代码修改，包括第三方纯js组件的更新、修改。
-   - 可以在js代码中require/import的资源文件，例如图片。
-  
-需要注意的是，即便资源文件可以热更新，但这些热更新后的资源文件会以`file://`协议的形式提供访问，某些读取资源文件的第三方可能并不支持`file://`协议。
 
+- 不可热更新 —— 原生修改，即所有需要`编译`后才能生效的修改：
+  - 任何在 iOS 或者 Android 目录中的修改、增删。
+  - 任何含有原生代码的第三方组件的更新、修改。
+- 可以热更新 —— 非原生修改，即所有`无需编译`，刷新即可生效的修改：
+
+  - js 代码修改，包括第三方纯 js 组件的更新、修改。
+  - 可以在 js 代码中 require/import 的资源文件，例如图片。
+
+需要注意的是，即便资源文件可以热更新，但这些热更新后的资源文件会以`file://`协议的形式提供访问，某些读取资源文件的第三方可能并不支持`file://`协议。
 
 #### 我是否可以搭建自己的热更新服务？
 
-你可以单独使用本组件的原生部分(不包括js模块)和命令行工具中的`bundle`、`diff`、`diffFromIpa`、`diffFromApk`四个功能。
+你可以单独使用本组件的原生部分(不包括 js 模块)和命令行工具中的`bundle`、`diff`、`diffFromIpa`、`diffFromApk`四个功能。
 
-这些功能都不会使用我们的热更新服务，也无需注册或登录账号。但你可能要编写自己的js模块来与不同的热更新服务器通讯。
+这些功能都不会使用我们的热更新服务，也无需注册或登录账号。但你可能要编写自己的 js 模块来与不同的热更新服务器通讯。
 
 如果您有兴趣搭建私有云服务，可以[邮件联系我们](mailto:hi@charmlot.com)。
 
@@ -34,6 +35,7 @@ type: 其他
 首先请确定你集成了最新版本，提交审核期间请不要发布任何热更新，不要做任何与更新相关的弹出提示。若以上都照做了仍然由于种种不明确的原因被拒（有一定几率），则可以按此步骤单独屏蔽 iOS 端(`react-native-update`版本需 >= 5.3.2)：
 
 1. 如果 RN 版本>=0.60，在项目根目录下编辑或创建 react-native.config.js，添加如下内容
+
 ```js
 // react-native.config.js
 module.exports = {
@@ -51,37 +53,41 @@ module.exports = {
 3. 如果是 0.60 以上版本或使用了 cocoapods，在 ios 目录中再次运行 pod install，确保 Podfile 和 Podfile.lock 中都没有'react-native-update'。如果 RN 版本<0.60，则运行`react-native unlink react-native-update`。
 4. 在 js 代码里调用 checkUpdate()方法前，判断 Platform.OS，如果是 ios 平台则直接 return 跳过。
 
-#### XCode编译时报错 "_BZ2_bzRead", referenced from 等
+#### XCode 编译时报错 "\_BZ2_bzRead", referenced from 等
 
-在工程target的Build Phases->Link Binary with Libraries中加入libz.tbd、libbz2.1.0.tbd
+在工程 target 的 Build Phases->Link Binary with Libraries 中加入 libz.tbd、libbz2.1.0.tbd
 
 #### 热更新成功完成，但是重启后又回滚了是怎么回事？
 
 可以正常更新，但是重启后回滚，一般有两种可能的情况：
-- 没有正确[配置bundleUrl](/docs/getting-started.html#配置bundle-url)
-- 没有正确[调用markSuccess](/docs/integration.html#%E9%A6%96%E6%AC%A1%E5%90%AF%E5%8A%A8%E3%80%81%E5%9B%9E%E6%BB%9A)
-  
-如果你确定上述两个步骤都正确无误，请在[issues区](https://github.com/reactnativecn/react-native-pushy/issues)给我们留言反馈。
+
+- 没有正确[配置 bundleUrl](/docs/getting-started.html#配置bundle-url)
+- 没有正确[调用 markSuccess](/docs/integration.html#%E9%A6%96%E6%AC%A1%E5%90%AF%E5%8A%A8%E3%80%81%E5%9B%9E%E6%BB%9A)
+
+如果你确定上述两个步骤都正确无误，请在[issues 区](https://github.com/reactnativecn/react-native-pushy/issues)给我们留言反馈。
 
 ### 付费问题
 
 #### 我应该选择哪个业务版本呢？
 
-其实完全无需考虑，先从标准版开始体验（新用户注册验证通过后，将自动获得7天标准版试用），各个版本功能完全一致！当前版本的配额不能满足需求时，可随时补差价升级到更高配额的版本。升级自动按天数计算差价，绝无额外费用。
+其实完全无需考虑，先从标准版开始体验（新用户注册验证通过后，将自动获得 7 天标准版试用），各个版本功能完全一致！当前版本的配额不能满足需求时，可随时补差价升级到更高配额的版本。升级自动按天数计算差价，绝无额外费用。
 
 #### 我可以试用付费版本先评估一下效果吗？
 
-新用户注册验证通过后，将自动获得7天标准版试用。如您需要评估更高配额的版本，可将注册用户名、邮箱、公司（或个人）名称发送至<hi@charmlot.com>，标题注明“pushy评估试用”，我们会人工为您开通7天专业版试用。
+新用户注册验证通过后，将自动获得 7 天标准版试用。如您需要评估更高配额的版本，可将注册用户名、邮箱、公司（或个人）名称发送至<hi@charmlot.com>，标题注明“pushy 评估试用”，我们会人工为您开通 7 天专业版试用。
 
 #### 配额具体如何计算？
 
-配额主要分为4种：
-1. 可创建的应用数量，注意iOS和Android版本记做不同的应用。
-2. 原生包数量及大小。原生包指通过`pushy uploadIpa/uploadApk`命令上传到Pushy服务器上作为热更新起始版本的完整apk/ipa安装包。
-3. 热更包数量及大小。热更包指通过`pushy bundle`所命令生成的ppk文件。注意这不是用户实际下载的更新文件，用户下载的是通过比对生成的增量diff文件（比ppk文件要小得多）。
+配额主要分为 4 种：
+
+1. 可创建的应用数量，注意 iOS 和 Android 版本记做不同的应用。
+2. 原生包数量及大小。原生包指通过`pushy uploadIpa/uploadApk`命令上传到 Pushy 服务器上作为热更新起始版本的完整 apk/ipa 安装包。
+3. 热更包数量及大小。热更包指通过`pushy bundle`所命令生成的 ppk 文件。注意这不是用户实际下载的更新文件，用户下载的是通过比对生成的增量 diff 文件（比 ppk 文件要小得多）。
 4. 用户每日下载更新的次数。用户打开应用，检查到有更新，触发下载行为，记为一次（无论下载、更新成功与否）。
-   
-以上2、3、4条为针对每个应用单独计算。具体配额和费用由于运营成本可能会有调整，请以[价格表](/pricing.html)页面为准。已购买的用户在续费前不受调整影响。
+
+> 这里有一些对[包大小的优化建议](bestpractice.html#优化原生和热更包体积)可供参考。
+
+以上 2、3、4 条为针对每个应用单独计算。具体配额和费用由于运营成本可能会有调整，请以[价格表](/pricing.html)页面为准。已购买的用户在续费前不受调整影响。
 
 #### 达到配额后还可以正常使用吗？
 
@@ -104,4 +110,3 @@ module.exports = {
 #### 如何开具发票？
 
 请将具体开票需求发送至<hi@charmlot.com>，并附上注册用户名和订单截图。我们默认会回复电子发票，类目为咨询服务。如需要邮寄纸质发票请注明。
-
