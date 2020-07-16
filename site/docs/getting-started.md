@@ -55,7 +55,7 @@ yarn add react-native-update@4.x
 </details>
 
 
-请记得一定要重新编译（react-native run-ios或run-android命令编译，或在Xcode/Android Studio中重新编译）。
+> 请记得，任意在ios和android目录下的修改，一定要重新编译（yarn react-native run-ios或run-android命令编译，或在Xcode/Android Studio中重新编译）才能生效。
 
 
 ## 手动link
@@ -179,6 +179,8 @@ public class MainApplication extends Application implements ReactApplication {
   }
 }
 ```
+
+> 请记得，任意在ios和android目录下的修改，一定要重新编译（yarn react-native run-ios或run-android命令编译，或在Xcode/Android Studio中重新编译）才能生效。
 
 ## 登录与创建应用
 
