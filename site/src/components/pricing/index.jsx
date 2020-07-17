@@ -116,6 +116,9 @@ function Pricing() {
           </div>
           <div style={{ color: '#8b909d', textAlign: 'center', fontSize: '15px', marginTop: 10 }}>
             <p>
+              新用户注册验证通过后，将<u>自动获得 7 天的专业版免费试用评估</u>。到期后转为免费版。
+            </p>
+            <p>
               如您需要更高配额，我们也提供定制版本或是私有服务器部署，您可将具体需求发送至{' '}
               <a href="mailto:hi@charmlot.com">hi@charmlot.com</a> 我们将第一时间回复。
             </p>
