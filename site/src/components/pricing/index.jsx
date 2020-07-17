@@ -1,7 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
 import { Button } from 'antd';
-import { SmileOutlined, CarOutlined, RocketOutlined } from '@ant-design/icons';
+import { SmileOutlined, CarOutlined, RocketOutlined, SendOutlined } from '@ant-design/icons';
 import './pricing.css';
 
 function gotoPurchase() {
@@ -31,7 +31,7 @@ function Pricing() {
                 </span>
               </div>
               <ul className="pricing__feature-list">
-                <li className="pricing__feature">可创建3个应用，每个应用限*：</li>
+                <li className="pricing__feature">可创建3个应用，每个限*：</li>
                 <li className="pricing__feature">30个原生包，每个最大30M</li>
                 <li className="pricing__feature">30个热更包，每个最大3M</li>
                 <li className="pricing__feature">每日前3千次更新满速下载</li>
@@ -57,10 +57,33 @@ function Pricing() {
                 </span>
               </div>
               <ul className="pricing__feature-list">
-                <li className="pricing__feature">可创建5个应用，每个应用限*：</li>
+                <li className="pricing__feature">可创建5个应用，每个限*：</li>
                 <li className="pricing__feature">50个原生包，每个最大100M</li>
                 <li className="pricing__feature">50个热更包，每个最大15M</li>
                 <li className="pricing__feature">每日前1万次更新满速下载</li>
+                <li className="pricing__feature">提供专人技术支持</li>
+              </ul>
+              <Button shape="round" type="primary" onClick={gotoPurchase}>
+                立即升级
+              </Button>
+            </div>
+            <div className="pricing__item">
+              <SendOutlined className="icon" />
+              <h3 className="pricing__title">高级版</h3>
+              <p className="pricing__sentence">适用于一般应用，中度更新需求</p>
+              <div className="pricing__price">
+                <span className="pricing__anim pricing__anim--1">
+                  <span className="pricing__currency">￥</span>1698
+                </span>
+                <span className="pricing__anim pricing__anim--2">
+                  <span className="pricing__period">/ 年</span>
+                </span>
+              </div>
+              <ul className="pricing__feature-list">
+                <li className="pricing__feature">可创建6个应用，每个限*：</li>
+                <li className="pricing__feature">60个原生包，每个最大200M</li>
+                <li className="pricing__feature">60个热更包，每个最大40M</li>
+                <li className="pricing__feature">每日前3万次更新满速下载</li>
                 <li className="pricing__feature">提供专人技术支持</li>
               </ul>
               <Button shape="round" type="primary" onClick={gotoPurchase}>
@@ -73,16 +96,16 @@ function Pricing() {
               <p className="pricing__sentence">适用于商业应用，高速迭代需求</p>
               <div className="pricing__price">
                 <span className="pricing__anim pricing__anim--1">
-                  <span className="pricing__currency">￥</span>2998
+                  <span className="pricing__currency">￥</span>3998
                 </span>
                 <span className="pricing__anim pricing__anim--2">
                   <span className="pricing__period">/ 年</span>
                 </span>
               </div>
               <ul className="pricing__feature-list">
-                <li className="pricing__feature">可创建10个应用，每个应用限*：</li>
+                <li className="pricing__feature">可创建10个应用，每个限*：</li>
                 <li className="pricing__feature">100个原生包，每个最大500M</li>
-                <li className="pricing__feature">100个热更包，每个最大50M</li>
+                <li className="pricing__feature">100个热更包，每个最大100M</li>
                 <li className="pricing__feature">每日前10万次更新满速下载</li>
                 <li className="pricing__feature">提供专人技术支持</li>
               </ul>
@@ -91,7 +114,7 @@ function Pricing() {
               </Button>
             </div>
           </div>
-          <div style={{ color: '#8b909d', textAlign: 'center' }}>
+          <div style={{ color: '#8b909d', textAlign: 'center', fontSize: '15px', marginTop: 10 }}>
             <p>
               如您需要更高配额，我们也提供定制版本或是私有服务器部署，您可将具体需求发送至{' '}
               <a href="mailto:hi@charmlot.com">hi@charmlot.com</a> 我们将第一时间回复。

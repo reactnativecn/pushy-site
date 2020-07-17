@@ -21,6 +21,11 @@ function Banner(props) {
         {/* <h1 key="h1">Pushy</h1> */}
         <img src={logo} style={{ margin: '0 0 25px 20px' }} alt="Pushy" />
         <p>极速热更新框架 for React Native</p>
+        <hr />
+        <p style={{ marginTop: 30, fontSize: 16 }}>
+          高速节点勤分发 &nbsp;&nbsp;&nbsp;山河浩广若比邻<br/>
+          增量算法尽优化 &nbsp;&nbsp;&nbsp;字节四两拨千斤
+        </p>
         <div className="button-wrapper">
           <Link to="/docs/getting-started.html">
             <Button style={{ margin: '0 16px' }} type="primary" ghost>
