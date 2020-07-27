@@ -4,7 +4,7 @@ title: 常见问题
 type: 其他
 ---
 
-如果本页面没能回答您的疑问，您可以去[issues 区](https://github.com/reactnativecn/react-native-pushy/issues)提问或给我们发[邮件](mailto:hi@charmlot.com)。
+如果本页面没能回答您的疑问，您可以去[issues 区](https://github.com/reactnativecn/react-native-pushy/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。
 
 ### 业务问题
 
