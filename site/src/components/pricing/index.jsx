@@ -21,7 +21,6 @@ function Pricing() {
             style={{
               marginBottom: 25,
               textAlign: 'center',
-              color: 'rgba(0, 0, 0, 0.85);',
             }}
           >
             新注册用户将自动获得 7 天的<u>专业版</u>免费试用评估。到期后转为免费版。
