@@ -66,6 +66,8 @@ class Header extends React.Component<HeaderProps, HeaderState> {
     let activeMenuItem = module || 'home';
     if (/^blog/.test(path)) {
       activeMenuItem = 'blog';
+    } else if (path.includes('/docs/faq.html')) {
+      activeMenuItem = 'faq';
     } else if (/docs/.test(path)) {
       activeMenuItem = 'docs';
     } else if (/pricing/.test(path)) {
@@ -84,6 +86,9 @@ class Header extends React.Component<HeaderProps, HeaderState> {
         </Menu.Item>
         <Menu.Item key="pricing">
           <Link to="/pricing.html">价格</Link>
+        </Menu.Item>
+        <Menu.Item key="faq">
+          <Link to="/docs/faq.html">常见问题</Link>
         </Menu.Item>
         {/* <Menu.Item key="blog">
           <Link to="/blog/">Blog</Link>
