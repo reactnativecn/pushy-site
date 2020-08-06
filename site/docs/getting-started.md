@@ -161,7 +161,7 @@ date +%s > "$DEST/pushy_build_time.txt"
 
 ### Android
 
-在MainApplication中增加如下代码：
+在MainApplication中增加如下代码（如果是混编原生的项目或其他原因没有使用ReactApplication，请[使用此api集成](api.html#updatecontextsetcustominstancemanagerreactinstancemanager-instancemanager))：
 
 ```java
 // ... 其它代码

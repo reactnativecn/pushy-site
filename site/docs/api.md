@@ -104,7 +104,11 @@ type: 开发指南
 ```java
 import cn.reactnative.modules.update.UpdateContext
 
-UpdateContext.setCustomInstanceManager(你自行创建的ReactInstanceManager);
+mReactInstanceManager = ReactInstanceManager.builder()
+                // ...各种setter，但注意不要调用setBundleAssetName
+                .setJSBundleFile(UpdateContext.getBundleUrl(mContext))
+                .build();
+UpdateContext.setCustomInstanceManager(mReactInstanceManager);
 ```
 
 ### iOS 方法
