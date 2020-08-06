@@ -17,6 +17,10 @@ type: 快速入门
 ```bash
 # 全局安装命令行工具，每台电脑只用装一次
 yarn global add react-native-update-cli
+
+# 若yarn全局安装后无法识别pushy命令，可换用npm全局安装，命令如下
+# npm i -g react-native-update-cli
+
 # 在项目中安装热更新模块
 yarn add react-native-update
 ```  
