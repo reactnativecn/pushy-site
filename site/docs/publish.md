@@ -6,7 +6,9 @@ type: 快速入门
 
 现在你的应用已经具备了检测更新的功能，下面我们来尝试发布并更新它。
 
-## 发布iOS应用
+## 发布原生起始版本
+
+### iOS
 
 首先参考[文档-在设备上运行](https://reactnative.cn/docs/running-on-device-ios.html#content)，
 确定你正在使用离线包。然后点击菜单。
@@ -21,7 +23,9 @@ $ pushy uploadIpa <your-package.ipa>
 
 随后你可以选择往AppStore发布这个版本，也可以先通过Test flight等方法进行测试。
 
-## 发布安卓应用
+如果后续需要再次打包（例如修改原生代码或配置），请先更改版本号，并再次uploadIpa到服务器端记录，否则后续生成的原生包无法获取热更新。
+
+### Android
 
 首先参考[文档-生成已签名的APK](https://reactnative.cn/docs/signed-apk-android.html#content)设置签名，
 然后在android文件夹下运行`./gradlew assembleRelease`或`./gradlew aR`，你就可以在`android/app/build/outputs/apk/release/app-release.apk`中找到你的应用包。
@@ -36,7 +40,9 @@ $ pushy uploadApk android/app/build/outputs/apk/release/app-release.apk
 
 随后你可以选择往应用市场发布这个版本，也可以先往设备上直接安装这个apk文件以进行测试。
 
-## 发布新的热更新版本
+如果后续需要再次打包（例如修改原生代码或配置），请先更改版本号，并再次uploadApk到服务器端记录，否则后续生成的原生包无法获取热更新。
+
+## 发布热更新版本
 
 你可以尝试修改一行代码(譬如将版本一修改为版本二)，然后生成新的热更新版本。
 
@@ -78,4 +84,6 @@ Enter packageId: <输入原生包版本序号，序号就是上面列表中)前�
 
 版本绑定完毕后，客户端就应当可以检查到更新并进行更新了。
 
-恭喜你，至此为止，你已经完成了植入代码热更新的全部工作。接下来，你可以查阅[常见问题与高级指南](faq_advance.md)了解更多深入的知识，尤其是在实际项目中的运用技巧。
+后续要继续发布新的热更新，只需反复执行`pushy bundle`命令即可。
+
+恭喜你，至此为止，你已经完成了植入代码热更新的全部工作。
