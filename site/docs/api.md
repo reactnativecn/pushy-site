@@ -96,7 +96,16 @@ type: 开发指南
 
 ### Android 方法
 
-待补充
+#### UpdateContext.setCustomInstanceManager(ReactInstanceManager instanceManager)
+
+如果是集成/混编Android方案，则可以使用此方法传入你自行创建的ReactInstanceManager。自`v5.5.8`版本起可用。
+
+示例：
+```java
+import cn.reactnative.modules.update.UpdateContext
+
+UpdateContext.setCustomInstanceManager(你自行创建的ReactInstanceManager);
+```
 
 ### iOS 方法
 
