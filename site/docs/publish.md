@@ -13,15 +13,20 @@ type: 快速入门
 首先参考[文档-在设备上运行](https://reactnative.cn/docs/running-on-device)，
 确定你正在使用离线包。然后点击菜单。
 
-按照正常的发布流程打包`.ipa`文件(Xcode中运行设备选真机或Generic iOS Device，然后菜单中选择Product-Archive)，然后运行如下命令
+按照正常的发布流程打包`.ipa`文件：
+
+1. Xcode中运行设备选真机或Generic iOS Device
+2. 菜单中选择Product - Archive
+3. Archive完成后选择`Export`生成.ipa文件，此时建议取消bitcode选项以减少ipa大小
+4. 然后运行如下命令上传到pushy服务器以供后续版本比对之用
 
 ```bash
 $ pushy uploadIpa <your-package.ipa>
 ```
 
-即可上传ipa以供后续版本比对之用。此ipa的`CFBundleShortVersionString`字段(位于`ios/项目名/Info.plist`中)会被记录为原生版本号`packageVersion`。
+此ipa的`CFBundleShortVersionString`字段(位于`ios/项目名/Info.plist`中)会被记录为原生版本号`packageVersion`。
 
-随后你可以选择往AppStore发布这个版本，也可以先通过Test flight等方法进行测试。
+随后你可以选择往AppStore上传这个版本（注意是刚刚已经archive完成的包重新选择Upload选项，且此时应该勾选bitcode选项），也可以先通过Test flight等方法进行测试。
 
 如果后续需要再次打包（例如修改原生代码或配置），请先更改版本号，并再次uploadIpa到服务器端记录，否则后续生成的原生包无法获取热更新。
 
