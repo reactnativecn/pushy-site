@@ -175,6 +175,7 @@ import cn.reactnative.modules.update.UpdateContext;
 public class MainApplication extends Application implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
+    // 注意这一段在 ReactNativeHost 内部！
     @Override
     protected String getJSBundleFile() {
         return UpdateContext.getBundleUrl(MainApplication.this);
