@@ -108,7 +108,7 @@ export default class MyProject extends Component {
         {text: '下次启动时', onPress: ()=>{switchVersionLater(hash);}},
       ]);
     } catch(err) {
-      Alert.alert('提示', '更新失败.');
+      Alert.alert('更新失败', err.message);
     }
   };
   checkUpdate = async () => {
@@ -120,7 +120,7 @@ export default class MyProject extends Component {
     try {
       info = await checkUpdate(appKey);
     } catch (err) {
-      console.warn(err);
+      Alert.alert('更新检查失败', err.message);
       return;
     }
     if (info.expired) {
