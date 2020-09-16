@@ -23,7 +23,7 @@ const {appKey} = _updateConfig[Platform.OS];
 
 ## 检查更新、下载更新
 
-异步函数checkUpdate可以检查当前版本是否需要更新：
+异步函数`checkUpdate`可以检查当前版本是否需要更新：
 
 ```javascript
 const info = await checkUpdate(appKey)
@@ -37,15 +37,32 @@ const info = await checkUpdate(appKey)
 
 3. `{update: true}`：当前有新版本可以更新。info的`name`、`description`字段可
 以用于提示用户，而`metaInfo`字段则可以根据你的需求自定义其它属性(如是否静默更新、
-是否强制更新等等)。另外还有几个字段，包含了完整更新包或补丁包的下载地址，
-react-native-update会首先尝试耗费流量更少的更新方式。将info对象传递给downloadUpdate作为参数即可。
+是否强制更新等等)。另外还有几个字段，包含了补丁包的下载地址等。
+pushy会首先尝试耗费流量更少的更新方式。将`info`对象传递给`downloadUpdate`方法作为参数即可。
+
+```javascript
+const hash = await downloadUpdate(info, 
+// 下载和解压回调为可选参数，从v5.8.0版本开始加入
+{
+  onDownloadProgress: ({ received, total }) => {
+    // 已下载的字节数, 总字节数
+    console.log(received, total)
+  },
+  onUnzipProgress: ({ received, total }) => {
+    // 已解压的文件数, 总文件数
+    console.log(received, total)
+  },
+});
+```
+
+`downloadUpdate`方法从`v5.8.0`版本开始新增接受第二个可选参数，为下载和解压进度的回调函数（`onDownloadProgress`和`onUnzipProgress`）。可根据回调参数自行设计进度的展示。
 
 ## 切换版本
 
 downloadUpdate的返回值是一个hash字符串，它是当前热更新版本的唯一标识。
 
-你可以使用`switchVersion`函数立即切换版本(此时应用会立即重新加载)，或者选择调用
-`switchVersionLater`，让应用在下一次启动的时候再加载新的版本。
+你可以使用`switchVersion(hash)`函数立即切换版本(此时应用会立即重新加载)，或者选择调用
+`switchVersionLater(hash)`，让应用在下一次启动的时候再加载新的版本。
 
 ## 首次启动、回滚
 
@@ -89,19 +106,39 @@ import _updateConfig from './update.json';
 const {appKey} = _updateConfig[Platform.OS];
 
 export default class MyProject extends Component {
+  state = {
+    received: 0,
+    total: 0,
+    progressType: '下载进度',
+  }
   componentDidMount(){
     if (isFirstTime) {
-      Alert.alert('提示', '这是当前版本第一次启动,是否要模拟启动失败?失败将回滚到上一版本', [
-        {text: '是', onPress: ()=>{throw new Error('模拟启动失败,请重启应用')}},
-        {text: '否', onPress: ()=>{markSuccess()}},
-      ]);
+      // 必须调用此更新成功标记方法
+      // 否则默认更新失败，下一次启动会自动回滚
+      markSuccess();
+      console.log('更新完成');
     } else if (isRolledBack) {
       Alert.alert('提示', '刚刚更新失败了,版本被回滚.');
     }
   }
   doUpdate = async (info) => {
     try {
-      const hash = await downloadUpdate(info);
+      const hash = await downloadUpdate(info, {
+        onDownloadProgress: ({ received, total }) => {
+          this.setState({
+            progressType: '下载进度',
+            received,
+            total,
+          });
+        },
+        onUnzipProgress: ({ received, total }) => {
+          this.setState({
+            progressType: '解压进度',
+            received,
+            total,
+          });
+        },
+      });
       Alert.alert('提示', '下载完毕,是否重启应用?', [
         {text: '是', onPress: ()=>{switchVersion(hash);}},
         {text: '否',},
@@ -137,6 +174,7 @@ export default class MyProject extends Component {
     }
   };
   render() {
+    const { received, total, progressType } = this.state;
     return (
       <View style={styles.container}>
         <Text style={styles.welcome}>
@@ -146,6 +184,9 @@ export default class MyProject extends Component {
           这是版本一 {'\n'}
           当前原生包版本号: {packageVersion}{'\n'}
           当前热更新版本Hash: {currentVersion||'(空)'}{'\n'}
+        </Text>
+        <Text>
+          {progressType}：{received} / {total}
         </Text>
         <TouchableOpacity onPress={this.checkUpdate}>
           <Text style={styles.instructions}>
