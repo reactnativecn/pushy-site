@@ -70,9 +70,26 @@ type: 开发指南
 
 ---
 
-#### async function downloadUpdate(info)
+#### async function downloadUpdate(info, progressCallbacks)
 
-下载更新版本。info为checkUpdate函数的返回值，并且仅当`update:true`时实际进行下载。
+下载更新版本。`info`为`checkUpdate`函数的返回值，并且仅当`update:true`时实际进行下载。
+
+从`v5.8.0`版本开始新增接受第二个可选参数，为下载和解压进度的回调函数（`onDownloadProgress`和`onUnzipProgress`）。可根据回调参数自行设计进度的展示。示例：
+
+```javascript
+const hash = await downloadUpdate(info, 
+// 下载和解压回调为可选参数，自v5.8.0版本起可用
+{
+  onDownloadProgress: ({ received, total }) => {
+    // 已下载的字节数, 总字节数
+    console.log(received, total)
+  },
+  onUnzipProgress: ({ received, total }) => {
+    // 已解压的文件数, 总文件数
+    console.log(received, total)
+  },
+});
+```
 
 ---
 
@@ -90,7 +107,7 @@ type: 开发指南
 
 #### function markSuccess()
 
-在isFirstTime为true时需在应用成功启动后调用此函数，
+在`isFirstTime`为`true`时，必须调用此函数作为更新成功的标记（否则下次启动会默认失败自动回滚）。
 
 ---
 
