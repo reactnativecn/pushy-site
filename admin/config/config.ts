@@ -39,7 +39,7 @@ export default defineConfig({
   layout: {
     name: 'Pushy热更新后台',
     locale: false,
-    siderWidth: 208,
+    // siderWidth: 208,
   },
   dynamicImport: {
     loading: '@/components/PageLoading/index',

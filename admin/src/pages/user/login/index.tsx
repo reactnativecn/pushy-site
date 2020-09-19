@@ -1,8 +1,7 @@
 // import { AlipayCircleOutlined, TaobaoCircleOutlined, WeiboCircleOutlined } from '@ant-design/icons';
 import { Alert, message } from 'antd';
 import React, { useState } from 'react';
-import { Link, history, useModel } from 'umi';
-import { getPageQuery } from '@/utils/utils';
+import { Link, useModel, history, History } from 'umi';
 import logo from '@/assets/logo.svg';
 import { LoginParamsType, doLogin } from '@/services/login';
 import LoginFrom from './components/Login';
@@ -29,41 +28,37 @@ const LoginMessage: React.FC<{
  * 此方法会跳转到 redirect 参数所在的位置
  */
 const replaceGoto = () => {
-  const urlParams = new URL(window.location.href);
-  const params = getPageQuery();
-  let { redirect } = params as { redirect: string };
-  if (redirect) {
-    const redirectUrlParams = new URL(redirect);
-    if (redirectUrlParams.origin === urlParams.origin) {
-      redirect = redirect.substr(urlParams.origin.length);
-      if (redirect.match(/^\/.*#/)) {
-        redirect = redirect.substr(redirect.indexOf('#') + 1);
-      }
-    } else {
-      window.location.href = '/dashboard';
+
+  setTimeout(() => {
+    const { query } = history.location;
+    const { redirect } = query as { redirect: string };
+    if (!redirect) {
+      history.replace('/dashboard');
       return;
     }
-  }
-  history.replace(redirect || '/dashboard');
+    (history as History).replace(redirect);
+  }, 10);
 };
 
 const Login: React.FC<{}> = () => {
   const [loginMessage, setLoginMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const { refresh } = useModel('@@initialState');
+  const { initialState, setInitialState } = useModel('@@initialState');
 
   const handleSubmit = async ({ pwd, ...values }: LoginParamsType) => {
     setSubmitting(true);
     try {
       // 登录
       const resp = await doLogin({ pwd: md5(pwd), ...values });
-      if (resp.ok) {
+      if (resp.ok && initialState) {
         message.success('登录成功！');
+        const currentUser = await initialState?.fetchUserInfo();
+        setInitialState({
+          ...initialState,
+          currentUser,
+        });
         replaceGoto();
-        setTimeout(() => {
-          refresh();
-        }, 0);
         return;
       }
     } catch (error) {
