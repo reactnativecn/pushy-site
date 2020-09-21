@@ -14,29 +14,20 @@ const ignoredPages = ['/user/login', '/user/register'];
 export async function getInitialState(): Promise<{
   currentUser?: API.CurrentUser;
   settings?: LayoutSettings;
-  fetchUserInfo: () => Promise<API.CurrentUser | undefined>;
 }> {
-
-  const fetchUserInfo = async () => {
+  const currentPage = history.location.pathname;
+  if (!ignoredPages.includes(currentPage)) {
     try {
       const currentUser = await queryCurrent();
-      return currentUser;
+      return {
+        currentUser,
+        settings: defaultSettings,
+      };
     } catch (error) {
       history.push('/user/login');
     }
-    return undefined;
-  };
-  const currentPage = history.location.pathname;
-  if (!ignoredPages.includes(currentPage)) {
-    const currentUser = await fetchUserInfo();
-    return {
-      fetchUserInfo,
-      currentUser,
-      settings: defaultSettings,
-    };
   }
   return {
-    fetchUserInfo,
     settings: defaultSettings,
   };
 }
@@ -44,22 +35,12 @@ export async function getInitialState(): Promise<{
 export const layout = ({
   initialState,
 }: {
-  initialState: {
-    settings?: LayoutSettings;
-    currentUser?: API.CurrentUser;
-    fetchUserInfo: () => Promise<API.CurrentUser | undefined>;
-  };
+  initialState: { settings?: LayoutSettings };
 }): BasicLayoutProps => {
   return {
     rightContentRender: () => <RightContent />,
     disableContentMargin: false,
     footerRender: () => <Footer />,
-    onPageChange: () => {
-      // 如果没有登录，重定向到 login
-      if (!initialState?.currentUser?.name && history.location.pathname !== '/user/login') {
-        history.push('/user/login');
-      }
-    },
     menuHeaderRender: undefined,
     ...initialState?.settings,
   };

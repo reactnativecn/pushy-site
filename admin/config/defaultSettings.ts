@@ -10,7 +10,7 @@ export default {
   fixSiderbar: true,
   colorWeak: false,
   menu: {
-    // defaultOpenAll: true,
+    defaultOpenAll: true,
   },
   title: 'Pushy热更新后台',
   pwa: false,

@@ -3,7 +3,7 @@ import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons
 import { Avatar, Menu, Spin } from 'antd';
 import { ClickParam } from 'antd/es/menu';
 import { history, useModel } from 'umi';
-import { setToken } from '@/utils/utils';
+import { getPageQuery, setToken } from '@/utils/utils';
 
 import { stringify } from 'querystring';
 import HeaderDropdown from '../HeaderDropdown';
@@ -18,14 +18,13 @@ export interface GlobalHeaderRightProps {
  */
 const loginOut = async () => {
   setToken('');
-  const { query, pathname } = history.location;
-  const { redirect } = query;
+  const { redirect } = getPageQuery();
   // Note: There may be security issues, please note
   if (window.location.pathname !== '/user/login' && !redirect) {
     history.replace({
       pathname: '/user/login',
       search: stringify({
-        redirect: pathname,
+        redirect: window.location.href,
       }),
     });
   }
@@ -36,7 +35,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
 
   const onMenuClick = useCallback((event: ClickParam) => {
     const { key } = event;
-    if (key === 'logout' && initialState) {
+    if (key === 'logout') {
       setInitialState({ ...initialState, currentUser: undefined });
       loginOut();
       return;
@@ -91,9 +90,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
   return (
     <HeaderDropdown overlay={menuHeaderDropdown}>
       <span className={`${styles.action} ${styles.account}`}>
-        {/* <Avatar size="small" className={styles.avatar} alt="avatar">
-          {currentUser.name[0]}
-        </Avatar> */}
+        <Avatar size="small" className={styles.avatar} src={currentUser.avatar} alt="avatar" />
         <span className={`${styles.name} anticon`}>{currentUser.name}</span>
       </span>
     </HeaderDropdown>

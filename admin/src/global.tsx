@@ -3,7 +3,6 @@ import React from 'react';
 import defaultSettings from '../config/defaultSettings';
 
 const { pwa } = defaultSettings; // if pwa is true
-const isHttps = document.location.protocol === 'https:';
 
 if (pwa) {
   // Notify user if offline now
@@ -66,7 +65,7 @@ if (pwa) {
       onClose: async () => {},
     });
   });
-} else if ('serviceWorker' in navigator && isHttps) {
+} else if ('serviceWorker' in navigator) {
   // unregister service worker
   const { serviceWorker } = navigator;
 
