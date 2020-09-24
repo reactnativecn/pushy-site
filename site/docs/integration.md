@@ -42,20 +42,16 @@ pushy会首先尝试耗费流量更少的更新方式。将`info`对象传递给
 
 ```javascript
 const hash = await downloadUpdate(info, 
-// 下载和解压回调为可选参数，从v5.8.0版本开始加入
+// 下载回调为可选参数，从v5.8.2版本开始加入
 {
   onDownloadProgress: ({ received, total }) => {
     // 已下载的字节数, 总字节数
     console.log(received, total)
   },
-  onUnzipProgress: ({ received, total }) => {
-    // 已解压的文件数, 总文件数
-    console.log(received, total)
-  },
 });
 ```
 
-`downloadUpdate`方法从`v5.8.0`版本开始新增接受第二个可选参数，为下载和解压进度的回调函数（`onDownloadProgress`和`onUnzipProgress`）。可根据回调参数自行设计进度的展示。
+`downloadUpdate`方法从`v5.8.2`版本开始新增接受第二个可选参数，为下载进度的回调函数（`onDownloadProgress`）。可根据回调参数自行设计进度的展示。
 
 ## 切换版本
 
@@ -109,7 +105,6 @@ export default class MyProject extends Component {
   state = {
     received: 0,
     total: 0,
-    progressType: '下载进度',
   }
   componentDidMount(){
     if (isFirstTime) {
@@ -126,14 +121,6 @@ export default class MyProject extends Component {
       const hash = await downloadUpdate(info, {
         onDownloadProgress: ({ received, total }) => {
           this.setState({
-            progressType: '下载进度',
-            received,
-            total,
-          });
-        },
-        onUnzipProgress: ({ received, total }) => {
-          this.setState({
-            progressType: '解压进度',
             received,
             total,
           });
@@ -174,7 +161,7 @@ export default class MyProject extends Component {
     }
   };
   render() {
-    const { received, total, progressType } = this.state;
+    const { received, total } = this.state;
     return (
       <View style={styles.container}>
         <Text style={styles.welcome}>
@@ -186,7 +173,7 @@ export default class MyProject extends Component {
           当前热更新版本Hash: {currentVersion||'(空)'}{'\n'}
         </Text>
         <Text>
-          {progressType}：{received} / {total}
+          下载进度：{received} / {total}
         </Text>
         <TouchableOpacity onPress={this.checkUpdate}>
           <Text style={styles.instructions}>
