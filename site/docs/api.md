@@ -10,19 +10,19 @@ type: 开发指南
 
 #### downloadRootDir
 
-下载的根目录。你可以使用react-native-fs等第三方组件检查其中的内容。
+下载的根目录。你可以使用 react-native-fs 等第三方组件检查其中的内容。
 
 ---
 
 #### packageVersion
 
-当前应用原生包的版本。其中android取自`versionName`字段(位于`android/app/build.gradle`中)。ios取自`CFBundleShortVersionString`字段(位于`ios/项目名/Info.plist`中)。
+当前应用原生包的版本。其中 android 取自`versionName`字段(位于`android/app/build.gradle`中)。ios 取自`CFBundleShortVersionString`字段(位于`ios/项目名/Info.plist`中)。
 
 ---
 
 #### currentVersion
 
-当前热更新版本（jsbundle文件）的Hash号。
+当前热更新版本（jsbundle 文件）的 Hash 号。
 
 ---
 
@@ -44,18 +44,19 @@ type: 开发指南
 
 检查更新，返回值有三种情形：
 
-1. `{expired: true}`：该应用原生包已过期（已从pushy服务器中删除），需要前往应用市场下载新的版本(在设置中填写downloadUrl)。
+1. `{expired: true}`：该应用原生包已过期（已从 pushy 服务器中删除），需要前往应用市场下载新的版本(在设置中填写 downloadUrl)。
+
 ```
     {
         expired: true,
         downloadUrl: 'http://appstore/downloadUrl',
     }
 ```
+
 2. `{upToDate: true}`：当前已经更新到最新，无需进行更新。
 
-3. `{update: true}`：当前有新版本可以更新。info的`name`、`description`字段可
-以用于提示用户，而`metaInfo`字段则可以根据你的需求自定义其它属性(如是否静默更新、
-是否强制更新等等)。另外还有几个字段，包含了热更新文件的下载地址，
+3. `{update: true}`：当前有新版本可以更新。info 的`name`、`description`字段可以用于提示用户，而`metaInfo`字段则可以根据你的需求自定义其它属性(如是否静默更新、是否强制更新等等)。另外还有几个字段，包含了热更新文件的下载地址，
+
 ```
     {
         update: true,
@@ -74,22 +75,24 @@ type: 开发指南
 
 下载更新版本。`info`为`checkUpdate`函数的返回值，并且仅当`update:true`时实际进行下载。
 
-从`v5.8.2`版本开始新增接受第二个可选参数，为下载进度的回调函数（`onDownloadProgress`）。可根据回调参数自行设计进度的展示。示例：
+从`v5.8.3`版本开始新增接受第二个可选参数，为下载进度的回调函数（`onDownloadProgress`）。可根据回调参数自行设计进度的展示。示例：
 
 ```javascript
-const hash = await downloadUpdate(info, 
-// 下载回调为可选参数，自v5.8.2版本起可用
-{
-  onDownloadProgress: ({ received, total }) => {
-    // 已下载的字节数, 总字节数
-    console.log(received, total)
+const hash = await downloadUpdate(
+  info,
+  // 下载回调为可选参数，自v5.8.3版本起可用
+  {
+    onDownloadProgress: ({ received, total }) => {
+      // 已下载的字节数, 总字节数
+      console.log(received, total);
+    },
   },
-});
+);
 ```
 
 ---
 
-#### function switchVersion(hash) 
+#### function switchVersion(hash)
 
 立即重启应用，并加载已经下载完毕的版本。
 
@@ -111,9 +114,10 @@ const hash = await downloadUpdate(info,
 
 #### UpdateContext.setCustomInstanceManager(ReactInstanceManager instanceManager)
 
-如果是集成/混编Android方案，则可以使用此方法传入你自行创建的ReactInstanceManager。自`v5.5.8`版本起可用。
+如果是集成/混编 Android 方案，则可以使用此方法传入你自行创建的 ReactInstanceManager。自`v5.5.8`版本起可用。
 
 示例：
+
 ```java
 import cn.reactnative.modules.update.UpdateContext
 
