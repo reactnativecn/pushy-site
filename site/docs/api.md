@@ -71,7 +71,7 @@ type: 开发指南
 
 ---
 
-#### async function downloadUpdate(info, progressCallbacks)
+#### async function downloadUpdate(info, callbacks)
 
 下载更新版本。`info`为`checkUpdate`函数的返回值，并且仅当`update:true`时实际进行下载。
 
@@ -89,6 +89,12 @@ const hash = await downloadUpdate(
   },
 );
 ```
+
+---
+
+#### async function downloadAndInstallApk({ url, onDownloadProgress })
+
+下载更新的 apk 包并直接安装。`url`必须为可直接下载到 apk 文件的地址，`onDownloadProgress`为可选的下载进度回调函数，可根据回调参数自行设计进度的展示。自`v5.9.0`版本起可用。
 
 ---
 

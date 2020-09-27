@@ -79,6 +79,7 @@ import {
   switchVersion,
   switchVersionLater,
   markSuccess,
+  downloadAndInstallApk,
 } from 'react-native-update';
 
 import _updateConfig from './update.json';
@@ -96,7 +97,7 @@ export default class MyProject extends Component {
       markSuccess();
       console.log('更新完成');
     } else if (isRolledBack) {
-      Alert.alert('提示', '刚刚更新失败了,版本被回滚.');
+      console.log('刚刚更新失败了,版本被回滚.');
     }
   }
   doUpdate = async (info) => {
@@ -141,11 +142,29 @@ export default class MyProject extends Component {
       return;
     }
     if (info.expired) {
-      Alert.alert('提示', '您的应用版本已更新,请前往应用商店下载新的版本', [
+      Alert.alert('提示', '您的应用版本已更新，点击确定下载安装新版本', [
         {
           text: '确定',
           onPress: () => {
-            info.downloadUrl && Linking.openURL(info.downloadUrl);
+            if (info.downloadUrl) {
+              // apk可直接下载安装
+              if (
+                Platform.OS === 'android' &&
+                info.downloadUrl.endsWith('.apk')
+              ) {
+                downloadAndInstallApk({
+                  url: info.downloadUrl,
+                  onDownloadProgress: ({received, total}) => {
+                    this.setState({
+                      received,
+                      total,
+                    });
+                  },
+                });
+              } else {
+                Linking.openURL(info.downloadUrl);
+              }
+            }
           },
         },
       ]);
