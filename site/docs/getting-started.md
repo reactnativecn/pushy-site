@@ -187,6 +187,26 @@ public class MainApplication extends Application implements ReactApplication {
 
 > 请记得，任意在ios和android目录下的修改，一定要重新编译（yarn react-native run-ios或run-android命令编译，或在Xcode/Android Studio中重新编译）才能生效。
 
+## 禁用android的crunch优化
+
+android会在生成apk时自动对png图片进行压缩，此操作既耗时又影响增量补丁的生成。我们强烈建议在`android/app/build.gradle`中关闭此操作：
+
+```gradle
+...
+android {
+    ...
+    signingConfigs { ... }
+    buildTypes {
+        release {
+            ...
+            // 添加下面这行以禁用crunch
+            crunchPngs false
+        }
+    }
+}
+...
+```
+
 ## 登录与创建应用
 
 首先请在<https://update.reactnative.cn>注册帐号，然后在你的项目根目录下运行以下命令：
