@@ -16,13 +16,10 @@ type: 快速入门
 
 ```bash
 # 全局安装命令行工具，每台电脑只用装一次
-yarn global add react-native-update-cli
-
-# 若yarn全局安装后无法识别pushy命令，可换用npm全局安装，命令如下
-# npm i -g react-native-update-cli
+npm i -g react-native-update-cli
 
 # 在项目中安装热更新模块
-yarn add react-native-update
+npm i react-native-update
 ```  
 
 > 如果下载极慢或者显示网络失败，请设置使用淘宝镜像`npx nrm use taobao`
@@ -52,14 +49,14 @@ pod install
 
 安装命令示例：
 ```bash
-yarn add react-native-update@4.x
+npm i react-native-update@4.x
 ```
 
 如果RN的版本是0.45及以下，你还必须安装[Android NDK](http://androiddevtools.cn)，版本最好选用r10e，并设置环境变量`ANDROID_NDK_HOME`，指向你的NDK根目录(例如`/Users/tdzl2003/Downloads/android-ndk-r10e`)。
 </details>
 
 
-> 请记得，任意在ios和android目录下的修改，一定要重新编译（yarn react-native run-ios或run-android命令编译，或在Xcode/Android Studio中重新编译）才能生效。
+> 请记得，任意在ios和android目录下的修改，一定要重新编译（npx react-native run-ios或run-android命令编译，或在Xcode/Android Studio中重新编译）才能生效。
 
 
 ## 手动link
@@ -185,7 +182,7 @@ public class MainApplication extends Application implements ReactApplication {
 }
 ```
 
-> 请记得，任意在ios和android目录下的修改，一定要重新编译（yarn react-native run-ios或run-android命令编译，或在Xcode/Android Studio中重新编译）才能生效。
+> 请记得，任意在ios和android目录下的修改，一定要重新编译（npx react-native run-ios或run-android命令编译，或在Xcode/Android Studio中重新编译）才能生效。
 
 ## 禁用android的crunch优化
 

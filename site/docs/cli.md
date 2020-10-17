@@ -7,8 +7,6 @@ type: 开发指南
 ### 安装
 
 ```
-$ yarn global add react-native-update-cli
-# 或
 $ npm install -g react-native-update-cli
 ```
 
