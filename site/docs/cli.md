@@ -25,7 +25,7 @@ $ npm install -g react-native-update-cli
 
 ---
 
-#### pushy diff <origin> <next>
+#### pushy diff [origin] [next]
 
 提供两个ppk文件，生成从origin到next版本的差异更新包。
 
@@ -33,7 +33,7 @@ $ npm install -g react-native-update-cli
 
 ---
 
-#### pushy diffFromApk <apkFile> <next>
+#### pushy diffFromApk [apkFile] [next]
 
 提供一个apk文件和一个ppk文件，生成从apk文件到next版本的差异更新包。
 
@@ -43,7 +43,7 @@ $ npm install -g react-native-update-cli
 
 ---
 
-#### pushy diffFromIpa <ipaFile> <next>
+#### pushy diffFromIpa [ipaFile] [next]
 
 提供一个ipa文件和一个ppk文件，生成从ipa文件到next版本的差异更新包。
 
@@ -53,7 +53,7 @@ $ npm install -g react-native-update-cli
 
 ---
 
-#### pushy login [<email>] [<pwd>]
+#### pushy login [email] [pwd]
 
 登录热更新开放平台。你需要先登录才能使用下面的命令。
 
@@ -105,13 +105,13 @@ $ npm install -g react-native-update-cli
 
 ---
 
-#### pushy uploadIpa <ipaFile>
+#### pushy uploadIpa [ipaFile]
 
 上传 ipa 文件到开放平台。
 
 ---
 
-#### pushy uploadApk <apkFile>
+#### pushy uploadApk [apkFile]
 
 上传 apk 文件到开放平台。
 
@@ -125,7 +125,7 @@ $ npm install -g react-native-update-cli
 
 ---
 
-#### pushy publish <ppkFile>
+#### pushy publish [ppkFile]
 
 发布新的热更新版本（ppk文件）。
 
