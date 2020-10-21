@@ -186,7 +186,7 @@ public class MainApplication extends Application implements ReactApplication {
 
 ## 禁用android的crunch优化
 
-android会在生成apk时自动对png图片进行压缩，此操作既耗时又影响增量补丁的生成。我们强烈建议在`android/app/build.gradle`中关闭此操作：
+android会在生成apk时自动对png图片进行压缩，此操作既耗时又影响增量补丁的生成。为了保证补丁能正常生成，您需要在`android/app/build.gradle`中关闭此操作：
 
 ```gradle
 ...
