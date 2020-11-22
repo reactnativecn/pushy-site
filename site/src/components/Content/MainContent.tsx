@@ -4,7 +4,6 @@ import React from 'react';
 import { Link } from 'gatsby';
 
 import {
-  ExportOutlined,
   LeftOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -12,7 +11,6 @@ import {
 } from '@ant-design/icons';
 
 import { Badge, Row, Col, Menu } from 'antd';
-import classNames from 'classnames';
 import MobileMenu from 'rc-drawer-menu';
 import moment from 'moment';
 import Article from './Article';
@@ -222,7 +220,6 @@ export default class MainContent extends React.PureComponent<MainContentProps, M
     const menuItems = this.getMenuItems();
     const currentItem = this.getPreAndNext(menuItems);
     const { next, previous } = currentItem;
-    const mainContainerClass = classNames('main-container', {});
     const { openKeys } = this.state;
     const menuChild = (
       <Menu
@@ -253,7 +250,7 @@ export default class MainContent extends React.PureComponent<MainContentProps, M
             </Col>
           )}
           <Col xxl={20} xl={19} lg={18} md={24} sm={24} xs={24}>
-            <div className={mainContainerClass}>
+            <div className="main-container">
               <Article {...this.props} content={localizedPageData} />
             </div>
           </Col>

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
 import { Affix } from 'antd';
-import delegate from 'delegate';
 import moment from 'moment';
 // import EditButton from './EditButton';
 import { IFrontmatterData } from '../../templates/docs';
@@ -21,21 +20,6 @@ export default class Article extends React.PureComponent<ArticleProps> {
   pingTimer: number;
 
   node: HTMLElement | null | undefined;
-
-  componentDidMount() {
-    // Add ga event click
-    this.delegation = delegate(
-      this.node,
-      '.resource-card',
-      'click',
-      (e: { delegateTarget: { href: any } }) => {
-        if ((window as any).ga) {
-          (window as any).ga('send', 'event', 'Download', 'resource', e.delegateTarget.href);
-        }
-      },
-      false,
-    );
-  }
 
   componentWillUnmount() {
     clearTimeout(this.pingTimer);
