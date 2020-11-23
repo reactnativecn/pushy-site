@@ -14,7 +14,7 @@ const getKebabCase = (str) =>
 module.exports = exports.onCreateNode = async ({ node, actions, getNode }) => {
   const { createNodeField } = actions;
   switch (node.internal.type) {
-    case 'MarkdownRemark':
+    case 'Mdx':
       const { permalink } = node.frontmatter;
       const { relativePath, sourceInstanceName } = getNode(node.parent);
       let slug = permalink;

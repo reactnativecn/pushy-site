@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet';
 import { Affix } from 'antd';
 import moment from 'moment';
 // import EditButton from './EditButton';
+import { MDXRenderer } from 'gatsby-plugin-mdx';
 import { IFrontmatterData } from '../../templates/docs';
 // import AvatarList from './AvatarList';
 
@@ -15,7 +16,6 @@ interface ArticleProps {
 }
 
 export default class Article extends React.PureComponent<ArticleProps> {
-  delegation: any;
 
   pingTimer: number;
 
@@ -23,9 +23,28 @@ export default class Article extends React.PureComponent<ArticleProps> {
 
   componentWillUnmount() {
     clearTimeout(this.pingTimer);
-    if (this.delegation) {
-      this.delegation.destroy();
+  }
+
+  renderTocList(toc, index = 0) {
+    if (toc.items) {
+      const list = <ul className="toc">{toc.items.map((item, index) => this.renderTocList(item, index))}</ul>;
+      if (toc.url) {
+        return (
+          <li key={index}>
+            <p>
+              <a href={toc.url}>{toc.title}</a>
+            </p>
+            {list}
+          </li>
+        );
+      }
+      return list;
     }
+    return (
+      <li key={index}>
+        <a href={toc.url}>{toc.title}</a>
+      </li>
+    );
   }
 
   render() {
@@ -60,17 +79,10 @@ export default class Article extends React.PureComponent<ArticleProps> {
 
           {!content.toc || content.toc.length <= 1 || meta.toc === false ? null : (
             <Affix className="toc-affix" offsetTop={16}>
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: content.toc.replace(/<ul>/g, '<ul class="toc">').replace(/\/#/g, '.html#'),
-                }}
-              />
+              {this.renderTocList(content.toc)}
             </Affix>
           )}
-          <section
-            className="markdown api-container"
-            dangerouslySetInnerHTML={{ __html: content.content }}
-          />
+          <MDXRenderer className="markdown api-container">{content.content}</MDXRenderer>
         </article>
       </>
     );
