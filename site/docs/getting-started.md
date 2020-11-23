@@ -35,7 +35,7 @@ pod install
 
 <details>
 <summary>
-如果你的RN版本比较老（0.46以下），请点击这里的注意事项
+如果你的RN版本比较老（< 0.46），请点击这里的注意事项
 </summary>
 
 如果你的RN版本比较老，请按下面表格尝试老一些的版本（但这些版本我们已不再维护，不能保证可以使用）：
@@ -66,7 +66,7 @@ npm i react-native-update@4.x
 ### iOS
 
 <details>
-<summary>RN 版本低于 0.60 且使用CocoaPods（推荐）</summary>
+<summary>RN < 0.60且使用CocoaPods（推荐）</summary>
 
 1. 在ios/Podfile中添加
 ```
@@ -78,7 +78,7 @@ pod 'react-native-update', path: '../node_modules/react-native-update'
 </details>
 
 <details>
-<summary>RN 版本低于 0.60且不使用CocoaPods</summary>
+<summary>RN < 0.60且不使用CocoaPods</summary>
 
 1. 在XCode中的Project Navigator里,右键点击`Libraries` ➜ `Add Files to [你的工程名]`
 2. 进入`node_modules` ➜ `react-native-update` ➜ `ios 并选中 `RCTPushy.xcodeproj`
@@ -102,7 +102,7 @@ date +%s > "$DEST/pushy_build_time.txt"
 
 
 <details>
-<summary>RN 版本低于 0.60</summary>
+<summary>RN < 0.60</summary>
 1. 在`android/settings.gradle`中添加如下代码:  
    
   	```
@@ -119,7 +119,6 @@ date +%s > "$DEST/pushy_build_time.txt"
 3. 打开`android/app/src/main/java/[...]/MainApplication.java`,
   - 在文件开头增加 `import cn.reactnative.modules.update.UpdatePackage;`
   - 在`getPackages()` 方法中增加 `new UpdatePackage()`(注意上一行可能要增加一个逗号)
-  
 </details>
 
 ## 配置Bundle URL

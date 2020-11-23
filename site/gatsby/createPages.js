@@ -15,7 +15,7 @@ module.exports = async ({ graphql, actions }) => {
   const allMarkdown = await graphql(
     `
       {
-        allMdx(limit: 1000) {
+        allMarkdownRemark(limit: 1000) {
           edges {
             node {
               fields {
@@ -37,7 +37,7 @@ module.exports = async ({ graphql, actions }) => {
   }
   const redirects = {};
 
-  const { edges } = allMarkdown.data.allMdx;
+  const { edges } = allMarkdown.data.allMarkdownRemark;
   edges.forEach((edge) => {
     const { slug, underScoreCasePath } = edge.node.fields;
     if (slug.includes('docs/') || slug.includes('/blog')) {
@@ -78,7 +78,7 @@ module.exports = async ({ graphql, actions }) => {
   const blogEdges = await graphql(
     `
       {
-        allMdx(
+        allMarkdownRemark(
           filter: { fileAbsolutePath: { regex: "/blog/" }, fields: { slug: {} } }
           sort: { order: DESC, fields: [frontmatter___time] }
           limit: 1

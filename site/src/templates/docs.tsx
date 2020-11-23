@@ -38,7 +38,7 @@ export interface IGraphqlFrontmatterData extends Omit<IFrontmatterData, 'title'>
 }
 
 export interface IMarkdownRemarkData {
-  body: string;
+  html: string;
   tableOfContents: string;
   frontmatter: IGraphqlFrontmatterData;
   fields: IMarkDownFields;
@@ -62,15 +62,15 @@ export default function Template({
   data,
   ...rest
 }: {
-  data: { mdx: IMarkdownRemarkData; allMdx: IAllMarkdownRemarkData };
+  data: { markdownRemark: IMarkdownRemarkData; allMarkdownRemark: IAllMarkdownRemarkData };
   isMobile: boolean;
   location: {
     pathname: string;
   };
 }) {
-  const { mdx, allMdx } = data;
-  const { frontmatter, fields, body, tableOfContents } = mdx;
-  const { edges } = allMdx;
+  const { markdownRemark, allMarkdownRemark } = data;
+  const { frontmatter, fields, html, tableOfContents } = markdownRemark;
+  const { edges } = allMarkdownRemark;
   const menuList = edges.map(({ node, next, previous }) => {
     const { fields: nodeFields } = node;
 
@@ -99,7 +99,7 @@ export default function Template({
             path: fields.path,
           },
           toc: tableOfContents,
-          content: body,
+          content: html,
         }}
         menuList={menuList}
       />
@@ -109,8 +109,8 @@ export default function Template({
 
 export const pageQuery = graphql`
   query TemplateDocsMarkdown($slug: String!, $type: String!) {
-    mdx(fields: { slug: { eq: $slug } }) {
-      body
+    markdownRemark(fields: { slug: { eq: $slug } }) {
+      html
       tableOfContents
       frontmatter {
         title
@@ -123,7 +123,7 @@ export const pageQuery = graphql`
         modifiedTime
       }
     }
-    allMdx(
+    allMarkdownRemark(
       filter: { fileAbsolutePath: { regex: $type } }
       sort: { fields: [frontmatter___order, frontmatter___type], order: DESC }
     ) {

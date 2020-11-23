@@ -50,10 +50,9 @@ module.exports = {
     // },
     `gatsby-plugin-sharp`,
     {
-      resolve: 'gatsby-plugin-mdx',
+      resolve: 'gatsby-transformer-remark',
       options: {
-        extensions: [`.md`, `.mdx`],
-        gatsbyRemarkPlugins: [
+        plugins: [
           'gatsby-remark-autolink-headers',
           {
             resolve: `gatsby-remark-images`,
