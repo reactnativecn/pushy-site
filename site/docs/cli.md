@@ -16,44 +16,56 @@ $ npm install -g react-native-update-cli
 
 生成资源包
 
-* platform: ios|android 对应的平台
-* entryFile: 入口脚本文件
-* intermediaDir: 临时文件输出目录
-* output: 最终ppk文件输出路径
-* dev: 是否打包开发版本
-* verbose: 是否展现打包过程的详细信息
+- platform: ios|android 对应的平台
+- entryFile: 入口脚本文件
+- intermediaDir: 临时文件输出目录
+- output: 最终 ppk 文件输出路径
+- dev: 是否打包开发版本
+- verbose: 是否展现打包过程的详细信息
 
 ---
 
-#### pushy diff [origin] [next]
+#### pushy parseIpa [ipaFile]
 
-提供两个ppk文件，生成从origin到next版本的差异更新包。
-
-* output: diff文件输出路径
+解析 ipa 文件并输出一些相关信息，如版本号，编译时间戳等。
 
 ---
 
-#### pushy diffFromApk [apkFile] [next]
+#### pushy parseApk [apkFile]
 
-提供一个apk文件和一个ppk文件，生成从apk文件到next版本的差异更新包。
+解析 apk 文件并输出一些相关信息，如版本号，编译时间戳等。
+
+---
+
+#### pushy diff [origin][next]
+
+提供两个 ppk 文件，生成从 origin 到 next 版本的差异更新包。
+
+- output: diff 文件输出路径
+
+---
+
+#### pushy diffFromApk [apkFile][next]
+
+提供一个 apk 文件和一个 ppk 文件，生成从 apk 文件到 next 版本的差异更新包。
 
 如果使用热更新开放平台，你不需要自己执行此命令。
 
-* output: diff文件输出路径
+- output: diff 文件输出路径
 
 ---
 
-#### pushy diffFromIpa [ipaFile] [next]
+#### pushy diffFromIpa [ipaFile][next]
 
-提供一个ipa文件和一个ppk文件，生成从ipa文件到next版本的差异更新包。
+提供一个 ipa 文件和一个 ppk 文件，生成从 ipa 文件到 next 版本的差异更新包。
 
 如果使用热更新开放平台，你不需要自己执行此命令。
 
-* output: diff文件输出路径
+- output: diff 文件输出路径
 
 ---
 
-#### pushy login [email] [pwd]
+#### pushy login [email][pwd]
 
 登录热更新开放平台。你需要先登录才能使用下面的命令。
 
@@ -127,7 +139,7 @@ $ npm install -g react-native-update-cli
 
 #### pushy publish [ppkFile]
 
-发布新的热更新版本（ppk文件）。
+发布新的热更新版本（ppk 文件）。
 
 - platform: ios|android 对应的平台
 - name: 当前热更新版本的名字(版本号)
