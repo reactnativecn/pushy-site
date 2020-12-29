@@ -63,6 +63,14 @@ module.exports = {
             },
           },
           {
+            resolve: 'gatsby-remark-mermaid',
+            options: {
+              mermaidOptions: {
+                securityLevel: 'loose',
+              },
+            },
+          },
+          {
             resolve: 'gatsby-remark-prismjs',
             options: {
               noInlineHighlight: true,

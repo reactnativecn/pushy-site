@@ -10,7 +10,7 @@ type: 开发指南
 
 在导出 ipa 以便上传到 pushy 服务时，可以取消 bitcode 选项以大幅减小 ipa 大小。上架 app store 或者通过 testflight 分发测试包时仍然可以保留 bitcode 选项，不影响热更新。
 
-![bitcode](./assets/bitcode.png)
+![bitcode](assets/bitcode.png)
 
 ##### Android 原生包优化(apk)
 
