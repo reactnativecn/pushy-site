@@ -37,6 +37,7 @@ jobs:
           cp CNAME public/
           mv agreement public/agreement
           cp .nojekyll public/
+          echo 15307112035367793282 > public/tencent1544252579020146588.txt
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
