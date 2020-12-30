@@ -71,7 +71,7 @@ function Footer() {
       <section className="bottom-bar">
         <p>React Native中文网 © 2020 武汉青罗网络科技有限公司</p>
         <p>
-          <a href="http://beian.miit.gov.cn/">鄂ICP备20002031号</a>
+          <a href="http://beian.miit.gov.cn/">鄂ICP备20002031号-3</a>
           <img
             src="https://img.alicdn.com/tfs/TB1..50QpXXXXX7XpXXXXXXXXXX-40-40.png"
             alt="鄂公网安备 42011202001821号"
