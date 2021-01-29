@@ -137,12 +137,12 @@ date +%s > "$DEST/pushy_build_time.txt"
 
 #import "RCTPushy.h"  // <-- import头文件，注意要放到if条件外面
 
-// 可能项目里有一些条件编译语句，例如RN自带的flipper
-#if DEBUG
+// 可能项目里有一些条件编译语句，例如像较新版本RN自带的flipper
+// #if DEBUG
 // 注意**不要**在这里面引入"RCTPushy.h"
-#import <FlipperKit/FlipperClient.h>
+// #import <FlipperKit/FlipperClient.h>
 // ...
-#endif
+// #endif
 
 
 // 如果RN版本 >= 0.59，修改sourceURLForBridge
