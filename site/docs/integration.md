@@ -21,13 +21,13 @@ const { appKey } = _updateConfig[Platform.OS];
 
 ## 检查更新、下载更新
 
-异步函数`checkUpdate`可以检查当前版本是否需要更新：
+异步函数[`checkUpdate`](api.html#async-function-checkupdateappkey)可以检查当前版本是否需要更新：
 
 ```javascript
 const info = await checkUpdate(appKey);
 ```
 
-返回的 info 有三种情况：
+返回的[`info`](api.html#async-function-checkupdateappkey)有三种情况：
 
 1. `{expired: true}`：该应用原生包已过期（已从 pushy 服务器中删除），开发者应该在 pushy 控制台添加一个更新下载链接，并自行提示用户下载。
 
@@ -52,7 +52,7 @@ const hash = await downloadUpdate(
 
 ## 切换版本
 
-downloadUpdate 的返回值是一个 hash 字符串，它是当前热更新版本的唯一标识。
+`downloadUpdate`的返回值是一个 hash 字符串，它是当前热更新版本的唯一标识。
 
 你可以使用`switchVersion(hash)`函数立即切换版本(此时应用会立即重新加载)，或者选择调用 `switchVersionLater(hash)`，让应用在下一次启动的时候再加载新的版本。
 
@@ -61,6 +61,8 @@ downloadUpdate 的返回值是一个 hash 字符串，它是当前热更新版�
 在每次更新完毕后的首次启动时，`isFirstTime`常量会为`true`。你必须在应用退出前合适的任何时机，调用`markSuccess`，否则应用下一次启动的时候将会进行回滚操作。这一机制称作“反触发”，这样当你应用启动初期即遭遇问题的时候，也能在下一次启动时恢复运作。
 
 你可以通过`isFirstTime`来获知这是当前版本的首次启动，也可以通过`isRolledBack`来获知应用刚刚经历了一次回滚操作。你可以在此时给予用户合理的提示。
+
+以上提及的所有api的说明文档可在[这里](api.html)查看。
 
 ## 完整的示例
 
