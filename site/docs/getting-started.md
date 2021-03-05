@@ -105,6 +105,7 @@ date +%s > "$DEST/pushy_build_time.txt"
 
 <details>
 <summary>RN < 0.60</summary>
+
 1. 在`android/settings.gradle`中添加如下代码:  
    
   	```

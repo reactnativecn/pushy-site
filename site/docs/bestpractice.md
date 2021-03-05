@@ -35,7 +35,7 @@ splits {
 
 ##### 热更新包优化(ppk)
 
-热更新包的主要内容是 js 包和一些静态资源（主要是图片）。
+热更新包的主要内容是 js 包和其所引用的静态资源（主要是图片）。
 
 - js 包成分分析。可以借助一些第三方工具（如[react-native-bundle-visualizer](https://github.com/IjzerenHein/react-native-bundle-visualizer)）来分析 js 文件中哪些占比较大，是否可以用其他库替换等（如 dayjs 替换 moment，lodash-es 替换 lodash）。
 - 图片优化。
