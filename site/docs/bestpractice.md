@@ -17,21 +17,20 @@ type: 开发指南
 apk 的优化主要考虑两个方向：
 
 - [启用 proguard 压缩混淆源码](https://reactnative.cn/docs/signed-apk-android#%E5%90%AF%E7%94%A8proguard%E6%9D%A5%E5%87%8F%E5%B0%91apk%E7%9A%84%E5%A4%A7%E5%B0%8F%EF%BC%88%E5%8F%AF%E9%80%89%EF%BC%89)。但这一步可能导致一些使用反射的代码运行时报错，启用后需要充分测试每个页面和功能，以及需要阅读一些第三方关于 proguard 的特别设置说明。
-- [删除一些不会用到的 cpu 架构支持](https://reactnative.cn/docs/signed-apk-android#%E9%92%88%E5%AF%B9%E4%B8%8D%E5%90%8C%E7%9A%84-cpu-%E6%9E%B6%E6%9E%84%E7%94%9F%E6%88%90-apk-%E4%BB%A5%E5%87%8F%E5%B0%8F-apk-%E6%96%87%E4%BB%B6%E7%9A%84%E5%A4%A7%E5%B0%8F)。找到`android/app/build.gradle`中的 cpu 架构部分，可以删除`armeabi-v7a`（老的 32 位手机 cpu，现在应该没有这样的设备了）和`x86_64`（64 位的 pc 模拟器，实际几乎无人使用，且`x86`仍然可以在 64 位上正常运行）：
+- [分开编译不同的 cpu 架构](https://reactnative.cn/docs/signed-apk-android#%E9%92%88%E5%AF%B9%E4%B8%8D%E5%90%8C%E7%9A%84-cpu-%E6%9E%B6%E6%9E%84%E7%94%9F%E6%88%90-apk-%E4%BB%A5%E5%87%8F%E5%B0%8F-apk-%E6%96%87%E4%BB%B6%E7%9A%84%E5%A4%A7%E5%B0%8F)。找到`android/app/build.gradle`中的 cpu 架构部分，如下所示启用`enable`选项：
 
 ```diff
 splits {
     abi {
         reset()
-        enable enableSeparateBuildPerCPUArchitecture
+-       enable enableSeparateBuildPerCPUArchitecture
++       enable true        // 启用单独的 cpu 架构编译
         universalApk false  // If true, also generate a universal APK
--       include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
-+       include "x86", "arm64-v8a"
     }
 }
 ```
 
-这样既可以保证兼容模拟器和真机，也大幅减小了 apk 的大小。
+如此一来会在编译目录中输出多个 apk 文件，分发和上传到热更新服务时只需要使用`app-arm64-v8a-release.apk`文件，可以大幅减小 apk 的大小。
 
 ##### 热更新包优化(ppk)
 
