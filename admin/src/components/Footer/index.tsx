@@ -4,7 +4,7 @@ import { DefaultFooter } from '@ant-design/pro-layout';
 
 export default () => (
   <DefaultFooter
-    copyright="2020 武汉青罗网络科技有限公司"
+    copyright={`${new Date().getFullYear()} 武汉青罗网络科技有限公司`}
     links={[
       {
         key: 'Pushy热更新',

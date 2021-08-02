@@ -69,7 +69,7 @@ function Footer() {
         </Row>
       </div>
       <section className="bottom-bar">
-        <p>React Native中文网 © 2020 武汉青罗网络科技有限公司</p>
+        <p>React Native中文网 © {new Date().getFullYear()} 武汉青罗网络科技有限公司</p>
         <p>
           <a href="http://beian.miit.gov.cn/">鄂ICP备20002031号-3</a>
           <img
