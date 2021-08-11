@@ -32,8 +32,6 @@ jobs:
         run: |
           cd site && yarn && yarn build && cd -
           mv site/public ./
-          cd admin && yarn && yarn build && cd -
-          mv admin/dist public/admin
           cp CNAME public/
           mv agreement public/agreement
           cp .nojekyll public/
