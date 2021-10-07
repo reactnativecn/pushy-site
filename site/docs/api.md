@@ -98,6 +98,28 @@ const hash = await downloadUpdate(
 
 ---
 
+#### function markSuccess()
+
+在`isFirstTime`为`true`时，必须调用此函数作为更新成功的标记（否则下次启动会默认失败自动回滚）。
+
+---
+
+#### async function getCurrentVersionInfo()
+
+获取当前已热更版本的信息（如尚未热更过则返回空对象）。
+
+返回值示例：
+
+```
+    {
+        name: '1.0.3-rc',
+        description: '添加聊天功能\n修复商城页面BUG',
+        metaInfo: '{"silent":true}',
+    }
+```
+
+---
+
 #### function switchVersion(hash)
 
 立即重启应用，并加载已经下载完毕的版本。
@@ -107,12 +129,6 @@ const hash = await downloadUpdate(
 #### function switchVersionLater(hash)
 
 在下一次启动应用的时候加载已经下载完毕的版本。
-
----
-
-#### function markSuccess()
-
-在`isFirstTime`为`true`时，必须调用此函数作为更新成功的标记（否则下次启动会默认失败自动回滚）。
 
 ---
 
