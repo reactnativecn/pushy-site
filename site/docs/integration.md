@@ -6,7 +6,25 @@ type: 快速入门
 
 安装配置完成后，确定应用编译顺利通过，下面我们来进行代码集成。
 
-## 获取 appKey
+## 极简快速集成
+
+我们从 v6.5.0 版本开始提供极简的一行式集成（老版本只能使用自定义集成方式）：
+
+```js
+import { simpleUpdate } from 'react-native-update';
+
+// 整个应用的根组件
+class App extends Component {}
+
+// 对根组件使用simpleUpdate方法封装后导出
+export default simpleUpdate(App);
+```
+
+此方式默认在 App 启动，以及从后台切换到前台时触发更新检查，弹出提示的内容也固定。如需自定义触发时机，以及修改界面提示等，请参考下面的自定义集成方式。
+
+## 自定义集成
+
+### 获取 appKey
 
 检查更新时必须提供你的`appKey`，这个值保存在`update.json`中，并且根据平台不同而不同。你可以用如下的代码获取：
 
@@ -19,7 +37,7 @@ const { appKey } = _updateConfig[Platform.OS];
 
 如果你不使用 pushy 命令行，你也可以从网页端查看到两个应用 appKey，并根据平台的不同来选择。
 
-## 检查更新、下载更新
+### 检查更新、下载更新
 
 异步函数[`checkUpdate`](api.html#async-function-checkupdateappkey)可以检查当前版本是否需要更新：
 
@@ -50,21 +68,21 @@ const hash = await downloadUpdate(
 
 `downloadUpdate`方法从`v5.8.3`版本开始新增接受第二个可选参数，为下载进度的回调函数（`onDownloadProgress`）。可根据回调参数自行设计进度的展示。
 
-## 切换版本
+### 切换版本
 
 `downloadUpdate`的返回值是一个 hash 字符串，它是当前热更新版本的唯一标识。
 
 你可以使用`switchVersion(hash)`函数立即切换版本(此时应用会立即重新加载)，或者选择调用 `switchVersionLater(hash)`，让应用在下一次启动的时候再加载新的版本。
 
-## 首次启动、回滚
+### 首次启动、回滚
 
 在每次更新完毕后的首次启动时，`isFirstTime`常量会为`true`。你必须在应用退出前合适的任何时机，调用`markSuccess`，否则应用下一次启动的时候将会进行回滚操作。这一机制称作“反触发”，这样当你应用启动初期即遭遇问题的时候，也能在下一次启动时恢复运作。
 
 你可以通过`isFirstTime`来获知这是当前版本的首次启动，也可以通过`isRolledBack`来获知应用刚刚经历了一次回滚操作。你可以在此时给予用户合理的提示。
 
-以上提及的所有api的说明文档可在[这里](api.html)查看。
+以上提及的所有 api 的说明文档可在[这里](api.html)查看。
 
-## 完整的示例
+### 完整的示例
 
 ```javascript
 import React, { Component } from 'react';
@@ -150,13 +168,10 @@ export default class MyProject extends Component {
           onPress: () => {
             if (info.downloadUrl) {
               // apk可直接下载安装
-              if (
-                Platform.OS === 'android' &&
-                info.downloadUrl.endsWith('.apk')
-              ) {
+              if (Platform.OS === 'android' && info.downloadUrl.endsWith('.apk')) {
                 downloadAndInstallApk({
                   url: info.downloadUrl,
-                  onDownloadProgress: ({received, total}) => {
+                  onDownloadProgress: ({ received, total }) => {
                     this.setState({
                       received,
                       total,
