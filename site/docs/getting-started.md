@@ -4,11 +4,11 @@ title: 安装配置
 type: 快速入门
 ---
 
-首先你应该有一个基于React Native开发的应用，我们把具有package.json的目录叫做你的"应用根目录"。
+首先你应该有一个基于 React Native 开发的应用，我们把具有 package.json 的目录叫做你的"应用根目录"。
 
-如果你还没有初始化应用，请参阅[开始使用React Native](https://reactnative.cn/docs/getting-started)。
+如果你还没有初始化应用，请参阅[开始使用 React Native](https://reactnative.cn/docs/getting-started)。
 
-所以我们也假设你已经拥有了开发React Native应用的一切环境，包括`Node.js`、`XCode`、`Android SDK`等等。
+所以我们也假设你已经拥有了开发 React Native 应用的一切环境，包括`Node.js`、`XCode`、`Android SDK`等等。
 
 ## 安装
 
@@ -20,74 +20,83 @@ npm i -g react-native-update-cli
 
 # 在项目中安装热更新模块
 npm i react-native-update
-```  
+```
 
 > 如果下载极慢或者显示网络失败，请设置使用淘宝镜像`npx nrm use taobao`
 
-如果你的RN版本 >= 0.60，请在iOS目录下执行:
+如果你的 RN 版本 >= 0.60，请在 ios 目录下执行:
 
 ```bash
 pod install
 ```
 
-如果你的RN版本 < 0.60，那么还需要[手动link](#手动link)
+如果你的 RN 版本 < 0.60，那么需要先在`package.json`文件的`scripts`中加入：
 
-> 注意：如果是混编RN项目，由于目前官方集成文档并不完善，参照官方文档可能无法实现自动link功能。此时即便RN版本 >= 0.60，你可能也需要执行手动link操作。
+```json
+"postinstall": "npx jetify -r"
+```
+
+然后按照[手动 link](#手动link)的说明操作。
+
+> 注意：如果是混编 RN 项目，由于目前官方集成文档并不完善，参照官方文档可能无法实现自动 link 功能。此时即便 RN 版本 >= 0.60，你可能也需要执行手动 link 操作。
 
 <details>
 <summary>
 如果你的RN版本比较老（< 0.46），请点击这里的注意事项
 </summary>
 
-如果你的RN版本比较老，请按下面表格尝试老一些的版本（但这些版本我们已不再维护，不能保证可以使用）：
+如果你的 RN 版本比较老，请按下面表格尝试老一些的版本（但这些版本我们已不再维护，不能保证可以使用）：
 
-| React Native版本 | react-native-update版本 |
-| ---------------- | ----------------------- |
-| 0.26及以下       | 1.0.x                   |
-| 0.27 - 0.28      | 2.x                     |
-| 0.29 - 0.33      | 3.x                     |
-| 0.34 - 0.45      | 4.x                     |
+| React Native 版本 | react-native-update 版本 |
+| ----------------- | ------------------------ |
+| 0.26 及以下       | 1.0.x                    |
+| 0.27 - 0.28       | 2.x                      |
+| 0.29 - 0.33       | 3.x                      |
+| 0.34 - 0.45       | 4.x                      |
 
 安装命令示例：
+
 ```bash
 npm i react-native-update@4.x
 ```
 
-如果RN的版本是0.45及以下，你还必须安装[Android NDK](http://androiddevtools.cn)，版本最好选用r10e，并设置环境变量`ANDROID_NDK_HOME`，指向你的NDK根目录(例如`/Users/tdzl2003/Downloads/android-ndk-r10e`)。
+如果 RN 的版本是 0.45 及以下，你还必须安装[Android NDK](http://androiddevtools.cn)，版本最好选用 r10e，并设置环境变量`ANDROID_NDK_HOME`，指向你的 NDK 根目录(例如`/Users/tdzl2003/Downloads/android-ndk-r10e`)。
+
 </details>
 
+> 请记得，任意在 ios 和 android 目录下的修改，一定要重新编译（npx react-native run-ios 或 run-android 命令编译，或在 Xcode/Android Studio 中重新编译）才能生效。
 
-> 请记得，任意在ios和android目录下的修改，一定要重新编译（npx react-native run-ios或run-android命令编译，或在Xcode/Android Studio中重新编译）才能生效。
+## 手动 link
 
+如果 RN 版本 >= 0.60 则不需要此手动 link 步骤。
 
-## 手动link
-
-如果RN版本 >= 0.60则不需要此手动link步骤。
-
-> 注意：如果是混编RN项目，由于目前官方集成文档并不完善，参照官方文档可能无法实现自动link功能。此时即便RN版本 >= 0.60，你可能也需要执行手动link操作。
+> 注意：如果是混编 RN 项目，由于目前官方集成文档并不完善，参照官方文档可能无法实现自动 link 功能。此时即便 RN 版本 >= 0.60，你可能也需要执行手动 link 操作。
 
 ### iOS
 
 <details>
 <summary>RN < 0.60且使用CocoaPods（推荐）</summary>
 
-1. 在ios/Podfile中添加
+1. 在 ios/Podfile 中添加
+
 ```
 pod 'react-native-update', path: '../node_modules/react-native-update'
 ```
-2. 在项目的ios目录下运行`pod install`
+
+2. 在项目的 ios 目录下运行`pod install`
 3. 重新编译
-   
+
 </details>
 
 <details>
 <summary>RN < 0.60且不使用CocoaPods</summary>
 
-1. 在XCode中的Project Navigator里,右键点击`Libraries` ➜ `Add Files to [你的工程名]`
+1. 在 XCode 中的 Project Navigator 里,右键点击`Libraries` ➜ `Add Files to [你的工程名]`
 2. 进入`node_modules` ➜ `react-native-update` ➜ `ios 并选中 `RCTPushy.xcodeproj`
-3. 在XCode中的project navigator里,选中你的工程,在 `Build Phases` ➜ `Link Binary With Libraries` 中添加 `libRCTPushy.a`、`libz.tbd`、`libbz2.1.0.tbd`
-5. 继续在`Build Settings`里搜索`Header Search Path`，添加`$(SRCROOT)/../node_modules/react-native-update/ios`，勾选`recursive`。
-6. 在`Build Phases`添加一个`New Run Script Phase`运行脚本，内容如下
+3. 在 XCode 中的 project navigator 里,选中你的工程,在 `Build Phases` ➜ `Link Binary With Libraries` 中添加 `libRCTPushy.a`、`libz.tbd`、`libbz2.1.0.tbd`
+4. 继续在`Build Settings`里搜索`Header Search Path`，添加`$(SRCROOT)/../node_modules/react-native-update/ios`，勾选`recursive`。
+5. 在`Build Phases`添加一个`New Run Script Phase`运行脚本，内容如下
+
 ```
 #!/bin/bash
 set -x
@@ -95,42 +104,41 @@ DEST="../node_modules/react-native-update/ios/"
 date +%s > "$DEST/pushy_build_time.txt"
 ```
 
-7. 尝试编译一下，顺利的话就会在`../node_modules/react-native-update/ios/`文件夹下面生成一个`pushy_build_time.txt`文件。
-然后在`Copy Bundle Resources`里把生成的`pushy_build_time.txt`文件添加进去。
+7. 尝试编译一下，顺利的话就会在`../node_modules/react-native-update/ios/`文件夹下面生成一个`pushy_build_time.txt`文件。然后在`Copy Bundle Resources`里把生成的`pushy_build_time.txt`文件添加进去。
 
 </details>
 
 ### Android
 
-
 <details>
 <summary>RN < 0.60</summary>
 
-1. 在`android/settings.gradle`中添加如下代码:  
-   
-  	```
-  	include ':react-native-update'
-  	project(':react-native-update').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-update/android')
-  	```
+1. 在`android/settings.gradle`中添加如下代码:
 
-2. 在`android/app/build.gradle`的 dependencies 部分增加如下代码:  
-  
-  	```
-    implementation project(':react-native-update')
-    ```
+   ```
+   include ':react-native-update'
+   project(':react-native-update').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-update/android')
+   ```
+
+2. 在`android/app/build.gradle`的 dependencies 部分增加如下代码:
+
+   ```
+   implementation project(':react-native-update')
+   ```
 
 3. 打开`android/app/src/main/java/[...]/MainApplication.java`,
-  - 在文件开头增加 `import cn.reactnative.modules.update.UpdatePackage;`
-  - 在`getPackages()` 方法中增加 `new UpdatePackage()`(注意上一行可能要增加一个逗号)
+
+- 在文件开头增加 `import cn.reactnative.modules.update.UpdatePackage;`
+- 在`getPackages()` 方法中增加 `new UpdatePackage()`(注意上一行可能要增加一个逗号)
 </details>
 
-## 配置Bundle URL
+## 配置 Bundle URL
 
 注意此步骤无论任何版本，目前都需要手动配置。
 
 ### iOS
 
-在你的AppDelegate.m文件中增加如下代码：
+在你的 AppDelegate.m 文件中增加如下代码：
 
 ```objectivec
 // ... 其它代码
@@ -174,7 +182,7 @@ date +%s > "$DEST/pushy_build_time.txt"
 
 ### Android
 
-在MainApplication中增加如下代码（如果是混编原生的项目或其他原因没有使用ReactApplication，请[使用此api集成](api.html#updatecontextsetcustominstancemanagerreactinstancemanager-instancemanager))：
+在 MainApplication 中增加如下代码（如果是混编原生的项目或其他原因没有使用 ReactApplication，请[使用此 api 集成](api.html#updatecontextsetcustominstancemanagerreactinstancemanager-instancemanager))：
 
 ```java
 // ... 其它代码
@@ -194,11 +202,11 @@ public class MainApplication extends Application implements ReactApplication {
 }
 ```
 
-> 请记得，任意在ios和android目录下的修改，一定要重新编译（npx react-native run-ios或run-android命令编译，或在Xcode/Android Studio中重新编译）才能生效。
+> 请记得，任意在 ios 和 android 目录下的修改，一定要重新编译（npx react-native run-ios 或 run-android 命令编译，或在 Xcode/Android Studio 中重新编译）才能生效。
 
-## 禁用android的crunch优化
+## 禁用 android 的 crunch 优化
 
-android会在生成apk时自动对png图片进行压缩，此操作既耗时又影响增量补丁的生成。为了保证补丁能正常生成，您需要在`android/app/build.gradle`中关闭此操作：
+android 会在生成 apk 时自动对 png 图片进行压缩，此操作既耗时又影响增量补丁的生成。为了保证补丁能正常生成，您需要在`android/app/build.gradle`中关闭此操作：
 
 ```gradle
 ...
@@ -226,9 +234,9 @@ email: <输入你的注册邮箱>
 password: <输入你的密码>
 ```
 
-这会在项目文件夹下创建一个`.update`文件，注意不要把这个文件上传到Git等CVS系统上。你可以在`.gitignore`末尾增加一行`.update`来忽略这个文件。
+这会在项目文件夹下创建一个`.update`文件，注意不要把这个文件上传到 Git 等 CVS 系统上。你可以在`.gitignore`末尾增加一行`.update`来忽略这个文件。
 
-登录之后可以创建应用。注意iOS平台和安卓平台需要分别创建：
+登录之后可以创建应用。注意 iOS 平台和安卓平台需要分别创建：
 
 ```bash
 $ pushy createApp --platform ios
@@ -265,6 +273,6 @@ Enter appId: <输入应用前面的编号>
 }
 ```
 
-你可以安全的把`update.json`上传到Git等CVS系统上，与你的团队共享这个文件，它不包含任何敏感信息。当然，他们在使用任何功能之前，都必须首先输入`pushy login`进行登录。
+你可以安全的把`update.json`上传到 Git 等 CVS 系统上，与你的团队共享这个文件，它不包含任何敏感信息。当然，他们在使用任何功能之前，都必须首先输入`pushy login`进行登录。
 
 至此应用的创建/选择就已经成功了。下一步，你需要给代码添加相应的功能，请参阅[代码集成](integration)。
