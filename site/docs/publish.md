@@ -24,7 +24,7 @@ type: 快速入门
 4. 然后运行如下命令上传到 pushy 服务器以供后续版本比对之用
 
 ```bash
-$ pushy uploadIpa <your-package.ipa>
+$ pushy uploadIpa <ipa后缀文件>
 ```
 
 此 ipa 的`CFBundleShortVersionString`字段(位于`ios/项目名/Info.plist`中)会被记录为原生版本号`packageVersion`。
@@ -57,17 +57,17 @@ $ pushy uploadApk android/app/build/outputs/apk/release/app-release.apk
 
 ## 发布热更新版本
 
-你可以尝试修改一行代码(譬如将版本一修改为版本二)，然后生成新的热更新版本。
+你可以尝试修改一行代码(譬如将版本一修改为版本二)，然后使用`pushy bundle --platform <ios|android>`命令来生成新的热更新版本。
 
 ```bash
-$ pushy bundle --platform <ios|android>
+$ pushy bundle --platform android
 Bundling with React Native version:  0.22.2
 <各种进度输出>
 Bundled saved to: build/output/android.1459850548545.ppk
 Would you like to publish it?(Y/N)
 ```
 
-如果想要立即发布，此时输入 Y。当然，你也可以在将来使用`pushy publish --platform <ios|android> <ppkFile>`来发布版本。
+如果想要立即上传，此时输入 Y。当然，你也可以在将来使用`pushy publish --platform android build/output/android.1459850548545.ppk`来上传刚才打包好的热更新包。
 
 ```
   Uploading [========================================================] 100% 0.0s
@@ -80,7 +80,7 @@ Would you like to bind packages to this version?(Y/N)
 
 此时版本已经提交到 pushy 服务，但用户暂时看不到此更新，你需要先将特定的原生包版本绑定到此热更新版本上。
 
-此时输入 Y 立即绑定，你也可以在将来使用`pushy update --platform <ios|android>`来使得对应原生包版本的用户更新。除此以外，你还可以在网页端操作，简单的将对应的原生包版本拖到此热更新版本下即可。
+此时输入 Y 立即绑定，你也可以在将来使用`pushy update --platform <ios|android>`来对已上传的热更包和原生包进行绑定。除此以外，你还可以在网页端操作，简单的将对应的原生包版本拖到需要的热更新版本下即可。
 
 ```
 Offset 0
@@ -94,8 +94,8 @@ Total 1 packages.
 Enter packageId: <输入原生包版本序号，序号就是上面列表中)前面的数字>
 ```
 
-版本绑定完毕后，客户端就应当可以检查到更新并进行更新了。
+版本绑定完毕后，服务器会在几秒内生成差量补丁，客户端就可以获取到更新了。
 
-后续要继续发布新的热更新，只需反复执行`pushy bundle`命令即可。z
+后续要继续发布新的热更新，只需反复执行`pushy bundle`命令即可。
 
 恭喜你，至此为止，你已经完成了植入代码热更新的全部工作。
