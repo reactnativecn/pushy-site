@@ -162,4 +162,5 @@ $ npm install -g react-native-update-cli
 
 - platform: ios|android 对应的平台
 - versionId: 要绑定的热更新版本 ID
-- packageId: 要绑定的原生包 ID
+- packageId: 要绑定的原生包 ID （与版本名二选一）
+- packageVersion: 要绑定的原生包版本名（与 ID 二选一，需 cli 版本 1.7.2 或以上）
