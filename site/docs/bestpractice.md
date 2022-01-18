@@ -65,9 +65,9 @@ splits {
 
 #### 元信息(Meta Info)的使用
 
-在发布热更新版本时，或者在网页端，你可以编辑版本的元信息。这是一段在检查更新时可以获得的字符串，你可以在其中按你所想的格式（一般建议用[JSON格式](https://developer.mozilla.org/zh-CN/docs/Learn/JavaScript/Objects/JSON)）保存一些信息。
+在发布热更新版本时，或者在网页端，你可以编辑版本的元信息。这是一段在检查更新时可以获得的字符串，你可以在其中按你所想的格式（一般建议用[JSON 格式](https://developer.mozilla.org/zh-CN/docs/Learn/JavaScript/Objects/JSON)）保存一些信息。
 
-比如我们可以在元信息中约定字段标志`silent`，表示需要静默更新。当我们上传热更包填写metainfo时，以[JSON格式](https://developer.mozilla.org/zh-CN/docs/Learn/JavaScript/Objects/JSON)输入：
+比如我们可以在元信息中约定字段标志`silent`，表示需要静默更新。当我们上传热更包填写 metainfo 时，以[JSON 格式](https://developer.mozilla.org/zh-CN/docs/Learn/JavaScript/Objects/JSON)输入：
 
 ```json
 { "silent": true }
@@ -75,7 +75,7 @@ splits {
 
 > 请注意，我们并不对输入做任何格式校验和约束，请自行校验输入是否正确。
 
-此时在客户端检查更新时，能获取到我们刚刚输入的元信息，但它并不具备任何功能，只是一个字符串而已。所以我们其实需要`预先`在更新流程中加入对应的处理逻辑：
+此时在客户端检查更新时，能获取到我们刚刚输入的元信息，但它并不具备任何功能，只是一个字符串而已。所以我们其实需要**预先**在更新流程中加入对应的处理逻辑：
 
 ```js
 // 调用 checkUpdate 获取 info
@@ -100,11 +100,11 @@ if (info.expired) {
 
 我们在原有的更新流程中加入元信息的读取和判断：
 
-```js 
+```js
 let metaInfo;
 try {
   // 注意 JSON 输入有可能有错误，需要用 try 语句来避免应用被带崩
-  metaInfo = JSON.parse(info.metaInfo)
+  metaInfo = JSON.parse(info.metaInfo);
 } catch (e) {
   // 异常处理，忽略或上报？
 }
