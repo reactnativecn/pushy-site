@@ -35,7 +35,7 @@ import _updateConfig from './update.json';
 const { appKey } = _updateConfig[Platform.OS];
 ```
 
-如果你不使用 pushy 命令行，你也可以从网页端查看到两个应用 appKey，并根据平台的不同来选择。
+如果你不使用 pushy 命令行，也可以从网页端查看到两个应用 appKey，并根据平台的不同来选择。
 
 ### 检查更新、下载更新
 
@@ -51,7 +51,7 @@ const info = await checkUpdate(appKey);
 
 2. `{upToDate: true}`：当前已经更新到最新，无需进行更新。
 
-3. `{update: true}`：当前有新版本可以更新。info 的`name`、`description`字段可以用于提示用户，而`metaInfo`字段则可以根据你的需求自定义其它属性(如是否静默更新、是否强制更新等等)。另外还有几个字段，包含了补丁包的下载地址等。 pushy 会首先尝试耗费流量更少的更新方式。将`info`对象传递给`downloadUpdate`方法作为参数即可。
+3. `{update: true}`：当前有新版本可以更新。info 的`name`、`description`字段可以用于提示用户，而`metaInfo`字段则可以根据你的需求自定义其它属性(如是否静默更新、是否强制更新等等)，具体用法可参考[场景实践](bestpractice.html#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了补丁包的下载地址等。 pushy 会首先尝试耗费流量更少的更新方式。将`info`对象传递给`downloadUpdate`方法作为参数即可。
 
 ```javascript
 const hash = await downloadUpdate(
