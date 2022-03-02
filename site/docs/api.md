@@ -145,7 +145,7 @@ import cn.reactnative.modules.update.UpdateContext
 
 mReactInstanceManager = ReactInstanceManager.builder()
                 // ...各种setter，但注意不要调用setBundleAssetName
-                .setJSBundleFile(UpdateContext.getBundleUrl(mContext, "index.android.bundle"))
+                .setJSBundleFile(UpdateContext.getBundleUrl(mContext, "assets://index.android.bundle"))
                 .build();
 UpdateContext.setCustomInstanceManager(mReactInstanceManager);
 ```
