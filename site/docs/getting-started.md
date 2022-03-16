@@ -15,10 +15,10 @@ type: 快速入门
 在你的项目根目录下运行以下命令：
 
 ```bash
-# 全局安装命令行工具，每台电脑只用装一次
+# 先全局安装命令行工具，每台电脑只用装一次
 npm i -g react-native-update-cli
 
-# 在项目中安装热更新模块
+# 然后在项目目录中安装热更新模块
 npm i react-native-update
 ```
 
