@@ -17,7 +17,7 @@ function Page2() {
           <QueueAnim key="queue" type="bottom" leaveReverse className="page2-content">
             <div key="code1" className="home-code">
               <div># 安装</div>
-              <div>$ npm i react-native-update-cli</div>
+              <div>$ npm i -g react-native-update-cli</div>
               <div>$ npm i react-native-update && cd ios && pod install</div>
 
               <br />
