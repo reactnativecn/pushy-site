@@ -38,15 +38,11 @@ type: 其他
 
 在工程 target 的 Build Phases->Link Binary with Libraries 中加入 libz.tbd、libbz2.1.0.tbd
 
-#### Android 编译报错 "错误：程序包 android.support.v4.content 不存在"
-
-在项目目录里运行`npx jetify`后再编译打包。
-
 #### 热更新成功完成，但是重启后又回滚了是怎么回事？
 
 可以正常更新，但是重启后回滚，一般有两种可能的情况：
 
-- 没有正确[配置 bundleUrl](/docs/getting-started.html#配置bundle-url)
+- 没有正确[配置 bundleUrl](/docs/getting-started.html#配置-bundle-url)
 - 没有正确[调用 markSuccess](/docs/integration.html#%E9%A6%96%E6%AC%A1%E5%90%AF%E5%8A%A8%E3%80%81%E5%9B%9E%E6%BB%9A)
 
 如果你确定上述两个步骤都正确无误，请在[issues 区](https://github.com/reactnativecn/react-native-pushy/issues)给我们留言反馈。
