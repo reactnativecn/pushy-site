@@ -36,7 +36,7 @@ pod install
 "postinstall": "npx jetify -r"
 ```
 
-然后按照[手动 link](#手动link)的说明操作。
+然后按照[手动 link](#手动-link)的说明操作。
 
 > 注意：如果是混编 RN 项目，由于目前官方集成文档并不完善，参照官方文档可能无法实现自动 link 功能。此时即便 RN 版本 >= 0.60，你可能也需要执行手动 link 操作。
 
