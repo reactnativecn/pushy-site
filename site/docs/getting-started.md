@@ -158,9 +158,10 @@ date +%s > "$DEST/pushy_build_time.txt"
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {
 #if DEBUG
-  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
+  // 原先这里的写法继续保留(所以debug模式下不可热更新)
+  return .....
 #else
-  // 非DEBUG情况下替换为热更新bundle
+  // 把这里非DEBUG的情况替换为热更新bundle的写法
   return [RCTPushy bundleURL];
 #endif
 }
@@ -169,10 +170,10 @@ date +%s > "$DEST/pushy_build_time.txt"
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 #if DEBUG
-  // 原来的jsCodeLocation保留在这里
+  // 原来的jsCodeLocation保留在这里(所以debug模式下不可热更新)
   jsCodeLocation = ..........
 #else
-  // 非DEBUG情况下替换为热更新bundle
+  // 把这里非DEBUG的情况替换为热更新bundle的写法
   jsCodeLocation = [RCTPushy bundleURL];
 #endif
   // ... 其它代码
