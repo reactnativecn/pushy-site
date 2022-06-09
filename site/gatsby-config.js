@@ -1,5 +1,4 @@
 module.exports = {
-  assetPrefix: `https://cdn.jsdelivr.net/gh/reactnativecn/pushy-site@gh-pages/`,
   siteMetadata: {
     title: 'Pushy - React Native热更新',
     description: '极速热更新',

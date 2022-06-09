@@ -13,7 +13,7 @@ export default function HTML(props) {
         <link
           type="text/css"
           rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/prismjs@1.20.0/themes/prism.min.css"
+          href="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/prism/1.20.0/themes/prism.min.css"
         ></link>
         {props.headComponents}
       </head>
