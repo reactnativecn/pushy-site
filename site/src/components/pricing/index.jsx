@@ -87,8 +87,8 @@ function Pricing() {
               </div>
               <ul className="pricing__feature-list">
                 <li className="pricing__feature">可创建6个应用，每个限*：</li>
-                <li className="pricing__feature">60个原生包，每个最大200M</li>
-                <li className="pricing__feature">60个热更包，每个最大40M</li>
+                <li className="pricing__feature">60个原生包，每个最大300M</li>
+                <li className="pricing__feature">60个热更包，每个最大50M</li>
                 <li className="pricing__feature">提供专人技术支持</li>
               </ul>
               <Button shape="round" type="primary" onClick={gotoPurchase}>
@@ -109,8 +109,8 @@ function Pricing() {
               </div>
               <ul className="pricing__feature-list">
                 <li className="pricing__feature">可创建10个应用，每个限*：</li>
-                <li className="pricing__feature">100个原生包，每个最大500M</li>
-                <li className="pricing__feature">100个热更包，每个最大100M</li>
+                <li className="pricing__feature">100个原生包，每个最大1000M</li>
+                <li className="pricing__feature">100个热更包，每个最大200M</li>
                 <li className="pricing__feature">提供专人技术支持</li>
               </ul>
               <Button shape="round" type="primary" onClick={gotoPurchase}>
