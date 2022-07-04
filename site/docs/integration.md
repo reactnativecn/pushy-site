@@ -8,16 +8,18 @@ type: 快速入门
 
 ## 极简快速集成
 
-我们从 v7.x 版本开始提供极简的一行式集成（老版本只能使用自定义集成方式）：
+我们从 v8.x 版本开始提供极简的三行式集成（老版本只能使用自定义集成方式）：
 
 ```js
 import { simpleUpdate } from 'react-native-update';
+import _updateConfig from './update.json';
+const { appKey } = _updateConfig[Platform.OS];
 
 // 整个应用的根组件
 class App extends Component {}
 
 // 对根组件使用simpleUpdate方法封装后导出
-export default simpleUpdate(App);
+export default simpleUpdate(App, { appKey });
 ```
 
 此方式默认在 App 启动，以及从后台切换到前台时触发更新检查，弹出提示的内容也固定。如需自定义触发时机，以及修改界面提示等，请参考下面的自定义集成方式。
