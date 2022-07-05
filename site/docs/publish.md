@@ -29,9 +29,9 @@ $ pushy uploadIpa <ipa后缀文件>
 
 此 ipa 的`CFBundleShortVersionString`字段(位于`ios/项目名/Info.plist`中)会被记录为原生版本号`packageVersion`。
 
-随后你可以选择往 AppStore 上传这个版本（注意是刚刚已经 archive 完成的包重新选择 Upload 选项，且此时应该勾选 bitcode 选项），也可以先通过[Test flight](https://developer.apple.com/cn/testflight/)或[蒲公英](https://www.pgyer.com/doc/view/build_ipa)等渠道进行真机安装测试。请注意：暂不支持通过 Xcode 直接进行热更新测试。
+随后你可以选择往 AppStore 上传这个版本（可以重新 export 并调整相关选项，但请不要重新 archive），也可以先通过[Test flight](https://developer.apple.com/cn/testflight/)或[蒲公英](https://www.pgyer.com/doc/view/build_ipa)等渠道进行真机安装测试。请注意：暂不支持通过 Xcode 直接进行热更新测试。
 
-如果后续需要再次打包（例如修改原生代码或配置），请先**更改版本号**，并再次`uploadIpa`到服务器端记录，否则后续生成的相同版本的原生包会由于[编译时间戳不一致而`无法获取热更新`](faq.html#热更新报错：热更新已暂停，原因：buildtime-mismatch。)。
+如果后续需要再次 archive 打包（例如修改原生代码或配置），请先**更改版本号**，并在打包完成后再次`uploadIpa`到服务器端记录，否则后续生成的相同版本的原生包会由于[编译时间戳不一致而`无法获取热更新`](faq.html#热更新报错：热更新已暂停，原因：buildtime-mismatch。)。
 
 > 注意：如果你在上传之前就运行了新的原生版本，由于服务器端没有记录，会暂停其更新数小时。可在删除原先安装的 app 再重新安装以清空暂停设置。在上传之后安装的客户端不会受此影响。
 
