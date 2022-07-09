@@ -40,8 +40,8 @@ function Pricing() {
               </div>
               <ul className="pricing__feature-list">
                 <li className="pricing__feature">可创建3个应用，每个限*：</li>
-                <li className="pricing__feature">原生包容量最大30M</li>
-                <li className="pricing__feature">热更包容量最大3M</li>
+                <li className="pricing__feature">30个原生包，每个最大30M</li>
+                <li className="pricing__feature">30个热更包，每个最大3M</li>
               </ul>
               <Button
                 shape="round"
@@ -65,8 +65,8 @@ function Pricing() {
               </div>
               <ul className="pricing__feature-list">
                 <li className="pricing__feature">可创建5个应用，每个限*：</li>
-                <li className="pricing__feature">原生包容量最大100M</li>
-                <li className="pricing__feature">热更包容量最大15M</li>
+                <li className="pricing__feature">50个原生包，每个最大100M</li>
+                <li className="pricing__feature">50个热更包，每个最大15M</li>
                 <li className="pricing__feature">提供专人技术支持</li>
               </ul>
               <Button shape="round" type="primary" onClick={gotoPurchase}>
@@ -87,8 +87,8 @@ function Pricing() {
               </div>
               <ul className="pricing__feature-list">
                 <li className="pricing__feature">可创建6个应用，每个限*：</li>
-                <li className="pricing__feature">原生包容量最大300M</li>
-                <li className="pricing__feature">热更包容量最大50M</li>
+                <li className="pricing__feature">60个原生包，每个最大300M</li>
+                <li className="pricing__feature">60个热更包，每个最大50M</li>
                 <li className="pricing__feature">提供专人技术支持</li>
               </ul>
               <Button shape="round" type="primary" onClick={gotoPurchase}>
@@ -109,8 +109,8 @@ function Pricing() {
               </div>
               <ul className="pricing__feature-list">
                 <li className="pricing__feature">可创建10个应用，每个限*：</li>
-                <li className="pricing__feature">原生包容量最大1000M</li>
-                <li className="pricing__feature">热更包容量最大200M</li>
+                <li className="pricing__feature">100个原生包，每个最大1000M</li>
+                <li className="pricing__feature">100个热更包，每个最大200M</li>
                 <li className="pricing__feature">提供专人技术支持</li>
               </ul>
               <Button shape="round" type="primary" onClick={gotoPurchase}>
