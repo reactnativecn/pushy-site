@@ -69,7 +69,12 @@ function Pricing() {
                 <li className="pricing__feature">50个热更包，每个最大15M</li>
                 <li className="pricing__feature">提供专人技术支持</li>
               </ul>
-              <Button shape="round" type="primary" onClick={gotoPurchase}>
+              <Button
+                style={{ marginTop: 'auto' }}
+                shape="round"
+                type="primary"
+                onClick={gotoPurchase}
+              >
                 立即升级
               </Button>
             </div>
@@ -91,7 +96,12 @@ function Pricing() {
                 <li className="pricing__feature">60个热更包，每个最大50M</li>
                 <li className="pricing__feature">提供专人技术支持</li>
               </ul>
-              <Button shape="round" type="primary" onClick={gotoPurchase}>
+              <Button
+                style={{ marginTop: 'auto' }}
+                shape="round"
+                type="primary"
+                onClick={gotoPurchase}
+              >
                 立即升级
               </Button>
             </div>
@@ -113,7 +123,12 @@ function Pricing() {
                 <li className="pricing__feature">100个热更包，每个最大200M</li>
                 <li className="pricing__feature">提供专人技术支持</li>
               </ul>
-              <Button shape="round" type="primary" onClick={gotoPurchase}>
+              <Button
+                style={{ marginTop: 'auto' }}
+                shape="round"
+                type="primary"
+                onClick={gotoPurchase}
+              >
                 立即升级
               </Button>
             </div>
