@@ -101,7 +101,7 @@ if (info.expired) {
 我们在原有的更新流程中加入元信息的读取和判断：
 
 ```js
-let metaInfo;
+let metaInfo = {};
 try {
   // 注意 JSON 输入有可能有错误，需要用 try 语句来避免应用被带崩
   metaInfo = JSON.parse(info.metaInfo);
