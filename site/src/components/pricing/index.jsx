@@ -42,12 +42,11 @@ function Pricing() {
               textAlign: 'center',
             }}
           >
-            新注册用户将自动获得{' '}
+            新注册用户将自动获得
             <Tooltip title="您可将注册用户名、公司（或个人）名称发送至<hi@charmlot.com>，申请延长评估时间">
               <a>7 天</a>
             </Tooltip>
-            的 <strong>专业版</strong>
-            免费试用评估。到期后转为免费版。
+            的<strong>专业版</strong>免费试用评估。到期后转为免费版。
           </p>
           <div className="pricing pricing--rabten">
             <div className="pricing__item">
@@ -110,7 +109,8 @@ function Pricing() {
                   ，每个最大100M
                 </li>
                 <li className="pricing__feature">
-                  50个 <HotUpdateText />
+                  50个
+                  <HotUpdateText />
                   ，每个最大15M
                 </li>
                 <li className="pricing__feature">提供专人技术支持</li>
@@ -148,7 +148,8 @@ function Pricing() {
                   ，每个最大300M
                 </li>
                 <li className="pricing__feature">
-                  60个 <HotUpdateText />
+                  60个
+                  <HotUpdateText />
                   ，每个最大50M
                 </li>
                 <li className="pricing__feature">提供专人技术支持</li>
@@ -186,7 +187,8 @@ function Pricing() {
                   ，每个最大1000M
                 </li>
                 <li className="pricing__feature">
-                  100个 <HotUpdateText />
+                  100个
+                  <HotUpdateText />
                   ，每个最大200M
                 </li>
                 <li className="pricing__feature">提供专人技术支持</li>
