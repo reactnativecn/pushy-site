@@ -8,14 +8,22 @@ function gotoPurchase() {
   window.location.href = 'https://update.reactnative.cn/profile';
 }
 
-const AppText = () => <Tooltip title="iOS 和 Android 版本记做不同的应用。您可删除已不再使用的应用来有效利用配额。">应用</Tooltip>;
-const PackageText = () => <Tooltip title="原生包指完整的 apk 或 ipa 格式的安装包。您可删除已不再使用的原生包来有效利用配额。">原生包</Tooltip>;
+const AppText = () => (
+  <Tooltip title="iOS 和 Android 版本记做不同的应用。您可删除已不再使用的应用来有效利用配额。">
+    <a>应用</a>
+  </Tooltip>
+);
+const PackageText = () => (
+  <Tooltip title="原生包指完整的 apk 或 ipa 格式的安装包。您可删除已不再使用的原生包来有效利用配额。">
+    <a>原生包</a>
+  </Tooltip>
+);
 const HotUpdateText = () => (
   <Tooltip
     title={`热更包指"pushy bundle"命令生成的 ppk 文件（其中包含jsbundle、图片等业务逻辑文件）。
 注意这不是用户实际下载的文件，用户实际下载的是经过服务器运算后生成的极小差量补丁包。您可删除已不再使用的热更包来有效利用配额。`}
   >
-    热更包
+    <a>热更包</a>
   </Tooltip>
 );
 
@@ -36,9 +44,9 @@ function Pricing() {
           >
             新注册用户将自动获得{' '}
             <Tooltip title="您可将注册用户名、公司（或个人）名称发送至<hi@charmlot.com>，申请延长评估时间">
-              7 天
+              <a>7 天</a>
             </Tooltip>
-            的<u>专业版</u>
+            的 <strong>专业版</strong>
             免费试用评估。到期后转为免费版。
           </p>
           <div className="pricing pricing--rabten">
