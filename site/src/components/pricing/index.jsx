@@ -138,7 +138,7 @@ function Pricing() {
               </div>
               <ul className="pricing__feature-list">
                 <li className="pricing__feature">
-                  可创建6个
+                  可创建10个
                   <AppText />
                   ，每个限*：
                 </li>
@@ -177,7 +177,7 @@ function Pricing() {
               </div>
               <ul className="pricing__feature-list">
                 <li className="pricing__feature">
-                  可创建10个
+                  可创建20个
                   <AppText />
                   ，每个限*：
                 </li>
