@@ -138,7 +138,7 @@ date +%s > "$DEST/pushy_build_time.txt"
 
 ### iOS
 
-在你的 AppDelegate.m 文件中增加如下代码：
+在你的 AppDelegate.mm 或 AppDelegate.m 文件（不同 RN 版本可能后缀名不同）中增加如下代码：
 
 ```objectivec
 // ... 其它代码
