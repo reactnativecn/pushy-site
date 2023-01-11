@@ -21,7 +21,7 @@ $ npm install -g react-native-update-cli
 - intermediaDir: 临时文件输出目录
 - output: 最终 ppk 文件输出路径
 - dev: 是否打包开发版本
-- verbose: 是否展现打包过程的详细信息
+- sourcemap: 是否生成sourcemap(需cli版本1.11.0+)
 
 ---
 
