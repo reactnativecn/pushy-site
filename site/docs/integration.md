@@ -15,8 +15,10 @@ import { simpleUpdate } from 'react-native-update';
 import _updateConfig from './update.json';
 const { appKey } = _updateConfig[Platform.OS];
 
-// 整个应用的根组件
-class App extends Component {}
+// 整个应用的根组件，class 或函数组件都可以
+class App extends Component {
+  // 这是个空的示例，请替换为你自己的根组件
+}
 
 // 对根组件使用simpleUpdate方法封装后导出
 export default simpleUpdate(App, { appKey });
