@@ -140,7 +140,7 @@ date +%s > "$DEST/pushy_build_time.txt"
 
 在你的 AppDelegate.mm 或 AppDelegate.m 文件（不同 RN 版本可能后缀名不同）中增加如下代码：
 
-```objectivec
+```c
 // ... 其它代码
 #import "AppDelegate.h"
 
@@ -188,17 +188,24 @@ date +%s > "$DEST/pushy_build_time.txt"
 ```java
 // ... 其它代码
 
-// 请注意不要少了这句import
+// ↓↓↓请注意不要少了这句import
 import cn.reactnative.modules.update.UpdateContext;
+// ↑↑↑
+
 public class MainApplication extends Application implements ReactApplication {
 
-  private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
-    // 注意这一段在 ReactNativeHost 内部！
+  private final ReactNativeHost mReactNativeHost =
+    // 老版本 RN 这里可能是 new ReactNativeHost(this)
+    new DefaultReactNativeHost(this) { 
+
+    // ↓↓↓将下面这一段添加到 DefaultReactNativeHost 内部！
     @Override
     protected String getJSBundleFile() {
         return UpdateContext.getBundleUrl(MainApplication.this);
     }
-    // ... 其它代码
+    // ↑↑↑
+
+    // ...其他代码
   }
 }
 ```
