@@ -17,7 +17,7 @@ const { TweenOneGroup } = TweenOne;
 const featuresCN = [
   {
     title: '增量更新',
-    content: ['基于 bsdiff 算法创建的kb级别', '超小更新包'],
+    content: ['基于 bsdiff/hdiff 算法创建', 'kb 级别超小更新包'],
     src: deltaIcon,
   },
   {
