@@ -106,7 +106,7 @@ function Pricing() {
                 <li className="pricing__feature">
                   50个
                   <PackageText />
-                  ，每个最大100M
+                  ，每个最大150M
                 </li>
                 <li className="pricing__feature">
                   50个
@@ -145,7 +145,7 @@ function Pricing() {
                 <li className="pricing__feature">
                   60个
                   <PackageText />
-                  ，每个最大300M
+                  ，每个最大500M
                 </li>
                 <li className="pricing__feature">
                   60个
@@ -184,7 +184,7 @@ function Pricing() {
                 <li className="pricing__feature">
                   100个
                   <PackageText />
-                  ，每个最大1000M
+                  ，每个最大2000M
                 </li>
                 <li className="pricing__feature">
                   100个
