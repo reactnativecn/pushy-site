@@ -8,9 +8,9 @@ type: 开发指南
 
 ##### iOS 原生包优化(ipa)
 
-在导出 ipa 以便上传到 pushy 服务时，可以取消 bitcode 选项以大幅减小 ipa 大小。上架 app store 或者通过 testflight 分发测试包时仍然可以保留 bitcode 选项，不影响热更新。
+对于同一份 archive（其版本号、编译时间和内置 bundle 已固定，不会受导出方式所影响），可以用不同选项多次导出 ipa，选择其中最小的上传到 pushy 服务器作为热更基准包。
 
-![bitcode](assets/bitcode.png)
+![bitcode](assets/exportipa.png)
 
 ##### Android 原生包优化(apk)
 
@@ -44,8 +44,8 @@ splits {
 
 #### 有很多渠道包需要热更，如何操作比较方便？
 
-1. 如果渠道包的`js代码和初始资源`有差别（无论多么细微的差别都会生成不同的jsbundle），那么只能单独生成 apk，分别上传和绑定。可以考虑写一些脚本自动调用 cli 来执行批量操作。
-2. 如果渠道包的`js代码和初始资源`完全一致，可以考虑使用[Flavor构建](https://developer.android.com/studio/build/build-variants?hl=zh-cn)，或其他一些动态生成渠道包的方案（比如[腾讯的 VasDolly](https://github.com/Tencent/VasDolly)，[美团的 walle](https://github.com/Meituan-Dianping/walle)等），这样所有的渠道包基于同一个基础 apk 生成（因而会有相同的编译时间戳和jsbundle）。这样可以只用上传一个基础 apk，对此 apk 的热更操作可以对所有渠道包生效。
+1. 如果渠道包的`js代码和初始资源`有差别（无论多么细微的差别都会生成不同的 jsbundle），那么只能单独生成 apk，分别上传和绑定。可以考虑写一些脚本自动调用 cli 来执行批量操作。
+2. 如果渠道包的`js代码和初始资源`完全一致，可以考虑使用[Flavor 构建](https://developer.android.com/studio/build/build-variants?hl=zh-cn)，或其他一些动态生成渠道包的方案（比如[腾讯的 VasDolly](https://github.com/Tencent/VasDolly)，[美团的 walle](https://github.com/Meituan-Dianping/walle)等），这样所有的渠道包基于同一个基础 apk 生成（因而会有相同的编译时间戳和 jsbundle）。这样可以只用上传一个基础 apk，对此 apk 的热更操作可以对所有渠道包生效。
 
 #### 如何支持 aab 格式的原生包？
 
