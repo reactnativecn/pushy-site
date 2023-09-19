@@ -19,10 +19,16 @@ type: 快速入门
 npm i -g react-native-update-cli
 
 # 然后在项目目录中安装热更新模块
+# 0.71 及以上版本使用最新版本如下
 npm i react-native-update
+
+# 0.71 以下版本请使用8.x版本
+# npm i react-native-update@8.x
 ```
 
 > 如果下载极慢或者显示网络失败，请设置使用淘宝镜像`npx nrm use taobao`
+
+> 注意请不要混用`npm/yarn/pnpm`等包管理器及对应的`lock`文件，团队成员请坚持使用同一包管理器，且仅保留统一格式的`lock`文件
 
 如果你的 RN 版本 >= 0.60，请在 ios 目录下执行:
 
@@ -53,6 +59,7 @@ pod install
 | 0.27 - 0.28       | 2.x                      |
 | 0.29 - 0.33       | 3.x                      |
 | 0.34 - 0.45       | 4.x                      |
+| 0.46 - 0.70       | 8.x                      |
 
 安装命令示例：
 
@@ -92,7 +99,7 @@ pod 'react-native-update', path: '../node_modules/react-native-update'
 <summary>RN < 0.60且不使用CocoaPods</summary>
 
 1. 在 XCode 中的 Project Navigator 里,右键点击`Libraries` ➜ `Add Files to [你的工程名]`
-2. 进入`node_modules` ➜ `react-native-update` ➜ `ios 并选中 `RCTPushy.xcodeproj`
+2. 进入`node_modules` ➜ `react-native-update` ➜ `ios 并选中`RCTPushy.xcodeproj`
 3. 在 XCode 中的 project navigator 里,选中你的工程,在 `Build Phases` ➜ `Link Binary With Libraries` 中添加 `libRCTPushy.a`、`libz.tbd`、`libbz2.1.0.tbd`
 4. 继续在`Build Settings`里搜索`Header Search Path`，添加`$(SRCROOT)/../node_modules/react-native-update/ios`，勾选`recursive`。
 5. 在`Build Phases`添加一个`New Run Script Phase`运行脚本，内容如下
@@ -196,7 +203,7 @@ public class MainApplication extends Application implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost =
     // 老版本 RN 这里可能是 new ReactNativeHost(this)
-    new DefaultReactNativeHost(this) { 
+    new DefaultReactNativeHost(this) {
 
     // ↓↓↓将下面这一段添加到 DefaultReactNativeHost 内部！
     @Override
