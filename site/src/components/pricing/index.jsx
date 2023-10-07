@@ -92,7 +92,7 @@ function Pricing() {
               <p className="pricing__sentence">适用于一般应用，中度更新需求</p>
               <div className="pricing__price">
                 <span className="pricing__anim pricing__anim--1">
-                  <span className="pricing__currency">￥</span>798
+                  <span className="pricing__currency">￥</span>800
                 </span>
                 <span className="pricing__anim pricing__anim--2">
                   <span className="pricing__period">/ 年</span>
@@ -130,7 +130,7 @@ function Pricing() {
               <p className="pricing__sentence">适用于一般应用，中度更新需求</p>
               <div className="pricing__price">
                 <span className="pricing__anim pricing__anim--1">
-                  <span className="pricing__currency">￥</span>2198
+                  <span className="pricing__currency">￥</span>2400
                 </span>
                 <span className="pricing__anim pricing__anim--2">
                   <span className="pricing__period">/ 年</span>
@@ -169,7 +169,7 @@ function Pricing() {
               <p className="pricing__sentence">适用于商业应用，高速迭代需求</p>
               <div className="pricing__price">
                 <span className="pricing__anim pricing__anim--1">
-                  <span className="pricing__currency">￥</span>6998
+                  <span className="pricing__currency">￥</span>7200
                 </span>
                 <span className="pricing__anim pricing__anim--2">
                   <span className="pricing__period">/ 年</span>
