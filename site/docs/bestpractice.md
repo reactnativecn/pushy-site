@@ -46,6 +46,7 @@ splits {
 
 1. 如果渠道包的`js代码和初始资源`有差别（无论多么细微的差别都会生成不同的 jsbundle），那么只能单独生成 apk，分别上传和绑定。可以考虑写一些脚本自动调用 cli 来执行批量操作。
 2. 如果渠道包的`js代码和初始资源`完全一致，可以考虑使用[Flavor 构建](https://developer.android.com/studio/build/build-variants?hl=zh-cn)，或其他一些动态生成渠道包的方案（比如[腾讯的 VasDolly](https://github.com/Tencent/VasDolly)，[美团的 walle](https://github.com/Meituan-Dianping/walle)等），这样所有的渠道包基于同一个基础 apk 生成（因而会有相同的编译时间戳和 jsbundle）。这样可以只用上传一个基础 apk，对此 apk 的热更操作可以对所有渠道包生效。
+3. 如果您是`高级版`或`专业版`客户，也可以考虑在管理后台的应用设置中启用`忽略编译时间戳`。此选项仅对比版本号，不校验时间戳，可提供更宽容的热更策略，但可能消耗更多流量。
 
 #### 如何支持 aab 格式的原生包？
 
