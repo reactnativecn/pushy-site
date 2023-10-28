@@ -10,7 +10,7 @@ type: 开发指南
 
 #### downloadRootDir
 
-下载的根目录。你可以使用 react-native-fs 等第三方组件检查其中的内容。
+下载的根目录。你可以使用`react-native-fs`等第三方组件读取其中的内容。
 
 ---
 
@@ -46,27 +46,27 @@ type: 开发指南
 
 1. `{expired: true}`：该应用原生包版本被设置为过期（或已从 pushy 服务器中删除，或从未上传），需要前往应用市场下载新的版本(在设置中填写 downloadUrl)。
 
-```
-    {
-        expired: true,
-        downloadUrl: 'http://appstore/downloadUrl',
-    }
+```js
+{
+    expired: true,
+    downloadUrl: 'http://appstore/downloadUrl',
+}
 ```
 
 2. `{upToDate: true}`：当前已经更新到最新，无需进行更新。
 
 3. `{update: true}`：当前有新版本可以更新。info 的`name`、`description`字段可以用于提示用户，而`metaInfo`字段则可以根据你的需求自定义一些标记(如是否静默更新、是否强制更新等等，自己根据标记的属性做一些条件流程控制)，具体用法可参考[场景实践](bestpractice.html#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了热更新文件的下载地址，
 
-```
-    {
-        update: true,
-        name: '1.0.3-rc',
-        hash: 'hash',
-        description: '添加聊天功能\n修复商城页面BUG',
-        metaInfo: '{"silent":true}',
-        pdiffUrl: 'http://update-packages.reactnative.cn/hash',
-        diffUrl: 'http://update-packages.reactnative.cn/hash',
-    }
+```js
+{
+    update: true,
+    name: '1.0.3-rc',
+    hash: 'hash',
+    description: '添加聊天功能\n修复商城页面BUG',
+    metaInfo: '{"silent":true}',
+    pdiffUrl: 'http://update-packages.reactnative.cn/hash',
+    diffUrl: 'http://update-packages.reactnative.cn/hash',
+}
 ```
 
 ---
@@ -96,6 +96,17 @@ const hash = await downloadUpdate(
 
 下载更新的 apk 包并直接安装。`url`必须为可直接下载到 apk 文件的地址，`onDownloadProgress`为可选的下载进度回调函数，可根据回调参数自行设计进度的展示。自`v5.9.0`版本起可用。
 
+注意从`v9.1.0`版本起，要使用这个功能需要在`AndroidManifest.xml`中手动添加安装权限，如果需要考虑 Android 7.0 以下的客户，则还需要添加外部存储权限。
+
+```xml
+<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+<!-- 如果需要考虑Android 7.0以下的客户，则还需要添加外部存储权限 -->
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+```
+
+注意某些应用市场可能会因为上述权限拒绝应用上架。去掉上述两个权限并不影响热更新功能。
+
 ---
 
 #### function markSuccess()
@@ -110,12 +121,12 @@ const hash = await downloadUpdate(
 
 返回值示例：
 
-```
-    {
-        name: '1.0.3-rc',
-        description: '添加聊天功能\n修复商城页面BUG',
-        metaInfo: '{"silent":true}',
-    }
+```js
+{
+    name: '1.0.3-rc',
+    description: '添加聊天功能\n修复商城页面BUG',
+    metaInfo: '{"silent":true}',
+}
 ```
 
 ---
@@ -129,6 +140,49 @@ const hash = await downloadUpdate(
 #### function switchVersionLater(hash)
 
 在下一次启动应用的时候加载已经下载完毕的版本。
+
+---
+
+#### function simpleUpdate(App: ComponentType, { appKey: string; onPushyEvents?: ({ type: EventType; data: EventData }) => void })
+
+极简热更新集成，示例请见[集成文档](/docs/integration.html#极简快速集成)，其中`onPushyEvents`参数请看下面的方法说明。
+
+---
+
+#### function onPushyEvents(({ type: EventType; data: EventData }) => void)
+
+发生某个事件时的回调，可用于上报统计数据。自`v8.4.0`版本后可用。其中回调参数构型具体如下：
+
+```ts
+// 回调事件类型
+export type EventType =
+  | 'rollback' // 回滚
+  | 'errorChecking' // 查询热更时出错
+  | 'checking' // 正在查询热更
+  | 'downloading' // 正在下载热更
+  | 'errorUpdate' // 热更时出错
+  | 'markSuccess' // 热更后成功标记
+  | 'downloadingApk' // 正在下载apk
+  | 'rejectStoragePermission' // 下载apk前申请存储权限被用户拒绝
+  | 'errorStoragePermission' // 下载apk前申请存储权限出错
+  | 'errowDownloadAndInstallApk'; // 下载或安装apk时出错
+
+// 回调事件数据
+export interface EventData {
+  currentVersion: string; // 当前版本hash
+  cInfo: {
+    pushy: string; // 当前pushy版本
+    rn: string; // 当前rn版本
+    os: string; // 当前操作系统及版本
+    uuid: string; // 用户标识符
+  };
+  packageVersion: string; // 原生包版本
+  buildTime: number; // 原生包编译时间戳
+  message?: string; // 相关说明信息
+  rolledBackVersion?: string; // 热更失败，回滚后的版本hash
+  newVersion?: string; // 已下载但热更失败的hash
+}
+```
 
 ---
 
@@ -149,7 +203,3 @@ mReactInstanceManager = ReactInstanceManager.builder()
                 .build();
 UpdateContext.setCustomInstanceManager(mReactInstanceManager);
 ```
-
-### iOS 方法
-
-待补充

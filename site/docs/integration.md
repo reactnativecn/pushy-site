@@ -21,7 +21,13 @@ class App extends Component {
 }
 
 // 对根组件使用simpleUpdate方法封装后导出
-export default simpleUpdate(App, { appKey });
+export default simpleUpdate(App, {
+  appKey,
+  onPushyEvents: ({ type, data }) => {
+    // 热更成功或报错的事件回调
+    // 可上报自有或第三方数据统计服务
+  },
+});
 ```
 
 此方式默认在 App 启动，以及从后台切换到前台时触发更新检查，弹出提示的内容也固定。如需自定义触发时机，以及修改界面提示等，请参考下面的自定义集成方式。
@@ -104,10 +110,15 @@ import {
   switchVersionLater,
   markSuccess,
   downloadAndInstallApk,
+  onPushyEvents,
 } from 'react-native-update';
 
 import _updateConfig from './update.json';
 const { appKey } = _updateConfig[Platform.OS];
+onPushyEvents(({ type, data }) => {
+  // 热更成功或报错的事件回调
+  // 可上报自有或第三方数据统计服务
+});
 
 export default class MyProject extends Component {
   state = {
