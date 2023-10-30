@@ -11,6 +11,7 @@ type: 快速入门
 我们从 v8.x 版本开始提供极简的三行式集成（老版本只能使用自定义集成方式）：
 
 ```js
+import { Platform } from 'react-native';
 import { simpleUpdate } from 'react-native-update';
 import _updateConfig from './update.json';
 const { appKey } = _updateConfig[Platform.OS];
