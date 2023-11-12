@@ -6,7 +6,7 @@ type: 快速入门
 
 现在你的应用已经具备了检测更新的功能，下面我们来尝试发布并更新它。流程可参考下图：
 
-![publishflow](assets/publishflow.png)
+![publishflow](./assets/publishflow.png)
 
 流程总结如下：
 

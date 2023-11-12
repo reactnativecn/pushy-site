@@ -10,7 +10,7 @@ type: 开发指南
 
 对于同一份 archive（其版本号、编译时间和内置 bundle 已固定，不会受导出方式所影响），可以用不同选项多次导出 ipa，选择其中最小的上传到 pushy 服务器作为热更基准包。
 
-![bitcode](assets/exportipa.png)
+![bitcode](./assets/exportipa.png)
 
 ##### Android 原生包优化(apk)
 
@@ -52,7 +52,7 @@ splits {
 
 如果您需要使用 aab 格式的 android 原生包，那么可以在上传到 Google play 之后，在其控制台中下载转换后的 apk 格式（见下图），然后将这个 apk 包上传到热更新的后台，即可正常支持热更新。
 
-![aab](assets/aab.png)
+![aab](./assets/aab.png)
 
 #### CI 的集成
 
@@ -93,15 +93,19 @@ if (info.expired) {
 } else {
   // 有更新，一般来说我们在这里给用户弹窗提示，让用户选择是否更新
   // 那么静默更新的本质其实就是不弹窗，直接执行，所以可以在这里加入额外的判断流程
-  Alert.alert('提示', '检查到新的版本' + info.name + ',是否下载?\n' + info.description, [
-    {
-      text: '是',
-      onPress: () => {
-        this.doUpdate(info);
+  Alert.alert(
+    "提示",
+    "检查到新的版本" + info.name + ",是否下载?\n" + info.description,
+    [
+      {
+        text: "是",
+        onPress: () => {
+          this.doUpdate(info);
+        },
       },
-    },
-    { text: '否' },
-  ]);
+      { text: "否" },
+    ]
+  );
 }
 ```
 
