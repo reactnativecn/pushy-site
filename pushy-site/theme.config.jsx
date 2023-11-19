@@ -1,7 +1,7 @@
+// eslint-disable-next-line import/no-anonymous-default-export
 export default {
   logo: <span>My Nextra Documentation</span>,
   project: {
-    link: "https://github.com/shuding/nextra",
+    link: "https://pushy.reactnative.cn",
   },
-  // ... other theme options
 };
