@@ -32,4 +32,7 @@ module.exports = withNextra({
     locales: ["zh-CN"],
     defaultLocale: "zh-CN",
   },
+  images: {
+    dangerouslyAllowSVG: true,
+  },
 });

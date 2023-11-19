@@ -45,6 +45,6 @@ config/components/package.json
 
 # gatsby files
 .cache/
-public
+# public
 false
 .eslintcache

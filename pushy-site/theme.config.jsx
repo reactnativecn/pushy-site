@@ -1,7 +1,8 @@
-// eslint-disable-next-line import/no-anonymous-default-export
+import Image from "next/image";
+import logo from "./public/images/logo.svg";
 export default {
-  logo: <span>My Nextra Documentation</span>,
+  logo: <Image height={48} src={logo} alt="Pushy 热更新" />,
   project: {
-    link: "https://pushy.reactnative.cn",
+    link: "https://github.com/reactnativecn/react-native-pushy",
   },
 };
