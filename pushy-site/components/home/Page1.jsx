@@ -1,48 +1,48 @@
 /* eslint-disable eslint-comments/disable-enable-pair */
 /* eslint-disable react/jsx-one-expression-per-line */
-import React, { Component } from 'react';
-import OverPack from 'rc-scroll-anim/lib/ScrollOverPack';
-import Parallax from 'rc-scroll-anim/lib/ScrollParallax';
-import QueueAnim from 'rc-queue-anim';
-import TweenOne from 'rc-tween-one';
+import React from "react";
+import OverPack from "rc-scroll-anim/es/ScrollOverPack";
+import Parallax from "rc-scroll-anim/es/ScrollParallax";
+import QueueAnim from "rc-queue-anim";
+import TweenOne, { TweenOneGroup } from "rc-tween-one";
 
-import deltaIcon from '../../images/smartphone-3.svg';
-import publishIcon from '../../images/internet-1.svg';
-import downloadIcon from '../../images/wifi.svg';
-import strategyIcon from '../../images/strategy.svg';
-import reliableIcon from '../../images/circuit.svg';
-import supportIcon from '../../images/chat.svg';
+import deltaIcon from "../../public/images/smartphone-3.svg";
+import publishIcon from "../../public/images/internet-1.svg";
+import downloadIcon from "../../public/images/wifi.svg";
+import strategyIcon from "../../public/images/strategy.svg";
+import reliableIcon from "../../public/images/circuit.svg";
+import supportIcon from "../../public/images/chat.svg";
+import Image from "next/image";
 
-const { TweenOneGroup } = TweenOne;
 const featuresCN = [
   {
-    title: '增量更新',
-    content: ['基于 bsdiff/hdiff 算法创建', 'kb 级别超小更新包'],
+    title: "增量更新",
+    content: ["基于 bsdiff/hdiff 算法创建", "kb 级别超小更新包"],
     src: deltaIcon,
   },
   {
-    title: '快捷发布',
-    content: ['命令行工具 & 网页双端管理', '支持CI部署'],
+    title: "快捷发布",
+    content: ["命令行工具 & 网页双端管理", "支持CI部署"],
     src: publishIcon,
   },
   {
-    title: '极速下载',
-    content: ['基于阿里云高速CDN分发', '全国范围秒速更新'],
+    title: "极速下载",
+    content: ["基于阿里云高速CDN分发", "全国范围秒速更新"],
     src: downloadIcon,
   },
   {
-    title: '稳定可靠',
-    content: ['自带崩溃回滚机制', '安全可靠'],
+    title: "稳定可靠",
+    content: ["自带崩溃回滚机制", "安全可靠"],
     src: reliableIcon,
   },
   {
-    title: '灵活扩展',
-    content: ['开放定制元信息', '提供灵活自由的更新策略'],
+    title: "灵活扩展",
+    content: ["开放定制元信息", "提供灵活自由的更新策略"],
     src: strategyIcon,
   },
   {
-    title: '技术支持',
-    content: ['遇到技术问题？', '工作时间段内小时级别响应'],
+    title: "技术支持",
+    content: ["遇到技术问题？", "工作时间段内小时级别响应"],
     src: supportIcon,
   },
 ];
@@ -56,7 +56,7 @@ const pointPos = [
   { x: 50, y: 50, opacity: 0.2 },
 ];
 
-class Page1 extends Component {
+class Page1 extends React.Component {
   state = {
     hoverNum: null,
   };
@@ -83,7 +83,7 @@ class Page1 extends Component {
         delay,
         opacity: 0.4,
         ...pointPos[e.index],
-        ease: 'easeOutBack',
+        ease: "easeOutBack",
         duration: 300,
       },
       {
@@ -102,12 +102,12 @@ class Page1 extends Component {
     featuresCN.forEach((item, i) => {
       const isHover = hoverNum === i;
       const pointChild = [
-        'point-0 left',
-        'point-0 right',
-        'point-ring',
-        'point-1',
-        'point-2',
-        'point-3',
+        "point-0 left",
+        "point-0 right",
+        "point-ring",
+        "point-1",
+        "point-2",
+        "point-3",
       ].map((className) => (
         <TweenOne
           component="i"
@@ -136,7 +136,7 @@ class Page1 extends Component {
                 y: 30,
                 opacity: 0,
                 duration: 300,
-                ease: 'easeInBack',
+                ease: "easeInBack",
               }}
               resetStyle={false}
               exclusive
@@ -146,10 +146,16 @@ class Page1 extends Component {
             <div
               className="page1-image"
               style={{
-                boxShadow: `${isHover ? '0 12px 24px' : '0 6px 12px'} ${item.shadowColor}`,
+                boxShadow: `${isHover ? "0 12px 24px" : "0 6px 12px"} ${
+                  item.shadowColor
+                }`,
               }}
             >
-              <img src={item.src} alt="img" style={i === 4 ? { marginLeft: -15 } : {}} />
+              <Image
+                src={item.src}
+                alt="img"
+                style={i === 4 ? { marginLeft: -15 } : {}}
+              />
             </div>
             <h3>{item.title}</h3>
             {item.content.map((t, tkey) => (
@@ -182,7 +188,7 @@ class Page1 extends Component {
               className="page1-bg"
               animation={{
                 translateY: 200,
-                ease: 'linear',
+                ease: "linear",
                 playScale: [0, 1.65],
               }}
               location="page1-wrapper"
@@ -197,12 +203,15 @@ class Page1 extends Component {
             <div className="title-line" />
           </div>
           <OverPack>{children}</OverPack>
-          <div style={{ float: 'right', opacity: 0.4, marginRight: '6%' }}>
-            Icons made by{' '}
-            <a href="https://www.flaticon.com/authors/swifticons" title="Swifticons">
+          <div style={{ float: "right", opacity: 0.4, marginRight: "6%" }}>
+            Icons made by{" "}
+            <a
+              href="https://www.flaticon.com/authors/swifticons"
+              title="Swifticons"
+            >
               Swifticons
-            </a>{' '}
-            from{' '}
+            </a>{" "}
+            from{" "}
             <a href="https://www.flaticon.com/" title="Flaticon">
               www.flaticon.com
             </a>

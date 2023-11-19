@@ -35,4 +35,11 @@ module.exports = withNextra({
   images: {
     dangerouslyAllowSVG: true,
   },
+  transpilePackages: [
+    "antd",
+    "@ant-design/icons",
+    "tween-one",
+    "rc-tween-one",
+    "rc-scroll-anim",
+  ],
 });
