@@ -36,7 +36,7 @@ function Footer() {
             <div className="footer-center">
               <h2>帮助</h2>
               <div>
-                <a target="_blank" rel="noopener noreferrer" href="/docs/faq.html">
+                <a target="_blank" rel="noopener noreferrer" href="/docs/faq">
                   常见问题
                 </a>
               </div>

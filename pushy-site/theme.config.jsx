@@ -3,7 +3,7 @@ import logo from "./public/images/logo.svg";
 import Footer from "./components/layout/Footer";
 import { useRouter } from "next/router";
 import { useConfig } from "nextra-theme-docs";
-
+import { Button } from "antd";
 export default {
   useNextSeoProps() {
     const { asPath } = useRouter();
@@ -40,15 +40,42 @@ export default {
   footer: {
     component: Footer,
   },
-  themeSwitch: {
-    useOptions() {
-      return {
-        light: "浅色模式",
-        dark: "夜间模式",
-        system: "跟随系统",
-      };
-    },
+  darkMode: false,
+  nextThemes: {
+    defaultTheme: "light",
   },
+  navbar: {
+    extraContent: (
+      <div className="header-meta">
+        <div className="right-header">
+          <Button
+            shape="round"
+            href="https://pushy-admin.reactnative.cn/#/user"
+            target="_blank"
+          >
+            登录
+          </Button>
+          <Button
+            shape="round"
+            href="https://pushy-admin.reactnative.cn/#/register"
+            target="_blank"
+            type="primary"
+          >
+            注册
+          </Button>
+        </div>
+      </div>
+    ),
+  },
+  // themeSwitch: {
+  //   useOptions() {
+  //     return {
+  //       light: "浅色模式",
+  //       dark: "夜间模式",
+  //       system: "跟随系统",
+  //     };
+  //   },
+  // },
   toc: {
     title: "目录",
   },

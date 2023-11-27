@@ -20,5 +20,10 @@
       "sidebar": false
     },
     "type": "page"
+  },
+  "常见问题": {
+    "type": "page",
+    "href": "/docs/faq",
+    "route": "#"
   }
 }
