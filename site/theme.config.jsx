@@ -91,5 +91,5 @@ export default {
     emptyResult: "暂无匹配的结果",
   },
 
-  gitTimestamp: false,
+  gitTimestamp: null,
 };

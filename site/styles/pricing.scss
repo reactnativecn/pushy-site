@@ -3,6 +3,7 @@
   min-height: 100vh;
   position: relative;
   /* color: #eaebed; */
+
   .pricing {
     display: -webkit-flex;
     display: flex;
@@ -23,12 +24,18 @@
     -webkit-align-items: stretch;
     align-items: stretch;
     text-align: center;
-    -webkit-flex: 0 1 330px;
-    flex: 0 1 330px;
+    -webkit-flex: 0 1 350px;
+    flex: 0 1 350px;
+    .anticon {
+      display: inline-block;
+    }
   }
 
   .pricing__feature-list {
     text-align: left;
+    a {
+      color: #1890ff;
+    }
   }
 
   .pricing__action {
@@ -45,10 +52,10 @@
   /* Rabten */
   .pricing--rabten .pricing__item {
     font-family: "Roboto", sans-serif;
-    padding: 2em 4em;
+    padding: 25px 60px;
     cursor: default;
     color: #262b38;
-    max-width: 320px;
+    // max-width: 320px;
   }
 
   .pricing--rabten .pricing__item {
@@ -60,7 +67,7 @@
   }
 
   .pricing--rabten .pricing__title {
-    font-size: 1.4em;
+    font-size: 22.5px !important;
     margin: 1.5em 0 0.5em;
   }
 
@@ -159,13 +166,13 @@
   }
 
   .pricing--rabten .pricing__feature-list {
-    font-size: 1.1em;
+    font-size: 16px;
     margin: 0;
     padding: 0.5em 0 3em;
     line-height: 1.6em;
     list-style: none;
     text-align: center;
-    color: #8b909d;
+    // color: #8b909d;
   }
 }
 

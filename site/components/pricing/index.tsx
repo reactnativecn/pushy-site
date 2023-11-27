@@ -6,10 +6,6 @@ import {
   SendOutlined,
 } from "@ant-design/icons";
 
-function gotoPurchase() {
-  window.location.href = "https://update.reactnative.cn/profile";
-}
-
 const AppText = () => (
   <Tooltip title="iOS 和 Android 版本记做不同的应用。您可删除已不再使用的应用来有效利用配额。">
     <a>应用</a>
@@ -116,7 +112,8 @@ function Pricing() {
               style={{ marginTop: "auto" }}
               shape="round"
               type="primary"
-              onClick={gotoPurchase}
+              target="_blank"
+              href="https://pushy-admin.reactnative.cn/#/user"
             >
               立即升级
             </Button>
@@ -155,7 +152,8 @@ function Pricing() {
               style={{ marginTop: "auto" }}
               shape="round"
               type="primary"
-              onClick={gotoPurchase}
+              target="_blank"
+              href="https://pushy-admin.reactnative.cn/#/user"
             >
               立即升级
             </Button>
@@ -194,7 +192,8 @@ function Pricing() {
               style={{ marginTop: "auto" }}
               shape="round"
               type="primary"
-              onClick={gotoPurchase}
+              target="_blank"
+              href="https://pushy-admin.reactnative.cn/#/user"
             >
               立即升级
             </Button>
@@ -204,16 +203,16 @@ function Pricing() {
           style={{
             color: "#8b909d",
             textAlign: "center",
-            fontSize: "15px",
+            fontSize: "16px",
             marginTop: 10,
           }}
         >
-          <p>
+          <p className="mb-4">
             如您需要更高配额，我们也提供定制版本或是私有服务器部署，您可将具体需求发送至{" "}
             <a href="mailto:hi@charmlot.com">hi@charmlot.com</a>{" "}
             我们将第一时间回复。
           </p>
-          <p>
+          <p className="mb-4">
             *注：iOS 和 Android 版本记做不同的应用。
             <br />
             原生包指完整的apk/ipa安装包。热更包指pushy

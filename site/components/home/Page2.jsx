@@ -33,7 +33,7 @@ function Page2() {
             <Button
               style={{ marginTop: 40, padding: '4px 56px' }}
               type="primary"
-              href="/docs/getting-started.html"
+              href="/docs/getting-started"
             >
               查看文档
             </Button>

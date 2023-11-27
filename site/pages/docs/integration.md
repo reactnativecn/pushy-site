@@ -91,7 +91,7 @@ const hash = await downloadUpdate(
 
 你可以通过`isFirstTime`来获知这是当前版本的首次启动，也可以通过`isRolledBack`来获知应用刚刚经历了一次回滚操作。你可以在此时给予用户合理的提示。
 
-以上提及的所有 api 的说明文档可在[这里](api.html)查看。
+以上提及的所有 api 的说明文档可在[这里](api)查看。
 
 ### 完整的示例
 
