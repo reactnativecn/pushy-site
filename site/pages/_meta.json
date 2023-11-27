@@ -1,0 +1,29 @@
+{
+  "index": {
+    "title": "首页",
+    "theme": {
+      "layout": "raw",
+      "breadcrumb": false,
+      "sidebar": false
+    },
+    "type": "page"
+  },
+  "docs": {
+    "title": "文档",
+    "type": "page"
+  },
+  "pricing": {
+    "title": "价格",
+    "theme": {
+      "layout": "raw",
+      "breadcrumb": false,
+      "sidebar": false
+    },
+    "type": "page"
+  },
+  "常见问题": {
+    "type": "page",
+    "href": "/docs/faq",
+    "route": "#"
+  }
+}

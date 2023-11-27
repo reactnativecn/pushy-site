@@ -1,0 +1,18 @@
+{
+  "getting-started": "安装配置",
+  "integration": "代码集成",
+  "publish": "发布流程",
+  "---1": {
+    "type": "separator",
+    "title": ""
+  },
+  "api": "API参考",
+  "cli": "命令行工具",
+  "bestpractice": "场景实践",
+  "---2": {
+    "type": "separator",
+    "title": ""
+  },
+  "faq": "常见问题",
+  "changelog": "更新日志"
+}
