@@ -1,4 +1,3 @@
-/* eslint-disable eslint-comments/disable-enable-pair */
 /* eslint-disable react/jsx-one-expression-per-line */
 import React from "react";
 import OverPack from "rc-scroll-anim/es/ScrollOverPack";

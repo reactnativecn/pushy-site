@@ -11,9 +11,9 @@ type: 快速入门
 我们从 v8.x 版本开始提供极简的三行式集成（老版本只能使用自定义集成方式）：
 
 ```js
-import { Platform } from 'react-native';
-import { simpleUpdate } from 'react-native-update';
-import _updateConfig from './update.json';
+import { Platform } from "react-native";
+import { simpleUpdate } from "react-native-update";
+import _updateConfig from "./update.json";
 const { appKey } = _updateConfig[Platform.OS];
 
 // 整个应用的根组件，class 或函数组件都可以
@@ -40,9 +40,9 @@ export default simpleUpdate(App, {
 检查更新时必须提供你的`appKey`，这个值保存在`update.json`中，并且根据平台不同而不同。你可以用如下的代码获取：
 
 ```javascript
-import { Platform } from 'react-native';
+import { Platform } from "react-native";
 
-import _updateConfig from './update.json';
+import _updateConfig from "./update.json";
 const { appKey } = _updateConfig[Platform.OS];
 ```
 
@@ -50,19 +50,19 @@ const { appKey } = _updateConfig[Platform.OS];
 
 ### 检查更新、下载更新
 
-异步函数[`checkUpdate`](api.html#async-function-checkupdateappkey)可以检查当前版本是否需要更新：
+异步函数[`checkUpdate`](api#async-function-checkupdateappkey)可以检查当前版本是否需要更新：
 
 ```javascript
 const info = await checkUpdate(appKey);
 ```
 
-返回的[`info`](api.html#async-function-checkupdateappkey)有三种情况：
+返回的[`info`](api#async-function-checkupdateappkey)有三种情况：
 
 1. `{expired: true}`：该应用原生包已过期（已从 pushy 服务器中删除），开发者应该在 pushy 控制台添加一个更新下载链接，并自行提示用户下载。
 
 2. `{upToDate: true}`：当前已经更新到最新，无需进行更新。
 
-3. `{update: true}`：当前有新版本可以更新。info 的`name`、`description`字段可以用于提示用户，而`metaInfo`字段则可以根据你的需求自定义其它属性(如是否静默更新、是否强制更新等等)，具体用法可参考[场景实践](bestpractice.html#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了补丁包的下载地址等。 pushy 会首先尝试耗费流量更少的更新方式。将`info`对象传递给`downloadUpdate`方法作为参数即可。
+3. `{update: true}`：当前有新版本可以更新。info 的`name`、`description`字段可以用于提示用户，而`metaInfo`字段则可以根据你的需求自定义其它属性(如是否静默更新、是否强制更新等等)，具体用法可参考[场景实践](bestpractice#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了补丁包的下载地址等。 pushy 会首先尝试耗费流量更少的更新方式。将`info`对象传递给`downloadUpdate`方法作为参数即可。
 
 ```javascript
 const hash = await downloadUpdate(
@@ -73,7 +73,7 @@ const hash = await downloadUpdate(
       // 已下载的字节数, 总字节数
       console.log(received, total);
     },
-  },
+  }
 );
 ```
 
@@ -96,9 +96,17 @@ const hash = await downloadUpdate(
 ### 完整的示例
 
 ```javascript
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
-import { StyleSheet, Platform, Text, View, Alert, TouchableOpacity, Linking } from 'react-native';
+import {
+  StyleSheet,
+  Platform,
+  Text,
+  View,
+  Alert,
+  TouchableOpacity,
+  Linking,
+} from "react-native";
 
 import {
   isFirstTime,
@@ -112,9 +120,9 @@ import {
   markSuccess,
   downloadAndInstallApk,
   onPushyEvents,
-} from 'react-native-update';
+} from "react-native-update";
 
-import _updateConfig from './update.json';
+import _updateConfig from "./update.json";
 const { appKey } = _updateConfig[Platform.OS];
 onPushyEvents(({ type, data }) => {
   // 热更成功或报错的事件回调
@@ -131,9 +139,9 @@ export default class MyProject extends Component {
       // 必须调用此更新成功标记方法
       // 否则默认更新失败，下一次启动会自动回滚
       markSuccess();
-      console.log('更新完成');
+      console.log("更新完成");
     } else if (isRolledBack) {
-      console.log('刚刚更新失败了,版本被回滚.');
+      console.log("刚刚更新失败了,版本被回滚.");
     }
   }
   doUpdate = async (info) => {
@@ -149,23 +157,23 @@ export default class MyProject extends Component {
       if (!hash) {
         return;
       }
-      Alert.alert('提示', '下载完毕,是否重启应用?', [
+      Alert.alert("提示", "下载完毕,是否重启应用?", [
         {
-          text: '是',
+          text: "是",
           onPress: () => {
             switchVersion(hash);
           },
         },
-        { text: '否' },
+        { text: "否" },
         {
-          text: '下次启动时',
+          text: "下次启动时",
           onPress: () => {
             switchVersionLater(hash);
           },
         },
       ]);
     } catch (err) {
-      Alert.alert('更新失败', err.message);
+      Alert.alert("更新失败", err.message);
     }
   };
   checkUpdate = async () => {
@@ -177,17 +185,20 @@ export default class MyProject extends Component {
     try {
       info = await checkUpdate(appKey);
     } catch (err) {
-      Alert.alert('更新检查失败', err.message);
+      Alert.alert("更新检查失败", err.message);
       return;
     }
     if (info.expired) {
-      Alert.alert('提示', '您的应用版本已更新，点击确定下载安装新版本', [
+      Alert.alert("提示", "您的应用版本已更新，点击确定下载安装新版本", [
         {
-          text: '确定',
+          text: "确定",
           onPress: () => {
             if (info.downloadUrl) {
               // apk可直接下载安装
-              if (Platform.OS === 'android' && info.downloadUrl.endsWith('.apk')) {
+              if (
+                Platform.OS === "android" &&
+                info.downloadUrl.endsWith(".apk")
+              ) {
                 downloadAndInstallApk({
                   url: info.downloadUrl,
                   onDownloadProgress: ({ received, total }) => {
@@ -205,17 +216,21 @@ export default class MyProject extends Component {
         },
       ]);
     } else if (info.upToDate) {
-      Alert.alert('提示', '您的应用版本已是最新.');
+      Alert.alert("提示", "您的应用版本已是最新.");
     } else {
-      Alert.alert('提示', '检查到新的版本' + info.name + ',是否下载?\n' + info.description, [
-        {
-          text: '是',
-          onPress: () => {
-            this.doUpdate(info);
+      Alert.alert(
+        "提示",
+        "检查到新的版本" + info.name + ",是否下载?\n" + info.description,
+        [
+          {
+            text: "是",
+            onPress: () => {
+              this.doUpdate(info);
+            },
           },
-        },
-        { text: '否' },
-      ]);
+          { text: "否" },
+        ]
+      );
     }
   };
   render() {
@@ -224,11 +239,11 @@ export default class MyProject extends Component {
       <View style={styles.container}>
         <Text style={styles.welcome}>欢迎使用热更新服务</Text>
         <Text style={styles.instructions}>
-          这是版本一 {'\n'}
+          这是版本一 {"\n"}
           当前原生包版本号: {packageVersion}
-          {'\n'}
-          当前热更新版本Hash: {currentVersion || '(空)'}
-          {'\n'}
+          {"\n"}
+          当前热更新版本Hash: {currentVersion || "(空)"}
+          {"\n"}
         </Text>
         <Text>
           下载进度：{received} / {total}
@@ -244,18 +259,18 @@ export default class MyProject extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F5FCFF",
   },
   welcome: {
     fontSize: 20,
-    textAlign: 'center',
+    textAlign: "center",
     margin: 10,
   },
   instructions: {
-    textAlign: 'center',
-    color: '#333333',
+    textAlign: "center",
+    color: "#333333",
     marginBottom: 5,
   },
 });

@@ -1,46 +1,26 @@
 // import React from 'react';
 // import { Link } from 'gatsby';
 import Link from "next/link";
+import { withRouter } from "next/router";
 
 import { MenuOutlined } from "@ant-design/icons";
 import { Row, Col, Menu, Button, Popover } from "antd";
-import logo from "../../images/logo.svg";
+import logo from "../../public/images/logo.svg";
 import Image from "next/image";
+import { Component } from "react";
 
 interface HeaderProps {
   isMobile: boolean;
-  location: {
-    pathname: string;
-  };
 }
 interface HeaderState {
   inputValue?: string;
   menuVisible: boolean;
-  menuMode?:
-    | "vertical"
-    | "vertical-left"
-    | "vertical-right"
-    | "horizontal"
-    | "inline";
+  menuMode?: "horizontal" | "vertical" | "inline";
 }
 
 class Header extends Component<HeaderProps, HeaderState> {
   state: HeaderState = {
     menuVisible: false,
-    menuMode: "horizontal",
-  };
-
-  timer: number;
-
-  componentDidUpdate(preProps: HeaderProps) {
-    const { isMobile } = this.props;
-    if (isMobile !== preProps.isMobile) {
-      this.setMenuMode(isMobile);
-    }
-  }
-
-  setMenuMode = (isMobile: boolean) => {
-    this.setState({ menuMode: isMobile ? "inline" : "horizontal" });
   };
 
   handleHideMenu = () => {
@@ -62,19 +42,20 @@ class Header extends Component<HeaderProps, HeaderState> {
   };
 
   render() {
-    const { menuMode, menuVisible } = this.state;
-    const { location } = this.props;
-    const path = location.pathname;
+    const { isMobile } = this.props;
+    const { menuVisible } = this.state;
+    const menuMode = isMobile ? "inline" : "horizontal";
 
-    const module = location.pathname
+    // @ts-ignore
+    const path = this.props.router.pathname;
+
+    const currentModule = path
       .replace(/(^\/|\/$)/g, "")
       .split("/")
       .slice(0, -1)
       .join("/");
-    let activeMenuItem = module || "home";
-    if (/^blog/.test(path)) {
-      activeMenuItem = "blog";
-    } else if (path.includes("/docs/faq.html")) {
+    let activeMenuItem = currentModule || "home";
+    if (path.includes("/docs/faq")) {
       activeMenuItem = "faq";
     } else if (/docs/.test(path)) {
       activeMenuItem = "docs";
@@ -87,19 +68,19 @@ class Header extends Component<HeaderProps, HeaderState> {
     const menu = [
       <Menu mode={menuMode} selectedKeys={[activeMenuItem]} id="nav" key="nav">
         <Menu.Item key="home">
-          <Link to="/">首页</Link>
+          <Link href="/">首页</Link>
         </Menu.Item>
         <Menu.Item key="docs">
-          <Link to="/docs/getting-started.html">文档</Link>
+          <Link href="/docs/getting-started.html">文档</Link>
         </Menu.Item>
         <Menu.Item key="pricing">
-          <Link to="/pricing.html">价格</Link>
+          <Link href="/pricing.html">价格</Link>
         </Menu.Item>
         <Menu.Item key="faq">
-          <Link to="/docs/faq.html">常见问题</Link>
+          <Link href="/docs/faq.html">常见问题</Link>
         </Menu.Item>
         {/* <Menu.Item key="blog">
-          <Link to="/blog/">Blog</Link>
+          <Link href="/blog/">Blog</Link>
         </Menu.Item> */}
       </Menu>,
     ];
@@ -156,4 +137,5 @@ class Header extends Component<HeaderProps, HeaderState> {
   }
 }
 
-export default Header;
+// @ts-ignore
+export default withRouter(Header);

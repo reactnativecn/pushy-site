@@ -28,12 +28,14 @@ const withNextra = require("nextra")({
 });
 
 module.exports = withNextra({
-  i18n: {
-    locales: ["zh-CN"],
-    defaultLocale: "zh-CN",
-  },
+  output: "export",
+  // i18n: {
+  //   locales: ["zh-CN"],
+  //   defaultLocale: "zh-CN",
+  // },
   images: {
     dangerouslyAllowSVG: true,
+    unoptimized: true,
   },
   transpilePackages: [
     "antd",

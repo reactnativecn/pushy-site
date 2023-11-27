@@ -55,7 +55,7 @@ type: 开发指南
 
 2. `{upToDate: true}`：当前已经更新到最新，无需进行更新。
 
-3. `{update: true}`：当前有新版本可以更新。info 的`name`、`description`字段可以用于提示用户，而`metaInfo`字段则可以根据你的需求自定义一些标记(如是否静默更新、是否强制更新等等，自己根据标记的属性做一些条件流程控制)，具体用法可参考[场景实践](bestpractice.html#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了热更新文件的下载地址，
+3. `{update: true}`：当前有新版本可以更新。info 的`name`、`description`字段可以用于提示用户，而`metaInfo`字段则可以根据你的需求自定义一些标记(如是否静默更新、是否强制更新等等，自己根据标记的属性做一些条件流程控制)，具体用法可参考[场景实践](bestpractice#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了热更新文件的下载地址，
 
 ```js
 {
@@ -86,7 +86,7 @@ const hash = await downloadUpdate(
       // 已下载的字节数, 总字节数
       console.log(received, total);
     },
-  },
+  }
 );
 ```
 
@@ -145,7 +145,7 @@ const hash = await downloadUpdate(
 
 #### function simpleUpdate(App: ComponentType, { appKey: string; onPushyEvents?: ({ type: EventType; data: EventData }) => void })
 
-极简热更新集成，示例请见[集成文档](/docs/integration.html#极简快速集成)，其中`onPushyEvents`参数请看下面的方法说明。
+极简热更新集成，示例请见[集成文档](/docs/integration#极简快速集成)，其中`onPushyEvents`参数请看下面的方法说明。
 
 ---
 
@@ -156,16 +156,16 @@ const hash = await downloadUpdate(
 ```ts
 // 回调事件类型
 export type EventType =
-  | 'rollback' // 回滚
-  | 'errorChecking' // 查询热更时出错
-  | 'checking' // 正在查询热更
-  | 'downloading' // 正在下载热更
-  | 'errorUpdate' // 热更时出错
-  | 'markSuccess' // 热更后成功标记
-  | 'downloadingApk' // 正在下载apk
-  | 'rejectStoragePermission' // 下载apk前申请存储权限被用户拒绝
-  | 'errorStoragePermission' // 下载apk前申请存储权限出错
-  | 'errowDownloadAndInstallApk'; // 下载或安装apk时出错
+  | "rollback" // 回滚
+  | "errorChecking" // 查询热更时出错
+  | "checking" // 正在查询热更
+  | "downloading" // 正在下载热更
+  | "errorUpdate" // 热更时出错
+  | "markSuccess" // 热更后成功标记
+  | "downloadingApk" // 正在下载apk
+  | "rejectStoragePermission" // 下载apk前申请存储权限被用户拒绝
+  | "errorStoragePermission" // 下载apk前申请存储权限出错
+  | "errowDownloadAndInstallApk"; // 下载或安装apk时出错
 
 // 回调事件数据
 export interface EventData {

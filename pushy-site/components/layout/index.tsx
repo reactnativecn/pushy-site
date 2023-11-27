@@ -1,8 +1,7 @@
-import React from 'react';
-import Media from 'react-media';
-import '../../static/style';
-import Header from './Header';
-import Footer from './Footer';
+import React from "react";
+import Media from "react-media";
+// import Header from "./Header";
+// import Footer from "./Footer";
 
 export interface LayoutProps {
   location: {
@@ -13,16 +12,15 @@ export interface LayoutProps {
 }
 
 export function Layout(props: LayoutProps) {
-  const { children, location, ...restProps } = props;
-  const { pathname } = location;
+  const { children, ...restProps } = props;
   return (
-    <div className={`page-wrapper ${pathname === '/' && 'index-page-wrapper'}`}>
-      <Header {...restProps} location={location} />
+    <div className={`page-wrapper`}>
+      {/* <Header {...restProps} /> */}
       {React.cloneElement(children, {
         ...children.props,
         isMobile: restProps.isMobile,
       })}
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }
@@ -30,7 +28,7 @@ export function Layout(props: LayoutProps) {
 const WrapperLayout = (props: LayoutProps) => (
   <Media query="(max-width: 996px)">
     {(isMobile) => {
-      const isNode = typeof window === 'undefined';
+      const isNode = typeof window === "undefined";
       return <Layout {...props} isMobile={isMobile && !isNode} />;
     }}
   </Media>

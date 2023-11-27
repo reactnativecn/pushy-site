@@ -56,8 +56,8 @@ type: 其他
 
 可以正常更新，但是重启后回滚，一般有两种可能的情况：
 
-- 没有正确[配置 bundleUrl](/docs/getting-started.html#配置-bundle-url)
-- 没有正确[调用 markSuccess](/docs/integration.html#%E9%A6%96%E6%AC%A1%E5%90%AF%E5%8A%A8%E3%80%81%E5%9B%9E%E6%BB%9A)
+- 没有正确[配置 bundleUrl](/docs/getting-started#配置-bundle-url)
+- 没有正确[调用 markSuccess](/docs/integration#%E9%A6%96%E6%AC%A1%E5%90%AF%E5%8A%A8%E3%80%81%E5%9B%9E%E6%BB%9A)
 
 如果你确定上述两个步骤都正确无误，请在[issues 区](https://github.com/reactnativecn/react-native-pushy/issues)给我们留言反馈。
 
@@ -103,7 +103,7 @@ type: 其他
 2. 原生包数量及大小。原生包指通过`pushy uploadIpa/uploadApk`命令上传到 Pushy 服务器上作为热更新起始版本的完整 apk/ipa 安装包。
 3. 热更包数量及大小。热更包指通过`pushy bundle`所命令生成的 ppk 文件。注意这不是用户实际下载的更新文件，用户下载的是通过比对生成的增量 diff 文件（比 ppk 文件要小得多）。
 
-> 这里有一些对[包大小的优化建议](bestpractice.html#优化原生和热更包体积)可供参考。
+> 这里有一些对[包大小的优化建议](bestpractice#优化原生和热更包体积)可供参考。
 
 以上 2、3 条为针对每个应用单独计算。具体配额和费用由于运营成本可能会有调整，请以[价格表](/pricing.html)页面为准。已购买的用户在续费前不受调整影响。
 
@@ -112,7 +112,7 @@ type: 其他
 #### 达到配额后还可以正常使用吗？
 
 当应用、原生包、热更包数量达到配额限制后，您将无法执行相应的新增操作。但用户端仍可正常检查更新，下载已发布的更新。您可选择升级到更高配额，或是通过删除已不再使用的应用、原生包、热更包来使数量降低到配额以内，以便继续执行新增操作。  
-若原生包、热更包大小超过限额，则会导致上传失败。您可以选择升级到更高配额，或是想办法进行[精简优化](bestpractice.html#优化原生和热更包体积)。
+若原生包、热更包大小超过限额，则会导致上传失败。您可以选择升级到更高配额，或是想办法进行[精简优化](bestpractice#优化原生和热更包体积)。
 
 ---
 

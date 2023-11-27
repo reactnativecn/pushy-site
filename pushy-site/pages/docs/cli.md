@@ -21,7 +21,7 @@ $ npm install -g react-native-update-cli
 - intermediaDir: 临时文件输出目录
 - output: 最终 ppk 文件输出路径
 - dev: 是否打包开发版本
-- sourcemap: 是否生成sourcemap(需cli版本1.11.0+)
+- sourcemap: 是否生成 sourcemap(需 cli 版本 1.11.0+)
 
 ---
 
@@ -144,7 +144,7 @@ $ npm install -g react-native-update-cli
 - platform: ios|android 对应的平台
 - name: 当前热更新版本的名字(版本号)
 - description: 当前热更新版本的描述信息，可以对用户进行展示
-- metaInfo: 当前热更新版本的元信息，可以用来保存一些额外信息，具体用法可参考[场景实践](bestpractice.html#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。
+- metaInfo: 当前热更新版本的元信息，可以用来保存一些额外信息，具体用法可参考[场景实践](bestpractice#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。
 
 ---
 

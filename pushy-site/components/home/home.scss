@@ -1,13 +1,18 @@
-$primary-color: #1890ff;
+@use "../../styles/theme.scss" as *;
 
 .home-wrapper {
   width: 100%;
-  color: #697b8c;
+  // color: #697b8c;
   .ant-btn {
     min-width: 110px;
     height: 40px;
     font-size: 16px;
     border-radius: 20px;
+  }
+
+  h3 {
+    font-size: 18px !important;
+    font-weight: 900;
   }
 
   svg g {
@@ -18,7 +23,7 @@ $primary-color: #1890ff;
   .banner-wrapper {
     position: relative;
     width: 100%;
-    max-width: 1500px;
+    // max-width: 1500px;
     height: 526px;
     margin: auto;
     .banner-title-wrapper {
