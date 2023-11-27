@@ -12,18 +12,18 @@ export default {
         titleTemplate: "%s – Pushy 极速热更新",
       };
     }
+    return {
+      titleTemplate: "Pushy 极速热更新",
+    };
   },
   head: () => {
-    const { frontMatter } = useConfig();
+    const { title } = useConfig();
     const url = "https://pushy.reactnative.cn";
 
     return (
       <>
         <meta property="og:url" content={url} />
-        <meta
-          property="og:title"
-          content={frontMatter.title || "Pushy 极速热更新"}
-        />
+        <meta property="og:title" content={title || "Pushy 极速热更新"} />
         <meta property="og:description" content={"Pushy 极速热更新"} />
         <meta
           property="og:keywords"

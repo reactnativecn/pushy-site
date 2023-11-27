@@ -44,7 +44,7 @@ function Banner(props) {
       </div>
       {!isMobile && (
         <div className="banner-image-wrapper">
-          <Image style={{ height: "100%" }} src={hero} alt="" />
+          <Image height={420} src={hero} alt="" />
         </div>
       )}
     </div>
