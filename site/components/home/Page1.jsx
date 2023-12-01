@@ -196,7 +196,7 @@ class Page1 extends React.Component {
             </Parallax>
           )}
           <h2>
-            为什么选择 <span>Pushy</span> ？
+            为什么选择 <span>Pushy</span>
           </h2>
           <div className="title-line-wrapper page1-line">
             <div className="title-line" />

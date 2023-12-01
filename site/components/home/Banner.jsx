@@ -30,7 +30,7 @@ function Banner(props) {
         </p>
         <div className="button-wrapper">
           <Link href="/docs/getting-started">
-            <Button style={{ margin: "0 16px" }} type="primary" ghost>
+            <Button size="large" className="mr-4" type="primary" ghost>
               立即免费体验
             </Button>
           </Link>
