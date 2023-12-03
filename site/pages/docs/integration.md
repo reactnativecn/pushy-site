@@ -193,12 +193,15 @@ export default class MyProject extends Component {
         {
           text: "确定",
           onPress: () => {
+            // downloadUrl 需要在后台设置中自行配置
             if (info.downloadUrl) {
               // apk可直接下载安装
               if (
                 Platform.OS === "android" &&
                 info.downloadUrl.endsWith(".apk")
               ) {
+                // 此方法还需要额外的配置，请参考
+                // https://pushy.reactnative.cn/docs/api#async-function-downloadandinstallapk-url-ondownloadprogress-
                 downloadAndInstallApk({
                   url: info.downloadUrl,
                   onDownloadProgress: ({ received, total }) => {

@@ -96,7 +96,7 @@ const hash = await downloadUpdate(
 
 下载更新的 apk 包并直接安装。`url`必须为可直接下载到 apk 文件的地址，`onDownloadProgress`为可选的下载进度回调函数，可根据回调参数自行设计进度的展示。自`v5.9.0`版本起可用。
 
-注意从`v9.1.0`版本起，要使用这个功能需要在`AndroidManifest.xml`中手动添加安装权限，如果需要考虑 Android 7.0 以下的客户，则还需要添加外部存储权限。
+注意要使用这个功能还需要在`AndroidManifest.xml`中手动添加安装权限，如果需要考虑 Android 7.0 以下的客户，则还需要添加外部存储权限。
 
 ```xml
 <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
