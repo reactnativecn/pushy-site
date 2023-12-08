@@ -4,15 +4,15 @@ title: 安装配置
 type: 快速入门
 ---
 
-import { Tabs } from 'nextra/components'
+import { Callout, Steps, Tabs } from "nextra/components";
 
-首先你应该有一个基于 React Native 开发的应用，我们把具有 package.json 的目录叫做你的"应用根目录"。
-
+首先你应该有一个基于 React Native 开发的应用，我们把具有 package.json 的目录叫做你的`应用根目录`。
 如果你还没有初始化应用，请参阅[开始使用 React Native](https://reactnative.cn/docs/getting-started)。
 
-所以我们也假设你已经拥有了开发 React Native 应用的一切环境，包括`Node.js`、`XCode`、`Android SDK`等等。
+我们假设你已经拥有了开发 React Native 应用的一切环境，包括`Node.js`、`XCode`、`Android SDK`等等。
 
-## 安装
+<Steps>
+### 安装
 
 在你的项目根目录下运行以下命令：
 
@@ -28,9 +28,13 @@ npm i react-native-update
 # npm i react-native-update@8.x
 ```
 
-> 如果下载极慢或者显示网络失败，请设置使用淘宝镜像`npx nrm use taobao`
+<Callout type="info">
+  如果下载极慢或者显示网络失败，请设置使用淘宝镜像 `npx nrm use taobao`
+</Callout>
 
-> 注意请不要混用`npm/yarn/pnpm`等包管理器及对应的`lock`文件，团队成员请坚持使用同一包管理器，且仅保留统一格式的`lock`文件
+<Callout type="warning">
+  注意请不要混用`npm/yarn/pnpm`等包管理器及对应的`lock`文件，团队成员请坚持使用同一包管理器，且仅保留统一格式的`lock`文件
+</Callout>
 
 如果你的 RN 版本 >= 0.60，请在 ios 目录下执行:
 
@@ -45,8 +49,6 @@ pod install
 ```
 
 然后按照[手动 link](#手动-link)的说明操作。
-
-> 注意：如果是混编 RN 项目，由于目前官方集成文档并不完善，参照官方文档可能无法实现自动 link 功能。此时即便 RN 版本 >= 0.60，你可能也需要执行手动 link 操作。
 
 <details>
 <summary>
@@ -69,22 +71,29 @@ pod install
 npm i react-native-update@4.x
 ```
 
-如果 RN 的版本是 0.45 及以下，你还必须安装[Android NDK](http://androiddevtools.cn)，版本最好选用 r10e，并设置环境变量`ANDROID_NDK_HOME`，指向你的 NDK 根目录(例如`/Users/tdzl2003/Downloads/android-ndk-r10e`)。
+如果 RN 的版本是 0.45 及以下，你还必须安装`[Android NDK](http://androiddevtools.cn)`，版本最好选用 r10e，并设置环境变量`ANDROID_NDK_HOME`，指向你的 NDK 根目录(例如`/Users/tdzl2003/Downloads/android-ndk-r10e`)。
 
 </details>
 
-> 请记得，任意在 ios 和 android 目录下的修改，一定要重新编译（npx react-native run-ios 或 run-android 命令编译，或在 Xcode/Android Studio 中重新编译）才能生效。
+<Callout type="info">
+  请记得，任意在 ios 和 android 目录下的修改，一定要重新编译（使用 npx
+  react-native run-ios 或 run-android 命令编译，或在 Xcode/Android Studio
+  中重新编译）才能生效。
+</Callout>
 
-## 手动 link
+### 手动 link
 
 如果 RN 版本 >= 0.60 则不需要此手动 link 步骤。
 
-> 注意：如果是混编 RN 项目，由于目前官方集成文档并不完善，参照官方文档可能无法实现自动 link 功能。此时即便 RN 版本 >= 0.60，你可能也需要执行手动 link 操作。
+<Callout type="info">
+  注意：如果是混编 RN 项目，由于自定义的配置可能不完整，自动 link
+  的功能可能不能正常工作。此时即便 RN 版本 >= 0.60，你可能也需要执行手动 link 操作。
+</Callout>
 
-### iOS
+#### iOS
 
 <details>
-<summary>RN < 0.60且使用CocoaPods（推荐）</summary>
+<summary>RN &lt; 0.60且使用CocoaPods（推荐）</summary>
 
 1. 在 ios/Podfile 中添加
 
@@ -98,7 +107,7 @@ pod 'react-native-update', path: '../node_modules/react-native-update'
 </details>
 
 <details>
-<summary>RN < 0.60且不使用CocoaPods</summary>
+<summary>RN &lt; 0.60且不使用CocoaPods</summary>
 
 1. 在 XCode 中的 Project Navigator 里,右键点击`Libraries` ➜ `Add Files to [你的工程名]`
 2. 进入`node_modules` ➜ `react-native-update` ➜ `ios 并选中`RCTPushy.xcodeproj`
@@ -117,10 +126,10 @@ date +%s > "$DEST/pushy_build_time.txt"
 
 </details>
 
-### Android
+#### Android
 
 <details>
-<summary>RN < 0.60</summary>
+<summary>RN &lt; 0.60</summary>
 
 1. 在`android/settings.gradle`中添加如下代码:
 
@@ -139,13 +148,14 @@ date +%s > "$DEST/pushy_build_time.txt"
 
 - 在文件开头增加 `import cn.reactnative.modules.update.UpdatePackage;`
 - 在`getPackages()` 方法中增加 `new UpdatePackage()`(注意上一行可能要增加一个逗号)
+
 </details>
 
-## 配置 Bundle URL
+### 配置 Bundle URL
 
 注意此步骤无论任何版本，目前都需要手动配置。
 
-### iOS
+#### iOS
 
 在你的 AppDelegate.mm 或 AppDelegate.m 文件（不同 RN 版本可能后缀名不同）中增加如下代码：
 
@@ -190,7 +200,7 @@ date +%s > "$DEST/pushy_build_time.txt"
 
 ```
 
-### Android
+#### Android
 
 在 MainApplication 中增加如下代码（如果是混编原生的项目或其他原因没有使用 ReactApplication，请[使用此 api 集成](api#updatecontextsetcustominstancemanagerreactinstancemanager-instancemanager))：
 
@@ -214,7 +224,7 @@ class MainApplication : Application(), ReactApplication {
           return UpdateContext.getBundleUrl(this@MainApplication)
         }
         // ↑↑↑
-        
+
         // ...其他代码
       }
 }
@@ -251,9 +261,13 @@ public class MainApplication extends Application implements ReactApplication {
 </Tabs.Tab>
 </Tabs>
 
-> 请记得，任意在 ios 和 android 目录下的修改，一定要重新编译（npx react-native run-ios 或 run-android 命令编译，或在 Xcode/Android Studio 中重新编译）才能生效。
+<Callout type="info">
+  请记得，任意在 ios 和 android 目录下的修改，一定要重新编译（npx react-native
+  run-ios 或 run-android 命令编译，或在 Xcode/Android Studio
+  中重新编译）才能生效。
+</Callout>
 
-## 禁用 android 的 crunch 优化
+### 禁用 android 的 crunch 优化
 
 android 会在生成 apk 时自动对 png 图片进行压缩，此操作既耗时又影响增量补丁的生成。为了保证补丁能正常生成，您需要在`android/app/build.gradle`中关闭此操作：
 
@@ -273,9 +287,9 @@ android {
 ...
 ```
 
-## 登录与创建应用
+### 登录与创建应用
 
-首先请在<https://update.reactnative.cn>注册帐号，然后在你的项目根目录下运行以下命令：
+首先请在 https://update.reactnative.cn 注册帐号，然后在你的项目根目录下运行以下命令：
 
 ```bash
 $ pushy login
@@ -294,7 +308,7 @@ $ pushy createApp --platform android
 App Name: <输入应用名字>
 ```
 
-> 两次输入的名字可以相同，这没有关系。
+<Callout type="info">两次输入的名字可以相同，这没有关系。</Callout>
 
 如果你已经在网页端或者其它地方创建过应用，也可以直接选择应用：
 
@@ -325,3 +339,5 @@ Enter appId: <输入应用前面的编号>
 你可以安全的把`update.json`上传到 Git 等 CVS 系统上，与你的团队共享这个文件，它不包含任何敏感信息。当然，他们在使用任何功能之前，都必须首先输入`pushy login`进行登录。
 
 至此应用的创建/选择就已经成功了。下一步，你需要给代码添加相应的功能，请参阅[代码集成](integration)。
+
+</Steps>
