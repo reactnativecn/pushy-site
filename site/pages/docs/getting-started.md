@@ -4,6 +4,8 @@ title: 安装配置
 type: 快速入门
 ---
 
+import { Tabs } from 'nextra/components'
+
 首先你应该有一个基于 React Native 开发的应用，我们把具有 package.json 的目录叫做你的"应用根目录"。
 
 如果你还没有初始化应用，请参阅[开始使用 React Native](https://reactnative.cn/docs/getting-started)。
@@ -192,6 +194,35 @@ date +%s > "$DEST/pushy_build_time.txt"
 
 在 MainApplication 中增加如下代码（如果是混编原生的项目或其他原因没有使用 ReactApplication，请[使用此 api 集成](api#updatecontextsetcustominstancemanagerreactinstancemanager-instancemanager))：
 
+<Tabs items={['Kotlin', 'Java']}>
+<Tabs.Tab>
+
+```kotlin
+// ... 其它代码
+
+// ↓↓↓请注意不要少了这句import
+import cn.reactnative.modules.update.UpdateContext;
+// ↑↑↑
+
+class MainApplication : Application(), ReactApplication {
+
+  override val reactNativeHost: ReactNativeHost =
+      object : DefaultReactNativeHost(this) {
+
+        // ↓↓↓将下面这一段添加到 DefaultReactNativeHost 内部！
+        override fun getJSBundleFile(): String? {
+          return UpdateContext.getBundleUrl(this@MainApplication)
+        }
+        // ↑↑↑
+        
+        // ...其他代码
+      }
+}
+```
+
+</Tabs.Tab>
+<Tabs.Tab>
+
 ```java
 // ... 其它代码
 
@@ -216,6 +247,9 @@ public class MainApplication extends Application implements ReactApplication {
   }
 }
 ```
+
+</Tabs.Tab>
+</Tabs>
 
 > 请记得，任意在 ios 和 android 目录下的修改，一定要重新编译（npx react-native run-ios 或 run-android 命令编译，或在 Xcode/Android Studio 中重新编译）才能生效。
 
