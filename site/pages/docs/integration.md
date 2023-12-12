@@ -58,7 +58,7 @@ const info = await checkUpdate(appKey);
 
 返回的[`info`](api#async-function-checkupdateappkey)有三种情况：
 
-1. `{expired: true}`：该应用原生包已过期（已从 pushy 服务器中删除），开发者应该在 pushy 控制台添加一个更新下载链接，并自行提示用户下载。
+1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），开发者应该在 pushy 控制台添加一个更新下载链接，并自行提示用户下载。
 
 2. `{upToDate: true}`：当前已经更新到最新，无需进行更新。
 
