@@ -220,7 +220,7 @@ export default class MyProject extends Component {
       ]);
     } else if (info.upToDate) {
       Alert.alert("提示", "您的应用版本已是最新.");
-    } else {
+    } else if (info.update) {
       Alert.alert(
         "提示",
         "检查到新的版本" + info.name + ",是否下载?\n" + info.description,
