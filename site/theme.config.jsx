@@ -92,4 +92,12 @@ export default {
   },
 
   gitTimestamp: null,
+  banner: {
+    key: 'v10-release',
+    text: (
+      <a href="https://pushy.reactnative.cn" target="_blank">
+        您当前访问的是已过期版本的文档，点击这里可以查看重新优化设计API的最新版本(v10+)🌟 →
+      </a>
+    )
+  },
 };
