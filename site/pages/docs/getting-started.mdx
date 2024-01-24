@@ -6,10 +6,14 @@ type: 快速入门
 
 import { Callout, Steps, Tabs } from "nextra/components";
 
+<Callout type="info">
+  请注意，当前版本的api经过了完全重构，与之前的版本(v10.0以下)不兼容。如果你需要查看之前版本的文档，请点击[这里](https://v9--pushy-site.netlify.app/)
+</Callout>
+
 首先你应该有一个基于 React Native 开发的应用，我们把具有 package.json 的目录叫做你的`应用根目录`。
 如果你还没有初始化应用，请参阅[开始使用 React Native](https://reactnative.cn/docs/getting-started)。
 
-我们假设你已经拥有了开发 React Native 应用的一切环境，包括`Node.js`、`XCode`、`Android SDK`等等。
+我们假设你已经拥有了开发 React Native 应用的一切环境，包括`Node.js`、`Xcode`、`Android SDK`等等。
 
 <Steps>
 ### 安装
@@ -21,11 +25,11 @@ import { Callout, Steps, Tabs } from "nextra/components";
 npm i -g react-native-update-cli
 
 # 然后在项目目录中安装热更新模块
-# 0.71 及以上版本使用最新版本如下
 npm i react-native-update
 
-# 0.71 以下版本请使用8.x版本
-# npm i react-native-update@8.x
+# 然后进入ios目录安装iOS模块
+cd ios && pod install
+
 ```
 
 <Callout type="info">
@@ -35,45 +39,6 @@ npm i react-native-update
 <Callout type="warning">
   注意请不要混用`npm/yarn/pnpm`等包管理器及对应的`lock`文件，团队成员请坚持使用同一包管理器，且仅保留统一格式的`lock`文件
 </Callout>
-
-如果你的 RN 版本 >= 0.60，请在 ios 目录下执行:
-
-```bash
-pod install
-```
-
-如果你的 RN 版本 < 0.60，那么需要先在`package.json`文件的`scripts`中加入：
-
-```json
-"postinstall": "npx jetify -r"
-```
-
-然后按照[手动 link](#手动-link)的说明操作。
-
-<details>
-<summary>
-如果你的RN版本比较老（< 0.46），请点击这里的注意事项
-</summary>
-
-如果你的 RN 版本比较老，请按下面表格尝试老一些的版本（但这些版本我们已不再维护，不能保证可以使用）：
-
-| React Native 版本 | react-native-update 版本 |
-| ----------------- | ------------------------ |
-| 0.26 及以下       | 1.0.x                    |
-| 0.27 - 0.28       | 2.x                      |
-| 0.29 - 0.33       | 3.x                      |
-| 0.34 - 0.45       | 4.x                      |
-| 0.46 - 0.70       | 8.x                      |
-
-安装命令示例：
-
-```bash
-npm i react-native-update@4.x
-```
-
-如果 RN 的版本是 0.45 及以下，你还必须安装`[Android NDK](http://androiddevtools.cn)`，版本最好选用 r10e，并设置环境变量`ANDROID_NDK_HOME`，指向你的 NDK 根目录(例如`/Users/tdzl2003/Downloads/android-ndk-r10e`)。
-
-</details>
 
 <Callout type="info">
   请记得，任意在 ios 和 android 目录下的修改，一定要重新编译（使用 npx
@@ -87,7 +52,8 @@ npm i react-native-update@4.x
 
 <Callout type="info">
   注意：如果是混编 RN 项目，由于自定义的配置可能不完整，自动 link
-  的功能可能不能正常工作。此时即便 RN 版本 >= 0.60，你可能也需要执行手动 link 操作。
+  的功能可能不能正常工作。此时即便 RN 版本 >= 0.60，你可能也需要执行手动 link
+  操作。
 </Callout>
 
 #### iOS
@@ -165,7 +131,7 @@ date +%s > "$DEST/pushy_build_time.txt"
 
 #import "RCTPushy.h"  // <-- import头文件，注意要放到if条件外面
 
-// 可能项目里有一些条件编译语句，例如像较新版本RN自带的flipper
+// 可能项目里有一些条件编译语句，例如有些版本RN自带的flipper
 // #if DEBUG
 // 注意**不要**在这里面引入"RCTPushy.h"
 // #import <FlipperKit/FlipperClient.h>
