@@ -63,11 +63,14 @@ const pushyClient = new Pushy({
 import {Icon, PaperProvider, Snackbar, Banner} from 'react-native-paper';
 function App() {
   const {
+    client,
     checkUpdate,
     downloadUpdate,
     switchVersionLater,
     switchVersion,
     updateInfo,
+    packageVersion,
+    currentHash,
     progress: {received, total} = {},
   } = usePushy();
   const [showUpdateBanner, setShowUpdateBanner] = useState(false);
@@ -100,6 +103,7 @@ function App() {
         </Snackbar>
       )}
       <Banner
+        style={{width: '100%', position: 'absolute', top: 0}}
         visible={showUpdateBanner}
         actions={[
           {
@@ -125,7 +129,7 @@ function App() {
 
 ```
 
-其中`checkUpdate`方法可以用来手动触发更新检查。检查后返回的[`updateInfo`](api#async-function-checkupdateappkey)有三种情况：
+其中`checkUpdate`方法可以用来手动触发更新检查。检查后会更新返回的[`updateInfo`](api#async-function-checkupdateappkey)，有三种情况：
 
 1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），开发者应该在 pushy 的管理后台添加一个更新下载链接，并自行提示用户下载。
 
@@ -137,7 +141,7 @@ function App() {
 
 ### 统计数据
 
-
+待补充
 
 以上提及的所有 api 的说明文档可在[这里](api)查看。
 
