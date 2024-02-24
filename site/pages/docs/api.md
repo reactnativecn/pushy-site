@@ -4,10 +4,180 @@ title: API参考
 type: 开发指南
 ---
 
-
 ### JavaScript 方法
 
+#### new Pushy(options: PushyOptions)
+
+创建 Pushy 热更新服务实例，其构造参数如下：
+
+```ts
+interface PushyOptions {
+  // 必填，通过pushy createApp或selectApp命令，或在网页管理端获取
+  appKey: string;
+
+  // 如已购买私有部署服务，可在此自定义私有服务器地址
+  server?: {
+    // 主节点
+    main: string;
+    // 备用节点群
+    backups?: string[];
+    // 远程查询节点接口
+    queryUrl?: string;
+  };
+
+  // 自定义日志输出，也可用于上报统计数据
+  logger?: ({ type, data }: { type: EventType; data: EventData }) => void;
+  // 是否使用系统默认的alert页面提示热更， 默认为true
+  useAlert?: boolean;
+  // 触发自动检查更新的策略
+  strategy?:
+    | "onAppStart" // 仅在app启动时
+    | "onAppResume" // 仅在app从后台切换到前台时
+    | "both"; // 默认值，同时包含前两个场景
+  // 是否在热更重启后自动标记为成功，默认为true
+  autoMarkSuccess?: boolean;
+  // 是否在若干ms后自动清除最后的报错，默认为不清除
+  dismissErrorAfter?: number;
+}
+
+// 日志事件类型
+type EventType =
+  // 更新失败，重启后发生回滚
+  | "rollback"
+  // 检查更新时报错
+  | "errorChecking"
+  // 正在发起检查
+  | "checking"
+  // 正在下载更新
+  | "downloading"
+  // 更新失败
+  | "errorUpdate"
+  // 更新成功
+  | "markSuccess"
+  // 下载apk
+  | "downloadingApk"
+  // 下载apk前申请存储权限被用户拒绝
+  | "rejectStoragePermission"
+  // 下载apk前申请存储权限发生错误
+  | "errorStoragePermission"
+  // 下载apk时发生错误
+  | "errowDownloadAndInstallApk";
+
+// 日志事件数据
+interface EventData {
+  // 当前已完成的热更hash值，如尚未热更则为空字符串
+  currentVersion: string;
+  // 客户端版本信息
+  cInfo: {
+    pushy: string; // 当前pushy版本
+    rn: string; // 当前rn版本
+    os: string; // 当前操作系统及版本
+    uuid: string; // 用户标识符
+  };
+  // 客户端原生版本号
+  packageVersion: string;
+  // 编译时间戳
+  buildTime: number;
+  // 报错相关的信息
+  message?: string;
+  // 发生回滚的版本hash值
+  rolledBackVersion?: string;
+  // 更新失败的新版本hash值
+  newVersion?: string;
+  // 其他一些数据
+  [key: string]: any;
+}
+```
+
 #### usePushy()
+
+热更相关的工具函数。
+
+```js
+const {
+  checkUpdate,
+  switchVersion,
+  switchVersionLater,
+  markSuccess,
+  dismissError,
+  downloadUpdate,
+  downloadAndInstallApk,
+  currentHash,
+  packageVersion,
+  client,
+  progress,
+  updateInfo,
+  lastError,
+} = usePushy();
+```
+
+其类型定义和功能如下：
+
+```ts
+interface PushyContext {
+  // 检查更新
+  checkUpdate: () => Promise<void>;
+  // 下载热更完成后调用，立即重启切换新版本
+  switchVersion: () => void;
+  // 下载热更完成后调用，用户手动重启app后切换新版本（静默更新）
+  switchVersionLater: () => void;
+  // 热更完成重启后，手动标记热更完成
+  markSuccess: () => void;
+  // 清除最后的报错状态
+  dismissError: () => void;
+  // 下载热更
+  downloadUpdate: () => Promise<void>;
+  // 下载并安装apk
+  downloadAndInstallApk: (url: string) => Promise<void>;
+  // 当前需要热更的版本hash
+  currentHash: string;
+  // 当前的原生版本号
+  packageVersion: string;
+  // 当前的pushy热更服务示例
+  client?: Pushy;
+  // 下载开始后的进度数据
+  progress?: {
+    hash: string;
+    // 已下载的字节数
+    received: number;
+    // 待下载的总字节数
+    total: number;
+  };
+  // 热更相关信息
+  updateInfo?: {
+    // 已是最新版本，无需热更
+    upToDate?: true;
+    // 当前原生版本已过期，需要下载新的原生版本
+    expired?: true;
+    // 在pushy网页管理端设置的原生版本下载地址
+    downloadUrl?: string;
+    // 是否存在新的热更
+    update?: true;
+    // 新热更的版本名称
+    name?: string;
+    // 新热更的hash值
+    hash?: string;
+    // 新热更的更新说明
+    description?: string;
+    // 新热更携带的额外元数据
+    metaInfo?: string;
+    // 差量热更包的下载地址
+    diffUrl?: string;
+    // 备用热更包的下载地址（不同的差量策略）
+    pdiffUrl?: string;
+    // 完成热更包的下载地址
+    updateUrl?: string;
+    // 当前热更是否已暂停
+    paused?:
+      | "app" // 当前应用所有原生版本暂停
+      | "package"; // 仅当前原生版本暂停
+    // 其他信息
+    message?: string;
+  };
+  // 检查、下载、应用热更等过程中的最新一次报错
+  lastError?: Error;
+}
+```
 
 ---
 
@@ -48,7 +218,7 @@ type: 开发指南
 
 ---
 
-#### function downloadAndInstallApk(url)
+#### async function downloadAndInstallApk(url)
 
 下载更新的 apk 包并直接安装。`url`必须为可直接下载到 apk 文件的地址。
 
@@ -96,43 +266,6 @@ type: 开发指南
 #### function switchVersionLater()
 
 在下一次启动应用的时候加载已经下载完毕的版本。
-
----
-
-#### function onPushyEvents(({ type: EventType; data: EventData }) => void)
-
-发生某个事件时的回调，可用于上报统计数据。自`v8.4.0`版本后可用。其中回调参数构型具体如下：
-
-```ts
-// 回调事件类型
-export type EventType =
-  | "rollback" // 回滚
-  | "errorChecking" // 查询热更时出错
-  | "checking" // 正在查询热更
-  | "downloading" // 正在下载热更
-  | "errorUpdate" // 热更时出错
-  | "markSuccess" // 热更后成功标记
-  | "downloadingApk" // 正在下载apk
-  | "rejectStoragePermission" // 下载apk前申请存储权限被用户拒绝
-  | "errorStoragePermission" // 下载apk前申请存储权限出错
-  | "errowDownloadAndInstallApk"; // 下载或安装apk时出错
-
-// 回调事件数据
-export interface EventData {
-  currentVersion: string; // 当前版本hash
-  cInfo: {
-    pushy: string; // 当前pushy版本
-    rn: string; // 当前rn版本
-    os: string; // 当前操作系统及版本
-    uuid: string; // 用户标识符
-  };
-  packageVersion: string; // 原生包版本
-  buildTime: number; // 原生包编译时间戳
-  message?: string; // 相关说明信息
-  rolledBackVersion?: string; // 热更失败，回滚后的版本hash
-  newVersion?: string; // 已下载但热更失败的hash
-}
-```
 
 ---
 
