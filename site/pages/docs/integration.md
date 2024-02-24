@@ -4,6 +4,8 @@ title: 代码集成
 type: 快速入门
 ---
 
+import { Callout, Steps, Tabs } from "nextra/components";
+
 <Callout type="info">
   请注意，当前版本的api经过了完全重构，与之前的版本(v10.0以下)不兼容。如果你需要查看之前版本的文档，请点击[这里](https://v9--pushy-site.netlify.app/)
 </Callout>
@@ -48,7 +50,7 @@ export default function Root() {
 
 ### 自定义更新界面
 
-默认配置下，pushy会以系统alert的形式来弹出更新提示，如需自定义更新界面，首先请关闭默认的 alert 弹窗：
+默认配置下，pushy 会以系统 alert 的形式来弹出更新提示，如需自定义更新界面，首先请关闭默认的 alert 弹窗：
 
 ```diff
 const pushyClient = new Pushy({
@@ -57,10 +59,10 @@ const pushyClient = new Pushy({
 });
 ```
 
-所有更新相关的数据可以通过一个单一的[`usePushy()`](/docs/api#usepushy)hook函数来获取，然后可以根据其提供的数据来自行渲染自定义的界面，如下面的例子：
+所有更新相关的数据可以通过一个单一的[`usePushy()`](/docs/api#usepushy)hook 函数来获取，然后可以根据其提供的数据来自行渲染自定义的界面，如下面的例子：
 
 ```js
-import {Icon, PaperProvider, Snackbar, Banner} from 'react-native-paper';
+import { Icon, PaperProvider, Snackbar, Banner } from "react-native-paper";
 function App() {
   const {
     client,
@@ -71,7 +73,7 @@ function App() {
     updateInfo,
     packageVersion,
     currentHash,
-    progress: {received, total} = {},
+    progress: { received, total } = {},
   } = usePushy();
   const [showUpdateBanner, setShowUpdateBanner] = useState(false);
   const [showUpdateSnackbar, setShowUpdateSnackbar] = useState(false);
@@ -92,41 +94,42 @@ function App() {
             setShowUpdateSnackbar(false);
           }}
           action={{
-            label: '更新',
+            label: "更新",
             onPress: async () => {
               setShowUpdateSnackbar(false);
               await downloadUpdate();
               setShowUpdateBanner(true);
             },
-          }}>
+          }}
+        >
           <Text>有新版本({updateInfo.name})可用，是否更新？</Text>
         </Snackbar>
       )}
       <Banner
-        style={{width: '100%', position: 'absolute', top: 0}}
+        style={{ width: "100%", position: "absolute", top: 0 }}
         visible={showUpdateBanner}
         actions={[
           {
-            label: '立即重启',
+            label: "立即重启",
             onPress: switchVersion,
           },
           {
-            label: '下次再说',
+            label: "下次再说",
             onPress: () => {
               switchVersionLater();
               setShowUpdateBanner(false);
             },
           },
         ]}
-        icon={({size}) => (
+        icon={({ size }) => (
           <Icon name="checkcircleo" size={size} color="#00f" />
-        )}>
+        )}
+      >
         更新已完成，是否立即重启？
       </Banner>
     </View>
   );
 }
-
 ```
 
 其中`checkUpdate`方法可以用来手动触发更新检查。检查后会更新返回的[`updateInfo`](api#async-function-checkupdateappkey)，有三种情况：
@@ -137,13 +140,24 @@ function App() {
 
 3. `{update: true}`：当前有新版本可以更新。info 的`name`、`description`字段可以用于提示用户，而`metaInfo`字段则可以根据你的需求自定义其它属性(如是否静默更新、是否强制更新等等)，具体用法可参考[场景实践](bestpractice#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了补丁包的下载地址等。 pushy 会首先尝试耗费流量更少的更新方式。
 
-当返回的`updateInfo`中`update`字段为true时，即可调用`downloadUpdate`方法来下载更新，此时可以获取到下载的进度数据`progress`。下载完成后可以调用`switchVersion`来立即重启更新，也可以使用`switchVersionLater`来标记下次启动时更新。
+当返回的`updateInfo`中`update`字段为 true 时，即可调用`downloadUpdate`方法来下载更新，此时可以获取到下载的进度数据`progress`。下载完成后可以调用`switchVersion`来立即重启更新，也可以使用`switchVersionLater`来标记下次启动时更新。
 
 ### 统计数据
 
-待补充
+初始化 Pushy 客户端时可以传入自定义的 logger 函数，其中可以自己记录日志或上报统计数据，比如下面的例子使用 Google Analytics 来上报事件：
+
+```ts
+import { getAnalytics, logEvent } from "firebase/analytics";
+const analytics = getAnalytics();
+
+const pushyClient = new Pushy({
+  appKey,
+  logger: ({ type, data }) => {
+    logEvent(analytics, "pushy_" + type, data);
+  },
+});
+```
 
 以上提及的所有 api 的说明文档可在[这里](api)查看。
-
 
 现在，你的应用已经可以通过 pushy 服务检查版本并进行更新了。下一步，你可以开始尝试发布应用包和版本，请参阅[发布热更新](publish)。
