@@ -102,6 +102,7 @@ const {
   dismissError,
   downloadUpdate,
   downloadAndInstallApk,
+  getCurrentVersionInfo,
   currentHash,
   packageVersion,
   client,
@@ -129,7 +130,13 @@ interface PushyContext {
   downloadUpdate: () => Promise<void>;
   // 下载并安装apk
   downloadAndInstallApk: (url: string) => Promise<void>;
-  // 当前需要热更的版本hash
+  // 获取当前已热更版本的信息
+  getCurrentVersionInfo: () => Promise<{
+    name?: string;
+    description?: string;
+    metaInfo?: string;
+  }>;
+  // 当前的版本hash
   currentHash: string;
   // 当前的原生版本号
   packageVersion: string;
@@ -183,9 +190,9 @@ interface PushyContext {
 
 #### async function checkUpdate()
 
-检查更新，返回值有三种情形：
+触发更新检查，更新`usePushy`中的`updateInfo`，返回值有三种情形：
 
-1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），需要前往应用市场下载新的版本(在设置中填写 downloadUrl)。
+1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），需要引导用户下载或跳转到应用市场(需要在网页管理端设置中填写`downloadUrl`)。
 
 ```js
 {
@@ -196,7 +203,7 @@ interface PushyContext {
 
 2. `{upToDate: true}`：当前已经更新到最新，无需进行更新。
 
-3. `{update: true}`：当前有新版本可以更新。info 的`name`、`description`字段可以用于提示用户，而`metaInfo`字段则可以根据你的需求自定义一些标记(如是否静默更新、是否强制更新等等，自己根据标记的属性做一些条件流程控制)，具体用法可参考[场景实践](bestpractice#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了热更新文件的下载地址，
+3. `{update: true}`：当前有新版本可以更新。`name`、`description`字段可以用于展示给用户版本号，更新内容等信息，而`metaInfo`字段则可以根据你的需求自定义一些标记(如是否静默更新、是否强制更新等等，自己根据标记的属性做一些条件流程控制)，具体用法可参考[场景实践](bestpractice#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了热更新文件的下载地址，
 
 ```js
 {
@@ -237,7 +244,7 @@ interface PushyContext {
 
 #### function markSuccess()
 
-在`isFirstTime`为`true`时，必须调用此函数作为更新成功的标记（否则下次启动会默认失败自动回滚）。
+手动调用此函数作为更新成功的标记（否则下次启动会默认失败自动回滚）。默认情况下不需调用此函数，除非设置`autoMarkSuccess`为`false`。
 
 ---
 

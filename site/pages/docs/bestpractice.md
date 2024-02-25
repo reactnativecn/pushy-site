@@ -85,27 +85,15 @@ splits {
 此时在客户端检查更新时，能获取到我们刚刚输入的元信息，但它并不具备任何功能，只是一个字符串而已。所以我们其实需要**预先**在更新流程中加入对应的处理逻辑：
 
 ```js
-// 调用 checkUpdate 获取 info
-if (info.expired) {
+// 调用 checkUpdate 获取 updateInfo
+if (updateInfo.expired) {
   // ... 原生包版本过期，下载或跳转下载页面
-} else if (info.upToDate) {
+} else if (updateInfo.upToDate) {
   // ... 没有更新，弹提示或忽略
 } else {
   // 有更新，一般来说我们在这里给用户弹窗提示，让用户选择是否更新
   // 那么静默更新的本质其实就是不弹窗，直接执行，所以可以在这里加入额外的判断流程
-  Alert.alert(
-    "提示",
-    "检查到新的版本" + info.name + ",是否下载?\n" + info.description,
-    [
-      {
-        text: "是",
-        onPress: () => {
-          this.doUpdate(info);
-        },
-      },
-      { text: "否" },
-    ]
-  );
+  // ...
 }
 ```
 
@@ -115,14 +103,14 @@ if (info.expired) {
 let metaInfo = {};
 try {
   // 注意 JSON 输入有可能有错误，需要用 try 语句来避免应用被带崩
-  metaInfo = JSON.parse(info.metaInfo);
+  metaInfo = JSON.parse(updateInfo.metaInfo);
 } catch (e) {
   // 异常处理，忽略或上报？
 }
 
 if (metaInfo.silent) {
   // 如果热更包携带有 silent 字段，不询问用户，直接执行更新
-  this.doUpdate(info);
+  switchVersion();
 } else {
   // 否则还是走之前的询问流程
   // Alert.alert('提示', '检查到新的版本.......
