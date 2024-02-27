@@ -39,7 +39,8 @@ function Pricing() {
           <Tooltip title="您可将注册用户名、公司（或个人）名称发送至<hi@charmlot.com>，申请延长评估时间">
             <a>7 天</a>
           </Tooltip>
-          的<strong>专业版</strong>免费试用评估。到期后转为免费版。
+          的<strong>专业版</strong>
+          免费试用评估。到期后转为免费版。如需按月购买，请联系QQ客服 34731408.
         </p>
         <div className="pricing pricing--rabten">
           <div className="pricing__item">
@@ -52,6 +53,13 @@ function Pricing() {
               </span>
               <span className="pricing__anim pricing__anim--2">
                 <span className="pricing__period"> / 年</span>
+              </span>
+              <hr />
+              <span className="pricing__anim pricing__anim--1">
+                {/* <span className="pricing__currency">￥</span>80 */}
+              </span>
+              <span className="pricing__anim pricing__anim--2">
+                {/* <span className="pricing__period">/ 月</span> */}
               </span>
             </div>
             <ul className="pricing__feature-list">
@@ -89,6 +97,13 @@ function Pricing() {
               </span>
               <span className="pricing__anim pricing__anim--2">
                 <span className="pricing__period">/ 年</span>
+              </span>
+              <hr />
+              <span className="pricing__anim pricing__anim--1">
+                <span className="pricing__currency">￥</span>100
+              </span>
+              <span className="pricing__anim pricing__anim--2">
+                <span className="pricing__period">/ 月</span>
               </span>
             </div>
             <ul className="pricing__feature-list">
@@ -128,6 +143,13 @@ function Pricing() {
               </span>
               <span className="pricing__anim pricing__anim--2">
                 <span className="pricing__period">/ 年</span>
+              </span>{" "}
+              <hr />
+              <span className="pricing__anim pricing__anim--1">
+                <span className="pricing__currency">￥</span>300
+              </span>
+              <span className="pricing__anim pricing__anim--2">
+                <span className="pricing__period">/ 月</span>
               </span>
             </div>
             <ul className="pricing__feature-list">
@@ -168,6 +190,13 @@ function Pricing() {
               </span>
               <span className="pricing__anim pricing__anim--2">
                 <span className="pricing__period">/ 年</span>
+              </span>{" "}
+              <hr />
+              <span className="pricing__anim pricing__anim--1">
+                <span className="pricing__currency">￥</span>900
+              </span>
+              <span className="pricing__anim pricing__anim--2">
+                <span className="pricing__period">/ 月</span>
               </span>
             </div>
             <ul className="pricing__feature-list">
