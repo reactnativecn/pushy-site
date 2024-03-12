@@ -139,29 +139,15 @@ date +%s > "$DEST/pushy_build_time.txt"
 // #endif
 
 
-// 如果RN版本 >= 0.59，修改sourceURLForBridge
+// 修改sourceURLForBridge方法
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {
 #if DEBUG
-  // 原先这里的写法继续保留(所以debug模式下不可热更新)
-  return .....
+  // 原先DEBUG这里的写法不作修改(所以DEBUG模式下不可热更新)
+  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
 #else
-  // 把这里非DEBUG的情况替换为热更新bundle的写法
-  return [RCTPushy bundleURL];
+  return [RCTPushy bundleURL];  // <--  把这里非DEBUG的情况替换为热更新bundle
 #endif
-}
-
-// 如果RN版本 < 0.59，修改didFinishLaunchingWithOptions
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
-#if DEBUG
-  // 原来的jsCodeLocation保留在这里(所以debug模式下不可热更新)
-  jsCodeLocation = ..........
-#else
-  // 把这里非DEBUG的情况替换为热更新bundle的写法
-  jsCodeLocation = [RCTPushy bundleURL];
-#endif
-  // ... 其它代码
 }
 
 ```
