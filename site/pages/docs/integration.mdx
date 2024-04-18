@@ -33,6 +33,10 @@ import { PushyProvider, Pushy } from "react-native-update";
 // 唯一必填参数是appKey，其他选项请参阅 api 文档
 const pushyClient = new Pushy({
   appKey,
+  // 注意，默认情况下，在开发环境中不会检查更新
+  // 如需在开发环境中调试更新，请设置debug为true
+  // 但即便打开此选项，也仅能检查、下载热更，并不能实际应用热更。实际应用热更必须在release包中进行。
+  // debug: true
 });
 
 // 在根组件外加上PushyProvider后导出
@@ -50,12 +54,13 @@ export default function Root() {
 
 ### 自定义更新界面
 
-默认配置下，pushy 会以系统 alert 的形式来弹出更新提示，如需自定义更新界面，首先请关闭默认的 alert 弹窗：
+默认配置下，pushy 会以系统 alert 的形式来弹出更新提示，如需自定义更新界面，首先请关闭默认的 alert 弹窗，并打开 debug 选项以便调试：
 
 ```diff
 const pushyClient = new Pushy({
   appKey,
 +  useAlert: false,
++  debug: true,
 });
 ```
 
