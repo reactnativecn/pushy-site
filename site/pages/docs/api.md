@@ -34,14 +34,14 @@ interface PushyOptions {
     | "onAppStart" // 仅在app启动时
     | "onAppResume" // 仅在app从后台切换到前台时
     | "both"; // 默认值，同时包含前两个场景
-    | null; // 不自动检查更新，必须手动调用checkUpdate方法，此选项需v10.4.1或更高版本
+    | null; // 不自动检查更新，必须手动调用checkUpdate方法，此选项需v10.4.2或更高版本
   // 是否在热更重启后自动标记为成功，默认为true
   autoMarkSuccess?: boolean;
   // 是否在若干ms后自动清除最后的报错，默认为不清除
   dismissErrorAfter?: number;
   // 是否在开发环境中检查热更，默认为false。如需在开发环境中调试热更，请打开此选项。
   // 但即便打开此选项，也仅能检查、下载热更，并不能实际应用热更。实际应用热更必须在release包中进行。
-  // 此选项需v10.4.1或更高版本
+  // 此选项需v10.4.2或更高版本
   debug?: boolean;
 }
 
