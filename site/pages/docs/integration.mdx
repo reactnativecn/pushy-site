@@ -41,6 +41,8 @@ const pushyClient = new Pushy({
 
 // 在根组件外加上PushyProvider后导出
 export default function Root() {
+  // 注意，在使用 PushyProvider 的当前组件中，无法直接调用 usePushy
+  // 只有当前组件的子组件才能调用 usePushy
   return (
     <PushyProvider client={pushyClient}>
       {/* ↓ 整个应用的根组件放到PushyProvider中 */}

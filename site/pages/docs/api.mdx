@@ -4,6 +4,8 @@ title: API参考
 type: 开发指南
 ---
 
+import { Callout } from "nextra/components";
+
 ### JavaScript 方法
 
 #### new Pushy(options: PushyOptions)
@@ -97,6 +99,10 @@ interface EventData {
 #### usePushy()
 
 热更相关的工具函数。
+
+<Callout type="info">
+注意，在使用 `<PushyProvider>` 的当前组件（一般是根组件）中无法直接调用`usePushy`，只有当前组件的子组件才能调用。
+</Callout>
 
 ```js
 const {
