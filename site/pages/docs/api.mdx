@@ -29,14 +29,18 @@ interface PushyOptions {
 
   // 自定义日志输出，也可用于上报统计数据
   logger?: ({ type, data }: { type: EventType; data: EventData }) => void;
-  // 是否使用系统默认的alert页面提示热更， 默认为true
-  useAlert?: boolean;
   // 触发自动检查更新的策略
-  strategy?:
+  checkStrategy?:
     | "onAppStart" // 仅在app启动时
     | "onAppResume" // 仅在app从后台切换到前台时
     | "both"; // 默认值，同时包含前两个场景
     | null; // 不自动检查更新，必须手动调用checkUpdate方法，此选项需v10.4.2或更高版本
+  // 自动下载和应用更新的策略
+  updateStrategy?:
+    | "alwaysAlert" // 默认值，使用系统默认的alert页面提示热更，v10.6.0版本前为 useAlert 选项
+    | "silentAndNow" // 自动静默下载并立刻应用热更
+    | "silentAndLater"; // 自动静默下载，但仅在用户退出app后重启时应用更新
+    | null; // 不自动下载和应用更新，如需自定义热更界面请选择此项
   // 是否在热更重启后自动标记为成功，默认为true
   autoMarkSuccess?: boolean;
   // 是否在若干ms后自动清除最后的报错，默认为不清除

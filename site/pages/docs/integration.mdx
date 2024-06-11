@@ -56,12 +56,12 @@ export default function Root() {
 
 ### 自定义更新界面
 
-默认配置下，pushy 会以系统 alert 的形式来弹出更新提示，如需自定义更新界面，首先请关闭默认的 alert 弹窗，并打开 debug 选项以便调试：
+默认配置下，pushy 会以系统 alert 的形式来弹出更新提示，如需自定义更新界面，首先请关闭默认的 updateStrategy 更新策略，并打开 debug 选项以便调试：
 
 ```diff
 const pushyClient = new Pushy({
   appKey,
-+  useAlert: false,
++  updateStrategy: null,
 +  debug: true,
 });
 ```
