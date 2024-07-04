@@ -121,11 +121,15 @@ $ npm install -g react-native-update-cli
 
 上传 ipa 文件到开放平台。
 
+- note: 备注（cli 需 1.24.0 或更高版本）
+
 ---
 
 #### pushy uploadApk [apkFile]
 
 上传 apk 文件到开放平台。
+
+- note: 备注（cli 需 1.24.0 或更高版本）
 
 ---
 
