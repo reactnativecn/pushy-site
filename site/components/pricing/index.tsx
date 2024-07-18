@@ -5,6 +5,7 @@ import {
   RocketOutlined,
   SendOutlined,
 } from "@ant-design/icons";
+import { ReactNode } from "react";
 
 const AppText = () => (
   <Tooltip title="iOS 和 Android 版本记做不同的应用。您可删除已不再使用的应用来有效利用配额。">
@@ -23,6 +24,33 @@ const HotUpdateText = () => (
   >
     <a>热更包</a>
   </Tooltip>
+);
+const CheckLimitText = ({ children }: { children: ReactNode }) => (
+  <>
+    <hr style={{ margin: "10px 0" }} />
+    所有应用累加
+    <br />
+    每天
+    <Tooltip
+      title={
+        <>
+          指每次客户端向服务器端发起更新检查请求，无论检查结果是否存在新版本。如日更新检查次数超过百万次，请点此查看
+          <a
+            target="_blank"
+            style={{ textDecorationLine: "underline", fontWeight: "bold" }}
+            href="docs/faq#大客户方案"
+          >
+            大客户方案
+          </a>
+          。
+        </>
+      }
+    >
+      <a>{children}次</a>
+    </Tooltip>
+    更新查询
+    <hr style={{ margin: "10px 0" }} />
+  </>
 );
 
 function Pricing() {
@@ -78,6 +106,9 @@ function Pricing() {
                 <HotUpdateText />
                 ，每个最大3M
               </li>
+              <li className="pricing__feature">
+                <CheckLimitText>1千</CheckLimitText>
+              </li>
             </ul>
             <Button
               shape="round"
@@ -120,6 +151,9 @@ function Pricing() {
                 50个
                 <HotUpdateText />
                 ，每个最大15M
+              </li>
+              <li className="pricing__feature">
+                <CheckLimitText>1万</CheckLimitText>
               </li>
               <li className="pricing__feature">提供专人技术支持</li>
             </ul>
@@ -167,6 +201,9 @@ function Pricing() {
                 60个
                 <HotUpdateText />
                 ，每个最大50M
+              </li>{" "}
+              <li className="pricing__feature">
+                <CheckLimitText>10万</CheckLimitText>
               </li>
               <li className="pricing__feature">提供专人技术支持</li>
             </ul>
@@ -214,6 +251,9 @@ function Pricing() {
                 100个
                 <HotUpdateText />
                 ，每个最大200M
+              </li>{" "}
+              <li className="pricing__feature">
+                <CheckLimitText>100万</CheckLimitText>
               </li>
               <li className="pricing__feature">提供专人技术支持</li>
             </ul>
