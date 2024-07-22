@@ -162,9 +162,11 @@ $ npm install -g react-native-update-cli
 
 #### pushy update
 
-为一个原生包版本绑定一个热更新版本。这项操作也可以在网页管理端进行。
+为一个原生包版本绑定一个热更新版本。这项操作也可以在网页管理端进行。以下参数中`packageId`，`packageVersion`，`minPackageVersion`和`maxPackageVersion`四选一即可。
 
 - platform: ios|android 对应的平台
 - versionId: 要绑定的热更新版本 ID
-- packageId: 要绑定的原生包 ID （与版本名二选一）
-- packageVersion: 要绑定的原生包版本名（与 ID 二选一，需 cli 版本 1.7.2 或以上）
+- packageId: 要绑定的原生包 ID （四选一）
+- packageVersion: 要绑定的原生包版本名（四选一，需 cli 版本 1.7.2+）
+- minPackageVersion: 要绑定的最低原生包版本，大于等于此版本的将逐个绑定（四选一，需 cli 版本 1.27.0+）
+- maxPackageVersion: 要绑定的最高原生包版本，小于等于此版本的将逐个绑定（四选一，需 cli 版本 1.27.0+）
