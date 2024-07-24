@@ -29,12 +29,14 @@ interface PushyOptions {
 
   // 自定义日志输出，也可用于上报统计数据
   logger?: ({ type, data }: { type: EventType; data: EventData }) => void;
+
   // 触发自动检查更新的策略
   checkStrategy?:
     | "onAppStart" // 仅在app启动时
     | "onAppResume" // 仅在app从后台切换到前台时
     | "both"; // 默认值，同时包含前两个场景
     | null; // 不自动检查更新，必须手动调用checkUpdate方法，此选项需v10.4.2或更高版本
+
   // 自动下载和应用更新的策略
   updateStrategy?:
     | "alwaysAlert" // 调试环境（__DEV__）默认值，使用系统默认的alert页面提示热更且会在有报错时弹出提示
@@ -42,14 +44,27 @@ interface PushyOptions {
     | "silentAndNow" // 自动静默下载并立刻应用热更
     | "silentAndLater"; // 自动静默下载，但仅在用户退出app后重启时应用更新
     | null; // 不自动下载和应用更新，如需自定义热更界面请选择此项
+
   // 是否在热更重启后自动标记为成功，默认为true
   autoMarkSuccess?: boolean;
+
   // 是否在若干ms后自动清除最后的报错，默认为不清除
   dismissErrorAfter?: number;
+
   // 是否在开发环境中检查热更，默认为false。如需在开发环境中调试热更，请打开此选项。
   // 但即便打开此选项，也仅能检查、下载热更，并不能实际应用热更。实际应用热更必须在release包中进行。
-  // 此选项需v10.4.2或更高版本
+  // 此选项需v10.4.2+版本
   debug?: boolean;
+
+  // 是否在调用 checkUpdate 和 downloadUpdate 时抛出错误，默认为不抛出错误，通过 lastError 获取错误信息
+  // 启用后可以使用 try catch 语句 捕获错误，同时 lastError 也仍然可用
+  // try {
+  //   await checkUpdate();
+  // } catch (e) {
+  //   console.error(e);
+  // }
+  // 此选项需v10.8.0+版本
+  throwError?: boolean;
 }
 
 // 日志事件类型
