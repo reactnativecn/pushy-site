@@ -134,6 +134,7 @@ const {
   downloadUpdate,
   downloadAndInstallApk,
   getCurrentVersionInfo,
+  parseTestQrCode,
   currentHash,
   packageVersion,
   client,
@@ -167,6 +168,8 @@ interface PushyContext {
     description?: string;
     metaInfo?: string;
   }>;
+  // 解析测试二维码，此方法需v10.11.2+版本
+  parseTestQrCode: (qrCode: string) => void;
   // 当前的版本hash
   currentHash: string;
   // 当前的原生版本号
@@ -304,6 +307,30 @@ interface PushyContext {
 #### function switchVersionLater()
 
 在下一次启动应用的时候加载已经下载完毕的版本。
+
+---
+
+#### function parseTestQrCode(qrCode: string)
+
+解析测试二维码，一般用于给 QA 人员测试热更新。如果在应用中已有扫码功能，则可以在应用中扫描 pushy 后台的测试二维码来测试任意版本的热更包。
+
+![testqrcode](./assets/testqrcode.png)
+
+代码示例：
+
+```js
+<Camera
+  onReadCode={({ nativeEvent: { codeStringValue } }) => {
+    // 先解析是否是pushy的测试二维码
+    if (parseTestQrCode(codeStringValue)) {
+      // 如果是pushy的测试二维码，则不再继续扫描
+      setShowCamera(false);
+      return;
+    }
+    // 如果不是，继续处理其他业务扫码逻辑
+  }}
+/>
+```
 
 ---
 
