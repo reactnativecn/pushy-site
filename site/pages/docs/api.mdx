@@ -323,10 +323,11 @@ interface PushyContext {
 ```js
 <Camera
   onReadCode={({ nativeEvent: { codeStringValue } }) => {
+    // 识别到二维码后先关闭相机
+    setShowCamera(false);
     // 先解析是否是pushy的测试二维码
     if (parseTestQrCode(codeStringValue)) {
-      // 如果是pushy的测试二维码，则不再继续扫描
-      setShowCamera(false);
+      // 如果是pushy的测试二维码，则不再做其他业务扫码逻辑
       return;
     }
     // 如果不是，继续处理其他业务扫码逻辑
