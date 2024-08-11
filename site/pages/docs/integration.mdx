@@ -87,7 +87,7 @@ function App() {
   const [showUpdateBanner, setShowUpdateBanner] = useState(false);
   const [showUpdateSnackbar, setShowUpdateSnackbar] = useState(false);
   const snackbarVisible =
-    showUpdateSnackbar && updateInfo?.update && !useDefaultAlert;
+    showUpdateSnackbar && updateInfo?.update;
   return (
     <View style={styles.container}>
       <Text>
