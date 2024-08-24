@@ -35,7 +35,7 @@ interface PushyOptions {
     | "onAppStart" // 仅在app启动时
     | "onAppResume" // 仅在app从后台切换到前台时
     | "both"; // 默认值，同时包含前两个场景
-    | null; // 不自动检查更新，必须手动调用checkUpdate方法，此选项需v10.4.2或更高版本
+    | null; // 不自动检查更新，必须手动调用checkUpdate方法，此选项需 v10.4.2+ 版本
 
   // 自动下载和应用更新的策略
   updateStrategy?:
@@ -53,7 +53,7 @@ interface PushyOptions {
 
   // 是否在开发环境中检查热更，默认为false。如需在开发环境中调试热更，请打开此选项。
   // 但即便打开此选项，也仅能检查、下载热更，并不能实际应用热更。实际应用热更必须在release包中进行。
-  // 此选项需v10.4.2+版本
+  // 此选项需 v10.4.2+ 版本
   debug?: boolean;
 
   // 是否在调用 checkUpdate 和 downloadUpdate 时抛出错误，默认为不抛出错误，通过 lastError 获取错误信息
@@ -63,8 +63,16 @@ interface PushyOptions {
   // } catch (e) {
   //   console.error(e);
   // }
-  // 此选项需v10.8.0+版本
+  // 此选项需 v10.8.0+ 版本
   throwError?: boolean;
+
+  // 在检查更新前执行，返回 false 则取消检查更新
+  // 此选项需 v10.12.0+ 版本
+  beforeCheckUpdate?: () => Promise<boolean>;
+
+  // 在下载更新前执行，返回 false 则取消下载更新，可以配合自定义的 metaInfo 做一些条件控制
+  // 此选项需 v10.12.0+ 版本
+  beforeDownloadUpdate?: (info: UpdateInfo) => Promise<boolean>;
 }
 
 // 日志事件类型
@@ -168,7 +176,7 @@ interface PushyContext {
     description?: string;
     metaInfo?: string;
   }>;
-  // 解析测试二维码，此方法需v10.11.2+版本
+  // 解析测试二维码，此方法需 v10.11.2+ 版本
   parseTestQrCode: (qrCode: string) => void;
   // 当前的版本hash
   currentHash: string;
