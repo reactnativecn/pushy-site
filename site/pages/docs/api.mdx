@@ -210,12 +210,6 @@ interface PushyContext {
     description?: string;
     // 新热更携带的额外元数据
     metaInfo?: string;
-    // 差量热更包的下载地址
-    diffUrl?: string;
-    // 备用热更包的下载地址（不同的差量策略）
-    pdiffUrl?: string;
-    // 完成热更包的下载地址
-    updateUrl?: string;
     // 当前热更是否已暂停
     paused?:
       | "app" // 当前应用所有原生版本暂停
