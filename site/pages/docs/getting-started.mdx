@@ -140,7 +140,19 @@ date +%s > "$DEST/pushy_build_time.txt"
 // #endif
 
 
-// 修改sourceURLForBridge方法
+// rn 版本 >= 0.74 需要修改 bundleURL 方法
+- (NSURL *)bundleURL
+{
+#if DEBUG
+  // 原先DEBUG这里的写法不作修改(所以DEBUG模式下不可热更新)
+  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
+#else
+  return [RCTPushy bundleURL];  // <--  把这里非DEBUG的情况替换为热更新bundle
+#endif
+}
+
+
+// rn 版本 < 0.74 需要修改sourceURLForBridge方法
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {
 #if DEBUG
