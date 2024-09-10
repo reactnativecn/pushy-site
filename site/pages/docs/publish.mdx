@@ -4,6 +4,8 @@ title: 发布热更新
 type: 快速入门
 ---
 
+import { Callout } from "nextra/components";
+
 现在你的应用已经具备了检测更新的功能，下面我们来尝试发布并更新它。流程可参考下图：
 
 ```mermaid
@@ -58,8 +60,6 @@ $ pushy uploadIpa <ipa后缀文件>
 
 如果后续需要再次 archive 打包（例如修改原生代码或配置。如果只是修改 js 代码则不需要重新打包。），请先**更改版本号**，并在打包完成后再次`uploadIpa`到服务器端记录，否则后续生成的相同版本的原生包会由于[编译时间戳不一致而`无法获取热更新`](faq#热更新报错：热更新已暂停，原因：buildtime-mismatch。)。
 
-> 注意：如果你在上传之前就运行了新的原生版本，由于服务器端没有记录，会暂停其更新数小时。可删除原先安装的 app 再重新安装以清空暂停设置。在上传之后安装的客户端不会受此影响。
-
 ### Android
 
 首先参考[文档-打包 APK](https://reactnative.cn/docs/signed-apk-android)设置签名，然后在 android 文件夹下运行`./gradlew assembleRelease`或`./gradlew aR`，你就可以在`android/app/build/outputs/apk/release/app-release.apk`中找到你的应用包。
@@ -78,11 +78,18 @@ $ pushy uploadApk android/app/build/outputs/apk/release/app-release.apk
 
 如果后续需要再次打包（例如修改原生代码或配置。如果只是修改 js 代码则不需要重新打包。），请先**更改版本号**，并再次`uploadApk`到服务器端记录，否则后续生成的相同版本的原生包会由于[编译时间戳不一致而`无法获取热更新`](faq#热更新报错：热更新已暂停，原因：buildtime-mismatch。)。
 
-> 注意：如果你在上传之前就运行了新的原生版本，由于服务器端没有记录，会暂停其更新数小时。可删除原先安装的 app 再重新安装以清空暂停设置。在上传之后安装的客户端不会受此影响。
-
 ## 发布热更新版本
 
 你可以尝试修改一行代码(譬如将版本一修改为版本二)，然后使用`pushy bundle --platform <ios|android>`命令来生成新的热更新版本。
+
+<Callout type="info">
+  如果你使用了较新版本的`expo`或其他没有`index.js`的框架，执行`bundle`命令时会报错。此时请手动创建一个`index.js`文件，在其中引用框架自身的入口文件即可。具体入口文件的路径如何，请参考框架的说明文档或者`package.json`中的`main`字段。例如针对`expo`的`index.js`可能是如下这样写：
+
+```js
+import "expo-router/entry";
+```
+
+</Callout>
 
 ```bash
 $ pushy bundle --platform android
