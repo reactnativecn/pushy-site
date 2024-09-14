@@ -17,16 +17,6 @@ interface PushyOptions {
   // 必填，通过pushy createApp或selectApp命令，或在网页管理端获取
   appKey: string;
 
-  // 如已购买私有部署服务，可在此自定义私有服务器地址
-  server?: {
-    // 主节点
-    main: string;
-    // 备用节点群
-    backups?: string[];
-    // 远程查询节点接口
-    queryUrl?: string;
-  };
-
   // 自定义日志输出，也可用于上报统计数据
   logger?: ({ type, data }: { type: EventType; data: EventData }) => void;
 
