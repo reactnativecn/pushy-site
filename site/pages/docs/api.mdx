@@ -36,6 +36,7 @@ interface PushyOptions {
     | null; // 不自动下载和应用更新，如需自定义热更界面请选择此项
 
   // 是否在热更重启后自动标记为成功，默认为true
+  // 一般情况下不建议手动标记
   autoMarkSuccess?: boolean;
 
   // 是否在若干ms后自动清除最后的报错，默认为不清除
@@ -270,7 +271,7 @@ interface PushyContext {
 
 #### function markSuccess()
 
-手动调用此函数作为更新成功的标记（否则下次启动会默认失败自动回滚）。默认情况下不需调用此函数，除非设置`autoMarkSuccess`为`false`。
+**一般情况下请勿手动调用此函数**。 调用此函数作为更新成功的标记（否则下次启动会默认失败自动回滚）。
 
 ---
 
