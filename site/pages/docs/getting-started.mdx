@@ -236,20 +236,42 @@ public class MainApplication extends Application implements ReactApplication {
 
 android 会在生成 apk 时自动对 png 图片进行压缩，此操作既耗时又影响增量补丁的生成。为了保证补丁能正常生成，您需要在`android/app/build.gradle`中关闭此操作：
 
-```gradle
-...
+```groovy
+// 在 android/app/build.gradle 文件中
+
 android {
-    ...
-    signingConfigs { ... }
+    // ...
+    signingConfigs {
+      // ...
+    }
     buildTypes {
         release {
-            ...
+            // ...
             // 添加下面这行以禁用crunch
             crunchPngs false
         }
     }
 }
-...
+
+```
+
+### 禁用 aab 包的资源分割（如果你需要在 Google Play 上架）
+
+如果你需要打 aab 包以在 Google Play 上架，则需要禁用 aab 包的资源分割：
+
+```groovy
+// 在 android/app/build.gradle 文件中
+
+android {
+    bundle {
+        density {
+            // 请禁用资源分割
+            // 否则热更后可能遇到图片无法显示的问题
+            enableSplit = false
+        }
+    }
+}
+
 ```
 
 ### 登录与创建应用
