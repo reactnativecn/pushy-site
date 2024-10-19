@@ -170,3 +170,4 @@ $ npm install -g react-native-update-cli
 - packageVersion: 要绑定的原生包版本名（四选一，需 cli 版本 1.7.2+）
 - minPackageVersion: 要绑定的最低原生包版本，大于等于此版本的将逐个绑定（四选一，需 cli 版本 1.27.0+）
 - maxPackageVersion: 要绑定的最高原生包版本，小于等于此版本的将逐个绑定（四选一，需 cli 版本 1.27.0+）
+- rollout: 灰度发布范围（1-100），默认为 100 （需 cli 版本 1.31.0+）
