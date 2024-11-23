@@ -157,8 +157,8 @@ interface PushyContext {
   markSuccess: () => void;
   // 清除最后的报错状态
   dismissError: () => void;
-  // 下载热更
-  downloadUpdate: () => Promise<void>;
+  // 下载热更, v10.16.0+ 版本返回值为`boolean`，表示是否下载成功
+  downloadUpdate: () => Promise<boolean | void>;
   // 下载并安装apk
   downloadAndInstallApk: (url: string) => Promise<void>;
   // 获取当前已热更版本的信息
@@ -248,7 +248,7 @@ interface PushyContext {
 
 #### async function downloadUpdate()
 
-下载热更包。仅当`update:true`时实际进行下载。会更新`progress`数据。
+下载热更包。仅当`update:true`时实际进行下载。会更新`progress`数据。v10.16.0+ 版本返回值为`boolean`，表示是否下载成功。
 
 ---
 

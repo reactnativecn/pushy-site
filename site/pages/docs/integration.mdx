@@ -86,8 +86,7 @@ function App() {
   } = usePushy();
   const [showUpdateBanner, setShowUpdateBanner] = useState(false);
   const [showUpdateSnackbar, setShowUpdateSnackbar] = useState(false);
-  const snackbarVisible =
-    showUpdateSnackbar && updateInfo?.update;
+  const snackbarVisible = showUpdateSnackbar && updateInfo?.update;
   return (
     <View style={styles.container}>
       <Text>
@@ -106,8 +105,9 @@ function App() {
             label: "更新",
             onPress: async () => {
               setShowUpdateSnackbar(false);
-              await downloadUpdate();
-              setShowUpdateBanner(true);
+              if (await downloadUpdate()) {
+                setShowUpdateBanner(true);
+              }
             },
           }}
         >
