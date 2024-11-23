@@ -54,7 +54,7 @@ interface PushyOptions {
   // } catch (e) {
   //   console.error(e);
   // }
-  // 此选项需 v10.8.0+ 版本
+  // 此选项需 v10.15.2+ 版本
   throwError?: boolean;
 
   // 在检查更新前执行，返回 false 则取消检查更新
@@ -173,7 +173,7 @@ interface PushyContext {
   currentHash: string;
   // 当前的原生版本号
   packageVersion: string;
-  // 当前的pushy热更服务示例
+  // 当前的pushy热更服务实例
   client?: Pushy;
   // 下载开始后的进度数据
   progress?: {
