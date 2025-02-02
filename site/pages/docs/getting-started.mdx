@@ -124,7 +124,10 @@ date +%s > "$DEST/pushy_build_time.txt"
 
 #### iOS
 
-在你的 AppDelegate.mm 或 AppDelegate.m 文件（不同 RN 版本可能后缀名不同）中增加如下代码：
+在你的 AppDelegate.mm 或 AppDelegate.m 或 AppDelegate.swift 文件（不同 RN 版本可能后缀名不同）中增加如下代码：
+
+<Tabs items={['Objective-C', 'Swift']}>
+<Tabs.Tab>
 
 ```c
 // ... 其它代码
@@ -164,6 +167,35 @@ date +%s > "$DEST/pushy_build_time.txt"
 }
 
 ```
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+```swift
+import UIKit
+import React
+import React_RCTAppDelegate
+import ReactAppDependencyProvider
+import react_native_update    // <-- 在这里引入，需要 pushy v10.22.0+ 版本
+
+
+@main
+class AppDelegate: RCTAppDelegate {
+  // ... 其他代码
+
+  override func bundleURL() -> URL? {
+#if DEBUG
+    // 原先 DEBUG 这里的写法不作修改(所以 DEBUG 模式下不可热更新)
+    RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+#else
+    RCTPushy.bundleURL()  // <--  把这里非 DEBUG 的情况替换为热更新 bundle
+#endif
+  }
+}
+```
+
+</Tabs.Tab>
+</Tabs>
 
 #### Android
 
