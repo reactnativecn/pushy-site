@@ -22,6 +22,7 @@ $ npm install -g react-native-update-cli
 - output: 最终 ppk 文件输出路径
 - dev: 是否打包开发版本
 - sourcemap: 是否生成 sourcemap(需 cli 版本 1.11.0+)
+- no-interactive: 不进行交互式提示
 
 ---
 
