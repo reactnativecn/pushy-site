@@ -23,6 +23,9 @@ $ npm install -g react-native-update-cli
 - dev: 是否打包开发版本
 - sourcemap: 是否生成 sourcemap(需 cli 版本 1.11.0+)
 - no-interactive: 不进行交互式提示
+- rncli: 指定使用官方命令行打包 (需 cli 版本 1.40.0+)
+- expo: 指定使用 expo 的命令行打包 (需 cli 版本 1.40.0+)
+- taro: 指定使用 taro 的命令行打包 (需 cli 版本 1.40.0+)
 
 ---
 
@@ -122,7 +125,7 @@ $ npm install -g react-native-update-cli
 
 上传 ipa 文件到开放平台。
 
-- note: 备注（cli 需 1.24.0 或更高版本）
+- note: 备注（cli 需 1.24.0 +）
 
 ---
 
@@ -130,7 +133,7 @@ $ npm install -g react-native-update-cli
 
 上传 apk 文件到开放平台。
 
-- note: 备注（cli 需 1.24.0 或更高版本）
+- note: 备注（cli 需 1.24.0 +）
 
 ---
 
