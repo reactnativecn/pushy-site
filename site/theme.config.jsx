@@ -33,9 +33,9 @@ export default {
     );
   },
   logo: <Image height={48} src={logo} alt="Pushy 极速热更新" />,
-  docsRepositoryBase: "https://github.com/reactnativecn/react-native-pushy",
+  docsRepositoryBase: "https://github.com/reactnativecn/react-native-update",
   project: {
-    link: "https://github.com/reactnativecn/react-native-pushy",
+    link: "https://github.com/reactnativecn/react-native-update",
   },
   footer: {
     component: Footer,

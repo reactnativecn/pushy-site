@@ -38,7 +38,7 @@ function Banner(props) {
             key="github-button"
             type="stargazers"
             namespace="reactnativecn"
-            repo="react-native-pushy"
+            repo="react-native-update"
           />
         </div>
       </div>

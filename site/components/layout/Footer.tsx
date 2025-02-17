@@ -44,7 +44,7 @@ function Footer() {
                 <a
                   target="_blank"
                   rel="noopener noreferrer"
-                  href="https://github.com/reactnativecn/react-native-pushy/issues"
+                  href="https://github.com/reactnativecn/react-native-update/issues"
                 >
                   issue讨论区
                 </a>
