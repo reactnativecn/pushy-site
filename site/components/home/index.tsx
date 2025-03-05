@@ -7,7 +7,7 @@ function Home(props: any) {
   return (
     <div className="home-wrapper">
       <Banner {...props} />
-      <Showcase {...props} />
+      <Showcase />
       <Page1 {...props} />
       <Page2 {...props} />
     </div>
