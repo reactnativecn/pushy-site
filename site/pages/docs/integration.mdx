@@ -28,7 +28,7 @@ const { appKey } = _updateConfig[Platform.OS];
 ### 初始化服务
 
 ```js
-import { PushyProvider, Pushy } from "react-native-update";
+import { UpdateProvider, Pushy } from "react-native-update";
 
 // 唯一必填参数是appKey，其他选项请参阅 api 文档
 const pushyClient = new Pushy({
@@ -39,15 +39,15 @@ const pushyClient = new Pushy({
   // debug: true
 });
 
-// 在根组件外加上PushyProvider后导出
+// 在根组件外加上 UpdateProvider 后导出
 export default function Root() {
-  // 注意，在使用 PushyProvider 的当前组件中，无法直接调用 usePushy
-  // 只有当前组件的子组件才能调用 usePushy
+  // 注意，在使用 UpdateProvider 的当前组件中，无法直接调用 useUpdate
+  // 只有当前组件的子组件才能调用 useUpdate
   return (
-    <PushyProvider client={pushyClient}>
-      {/* ↓ 整个应用的根组件放到PushyProvider中 */}
+    <UpdateProvider client={pushyClient}>
+      {/* ↓ 整个应用的根组件放到 UpdateProvider 中 */}
       <App />
-    </PushyProvider>
+    </UpdateProvider>
   );
 }
 ```
@@ -68,9 +68,10 @@ const pushyClient = new Pushy({
 });
 ```
 
-所有更新相关的数据可以通过一个单一的[`usePushy()`](/docs/api#usepushy)hook 函数来获取，然后可以根据其提供的数据来自行渲染自定义的界面，如下面的例子：
+所有更新相关的数据可以通过一个单一的[`useUpdate()`](/docs/api#useupdate)hook 函数来获取（此函数也有别名`usePushy()`），然后可以根据其提供的数据来自行渲染自定义的界面，如下面的例子：
 
 ```js
+import { useUpdate } from "react-native-update";
 import { Icon, PaperProvider, Snackbar, Banner } from "react-native-paper";
 function App() {
   const {
@@ -83,7 +84,7 @@ function App() {
     packageVersion,
     currentHash,
     progress: { received, total } = {},
-  } = usePushy();
+  } = useUpdate();
   const [showUpdateBanner, setShowUpdateBanner] = useState(false);
   const [showUpdateSnackbar, setShowUpdateSnackbar] = useState(false);
   const snackbarVisible = showUpdateSnackbar && updateInfo?.update;
@@ -141,7 +142,7 @@ function App() {
 }
 ```
 
-其中`checkUpdate`方法可以用来手动触发更新检查。检查后会更新`usePushy`返回的[`updateInfo`](api#async-function-checkupdateappkey)（注意`checkUpdate`方法本身没有返回值），有三种情况：
+其中`checkUpdate`方法可以用来手动触发更新检查。检查后会返回[`updateInfo`](api#async-function-checkupdate)（注意在 v10.26.0 版本之前，`checkUpdate`方法本身没有返回值，只能从`usePushy()`返回的`updateInfo`中获取），有三种情况：
 
 1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），开发者应该在 pushy 的管理后台添加一个更新下载链接，并自行提示用户下载。如需在应用内执行 apk 更新，还需配置[安装权限](/docs/api#async-function-downloadandinstallapkurl)。
 

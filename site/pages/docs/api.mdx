@@ -95,8 +95,8 @@ interface EventData {
   currentVersion: string;
   // 客户端版本信息
   cInfo: {
-    pushy: string; // 当前pushy版本
-    rn: string; // 当前rn版本
+    rnu: string; // 当前 react-native-update 版本
+    rn: string; // 当前 react-native 版本
     os: string; // 当前操作系统及版本
     uuid: string; // 用户标识符
   };
@@ -115,12 +115,12 @@ interface EventData {
 }
 ```
 
-#### usePushy()
+#### useUpdate()
 
-热更相关的工具函数。
+热更相关的工具函数。此方法也可使用别名 `usePushy` 引入。
 
 <Callout type="info">
-注意，在使用 `<PushyProvider>` 的当前组件（一般是根组件）中无法直接调用`usePushy`，只有当前组件的子组件才能调用。
+注意，在使用 `<UpdateProvider>` 的当前组件（一般是根组件）中无法直接调用`useUpdate`，只有当前组件的子组件才能调用。
 </Callout>
 
 ```js
@@ -140,15 +140,15 @@ const {
   progress,
   updateInfo,
   lastError,
-} = usePushy();
+} = useUpdate();
 ```
 
 其类型定义和功能如下：
 
 ```ts
-interface PushyContext {
-  // 检查更新
-  checkUpdate: () => Promise<void>;
+interface UpdateContext {
+  // 检查更新（注意在 v10.26.0 版本之前，`checkUpdate`方法本身没有返回值，只能从`usePushy()`返回的`updateInfo`中获取）
+  checkUpdate: () => Promise<void | UpdateInfo>;
   // 下载热更完成后调用，立即重启切换新版本
   switchVersion: () => void;
   // 下载热更完成后调用，用户手动重启app后切换新版本（静默更新）
@@ -217,7 +217,7 @@ interface PushyContext {
 
 #### async function checkUpdate()
 
-触发更新检查，更新`usePushy`中的`updateInfo`（注意`checkUpdate`方法本身没有返回值），返回值有三种情形：
+触发更新检查，返回`updateInfo`（注意在 v10.26.0 版本之前，`checkUpdate`方法本身没有返回值，只能从`usePushy()`返回的`updateInfo`中获取），返回值有三种情形：
 
 1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），需要引导用户下载或跳转到应用市场(需要在网页管理端设置中填写`downloadUrl`)。如需在应用内执行 apk 更新，还需配置[安装权限](/docs/api#async-function-downloadandinstallapkurl)。
 
