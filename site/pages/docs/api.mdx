@@ -64,6 +64,10 @@ interface PushyOptions {
   // 在下载更新前执行，返回 false 则取消下载更新，可以配合自定义的 metaInfo 做一些条件控制
   // 此选项需 v10.12.0+ 版本
   beforeDownloadUpdate?: (info: UpdateInfo) => Promise<boolean>;
+
+  // 在下载更新后执行，返回 false 则取消内置策略进一步执行，可以配合自定义的 metaInfo 做一些条件控制
+  // 此选项需 v10.27.0+ 版本
+  afterDownloadUpdate?: (info: UpdateInfo) => Promise<boolean>;
 }
 
 // 日志事件类型
