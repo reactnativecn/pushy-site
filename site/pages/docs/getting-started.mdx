@@ -264,6 +264,84 @@ public class MainApplication extends Application implements ReactApplication {
   中重新编译）才能生效。
 </Callout>
 
+#### Harmony
+
+在 harmony/entry/src/main/ets/pages/Index.ets 中增加如下代码：
+
+<Tabs items={['ets']}>
+<Tabs.Tab>
+
+```js
+// ... 其它代码
+
+// ↓↓↓请注意不要少了这句import
+import { FileJSBundleProvider } from 'pushy/src/main/ets/FileJSBundleProvider';
+// ↑↑↑
+
+@Entry
+@Component
+struct Index {
+  @StorageLink('RNOHCoreContext') private rnohCoreContext: RNOHCoreContext | undefined = undefined
+  @State shouldShow: boolean = false
+
+  aboutToAppear(): void {
+    this.shouldShow = true
+  }
+
+  onBackPress(): boolean | undefined {
+    // NOTE: this is required since `Ability`'s `onBackPressed` function always
+    // terminates or puts the app in the background, but we want Ark to ignore it completely
+    // when handled by RN
+    this.rnohCoreContext!.dispatchBackPress()
+
+    // this.preferences = preferences.getPreferencesSync(this.context, {name:'update'});
+    return true
+  }
+
+  build() {
+    Column() {
+      if (this.rnohCoreContext && this.shouldShow) {
+        RNApp({
+          rnInstanceConfig: {
+            createRNPackages,
+            enableNDKTextMeasuring: true,
+            enableBackgroundExecutor: false,
+            enableCAPIArchitecture: true,
+            arkTsComponentNames: arkTsComponentNames,
+          },
+          initialProps: { "foo": "bar" } as Record<string, string>,
+          appKey: "harmony_use_pushy",
+          wrappedCustomRNComponentBuilder: wrappedCustomRNComponentBuilder,
+          onSetUp: (rnInstance) => {
+            rnInstance.enableFeatureFlag("ENABLE_RN_INSTANCE_CLEAN_UP")
+          },
+          jsBundleProvider: new TraceJSBundleProviderDecorator(
+            new AnyJSBundleProvider([
+              // MetroJSBundleProvider.fromServerIp('127.0.0.1'),
+              // new ResourceJSBundleProvider(rnohCoreContext.uiAbilityContext.resourceManager, 'hermes_bundle.hbc'),
+              // ↓↓↓将下面这一段添加到 AnyJSBundleProvider 内部！
+              new FileJSBundleProvider(this.rnohCoreContext.uiAbilityContext),
+              new ResourceJSBundleProvider(this.rnohCoreContext.uiAbilityContext.resourceManager, 'bundle.harmony.js')
+            ]),
+            this.rnohCoreContext.logger),
+        })
+      }
+    }
+    .height('100%')
+    .width('100%')
+  }
+}
+```
+
+</Tabs.Tab>
+</Tabs>
+
+<Callout type="info">
+  请记得，任意在 ios 和 android 目录下的修改，一定要重新编译（npx react-native
+  run-ios 或 run-android 命令编译，或在 Xcode/Android Studio
+  中重新编译）才能生效。
+</Callout>
+
 ### 禁用 android 的 crunch 优化
 
 android 会在生成 apk 时自动对 png 图片进行压缩，此操作既耗时又影响增量补丁的生成。为了保证补丁能正常生成，您需要在`android/app/build.gradle`中关闭此操作：
@@ -318,12 +396,14 @@ password: <输入你的密码>
 
 这会在项目文件夹下创建一个`.update`文件，注意不要把这个文件上传到 Git 等 CVS 系统上。你可以在`.gitignore`末尾增加一行`.update`来忽略这个文件。
 
-登录之后可以创建应用。注意 iOS 平台和安卓平台需要分别创建：
+登录之后可以创建应用。注意 iOS 平台、安卓平台、鸿蒙平台需要分别创建：
 
 ```bash
 $ pushy createApp --platform ios
 App Name: <输入应用名字>
 $ pushy createApp --platform android
+App Name: <输入应用名字>
+$ pushy createApp --platform harmony
 App Name: <输入应用名字>
 ```
 
@@ -350,6 +430,10 @@ Enter appId: <输入应用前面的编号>
     },
     "android": {
         "appId": 2,
+        "appKey": "<一串随机字符串>"
+    },
+    "harmony": {
+        "appId": 3,
         "appKey": "<一串随机字符串>"
     }
 }
