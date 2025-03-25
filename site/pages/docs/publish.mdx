@@ -90,7 +90,7 @@ $ pushy uploadApp harmony/build/outputs/default/harmony-default-unsigned.app
 
 即可上传 app 以供后续版本比对之用。此 app 的`versionName`字段(位于`harmony/AppScope/app.json5`中)会被记录为原生版本号`packageVersion`。
 
-随后你可以选择往华为应用市场发布这个版本，也可以先往设备上通过命令hdc shell命令安装这个 app 文件以进行测试。
+随后你可以选择往华为应用市场发布这个版本，也可以先往设备上通过命令`hdc shell`命令安装这个 app 文件以进行测试。
 
 如果后续需要再次打包（例如修改原生代码或配置。如果只是修改 js 代码则不需要重新打包。），请先**更改版本号**，并再次`uploadApp`到服务器端记录，否则后续生成的相同版本的原生包会由于[编译时间戳不一致而`无法获取热更新`](faq#热更新报错：热更新已暂停，原因：buildtime-mismatch。)。
 
