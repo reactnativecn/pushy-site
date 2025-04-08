@@ -14,7 +14,7 @@ $ npm install -g react-native-update-cli
 
 #### pushy bundle
 
-生成资源包
+生成热更资源包。会自动探测项目中是否使用了 expo、taro 等框架并自动调用对应的命令行打包。如果探测不准确或使用对应命令行打包时报错，可尝试使用 `--rncli` 参数来指定官方命令行打包。
 
 - platform: ios|android|harmony 对应的平台
 - entryFile: 入口脚本文件
