@@ -9,7 +9,7 @@ import pabdc from "../../public/images/showcase/pabdc.png";
 // import yckj from "../../public/images/showcase/yckj.svg";
 // import najj from "../../public/images/showcase/najj.svg";
 import rjwl from "../../public/images/showcase/rjwl.svg";
-// import htxx from "../../public/images/showcase/htxx.png";
+import htxx from "../../public/images/showcase/htxx.png";
 import tjgj from "../../public/images/showcase/tjgj.png";
 import zglt from "../../public/images/showcase/zglt.png";
 import opple from "../../public/images/showcase/opple.png";
@@ -26,14 +26,14 @@ function Showcase() {
         <div className="title-line" />
       </div>
       <div className="grid grid-cols-2 xl:grid-cols-5 gap-y-5">
-        <div className="h-20 flex justify-center items-center">
+        {/* <div className="h-20 flex justify-center items-center">
           <Image
             src={dsec}
             alt="澳門特別行政區政府 統計暨普查局"
             title="澳門特別行政區政府 統計暨普查局"
             height={70}
           />
-        </div>
+        </div> */}
         <div className="h-20 flex justify-center items-center">
           <Image src={zglt} alt="中国联通" title="中国联通" />
         </div>
@@ -58,16 +58,16 @@ function Showcase() {
           <Image src={pabdc} alt="平安不动产" title="平安不动产" height={55} />
         </div>
         <div className="h-20 flex justify-center items-center">
-          <Image src={hqsb} alt="环球时报" title="环球时报" height={55} />
+          <Image src={tjgj} alt="天津公交" title="天津公交" height={48} />
         </div>
         <div className="h-20 flex justify-center items-center">
           <Image src={rjwl} alt="锐捷网络" title="锐捷网络" height={35} />
-        </div>
-        {/* <div className="h-20 flex justify-center items-center">
-          <Image src={htxx} alt="航天信息" title="航天信息" height={110} />
-        </div> */}
+        </div>{" "}
         <div className="h-20 flex justify-center items-center">
-          <Image src={tjgj} alt="天津公交" title="天津公交" height={48} />
+          <Image src={hqsb} alt="环球时报" title="环球时报" height={55} />
+        </div>
+        <div className="h-20 flex justify-center items-center">
+          <Image src={htxx} alt="航天信息" title="航天信息" height={80} />
         </div>
       </div>
     </div>
