@@ -390,6 +390,8 @@ struct Index {
 
 第一次扫码后可能只是触发服务器任务队列，会弹出提示 10 秒后重新扫码，此时会获得热更包，触发内置或自定义的更新策略。
 
+注意如果你使用自定义的更新策略，请务必从`useUpdate()`中获取`updateInfo`，而不要依赖`checkUpdate`方法的返回值，否则扫码不会有后续动作。
+
 ### 禁用 android 的 crunch 优化
 
 android 会在生成 apk 时自动对 png 图片进行压缩，此操作既耗时又影响增量补丁的生成。为了保证补丁能正常生成，您需要在`android/app/build.gradle`中关闭此操作：
