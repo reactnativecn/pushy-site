@@ -330,12 +330,65 @@ struct Index {
 }
 ```
 
-
 <Callout type="info">
   请记得，任意在 ios 和 android 目录下的修改，一定要重新编译（npx react-native
   run-ios 或 run-android 命令编译，或在 Xcode/Android Studio
   中重新编译）才能生效。
 </Callout>
+
+### 添加测试用的 Deep Link
+
+此步骤可以极其便利的在和用户完全一致的环境中安全地测试热更新，无需额外的设备注册步骤，也不影响现有的热更新流程。
+
+<Tabs items={['Android', 'iOS']}>
+<Tabs.Tab>
+
+在 `android/app/src/main/AndroidManifest.xml` 中添加如下代码：
+
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+
+    <!-- 其他代码 -->
+
+    <!-- ↓↓↓ 注意 activity 的 launchMode 需要设置为 singleTask -->
+    <activity
+      android:launchMode="singleTask">
+      <!-- ↑↑↑ -->
+
+
+      <!-- ↓↓↓ 添加如下 intent-filter -->
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <!-- 添加你自定义的 scheme -->
+        <data android:scheme="你自定义的协议名，请不要和常见协议名或其他app冲突" />
+      </intent-filter>
+      <!-- ↑↑↑ -->
+
+    </activity>
+  </application>
+</manifest>
+```
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+步骤待补充，可以先参考 [React Native 的文档](https://reactnative.cn/docs/linking?syntax=ios)
+
+</Tabs.Tab>
+</Tabs>
+
+---
+
+在完成上述配置并编译之后，你就可以将鼠标移到网页后台的二维码图标上，如下图所示：
+
+![Deep Link二维码](./assets/deeplinkqrcode.jpg)
+
+勾选`使用 Deep Link`选项，在后面的输入框中填入你自定义的协议名，在二维码刷新后，即可在设备上直接使用系统相机或扫码功能（注意不能使用微信扫码）来扫描，即可自动触发热更检查功能。
+
+第一次扫码后可能只是触发服务器任务队列，会弹出提示 10 秒后重新扫码，此时会获得热更包，触发内置或自定义的更新策略。
 
 ### 禁用 android 的 crunch 优化
 
