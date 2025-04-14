@@ -102,7 +102,7 @@ splits {
 此时在客户端检查更新时，能获取到我们刚刚输入的元信息，但它并不具备任何功能，只是一个字符串而已。所以我们其实需要**预先**在更新流程中加入对应的处理逻辑：
 
 ```js
-// 调用 checkUpdate 获取 updateInfo
+// 调用 useUpdate() 获取 updateInfo
 if (updateInfo.expired) {
   // ... 原生包版本过期，下载或跳转下载页面
 } else if (updateInfo.upToDate) {

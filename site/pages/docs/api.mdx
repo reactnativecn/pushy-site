@@ -68,6 +68,10 @@ interface PushyOptions {
   // 在下载更新后执行，返回 false 则取消内置策略进一步执行，可以配合自定义的 metaInfo 做一些条件控制
   // 此选项需 v10.27.0+ 版本
   afterDownloadUpdate?: (info: UpdateInfo) => Promise<boolean>;
+
+  // 在原生包过期时执行，返回 false 则取消内置策略进一步执行，可以配合自定义的 metaInfo 做一些条件控制
+  // 此选项需 v10.28.2+ 版本
+  onPackageExpired?: (info: UpdateInfo) => Promise<boolean>;
 }
 
 // 日志事件类型
@@ -152,7 +156,8 @@ const {
 
 ```ts
 interface UpdateContext {
-  // 检查更新（注意在 v10.26.0 版本之前，`checkUpdate`方法本身没有返回值，只能从`usePushy()`返回的`updateInfo`中获取）
+  // 检查更新（注意在 v10.26.0 版本之前，`checkUpdate`方法本身没有返回值，只能从`useUpdate()`返回的`updateInfo`中获取）
+  // 我们也仍然推荐优先从`useUpdate()`中获取`updateInfo`
   checkUpdate: () => Promise<void | UpdateInfo>;
   // 下载热更完成后调用，立即重启切换新版本
   switchVersion: () => void;
@@ -222,7 +227,7 @@ interface UpdateContext {
 
 #### async function checkUpdate()
 
-触发更新检查，返回`updateInfo`（注意在 v10.26.0 版本之前，`checkUpdate`方法本身没有返回值，只能从`usePushy()`返回的`updateInfo`中获取），返回值有三种情形：
+触发更新检查，返回`updateInfo`（注意在 v10.26.0 版本之前，`checkUpdate`方法本身没有返回值，只能从`useUpdate()`返回的`updateInfo`中获取，且我们仍然推荐优先使用`useUpdate()`来获取），返回值有三种情形：
 
 1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），需要引导用户下载或跳转到应用市场(需要在网页管理端设置中填写`downloadUrl`)。如需在应用内执行 apk 更新，还需配置[安装权限](/docs/api#async-function-downloadandinstallapkurl)。
 
