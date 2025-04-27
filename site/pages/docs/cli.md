@@ -27,6 +27,11 @@ $ npm install -g react-native-update-cli
 - expo: 指定使用 expo 的命令行打包 (需 cli 版本 1.40.0+)
 - taro: 指定使用 taro 的命令行打包 (需 cli 版本 1.40.0+)
 
+从 v1.44.2 版本开始，新增了以下直接上传发布的参数（等同于打包完成后连续调用 `pushy publish` 命令）：
+- name: 指定热更新版本的名字(版本号)
+- description: 指定热更新版本的描述信息，可以对用户进行展示
+- metaInfo: 指定热更新版本的元信息，可以用来保存一些额外信息，具体用法可参考[场景实践](bestpractice#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。
+
 ---
 
 #### pushy parseIpa [ipaFile]
