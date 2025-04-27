@@ -11,7 +11,6 @@ import downloadIcon from "../../public/images/wifi.svg";
 import strategyIcon from "../../public/images/strategy.svg";
 import reliableIcon from "../../public/images/circuit.svg";
 import supportIcon from "../../public/images/chat.svg";
-import Image from "next/image";
 
 const featuresCN = [
   {
@@ -150,7 +149,7 @@ class Page1 extends React.Component {
                 }`,
               }}
             >
-              <Image
+              <img
                 src={item.src}
                 alt="img"
                 style={i === 4 ? { marginLeft: -15 } : {}}

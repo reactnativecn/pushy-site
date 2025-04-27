@@ -1,7 +1,6 @@
 // import { Button } from "antd";
 // import Link from "next/link";
 
-import Image from "next/image";
 import wyyx from "../../public/images/showcase/wyyx.png";
 import lyl from "../../public/images/showcase/lyl.png";
 import hzsfdx from "../../public/images/showcase/hzsfdx.jpg";
@@ -27,7 +26,7 @@ function Showcase() {
       </div>
       <div className="grid grid-cols-2 xl:grid-cols-5 gap-y-5">
         {/* <div className="h-20 flex justify-center items-center">
-          <Image
+          <img
             src={dsec}
             alt="澳門特別行政區政府 統計暨普查局"
             title="澳門特別行政區政府 統計暨普查局"
@@ -35,13 +34,13 @@ function Showcase() {
           />
         </div> */}
         <div className="h-20 flex justify-center items-center">
-          <Image src={zglt} alt="中国联通" title="中国联通" />
+          <img src={zglt} alt="中国联通" title="中国联通" />
         </div>
         <div className="h-20 flex justify-center items-center">
-          <Image src={wyyx} alt="网易游戏" title="网易游戏" />
+          <img src={wyyx} alt="网易游戏" title="网易游戏" />
         </div>
         <div className="h-20 flex justify-center items-center">
-          <Image
+          <img
             src={hzsfdx}
             alt="华中师范大学"
             title="华中师范大学"
@@ -49,25 +48,25 @@ function Showcase() {
           />
         </div>
         <div className="h-20 flex justify-center items-center">
-          <Image src={lyl} alt="蓝月亮" title="蓝月亮" height={50} />
+          <img src={lyl} alt="蓝月亮" title="蓝月亮" height={50} />
         </div>
         <div className="h-20 flex justify-center items-center">
-          <Image src={opple} alt="欧普照明" title="欧普照明" height={110} />
+          <img src={opple} alt="欧普照明" title="欧普照明" height={110} />
         </div>
         <div className="h-20 flex justify-center items-center">
-          <Image src={pabdc} alt="平安不动产" title="平安不动产" height={55} />
+          <img src={pabdc} alt="平安不动产" title="平安不动产" height={55} />
         </div>
         <div className="h-20 flex justify-center items-center">
-          <Image src={tjgj} alt="天津公交" title="天津公交" height={48} />
+          <img src={tjgj} alt="天津公交" title="天津公交" height={48} />
         </div>
         <div className="h-20 flex justify-center items-center">
-          <Image src={rjwl} alt="锐捷网络" title="锐捷网络" height={35} />
+          <img src={rjwl} alt="锐捷网络" title="锐捷网络" height={35} />
         </div>{" "}
         <div className="h-20 flex justify-center items-center">
-          <Image src={hqsb} alt="环球时报" title="环球时报" height={55} />
+          <img src={hqsb} alt="环球时报" title="环球时报" height={55} />
         </div>
         <div className="h-20 flex justify-center items-center">
-          <Image src={htxx} alt="航天信息" title="航天信息" height={80} />
+          <img src={htxx} alt="航天信息" title="航天信息" height={80} />
         </div>
       </div>
     </div>

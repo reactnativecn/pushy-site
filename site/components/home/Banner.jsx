@@ -7,7 +7,6 @@ import Link from "next/link";
 // import BannerSVGAnim from './BannerSVGAnim';
 import logo from "../../public/images/logo.svg";
 import hero from "../../public/images/home_hero.svg";
-import Image from "next/image";
 
 function Banner(props) {
   const { isMobile } = props;
@@ -20,7 +19,7 @@ function Banner(props) {
       )} */}
       <div className="banner-title-wrapper">
         {/* <h1 key="h1">Pushy</h1> */}
-        <Image src={logo} style={{ margin: "0 0 25px 20px" }} alt="Pushy" />
+        <img src={logo} style={{ margin: "0 0 25px 20px" }} alt="Pushy" />
         <p>极速热更新框架 for React Native</p>
         <hr />
         <p style={{ marginTop: 30, fontSize: 16 }}>
@@ -44,7 +43,7 @@ function Banner(props) {
       </div>
       {!isMobile && (
         <div className="banner-image-wrapper">
-          <Image height={420} src={hero} alt="" />
+          <img height={420} src={hero} alt="" />
         </div>
       )}
     </div>
