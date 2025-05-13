@@ -266,7 +266,7 @@ public class MainApplication extends Application implements ReactApplication {
 
 #### Harmony
 在 `harmony/entry/src/main/cpp/CMakeLists.txt` 中增加如下依赖：
-```c++
+```c
 add_subdirectory("${OH_MODULES}/pushy/src/main/cpp" ./pushy)
 target_link_libraries(rnoh_app PUBLIC rnoh_pushy)
 ```
