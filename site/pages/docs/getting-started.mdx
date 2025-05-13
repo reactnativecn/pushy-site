@@ -266,13 +266,13 @@ public class MainApplication extends Application implements ReactApplication {
 
 #### Harmony
 在 `harmony/entry/src/main/cpp/CMakeLists.txt` 中增加如下依赖：
-```ts
+```c++
 add_subdirectory("${OH_MODULES}/pushy/src/main/cpp" ./pushy)
 target_link_libraries(rnoh_app PUBLIC rnoh_pushy)
 ```
 
 在 `harmony/entry/oh-package.json5` 中增加如下依赖：
-```ts
+```json
 "dependencies": {
     "pushy": "file:../../node_modules/react-native-update/harmony/pushy.har",
   }
