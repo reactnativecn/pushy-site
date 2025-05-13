@@ -265,6 +265,29 @@ public class MainApplication extends Application implements ReactApplication {
 </Callout>
 
 #### Harmony
+在 `harmony/entry/src/main/cpp/CMakeLists.txt` 中增加如下依赖：
+```ts
+add_subdirectory("${OH_MODULES}/pushy/src/main/cpp" ./pushy)
+target_link_libraries(rnoh_app PUBLIC rnoh_pushy)
+```
+
+在 `harmony/entry/oh-package.json5` 中增加如下依赖：
+```ts
+"dependencies": {
+    "pushy": "file:../../node_modules/react-native-update/harmony/pushy.har",
+  }
+```
+
+在 `harmony/entry/src/main/ets/RNPackagesFactory.ts` 代码如下：
+```ts
+import type {RNPackageContext, RNPackage} from '@rnoh/react-native-openharmony/ts';
+import {PushyPackage} from 'pushy/ts';
+
+export function createRNPackages(ctx: RNPackageContext): RNPackage[] {
+  return [new PushyPackage(ctx)];
+}
+
+```
 
 在 `harmony/entry/src/main/ets/pages/Index.ets` 中增加如下代码：
 
