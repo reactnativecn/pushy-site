@@ -313,11 +313,15 @@ interface UpdateContext {
 
 立即重启应用，并加载已经下载完毕的版本。
 
+> 注意!不可依赖`progress`来判断下载完成，必须要在`await downloadUpdate()`之后再调用此方法。
+
 ---
 
 #### function switchVersionLater()
 
 在下一次启动应用的时候加载已经下载完毕的版本。
+
+> 注意!不可依赖`progress`来判断下载完成，必须要在`await downloadUpdate()`之后再调用此方法。
 
 ---
 
