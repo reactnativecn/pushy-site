@@ -28,6 +28,7 @@ $ npm install -g react-native-update-cli
 - taro: 指定使用 taro 的命令行打包 (需 cli 版本 1.40.0+)
 
 从 v1.44.2 版本开始，新增了以下直接上传发布的参数（等同于打包完成后连续调用 `pushy publish` 命令）：
+
 - name: 指定热更新版本的名字(版本号)
 - description: 指定热更新版本的描述信息，可以对用户进行展示
 - metaInfo: 指定热更新版本的元信息，可以用来保存一些额外信息，具体用法可参考[场景实践](bestpractice#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。
@@ -195,12 +196,34 @@ $ npm install -g react-native-update-cli
 
 #### pushy update
 
-为一个原生包版本绑定一个热更新版本。这项操作也可以在网页管理端进行。以下参数中`packageId`，`packageVersion`，`minPackageVersion`和`maxPackageVersion`四选一即可。
+为一个原生包版本绑定一个热更新版本。这项操作也可以在网页管理端进行。以下参数中`packageId`，`packageVersion`，`minPackageVersion`，`maxPackageVersion`和`packageVersionRange`中多选一即可。
 
 - platform: ios|android|harmony 对应的平台
 - versionId: 要绑定的热更新版本 ID
-- packageId: 要绑定的原生包 ID （四选一）
-- packageVersion: 要绑定的原生包版本名（四选一，需 cli 版本 1.7.2+）
-- minPackageVersion: 要绑定的最低原生包版本，大于等于此版本的将逐个绑定（四选一，需 cli 版本 1.27.0+）
-- maxPackageVersion: 要绑定的最高原生包版本，小于等于此版本的将逐个绑定（四选一，需 cli 版本 1.27.0+）
 - rollout: 灰度发布范围（1-100），默认为 100 （需 cli 版本 1.31.0+）
+- dryRun: 是否只进行预览，不进行实际绑定（需 cli 版本 1.45.4+）
+- packageId: 要绑定的原生包 ID （多选一）
+- packageVersion: 要绑定的原生包版本名（多选一，需 cli 版本 1.7.2+）
+- minPackageVersion: 要绑定的最低原生包版本，大于等于此版本的将逐个绑定（多选一，需 cli 版本 1.27.0+）
+- maxPackageVersion: 要绑定的最高原生包版本，小于等于此版本的将逐个绑定（多选一，需 cli 版本 1.27.0+）
+- packageVersionRange: 要绑定的原生包版本范围（多选一，需 cli 版本 1.45.4+），范围格式遵循 semver 的语法，可参考 <https://quickref.cnxiaobai.com/docs/semver.html> 或 <https://devhints.io/semver>
+
+示例：
+
+```bash
+❯ pushy update --versionId 211343 --platform android --packageVersionRange ">=1.0 <3.0" --dryRun
+react-native-update-cli: 1.45.4 （最新：1.45.4）
+react-native-update: 10.28.11 （最新：10.28.11）
+以下是 dry-run 模拟运行结果，不会实际执行任何操作：
+已将热更包 211343 绑定到原生版本 1.28.1 (id: 75219)
+已将热更包 211343 绑定到原生版本 1.28 (id: 75184)
+已将热更包 211343 绑定到原生版本 1.5 (id: 73396)
+已将热更包 211343 绑定到原生版本 2.0 (id: 68219)
+已将热更包 211343 绑定到原生版本 1.0 (id: 68158)
+操作完成，共已绑定 5 个原生版本
+```
+
+
+
+
+

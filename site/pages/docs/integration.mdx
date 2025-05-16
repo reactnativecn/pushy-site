@@ -10,6 +10,7 @@ import { Callout, Steps, Tabs } from "nextra/components";
   请注意，当前版本的api经过了完全重构，与之前的版本(v10.0以下)不兼容。如果你需要查看之前版本的文档，请点击[这里](https://v9--pushy-site.netlify.app/)
 </Callout>
 
+
 安装配置完成后，确定应用编译顺利通过，下面我们来进行代码集成。
 
 ### 获取 appKey
@@ -159,7 +160,7 @@ function App() {
 
 3. `{update: true}`：当前有新版本可以更新。info 的`name`、`description`字段可以用于提示用户，而`metaInfo`字段则可以根据你的需求自定义其它属性(如是否静默更新、是否强制更新等等)，具体用法可参考[场景实践](bestpractice#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了补丁包的下载地址等。 pushy 会首先尝试耗费流量更少的更新方式。
 
-当返回的`updateInfo`中`update`字段为 true 时，即可调用`downloadUpdate`方法来下载更新，此时可以获取到下载的进度数据`progress`。下载完成后可以调用`switchVersion`来立即重启更新，也可以使用`switchVersionLater`来标记下次启动时更新。
+当返回的`updateInfo`中`update`字段为 true 时，即可调用`downloadUpdate`方法来下载更新，此时可以获取到下载的进度数据`progress`。下载完成后（注意!不可依赖`progress`来判断下载完成，必须要`await downloadUpdate()`之后）可以调用`switchVersion`来立即重启更新，也可以使用`switchVersionLater`来标记下次启动时更新。
 
 ### 统计数据
 
