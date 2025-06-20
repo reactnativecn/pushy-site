@@ -33,6 +33,21 @@ $ npm install -g react-native-update-cli
 - description: 指定热更新版本的描述信息，可以对用户进行展示
 - metaInfo: 指定热更新版本的元信息，可以用来保存一些额外信息，具体用法可参考[场景实践](bestpractice#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。
 
+从 v1.46.0 版本开始，在传入 `name`， `description`， `metaInfo` 参数的同时，可继续叠加以下参数（等同于在 调用`pushy publish` 命令后，再连续调用 `pushy update` 命令）：
+
+- packageId: 要绑定的原生包 ID （多选一）
+- packageVersion: 要绑定的原生包版本名（多选一）
+- minPackageVersion: 要绑定的最低原生包版本，大于等于此版本的将逐个绑定（多选一）
+- maxPackageVersion: 要绑定的最高原生包版本，小于等于此版本的将逐个绑定（多选一）
+- packageVersionRange: 要绑定的原生包版本范围（多选一），范围格式遵循 semver 的语法，可参考 <https://quickref.cnxiaobai.com/docs/semver.html> 或 <https://devhints.io/semver>
+
+示例：
+
+```bash
+
+pushy bundle --platform android --name "1.0.0" --description "热更新版本 1.0.0" --metaInfo '{"key": "value"}' --packageVersionRange ">=1.0 <3.0"
+```
+
 ---
 
 #### pushy parseIpa [ipaFile]
@@ -183,6 +198,21 @@ $ npm install -g react-native-update-cli
 - name: 当前热更新版本的名字(版本号)
 - description: 当前热更新版本的描述信息，可以对用户进行展示
 - metaInfo: 当前热更新版本的元信息，可以用来保存一些额外信息，具体用法可参考[场景实践](bestpractice#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。
+
+从 v1.46.0 版本开始，支持以下参数（等同于在 调用`pushy publish` 命令后，再连续调用 `pushy update` 命令）：
+
+- packageId: 要绑定的原生包 ID （多选一）
+- packageVersion: 要绑定的原生包版本名（多选一）
+- minPackageVersion: 要绑定的最低原生包版本，大于等于此版本的将逐个绑定（多选一）
+- maxPackageVersion: 要绑定的最高原生包版本，小于等于此版本的将逐个绑定（多选一）
+- packageVersionRange: 要绑定的原生包版本范围（多选一），范围格式遵循 semver 的语法，可参考 <https://quickref.cnxiaobai.com/docs/semver.html> 或 <https://devhints.io/semver>
+
+示例：
+
+```bash
+
+pushy publish .pushy/output/android.1750423283653.ppk --platform android --name "1.0.0" --description "热更新版本 1.0.0" --metaInfo '{"key": "value"}' --packageVersionRange ">=1.0 <3.0"
+```
 
 ---
 
