@@ -214,11 +214,12 @@ interface UpdateContext {
     // 当前热更是否已暂停
     paused?:
       | "app" // 当前应用所有原生版本暂停
-      | "package"; // 仅当前原生版本暂停
+      | "package" // 仅当前原生版本暂停
+      | "quota"; // 因检查次数超限而暂停
     // 其他信息
     message?: string;
   };
-  // 检查、下载、应用热更等过程中的最新一次报错
+  // 检查、下载、应用热更等过程中的最近一次报错
   lastError?: Error;
 }
 ```
