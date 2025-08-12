@@ -7,7 +7,8 @@
     "title": ""
   },
   "api": "API文档",
-  "cli": "命令行工具",
+  "cli": "命令行工具（内置）",
+  "cli_module": "命令行工具（自定义模块）",
   "bestpractice": "场景实践",
   "---2": {
     "type": "separator",
