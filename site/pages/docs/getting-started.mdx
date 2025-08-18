@@ -274,6 +274,20 @@ add_subdirectory("${OH_MODULES}/pushy/src/main/cpp" ./pushy)
 target_link_libraries(rnoh_app PUBLIC rnoh_pushy)
 ```
 
+在 `harmony/entry/src/main/cpp/PackageProvider.cpp` 中增加如下依赖：
+
+```c
+#include "RNOH/PackageProvider.h"
+#include "PushyPackage.h"
+using namespace rnoh;
+
+std::vector<std::shared_ptr<Package>> PackageProvider::getPackages(Package::Context ctx) {
+    return {
+         std::make_shared<PushyPackage>(ctx)
+    };
+}
+```
+
 在 `harmony/entry/oh-package.json5` 中增加如下依赖：
 
 ```json
