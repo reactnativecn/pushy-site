@@ -123,6 +123,10 @@ date +%s > "$DEST/pushy_build_time.txt"
 如果你使用 `expo` 48 或更高版本，且 `react-native-update` >= 10.28.2，则可以自动配置 bundle url，请直接去往[下一个步骤](#添加测试用的-deep-link)。
 如果你没有使用 `expo`，或 `expo` 版本低于 48，则需要按以下步骤手动配置。
 
+<Callout type="warning">
+  注意：如果你使用 `expo`，请不要同时安装 `expo-updates`，否则会导致热更新功能冲突。
+</Callout>
+
 #### iOS
 
 在你的 AppDelegate.mm 或 AppDelegate.m 或 AppDelegate.swift 文件（不同 RN 版本可能后缀名不同）中增加如下代码：
