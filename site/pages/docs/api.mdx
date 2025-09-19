@@ -174,13 +174,13 @@ interface UpdateContext {
   downloadUpdate: () => Promise<boolean | void>;
   // 下载并安装apk
   downloadAndInstallApk: (url: string) => Promise<void>;
-  // 异步获取当前已热更版本的信息，v10.31.0 版本后用 `currentVersionInfo` 代替
+  // 异步获取当前已热更版本的信息，v10.31.2 版本后用 `currentVersionInfo` 代替
   getCurrentVersionInfo: () => Promise<{
     name?: string;
     description?: string;
     metaInfo?: string;
   }>;
-  // 当前已热更版本的信息，需 v10.31.0+ 版本
+  // 当前已热更版本的信息，需 v10.31.2+ 版本
   currentVersionInfo: {
     name?: string;
     description?: string;
@@ -299,7 +299,7 @@ interface UpdateContext {
 
 #### async function getCurrentVersionInfo()
 
-获取当前已热更版本的信息（如尚未热更过则返回空对象）。v10.31.0 版本之后可以直接用 `currentVersionInfo` 代替。
+获取当前已热更版本的信息（如尚未热更过则返回空对象）。v10.31.2 版本之后可以直接用 `currentVersionInfo` 代替。
 
 返回值示例：
 
