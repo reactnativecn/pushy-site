@@ -27,8 +27,11 @@ npm i -g react-native-update-cli
 # 然后在项目目录中安装热更新模块
 npm i react-native-update
 
-# 然后进入ios目录安装iOS模块
+# 如果没有使用 expo，则进入 iOS 目录安装 iOS 模块
 cd ios && pod install
+
+# 如果使用 expo
+npx expo prebuild
 
 ```
 
