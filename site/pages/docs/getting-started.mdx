@@ -20,6 +20,9 @@ import { Callout, Steps, Tabs } from "nextra/components";
 
 在你的项目根目录下运行以下命令（如果你使用 yarn 等其他包管理器，请自行替换命令）：
 
+<Tabs items={['React Native', 'Expo']}>
+<Tabs.Tab>
+
 ```bash
 # 先全局安装命令行工具
 npm i -g react-native-update-cli
@@ -30,10 +33,36 @@ npm i react-native-update
 # 如果没有使用 expo，则进入 iOS 目录安装 iOS 模块
 cd ios && pod install
 
-# 如果使用 expo
+```
+
+</Tabs.Tab>
+
+<Tabs.Tab>
+
+```bash
+# 先全局安装命令行工具
+npm i -g react-native-update-cli
+
+# 然后在项目目录中安装热更新模块
+npm i react-native-update
+
+# 如果使用 expo, 要求 expo 50 或更高版本，需要使用 prebuild 命令预构建项目
 npx expo prebuild
 
+# 然后进入 iOS 目录安装 iOS 模块
+cd ios && pod install
+
 ```
+
+<Callout type="warning">
+  注意：如果使用
+  expo，请不要同时安装`expo-updates`，否则会导致热更新功能冲突。另外，expo 51
+  版本以下的新架构支持并不完整，可能无法正常使用。如需使用新架构，建议使用尽可能新的
+  expo 版本。
+</Callout>
+
+</Tabs.Tab>
+</Tabs>
 
 <Callout type="info">
   如果下载极慢或者显示网络失败，请设置使用淘宝镜像 `npx nrm use taobao`
@@ -125,13 +154,6 @@ date +%s > "$DEST/pushy_build_time.txt"
 
 如果你使用 `expo` 48 或更高版本，且 `react-native-update` >= 10.28.2，则可以自动配置 bundle url，请直接去往[下一个步骤](#添加测试用的-deep-link)。
 如果你没有使用 `expo`，或 `expo` 版本低于 48，则需要按以下步骤手动配置。
-
-<Callout type="warning">
-  注意：如果你使用
-  `expo`，请不要同时安装`expo-updates`，否则会导致热更新功能冲突。另外，expo 51
-  版本以下的新架构支持并不完整，可能无法正常使用。如确需新架构，建议使用尽可能新的
-  expo 版本。
-</Callout>
 
 #### iOS
 
@@ -615,3 +637,4 @@ Enter appId: <输入应用前面的编号>
 至此应用的创建/选择就已经成功了。下一步，你需要给代码添加相应的功能，请参阅[代码集成](integration)。
 
 </Steps>
+````
