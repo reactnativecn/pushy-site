@@ -348,61 +348,26 @@ std::vector<std::shared_ptr<Package>> PackageProvider::getPackages(Package::Cont
   ],
 ```
 
+在 `harmony/hvigor/hvigor-config.json5` 中增加如下配置：
+
+```json5
+{
+  dependencies: {
+    pushy: "file:../../node_modules/react-native-update/harmony/pushy",
+  },
+}
+```
+
 在 `harmony/entry/hvigorfile.ts` 中增加如下配置：
 
 ```ts
 import { hapTasks } from "@ohos/hvigor-ohos-plugin";
-import fs from "fs";
-import path from "path";
-
-export function generatePushyBuildTime(str?: string) {
-  return {
-    pluginId: "PushyBuildTimePlugin",
-    apply(pluginContext) {
-      pluginContext.registerTask({
-        name: "pushy_build_time",
-        run: (taskContext) => {
-          const metaFilePath = path.resolve(
-            __dirname,
-            "src/main/resources/rawfile/meta.json"
-          );
-          const dirPath = path.dirname(metaFilePath);
-          if (!fs.existsSync(dirPath)) {
-            fs.mkdirSync(dirPath, { recursive: true });
-          }
-          const moduleJsonPath = path.resolve(
-            __dirname,
-            "../AppScope/app.json5"
-          );
-          let versionName = "";
-          if (fs.existsSync(moduleJsonPath)) {
-            const moduleContent = fs.readFileSync(moduleJsonPath, "utf-8");
-            const versionMatch = moduleContent.match(
-              /"versionName":\s*"([^"]+)"/
-            );
-            if (versionMatch && versionMatch[1]) {
-              versionName = versionMatch[1];
-            }
-          }
-          const buildTime = new Date().toISOString();
-          const metaContent = {
-            pushy_build_time: buildTime,
-            versionName: versionName,
-          };
-          fs.writeFileSync(metaFilePath, JSON.stringify(metaContent, null, 4));
-          console.log(`Build time written to ${metaFilePath}`);
-        },
-        dependencies: [],
-        postDependencies: ["default@BuildJS"],
-      });
-    },
-  };
-}
+import { reactNativeUpdatePlugin } from "pushy/hvigor-plugin";
 
 export default {
   system: hapTasks /* Built-in plugin of Hvigor. It cannot be modified. */,
   plugins: [
-    generatePushyBuildTime(),
+    reactNativeUpdatePlugin(),
   ] /* Custom plugin to extend the functionality of Hvigor. */,
 };
 ```
@@ -454,25 +419,15 @@ struct Index {
     Column() {
       if (this.rnohCoreContext && this.shouldShow) {
         RNApp({
-          rnInstanceConfig: {
-            createRNPackages,
-            enableNDKTextMeasuring: true,
-            enableBackgroundExecutor: false,
-            enableCAPIArchitecture: true,
-            arkTsComponentNames: arkTsComponentNames,
-          },
-          initialProps: { "foo": "bar" } as Record<string, string>,
-          appKey: "harmony_use_pushy",
-          wrappedCustomRNComponentBuilder: wrappedCustomRNComponentBuilder,
-          onSetUp: (rnInstance) => {
-            rnInstance.enableFeatureFlag("ENABLE_RN_INSTANCE_CLEAN_UP")
-          },
+          // ... 其他代码
           jsBundleProvider: new TraceJSBundleProviderDecorator(
             new AnyJSBundleProvider([
               // MetroJSBundleProvider.fromServerIp('127.0.0.1'),
               // new ResourceJSBundleProvider(rnohCoreContext.uiAbilityContext.resourceManager, 'hermes_bundle.hbc'),
               // ↓↓↓将下面这一段添加到 AnyJSBundleProvider 内部！
               new PushyFileJSBundleProvider(this.rnohCoreContext.uiAbilityContext),
+
+              // 注意无论是否使用 hermes 格式，请保持 bundle 文件名为 bundle.harmony.js
               new ResourceJSBundleProvider(this.rnohCoreContext.uiAbilityContext.resourceManager, 'bundle.harmony.js')
             ]),
             this.rnohCoreContext.logger),
