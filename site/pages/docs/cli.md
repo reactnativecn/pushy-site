@@ -226,11 +226,13 @@ pushy publish .pushy/output/android.1750423283653.ppk --platform android --name 
 
 #### pushy update
 
-为一个原生包版本绑定一个热更新版本。这项操作也可以在网页管理端进行。以下参数中`packageId`，`packageVersion`，`minPackageVersion`，`maxPackageVersion`和`packageVersionRange`中多选一即可。
+为一个原生包版本绑定发布一个热更新版本。这项操作也可以在网页管理端进行。以下参数中`packageId`，`packageVersion`，`minPackageVersion`，`maxPackageVersion`和`packageVersionRange`中多选一即可。
+
+cli 2.4.0 版本开始可以同时绑定一个全量和一个灰度版本。2.4.0 之前全量和灰度版本会互相覆盖，后设置的生效。
 
 - platform: ios|android|harmony 对应的平台
 - versionId: 要绑定的热更新版本 ID
-- rollout: 灰度发布范围（1-100），默认为 100 （需 cli 版本 1.31.0+）
+- rollout: 灰度发布范围（整数取值 1 - 100，对应 1% - 100% 用户覆盖率），默认为 100（需 cli 版本 1.31.0+）
 - dryRun: 是否只进行预览，不进行实际绑定（需 cli 版本 1.45.4+）
 - packageId: 要绑定的原生包 ID （多选一）
 - packageVersion: 要绑定的原生包版本名（多选一，需 cli 版本 1.7.2+）
