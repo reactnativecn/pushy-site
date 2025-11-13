@@ -5,6 +5,7 @@ type: 关于
 ---
 
 import { Callout } from "nextra/components";
+import { AppleOutlined, AndroidOutlined, HarmonyOSOutlined } from '@ant-design/icons';
 
 # Pushy - 专业的热更新解决方案
 
@@ -22,16 +23,37 @@ Pushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-n
 - **⚡️ 极速分发**：国内用户使用阿里云高速 CDN，国外用户智能分流至 Cloudflare，在各地区都使用覆盖率最好的 CDN 服务商，更新成功率高达 **99.9%+**
 - **🔄 智能更新**：跨越多个版本时只需下载**一个更新包**，无需逐版本更新
 - **🛡️ 安全可靠**：内置崩溃回滚机制，出现问题自动回退，确保应用稳定运行
+- **🌐 全平台覆盖**：
+  - <AppleOutlined style={{fontSize: '16px', color: '#555', marginRight: '6px'}} /> **iOS** - 完美支持
+  - <AndroidOutlined style={{fontSize: '16px', color: '#3DDC84', marginRight: '6px'}} /> **Android** - 完美支持
+  - <HarmonyOSOutlined style={{fontSize: '16px', color: '#000', marginRight: '6px'}} /> **鸿蒙（HarmonyOS）** - 业内独家第一方支持
+  - ✅ **Expo** - 无缝集成
+  - ✅ **新架构** - 第一时间跟进支持
+  - ✅ **Hermes** - 完整支持字节码格式
 
+## 💰 性价比之选
 
-### 全平台覆盖
+相比同类服务，Pushy 不仅功能更强大，价格也更亲民：
 
-✅ **iOS** - 完美支持  
-✅ **Android** - 完美支持  
-✅ **鸿蒙（HarmonyOS）** - 业内独家第一方支持  
-✅ **Expo** - 无缝集成  
-✅ **新架构** - 第一时间跟进支持  
-✅ **Hermes** - 完整支持字节码格式  
+| 对比项 | Pushy | Expo Update |
+|--------|-------|-------------|
+| **起步价** | ¥66/月 | ~¥136/月 |
+| **流量计费** | 不单独计费 | 超出需额外付费 |
+| **更新包大小** | 几十 KB（增量） | 几十 MB（全量） |
+| **国内速度** | ⭐⭐⭐⭐⭐ 极快 | ⭐⭐ 较慢 |
+| **鸿蒙支持** | ✅ 支持 | ❌ 不支持 |
+
+<Callout type="warning">
+**注意**：Microsoft App Center（Code Push）已于 2025 年 3 月 31 日正式停止服务。如果你正在使用 Code Push，现在正是迁移到 Pushy 的最佳时机！
+</Callout>  
+
+使用 Pushy 后，你的团队将获得：
+
+- ✅ **节省 90% 以上的流量成本**
+- ✅ **发版速度提升 10 倍以上**（无需等待应用商店审核）
+- ✅ **Bug 修复时间缩短至分钟级**
+- ✅ **用户更新率提升至 99%+**（相比应用商店的自然更新率）
+- ✅ **开发迭代更加灵活自由**
 
 ### 开源自由
 
@@ -68,22 +90,6 @@ const pushyClient = new Pushy({ appKey });
 - **Web 管理界面**：可视化管理，实时查看更新状态
 - **CI/CD 集成**：完美融入你的自动化部署流程
 - **开放 API**：meta 信息自定义，扩展性极强
-
-## 💰 性价比之选
-
-相比同类服务，Pushy 不仅功能更强大，价格也更亲民：
-
-| 对比项 | Pushy | Expo Update |
-|--------|-------|-------------|
-| **起步价** | ¥66/月 | ~¥136/月 |
-| **流量计费** | 不单独计费 | 超出需额外付费 |
-| **更新包大小** | 几十 KB（增量） | 几十 MB（全量） |
-| **国内速度** | ⭐⭐⭐⭐⭐ 极快 | ⭐⭐ 较慢 |
-| **鸿蒙支持** | ✅ 支持 | ❌ 不支持 |
-
-<Callout type="warning">
-**注意**：Microsoft App Center（Code Push）已于 2025 年 3 月 31 日正式停止服务。如果你正在使用 Code Push，现在正是迁移到 Pushy 的最佳时机！
-</Callout>
 
 ## 🎯 适用场景
 
@@ -135,17 +141,6 @@ const pushyClient = new Pushy({ appKey });
 不确定是否适合你的项目？查看[常见问题](/docs/faq)或直接[联系我们](https://reactnative.cn/about.html#content)获取专业建议。
 </Callout>
 
-## 📊 实际收益
-
-使用 Pushy 后，你的团队将获得：
-
-- ✅ **节省 90% 以上的流量成本**
-- ✅ **发版速度提升 10 倍以上**（无需等待应用商店审核）
-- ✅ **Bug 修复时间缩短至分钟级**
-- ✅ **用户更新率提升至 99%+**（相比应用商店的自然更新率）
-- ✅ **开发迭代更加灵活自由**
-
----
 
 立即开始使用 Pushy，让你的 React Native 应用拥有极致的热更新体验！
 
