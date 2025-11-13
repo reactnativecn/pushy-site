@@ -13,7 +13,7 @@ import { AppleOutlined, AndroidOutlined, HarmonyOSOutlined } from '@ant-design/i
 **现已全面支持鸿蒙系统以及 React Native 新架构！**
 </Callout>
 
-Pushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-native-update) <img src="https://badge.fury.io/js/react-native-update.svg" alt="npm version" style={{display: 'inline', verticalAlign: 'middle', margin: '0 4px'}} />) 是面向 React Native 应用提供的**专业热更新服务**，由 [React Native 中文网](https://reactnative.cn)独家研发并持续维护。我们致力于为全球 React Native 开发者提供最快速、最稳定、最经济的热更新体验。
+Pushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-native-update) <a href="https://www.npmjs.com/package/react-native-update"><img src="https://badge.fury.io/js/react-native-update.svg" alt="npm version" style={{display: 'inline', verticalAlign: 'middle', margin: '0 4px'}} /></a>) 是面向 React Native 应用提供的**专业热更新服务**，由 [React Native 中文网](https://reactnative.cn)独家研发并持续维护。我们致力于为全球 React Native 开发者提供最快速、最稳定、最经济的热更新体验。
 
 ## 🚀 为什么选择 Pushy？
 
@@ -21,15 +21,22 @@ Pushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-n
 
 - **🎯 超小更新包**：基于 bsdiff/hdiff 算法的增量更新，通常只需**几十 KB**（相比其他全量更新服务的几十 MB，节省流量 99%+）
 - **⚡️ 极速分发**：国内用户使用阿里云高速 CDN，国外用户智能分流至 Cloudflare，在各地区都使用覆盖率最好的 CDN 服务商，更新成功率高达 **99.9%+**
-- **🔄 智能更新**：跨越多个版本时只需下载**一个更新包**，无需逐版本更新
 - **🛡️ 安全可靠**：内置崩溃回滚机制，出现问题自动回退，确保应用稳定运行
-- **🌐 全平台覆盖**：
-  - <AppleOutlined style={{fontSize: '16px', color: '#555', marginRight: '6px'}} /> **iOS** - 完美支持
-  - <AndroidOutlined style={{fontSize: '16px', color: '#3DDC84', marginRight: '6px'}} /> **Android** - 完美支持
-  - <HarmonyOSOutlined style={{fontSize: '16px', color: '#000', marginRight: '6px'}} /> **鸿蒙（HarmonyOS）** - 业内独家第一方支持
+- **🌐 全平台覆盖**：完美支持 <AppleOutlined style={{fontSize: '16px', color: '#555', marginRight: '6px'}} /> **iOS** , <AndroidOutlined style={{fontSize: '16px', color: '#3DDC84', marginRight: '6px'}} /> **Android**, 且业内独家第一方支持 <HarmonyOSOutlined style={{fontSize: '16px', color: '#000', marginRight: '6px'}} /> **鸿蒙（HarmonyOS）**
+- **🔍 深耕 React Native 生态**：
   - ✅ **Expo** - 无缝集成
   - ✅ **新架构** - 第一时间跟进支持
   - ✅ **Hermes** - 完整支持字节码格式
+- **🛠️ 完整工具链**：
+  - **命令行工具**：快速发布、版本管理、回滚操作
+  - **Web 管理界面**：可视化管理，实时查看更新状态
+  - **CI/CD 集成**：完美融入你的自动化部署流程
+  - **开放 API**：meta 信息自定义，扩展性极强
+- **📖 核心逻辑完全开源 **：客户端、命令行工具以及管理界面代码都[完全开源](https://github.com/reactnativecn)，接受社区审计，代码透明可信，你可以随时迁移到自建服务器或其他服务
+- **🔒 数据安全**：可以自行插入数据埋点，完全掌控自己的数据
+- **💬 专业人工支持**：提供付费专人技术支持，有问必答，确保你的应用稳定运行
+- **🏆 多年稳定运营**：从 2016 年开始运营至今，服务众多知名企业和应用
+
 
 ## 💰 性价比之选
 
@@ -55,16 +62,6 @@ Pushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-n
 - ✅ **用户更新率提升至 99%+**（相比应用商店的自然更新率）
 - ✅ **开发迭代更加灵活自由**
 
-### 开源自由
-
-- **📖 核心逻辑完全开源**：客户端、命令行工具以及管理界面代码都[完全开源](https://github.com/reactnativecn/react-native-update)，接受社区审计，代码透明可信
-	- 客户端代码：[react-native-update](https://github.com/reactnativecn/react-native-update)
-	- 命令行工具代码：[react-native-update-cli](https://github.com/reactnativecn/react-native-update-cli)
-	- 管理界面代码：[pushy-admin](https://github.com/reactnativecn/pushy-admin)
-- **🔓 不锁定用户**：开放的架构设计，你可以随时迁移到自建服务器或其他服务
-- **🤝 社区驱动**：欢迎社区贡献，共同改进和完善
-- **🔒 数据安全**：可以自行插入数据埋点，完全掌控自己的数据
-
 ### 简单易用
 
 ```js
@@ -84,12 +81,6 @@ const pushyClient = new Pushy({ appKey });
 - 💬 **提示更新** - 友好的系统弹窗提醒
 - ⚙️ **自定义策略** - 完全可控的更新流程
 
-### 专业的管理工具
-
-- **命令行工具**：快速发布、版本管理、回滚操作
-- **Web 管理界面**：可视化管理，实时查看更新状态
-- **CI/CD 集成**：完美融入你的自动化部署流程
-- **开放 API**：meta 信息自定义，扩展性极强
 
 ## 🎯 适用场景
 
@@ -112,23 +103,6 @@ const pushyClient = new Pushy({ appKey });
 - 可自定义更新时机和提示
 - 支持后台下载，不影响使用
 
-## 🏆 技术优势
-
-### 始终保持最新
-第一时间支持 React Native 最新正式版本，紧跟官方步伐，确保你的技术栈不会过时。
-
-### 中文生态友好
-- 完整的中文文档
-- 活跃的中文社区
-- 专业的中文技术支持
-- 本土化的服务响应
-
-### 企业级可靠性
-- 可托管可私有部署
-- 提供付费专人技术支持
-- 多年稳定运营经验（从 2016 年开始运营至今）
-- 服务众多知名企业和应用
-
 ## 🚦 开始使用
 
 只需三步，即可为你的 React Native 应用添加热更新能力：
@@ -144,5 +118,4 @@ const pushyClient = new Pushy({ appKey });
 
 立即开始使用 Pushy，让你的 React Native 应用拥有极致的热更新体验！
 
-👉 [开始安装配置](/docs/getting-started)
 
