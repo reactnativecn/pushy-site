@@ -53,9 +53,48 @@ export default function Root() {
 }
 ```
 
-如没有特别的自定义需求，那么到此热更新已经可以开始正常运作（如需在应用内执行 apk 更新，还需配置[安装权限](/docs/api#async-function-downloadandinstallapkurl)）。默认配置下，在 App 启动，以及从后台切换到前台时会触发更新检查，弹出提示的内容也固定。
+如没有特别的自定义需求，那么到此热更新已经可以开始正常运作（如需在应用内执行 apk 更新，还需配置[安装权限](/docs/api#async-function-downloadandinstallapkurl)）。在默认的配置下，在 App 启动，以及从后台切换到前台时会触发更新检查，弹出提示的内容也固定。
 
-如需自定义触发时机，以及修改界面提示等，请参考下面的自定义更新界面。
+如需简单调整检查和更新策略，可参考以下内置的策略参数：
+
+#### checkStrategy（检查更新策略）
+
+用于控制自动检查更新的触发时机：
+
+- `"both"`（默认值）：在 App 启动时和从后台切换到前台时都会检查更新
+- `"onAppStart"`：仅在 App 启动时检查更新
+- `"onAppResume"`：仅在 App 从后台切换到前台时检查更新
+- `null`：不自动检查更新，必须手动调用 `checkUpdate` 方法（需 v10.4.2+ 版本）
+
+示例：
+
+```js
+const pushyClient = new Pushy({
+  appKey,
+  checkStrategy: "onAppStart", // 仅在启动时检查
+});
+```
+
+#### updateStrategy（更新应用策略）
+
+用于控制检测到更新后的自动下载和应用行为：
+
+- `"alwaysAlert"`：调试环境（`__DEV__`）的默认值，使用系统 alert 提示热更，并在有报错时弹出提示
+- `"alertUpdateAndIgnoreError"`：生产环境的默认值，有热更时使用系统 alert 提示，但不弹出报错提示
+- `"silentAndNow"`：自动静默下载并立即应用热更（会立即重启应用）
+- `"silentAndLater"`：自动静默下载，但仅在用户杀掉 App 后重启时应用更新
+- `null`：不自动下载和应用更新，需完全自定义热更界面
+
+示例：
+
+```js
+const pushyClient = new Pushy({
+  appKey,
+  updateStrategy: "silentAndLater", // 静默下载，下次启动时更新
+});
+```
+
+如需更大程度的自定义，如自定义触发时机，以及修改界面提示等，请参考下面的自定义更新界面。
 
 ### 自定义更新界面
 
@@ -178,6 +217,6 @@ const pushyClient = new Pushy({
 });
 ```
 
-以上提及的所有 api 的说明文档可在[这里](api)查看。
+以上提及的所有 api 的说明文档可在[这里](api)查看。还有一些其他常见的场景可以参考[场景实践](bestpractice)。
 
 现在，你的应用已经可以通过 pushy 服务检查版本并进行更新了。下一步，你可以开始尝试发布应用包和版本，请参阅[发布热更新](publish)。
