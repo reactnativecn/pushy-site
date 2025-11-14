@@ -29,7 +29,7 @@ function Banner(props) {
           增量算法尽优化 &nbsp;&nbsp;&nbsp;字节四两拨千斤
         </p>
         <div className="button-wrapper">
-          <Link href="/docs/getting-started">
+          <Link href="/docs/intro">
             <Button size="large" className="mr-4" type="primary" ghost>
               立即免费体验
             </Button>
