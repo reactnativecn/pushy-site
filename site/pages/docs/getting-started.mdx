@@ -527,7 +527,7 @@ android {
 
 ### 禁用 aab 包的资源分割（如果你需要在 Google Play 上架）
 
-如果你需要打 aab 包以在 Google Play 上架，且 react-native-update 版本 低于 10.33.0，则需要禁用 aab 包的资源分割。若已升级到 10.33.0+ 版本，则不需要此设置。
+如果你需要打 aab 包以在 Google Play 上架，则需要禁用 aab 包的资源分割，否则热更后可能遇到图片无法显示的问题。
 
 ```groovy
 // 在 android/app/build.gradle 文件中
@@ -537,7 +537,6 @@ android {
         density {
             // 请禁用资源分割
             // 否则热更后可能遇到图片无法显示的问题
-            // v10.33.0 版本之后不需要此设置
             enableSplit = false
         }
     }
