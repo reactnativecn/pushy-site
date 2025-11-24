@@ -466,8 +466,12 @@ struct Index {
       android:launchMode="singleTask">
       <!-- ↑↑↑ -->
 
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
 
-      <!-- ↓↓↓ 添加如下 intent-filter -->
+      <!-- ↓↓↓ 添加如下 intent-filter， 注意和上面的 intent-filter 是不同的 action 和 category -->
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
