@@ -54,6 +54,8 @@ pushy bundle --platform android --name "1.0.0" --description "热更新版本 1.
 
 解析 ipa 文件并输出一些相关信息，如版本号，编译时间戳等。
 
+
+
 ---
 
 #### pushy parseApk [apkFile]
@@ -138,7 +140,7 @@ pushy bundle --platform android --name "1.0.0" --description "热更新版本 1.
 
 删除已有应用。所有已创建的应用包、热更新版本都会被同时删除。这项操作也可以在网页管理端进行。
 
-- platform: ios|android|harmony 对应的平台
+- appId: 要删除的应用 ID
 
 ---
 
@@ -190,6 +192,15 @@ pushy bundle --platform android --name "1.0.0" --description "热更新版本 1.
 
 ---
 
+#### pushy deletePackage
+
+删除已经上传的原生包。
+
+- appId: 要删除的原生包所属的应用 ID
+- packageId: 要删除的原生包 ID
+
+---
+
 #### pushy publish [ppkFile]
 
 发布新的热更新版本（ppk 文件）。
@@ -221,6 +232,15 @@ pushy publish .pushy/output/android.1750423283653.ppk --platform android --name 
 分页列举可用的版本。这项操作也可以在网页管理端进行。
 
 - platform: ios|android|harmony 对应的平台
+
+---
+
+#### pushy deleteVersion
+
+删除已经发布的热更新版本。
+
+- appId: 要删除的热更新版本所属的应用 ID
+- versionId: 要删除的热更新版本 ID
 
 ---
 
