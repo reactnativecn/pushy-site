@@ -85,6 +85,24 @@ splits {
 
 </details>
 
+若您用来测试的原生包当前已经有发布的热更版本且更新策略是立即应用，那么和扫码测试之间可能产生策略冲突，比如扫码更新后又立即强制更新到发布版本，对测试带来不便。此时可以考虑在扫码更新之后，利用 beforeCheckUpdate 回调临时禁止更新检查，直到下次启动再恢复。
+
+```js
+
+// isFirstTimeDebug 这个标志位需要 v10.37.0+ 版本，表示当前是扫码热更后的第一次启动
+import { isFirstTimeDebug } from 'react-native-update/core';
+
+new Pushy({
+  beforeCheckUpdate: () => {
+    if (isFirstTimeDebug) {
+      // 如果当前是扫码热更后的第一次启动，则跳过热更检查
+      return false;
+    }
+    return true;
+  },
+})
+```
+
 万一确实发生线上事故需要回滚的话，先立即对原生包或者整个应用设置暂停热更，然后更改绑定到之前正常的版本，或者利用版本控制系统回滚代码到正常的状态，然后重新生成热更包并推送。
 
 #### 元信息(Meta Info)的使用
