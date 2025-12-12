@@ -92,7 +92,7 @@ splits {
 // isFirstTimeDebug 这个标志位需要 v10.37.0+ 版本，表示当前是扫码热更后的第一次启动
 import { isFirstTimeDebug } from 'react-native-update/src/core';
 
-new Pushy({
+const pushyClient = new Pushy({
   beforeCheckUpdate: () => {
     if (isFirstTimeDebug) {
       // 如果当前是扫码热更后的第一次启动，则跳过热更检查
