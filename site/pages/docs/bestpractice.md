@@ -90,7 +90,7 @@ splits {
 ```js
 
 // isFirstTimeDebug 这个标志位需要 v10.37.0+ 版本，表示当前是扫码热更后的第一次启动
-import { isFirstTimeDebug } from 'react-native-update/core';
+import { isFirstTimeDebug } from 'react-native-update/src/core';
 
 new Pushy({
   beforeCheckUpdate: () => {
