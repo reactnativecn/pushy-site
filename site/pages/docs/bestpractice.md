@@ -50,9 +50,7 @@ splits {
 
 #### 如何支持 aab 格式的原生包？
 
-如果您需要使用 aab 格式的 android 原生包，那么可以在上传到 Google play 之后，在其控制台中下载转换后的 apk 格式（见下图），然后将这个 apk 包上传到热更新的后台，即可正常支持热更新。
-
-![aab](./assets/aab.png)
+将 react-native-update-cli 更新到 v2.6.0 以上版本，即可使用 pushy parseAab 和 pushy uploadAab 命令来支持 aab 格式的原生包。
 
 #### 测试与回滚
 

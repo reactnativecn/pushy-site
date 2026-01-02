@@ -64,12 +64,13 @@ $ pushy uploadIpa <ipa后缀文件>
 
 首先参考[文档-打包 APK](https://reactnative.cn/docs/signed-apk-android)设置签名，然后在 android 文件夹下运行`./gradlew assembleRelease`或`./gradlew aR`，你就可以在`android/app/build/outputs/apk/release/app-release.apk`中找到你的应用包。
 
-> 如果你需要使用 aab 格式（android app bundle，google 市场专用）的包，请参考这里的[做法](bestpractice#如何支持-aab-格式的原生包)将其转换为 apk 格式后再操作。
 
 然后运行如下命令
 
 ```bash
 $ pushy uploadApk android/app/build/outputs/apk/release/app-release.apk
+# 如果你打的是 aab 格式的包，则请使用以下命令
+# pushy uploadAab android/app/build/outputs/bundle/release/app-release.aab
 ```
 
 即可上传 apk 以供后续版本比对之用。此 apk 的`versionName`字段(位于`android/app/build.gradle`中)会被记录为原生版本号`packageVersion`。

@@ -70,6 +70,13 @@ pushy bundle --platform android --name "1.0.0" --description "热更新版本 1.
 
 ---
 
+#### pushy parseAab [aabFile]
+
+解析 aab 文件并输出一些相关信息，如版本号，编译时间戳等。
+
+
+---
+
 #### pushy diff [origin][next]
 
 提供两个 ppk 文件，生成从 origin 到 next 版本的差异更新包。
@@ -181,6 +188,14 @@ pushy bundle --platform android --name "1.0.0" --description "热更新版本 1.
 上传 app 文件到开放平台。
 
 - note: 备注（cli 需 1.24.0 +）
+
+---
+
+#### pushy uploadAab [aabFile]
+
+上传 aab 文件到开放平台。
+
+- note: 备注（cli 需 2.6.0 +）
 
 ---
 
