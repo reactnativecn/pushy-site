@@ -480,7 +480,7 @@ struct Index {
 
 ### 覆盖 android 的 onCreate
 
-如果你有安装 `react-native-screens` (使用 `react-navigation` 一般都会要求安装)，则安卓端在热更后重启可能会白屏。此时需要在 Android 的 `MainActivity` 中设置 `RNScreensFragmentFactory`，以确保 Fragment 恢复流程一致，避免崩溃。注意不要把这段覆盖写在 `MainActivityDelegate` 里，而是直接放在 `MainActivity` 中：
+如果你有安装 `react-native-screens` (使用 `react-navigation` 一般都会要求安装)，则安卓端在热更后重启可能会白屏。此时需要在 Android 的 `MainActivity` 中设置 `RNScreensFragmentFactory`，以确保 Fragment 恢复流程一致，避免崩溃。注意不要把这段覆盖写在 `MainActivityDelegate` 里，而是直接放在 `MainActivity` 中。
 更多说明可以参考 `react-native-screens` 的 [readme](https://github.com/software-mansion/react-native-screens?tab=readme-ov-file#android)
 
 <Tabs items={['Kotlin', 'Java']}>
