@@ -478,6 +478,55 @@ struct Index {
   中重新编译）才能生效。
 </Callout>
 
+### 覆盖 android 的 onCreate
+
+如果你有安装 `react-native-screens` (使用 `react-navigation` 一般都会要求安装)，则安卓端在热更后重启可能会白屏。此时需要在 Android 的 `MainActivity` 中设置 `RNScreensFragmentFactory`，以确保 Fragment 恢复流程一致，避免崩溃。注意不要把这段覆盖写在 `MainActivityDelegate` 里，而是直接放在 `MainActivity` 中：
+更多说明可以参考 `react-native-screens` 的 [readme](https://github.com/software-mansion/react-native-screens?tab=readme-ov-file#android)
+
+<Tabs items={['Kotlin', 'Java']}>
+<Tabs.Tab>
+
+```kotlin
+// android/app/src/main/java/[...]/MainActivity.kt
+import android.os.Bundle
+import com.swmansion.rnscreens.fragment.restoration.RNScreensFragmentFactory
+
+class MainActivity : ReactActivity() {
+  // ...其他代码
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    supportFragmentManager.fragmentFactory = RNScreensFragmentFactory()
+    super.onCreate(savedInstanceState)
+    // 如果你用的版本比较老，没有 RNScreensFragmentFactory，则使用下面的写法
+    // super.onCreate(null)
+  }
+}
+```
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+```java
+// android/app/src/main/java/[...]/MainActivity.java
+import android.os.Bundle;
+import com.swmansion.rnscreens.fragment.restoration.RNScreensFragmentFactory;
+
+public class MainActivity extends ReactActivity {
+  // ...其他代码
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    getSupportFragmentManager().setFragmentFactory(new RNScreensFragmentFactory());
+    super.onCreate(savedInstanceState);
+    // 如果你用的版本比较老，没有 RNScreensFragmentFactory，则使用下面的写法
+    // super.onCreate(null);
+  }
+}
+```
+
+</Tabs.Tab>
+</Tabs>
+
 ### 添加测试用的 Deep Link
 
 此步骤可以极其便利的在和用户完全一致的环境中安全地测试热更新，无需额外的设备注册步骤，也不影响现有的热更新流程。
