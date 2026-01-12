@@ -1,0 +1,13 @@
+[
+  "intro",
+  "getting-started",
+  "integration",
+  "publish",
+  { "type": "divider" },
+  "api",
+  "cli",
+  "cli_module",
+  "bestpractice",
+  { "type": "divider" },
+  "faq"
+]

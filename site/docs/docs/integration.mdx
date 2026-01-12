@@ -1,0 +1,224 @@
+---
+order: 1
+title: 代码集成
+type: 快速入门
+---
+
+:::info
+
+  请注意，当前版本的api经过了完全重构，与之前的版本(v10.0以下)不兼容。如果你需要查看之前版本的文档，请点击[这里](https://v9--pushy-site.netlify.app/)
+
+:::
+
+
+安装配置完成后，确定应用编译顺利通过，下面我们来进行代码集成。
+
+### 获取 appKey
+
+检查更新时必须提供你的`appKey`，这个值保存在`update.json`中（使用`pushy createApp`或`pushy selectApp`命令后会自动生成），并且根据平台不同而不同。你可以用如下的代码获取`appKey`：
+
+```javascript
+import { Platform } from "react-native";
+
+import _updateConfig from "./update.json";
+const { appKey } = _updateConfig[Platform.OS];
+```
+
+也可以在网页端的应用设置中查看应用的 appKey。
+
+### 初始化服务
+
+```js
+import { UpdateProvider, Pushy } from "react-native-update";
+
+// 唯一必填参数是appKey，其他选项请参阅 api 文档
+const pushyClient = new Pushy({
+  appKey,
+  // 注意，默认情况下，在开发环境中不会检查更新
+  // 如需在开发环境中调试更新，请设置debug为true
+  // 但即便打开此选项，也仅能检查、下载热更，并不能实际应用热更。实际应用热更必须在release包中进行。
+  // debug: true
+});
+
+// 在根组件外加上 UpdateProvider 后导出
+export default function Root() {
+  // 注意，在使用 UpdateProvider 的当前组件中，无法直接调用 useUpdate
+  // 只有当前组件的子组件才能调用 useUpdate
+  return (
+    <UpdateProvider client={pushyClient}>
+      {/* ↓ 整个应用的根组件放到 UpdateProvider 中 */}
+      <App />
+    </UpdateProvider>
+  );
+}
+```
+
+如没有特别的自定义需求，那么到此热更新已经可以开始正常运作（如需在应用内执行 apk 更新，还需配置[安装权限](/docs/api#async-function-downloadandinstallapkurl)）。在默认的配置下，在 App 启动，以及从后台切换到前台时会触发更新检查，弹出提示的内容也固定。
+
+如需简单调整检查和更新策略，可参考以下内置的策略参数：
+
+#### checkStrategy（检查更新策略）
+
+用于控制自动检查更新的触发时机：
+
+- `"both"`（默认值）：在 App 启动时和从后台切换到前台时都会检查更新
+- `"onAppStart"`：仅在 App 启动时检查更新
+- `"onAppResume"`：仅在 App 从后台切换到前台时检查更新
+- `null`：不自动检查更新，必须手动调用 `checkUpdate` 方法（需 v10.4.2+ 版本）
+
+示例：
+
+```js
+const pushyClient = new Pushy({
+  appKey,
+  checkStrategy: "onAppStart", // 仅在启动时检查
+});
+```
+
+#### updateStrategy（更新应用策略）
+
+用于控制检测到更新后的自动下载和应用行为：
+
+- `"alwaysAlert"`：调试环境（`__DEV__`）的默认值，使用系统 alert 提示热更，并在有报错时弹出提示
+- `"alertUpdateAndIgnoreError"`：生产环境的默认值，有热更时使用系统 alert 提示，但不弹出报错提示
+- `"silentAndNow"`：自动静默下载并立即应用热更（会立即重启应用）
+- `"silentAndLater"`：自动静默下载，但仅在用户杀掉 App 后重启时应用更新
+- `null`：不自动下载和应用更新，需完全自定义热更界面
+
+示例：
+
+```js
+const pushyClient = new Pushy({
+  appKey,
+  updateStrategy: "silentAndLater", // 静默下载，下次启动时更新
+});
+```
+
+如需更大程度的自定义，如自定义触发时机，以及修改界面提示等，请参考下面的自定义更新界面。
+
+### 自定义更新界面
+
+默认配置下，pushy 会以系统 alert 的形式来弹出更新提示，如需自定义更新界面，首先请关闭默认的 updateStrategy 更新策略，并打开 debug 选项以便调试：
+
+```diff
+const pushyClient = new Pushy({
+  appKey,
++  updateStrategy: null,
++  debug: true,
+});
+```
+
+所有更新相关的数据可以通过一个单一的[`useUpdate()`](/docs/api#useupdate)hook 函数来获取（此函数也有别名`usePushy()`），然后可以根据其提供的数据来自行渲染自定义的界面，如下面的例子：
+
+```js
+import { useUpdate } from "react-native-update";
+import { Icon, PaperProvider, Snackbar, Banner } from "react-native-paper";
+function App() {
+  const {
+    client,
+    checkUpdate,
+    downloadUpdate,
+    switchVersionLater,
+    switchVersion,
+    updateInfo,
+    packageVersion,
+    currentHash,
+    progress: { received, total } = {},
+  } = useUpdate();
+  const [showUpdateBanner, setShowUpdateBanner] = useState(false);
+  const [showUpdateSnackbar, setShowUpdateSnackbar] = useState(false);
+  const snackbarVisible = showUpdateSnackbar && updateInfo?.update;
+  return (
+    <View style={styles.container}>
+      <Text>
+        更新下载进度：{received} / {total}
+      </Text>
+      <Pressable onPress={checkUpdate}>
+        <Text>点击这里检查更新</Text>
+      </Pressable>
+      {snackbarVisible && (
+        <Snackbar
+          visible={true}
+          onDismiss={() => {
+            setShowUpdateSnackbar(false);
+          }}
+          action={{
+            label: "更新",
+            onPress: async () => {
+              setShowUpdateSnackbar(false);
+              if (await downloadUpdate()) {
+                setShowUpdateBanner(true);
+              }
+            },
+          }}
+        >
+          <Text>有新版本({updateInfo.name})可用，是否更新？</Text>
+        </Snackbar>
+      )}
+      <Banner
+        style={{ width: "100%", position: "absolute", top: 0 }}
+        visible={showUpdateBanner}
+        actions={[
+          {
+            label: "立即重启",
+            onPress: switchVersion,
+          },
+          {
+            label: "下次再说",
+            onPress: () => {
+              switchVersionLater();
+              setShowUpdateBanner(false);
+            },
+          },
+        ]}
+        icon={({ size }) => (
+          <Icon name="checkcircleo" size={size} color="#00f" />
+        )}
+      >
+        更新已完成，是否立即重启？
+      </Banner>
+    </View>
+  );
+}
+```
+
+其中`checkUpdate`方法可以用来手动触发更新检查。虽然这个方法会返回[`updateInfo`](api#async-function-checkupdate)（仅限 v10.26.0+ 版本），但我们仍然推荐优先使用`useUpdate()`来获取`updateInfo`。
+
+:::info
+
+依赖`useUpdate()`而不是`checkUpdate`来获取`updateInfo`，这样做虽然一开始可能觉得不太直观，但可以将**检查逻辑**和**更新逻辑**完全解耦，使更新流程上的各个组件不需要互相依赖和影响。
+比如检查更新的按钮只管调用`checkUpdate`，某个显示小红点的组件只管从 `useUpdate()` 中获取`updateInfo`，而主要的下载流程可以写一个单独的`useEffect`，这几者之间并不需要考虑先后顺序、组件层级或者传递数据。
+又比如你可能在多处都有检查更新的调用，比如 app 启动时、前后台切换时，又或者使用 deeplink 和扫码，这些不同的检查逻辑也不用重复去实现后续的更新逻辑。
+
+:::
+
+
+`updateInfo` 有三种情况：
+
+1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），开发者应该在 pushy 的管理后台添加一个更新下载链接，并自行提示用户下载。如需在应用内执行 apk 更新，还需配置[安装权限](/docs/api#async-function-downloadandinstallapkurl)。
+
+2. `{upToDate: true}`：当前已经更新到最新，无需进行更新。
+
+3. `{update: true}`：当前有新版本可以更新。info 的`name`、`description`字段可以用于提示用户，而`metaInfo`字段则可以根据你的需求自定义其它属性(如是否静默更新、是否强制更新等等)，具体用法可参考[场景实践](bestpractice#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了补丁包的下载地址等。 pushy 会首先尝试耗费流量更少的更新方式。
+
+当返回的`updateInfo`中`update`字段为 true 时，即可调用`downloadUpdate`方法来下载更新，此时可以获取到下载的进度数据`progress`。下载完成后（注意!不可依赖`progress`来判断下载完成，必须要`await downloadUpdate()`之后）可以调用`switchVersion`来立即重启更新，也可以使用`switchVersionLater`来标记下次启动时更新。
+
+### 统计数据
+
+初始化 Pushy 客户端时可以传入自定义的 logger 函数，其中可以自己记录日志或上报统计数据，比如下面的例子使用 Google Analytics 来上报事件：
+
+```ts
+import { getAnalytics, logEvent } from "firebase/analytics";
+const analytics = getAnalytics();
+
+const pushyClient = new Pushy({
+  appKey,
+  logger: ({ type, data }) => {
+    logEvent(analytics, "pushy_" + type, data);
+  },
+});
+```
+
+以上提及的所有 api 的说明文档可在[这里](api)查看。还有一些其他常见的场景可以参考[场景实践](bestpractice)。
+
+现在，你的应用已经可以通过 pushy 服务检查版本并进行更新了。下一步，你可以开始尝试发布应用包和版本，请参阅[发布热更新](publish)。

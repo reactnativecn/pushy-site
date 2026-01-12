@@ -1,0 +1,381 @@
+---
+order: 11
+title: API参考
+type: 开发指南
+---
+
+### JavaScript 方法
+
+#### new Pushy(options: PushyOptions)
+
+创建 Pushy 热更新服务实例，其构造参数如下：
+
+```ts
+interface PushyOptions {
+  // 必填，通过pushy createApp或selectApp命令，或在网页管理端获取
+  appKey: string;
+
+  // 自定义日志输出，也可用于上报统计数据
+  logger?: ({ type, data }: { type: EventType; data: EventData }) => void;
+
+  // 触发自动检查更新的策略
+  checkStrategy?:
+    | "onAppStart" // 仅在app启动时
+    | "onAppResume" // 仅在app从后台切换到前台时
+    | "both"; // 默认值，同时包含前两个场景
+    | null; // 不自动检查更新，必须手动调用checkUpdate方法，此选项需 v10.4.2+ 版本
+
+  // 自动下载和应用更新的策略
+  updateStrategy?:
+    | "alwaysAlert" // 调试环境（__DEV__）默认值，使用系统默认的alert页面提示热更且会在有报错时弹出提示
+    | "alertUpdateAndIgnoreError" // 生产环境默认值，在有热更时使用系统默认的alert页面提示热更，但不弹出任何报错提示
+    | "silentAndNow" // 自动静默下载并立刻应用热更
+    | "silentAndLater"; // 自动静默下载，但仅在用户退出app后重启时应用更新
+    | null; // 不自动下载和应用更新，如需自定义热更界面请选择此项
+
+  // 是否在热更重启后自动标记为成功，默认为true
+  // 一般情况下不建议手动标记
+  autoMarkSuccess?: boolean;
+
+  // 是否在若干ms后自动清除最后的报错，默认为不清除
+  dismissErrorAfter?: number;
+
+  // 是否在开发环境中检查热更，默认为false。如需在开发环境中调试热更，请打开此选项。
+  // 但即便打开此选项，也仅能检查、下载热更，并不能实际应用热更。实际应用热更必须在release包中进行。
+  // 此选项需 v10.4.2+ 版本
+  debug?: boolean;
+
+  // 是否在调用 checkUpdate 和 downloadUpdate 时抛出错误，默认为不抛出错误，通过 lastError 获取错误信息
+  // 启用后可以使用 try catch 语句 捕获错误，同时 lastError 也仍然可用
+  // try {
+  //   await checkUpdate();
+  // } catch (e) {
+  //   console.error(e);
+  // }
+  // 此选项需 v10.15.2+ 版本
+  throwError?: boolean;
+
+  // 在检查更新前执行，返回 false 则取消检查更新
+  // 此选项需 v10.12.0+ 版本
+  beforeCheckUpdate?: () => Promise<boolean>;
+
+  // 在下载更新前执行，返回 false 则取消下载更新，可以配合自定义的 metaInfo 做一些条件控制
+  // 此选项需 v10.12.0+ 版本
+  beforeDownloadUpdate?: (info: UpdateInfo) => Promise<boolean>;
+
+  // 在下载更新后执行，返回 false 则取消内置策略进一步执行，可以配合自定义的 metaInfo 做一些条件控制
+  // 此选项需 v10.27.0+ 版本
+  afterDownloadUpdate?: (info: UpdateInfo) => Promise<boolean>;
+
+  // 在原生包过期时执行，返回 false 则取消内置策略进一步执行，可以配合自定义的 metaInfo 做一些条件控制
+  // 此选项需 v10.28.2+ 版本
+  onPackageExpired?: (info: UpdateInfo) => Promise<boolean>;
+}
+
+// 日志事件类型
+type EventType =
+  // 更新失败，重启后发生回滚
+  | "rollback"
+  // 检查更新时报错
+  | "errorChecking"
+  // 正在发起检查
+  | "checking"
+  // 正在下载更新
+  | "downloading"
+  // 已下载更新
+  | "downloadSuccess"
+  // 更新失败
+  | "errorUpdate"
+  // 更新成功
+  | "markSuccess"
+  // 下载apk
+  | "downloadingApk"
+  // 下载apk前申请存储权限被用户拒绝
+  | "rejectStoragePermission"
+  // 下载apk前申请存储权限发生错误
+  | "errorStoragePermission"
+  // 下载apk时发生错误
+  | "errorDownloadAndInstallApk";
+
+// 日志事件数据
+interface EventData {
+  // 当前已完成的热更hash值，如尚未热更则为空字符串
+  currentVersion: string;
+  // 客户端版本信息
+  cInfo: {
+    rnu: string; // 当前 react-native-update 版本
+    rn: string; // 当前 react-native 版本
+    os: string; // 当前操作系统及版本
+    uuid: string; // 用户标识符
+  };
+  // 客户端原生版本号
+  packageVersion: string;
+  // 编译时间戳
+  buildTime: number;
+  // 报错相关的信息
+  message?: string;
+  // 发生回滚的版本hash值
+  rolledBackVersion?: string;
+  // 更新失败的新版本hash值
+  newVersion?: string;
+  // 其他一些数据
+  [key: string]: any;
+}
+```
+
+#### useUpdate()
+
+热更相关的工具函数。此方法也可使用别名 `usePushy` 引入。
+
+:::info
+
+注意，在使用 `<UpdateProvider>` 的当前组件（一般是根组件）中无法直接调用`useUpdate`，只有当前组件的子组件才能调用。
+
+:::
+
+```js
+const {
+  checkUpdate,
+  switchVersion,
+  switchVersionLater,
+  markSuccess,
+  dismissError,
+  downloadUpdate,
+  downloadAndInstallApk,
+  getCurrentVersionInfo,
+  currentVersionInfo,
+  parseTestQrCode,
+  currentHash,
+  packageVersion,
+  client,
+  progress,
+  updateInfo,
+  lastError,
+  restartApp,
+} = useUpdate();
+```
+
+其类型定义和功能如下：
+
+```ts
+interface UpdateContext {
+  // 检查更新（注意在 v10.26.0 版本之前，`checkUpdate`方法本身没有返回值，只能从`useUpdate()`返回的`updateInfo`中获取）
+  // 我们也仍然推荐优先从`useUpdate()`中获取`updateInfo`
+  checkUpdate: () => Promise<void | UpdateInfo>;
+  // 下载热更完成后调用，立即重启切换新版本
+  switchVersion: () => void;
+  // 下载热更完成后调用，用户手动重启app后切换新版本（静默更新）
+  switchVersionLater: () => void;
+  // 热更完成重启后，手动标记热更完成
+  markSuccess: () => void;
+  // 清除最后的报错状态
+  dismissError: () => void;
+  // 下载热更, v10.16.0+ 版本返回值为`boolean`，表示是否下载成功
+  downloadUpdate: () => Promise<boolean | void>;
+  // 下载并安装apk
+  downloadAndInstallApk: (url: string) => Promise<void>;
+  // 异步获取当前已热更版本的信息，v10.31.2 版本后用 `currentVersionInfo` 代替
+  getCurrentVersionInfo: () => Promise<{
+    name?: string;
+    description?: string;
+    metaInfo?: string;
+  }>;
+  // 当前已热更版本的信息，需 v10.31.2+ 版本
+  currentVersionInfo: {
+    name?: string;
+    description?: string;
+    metaInfo?: string;
+  };
+  // 解析测试二维码，此方法需 v10.11.2+ 版本
+  parseTestQrCode: (qrCode: string) => void;
+  // 当前的版本hash
+  currentHash: string;
+  // 当前的原生版本号
+  packageVersion: string;
+  // 当前的pushy热更服务实例
+  client?: Pushy;
+  // 下载开始后的进度数据
+  progress?: {
+    hash: string;
+    // 已下载的字节数
+    received: number;
+    // 待下载的总字节数
+    total: number;
+  };
+  // 热更相关信息
+  updateInfo?: {
+    // 已是最新版本，无需热更
+    upToDate?: true;
+    // 当前原生版本已过期，需要下载新的原生版本
+    expired?: true;
+    // 在pushy网页管理端设置的原生版本下载地址
+    downloadUrl?: string;
+    // 是否存在新的热更
+    update?: true;
+    // 新热更的版本名称
+    name?: string;
+    // 新热更的hash值
+    hash?: string;
+    // 新热更的更新说明
+    description?: string;
+    // 新热更携带的额外元数据
+    metaInfo?: string;
+    // 当前热更是否已暂停
+    paused?:
+      | "app" // 当前应用所有原生版本暂停
+      | "package" // 仅当前原生版本暂停
+      | "quota"; // 因检查次数超限而暂停
+    // 其他信息
+    message?: string;
+  };
+  // 检查、下载、应用热更等过程中的最近一次报错
+  lastError?: Error;
+}
+```
+
+---
+
+#### async function checkUpdate()
+
+触发更新检查，返回`updateInfo`（注意在 v10.26.0 版本之前，`checkUpdate`方法本身没有返回值，只能从`useUpdate()`返回的`updateInfo`中获取，且我们仍然推荐优先使用`useUpdate()`来获取），返回值有三种情形：
+
+1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），需要引导用户下载或跳转到应用市场(需要在网页管理端设置中填写`downloadUrl`)。如需在应用内执行 apk 更新，还需配置[安装权限](/docs/api#async-function-downloadandinstallapkurl)。
+
+```js
+{
+    expired: true,
+    downloadUrl: 'http://appstore/downloadUrl',
+}
+```
+
+2. `{upToDate: true}`：当前已经更新到最新，无需进行更新。
+
+3. `{update: true}`：当前有新版本可以更新。`name`、`description`字段可以用于展示给用户版本号，更新内容等信息，而`metaInfo`字段则可以根据你的需求自定义一些标记(如是否静默更新、是否强制更新等等，自己根据标记的属性做一些条件流程控制)，具体用法可参考[场景实践](bestpractice#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了热更新文件的下载地址，
+
+```js
+{
+    update: true,
+    name: '1.0.3-rc',
+    hash: 'hash',
+    description: '添加聊天功能\n修复商城页面BUG',
+    metaInfo: '{"silent":true}',
+    pdiffUrl: 'http://update-packages.reactnative.cn/hash',
+    diffUrl: 'http://update-packages.reactnative.cn/hash',
+}
+```
+
+---
+
+#### async function downloadUpdate()
+
+下载热更包。仅当`update:true`时实际进行下载。会更新`progress`数据。v10.16.0+ 版本返回值为`boolean`，表示是否下载成功。
+
+---
+
+#### async function downloadAndInstallApk(url)
+
+下载更新的 apk 包并直接安装。`url`必须为可直接下载到 apk 文件的地址。
+
+由于系统安全限制等各种外部因素，此功能并不能保证一定正常调用。在应用当前运行周期内，如果下载或者安装失败，则再次调用时不会重试，只会静默失败。
+
+注意要使用这个功能还需要在`AndroidManifest.xml`中手动添加安装权限，如果需要考虑 Android 7.0 以下的客户，则还需要添加外部存储权限。
+
+```xml
+<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+<!-- 如果需要考虑Android 7.0以下的客户，则还需要添加外部存储权限 -->
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+```
+
+注意某些应用市场可能会因为上述权限拒绝应用上架。去掉上述两个权限并不影响热更新功能。
+
+---
+
+#### function markSuccess()
+
+**一般情况下请勿手动调用此函数**。调用此函数作为更新成功的标记（否则下次启动会默认失败自动回滚）。
+
+---
+
+#### async function getCurrentVersionInfo()
+
+获取当前已热更版本的信息（如尚未热更过则返回空对象）。v10.31.2 版本之后可以直接用 `currentVersionInfo` 代替。
+
+返回值示例：
+
+```js
+{
+    name: '1.0.3-rc',
+    description: '添加聊天功能\n修复商城页面BUG',
+    metaInfo: '{"silent":true}',
+}
+```
+
+---
+
+#### function restartApp()
+
+立即重启应用。v10.28.2+ 版本可用。
+
+---
+
+#### function switchVersion()
+
+立即重启应用，并加载已经下载完毕的版本。
+
+> 注意!不可依赖`progress`来判断下载完成，必须要在`await downloadUpdate()`之后再调用此方法。
+
+---
+
+#### function switchVersionLater()
+
+在下一次启动应用的时候加载已经下载完毕的版本。
+
+> 注意!不可依赖`progress`来判断下载完成，必须要在`await downloadUpdate()`之后再调用此方法。
+
+---
+
+#### function parseTestQrCode(qrCode: string)
+
+解析测试二维码，一般用于给 QA 人员测试热更新。如果在应用中已有扫码功能，则可以在应用中扫描 pushy 后台的测试二维码来测试任意版本的热更包。
+
+![testqrcode](./assets/testqrcode.png)
+
+注意使用此方法，上述界面中的"使用 Deep Link"选项 <u><b>请不要</b></u> 勾选。
+
+代码示例：
+
+```js
+<Camera
+  onReadCode={({ nativeEvent: { codeStringValue } }) => {
+    // 识别到二维码后先关闭相机
+    setShowCamera(false);
+    // 先解析是否是pushy的测试二维码
+    if (parseTestQrCode(codeStringValue)) {
+      // 如果是pushy的测试二维码，则不再做其他业务扫码逻辑
+      return;
+    }
+    // 如果不是，继续处理其他业务扫码逻辑
+  }}
+/>
+```
+
+---
+
+### Android 方法
+
+#### UpdateContext.setCustomInstanceManager(ReactInstanceManager instanceManager)
+
+如果是集成/混编 Android 方案，则可以使用此方法传入你自行创建的 ReactInstanceManager。自`v5.5.8`版本起可用。
+
+示例：
+
+```java
+import cn.reactnative.modules.update.UpdateContext
+
+mReactInstanceManager = ReactInstanceManager.builder()
+                // ...各种setter，但注意不要调用setBundleAssetName
+                .setJSBundleFile(UpdateContext.getBundleUrl(mContext, "assets://index.android.bundle"))
+                .build();
+UpdateContext.setCustomInstanceManager(mReactInstanceManager);
+```
