@@ -111,6 +111,7 @@ const pushyClient = new Pushy({
 所有更新相关的数据可以通过一个单一的[`useUpdate()`](/docs/api#useupdate)hook 函数来获取（此函数也有别名`usePushy()`），然后可以根据其提供的数据来自行渲染自定义的界面，如下面的例子：
 
 ```js
+import { Text, View, TouchableOpacity } from 'react-native';
 import { useUpdate } from "react-native-update";
 import { Icon, PaperProvider, Snackbar, Banner } from "react-native-paper";
 function App() {
@@ -133,9 +134,14 @@ function App() {
       <Text>
         更新下载进度：{received} / {total}
       </Text>
-      <Pressable onPress={checkUpdate}>
+      <TouchableOpacity
+        onPress={() => {
+          checkUpdate();
+          setShowUpdateSnackbar(true);
+        }}
+      >
         <Text>点击这里检查更新</Text>
-      </Pressable>
+      </TouchableOpacity>
       {snackbarVisible && (
         <Snackbar
           visible={true}
