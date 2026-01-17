@@ -1,0 +1,133 @@
+---
+order: 12
+title: API Token
+type: 开发指南
+---
+
+import { Callout } from "nextra/components";
+
+# API Token
+
+API Token 是一种用于在 CI/CD 流程或自动化脚本中调用 Pushy API 的认证方式。相比直接使用账号密码，API Token 更加安全且便于管理。
+
+## 使用场景
+
+- **持续集成/持续部署 (CI/CD)**：在 GitHub Actions、GitLab CI、Jenkins 等平台中自动发布热更新
+- **自动化脚本**：编写脚本批量管理应用、版本或原生包
+- **第三方工具集成**：将 Pushy 与其他开发工具集成
+
+## 创建 API Token
+
+1. 登录 [Pushy 管理后台](https://pushy-admin.reactnative.cn)
+2. 在左侧菜单中点击「API Token」
+3. 点击「创建 Token」按钮
+4. 填写 Token 名称（如：CI/CD Pipeline）
+5. 选择所需权限
+6. 可选设置过期时间
+7. 点击创建后，**立即复制并安全保存 Token**
+
+<Callout type="warning">
+Token 只会在创建时显示一次，之后无法再次查看。请务必在创建后立即复制保存！
+</Callout>
+
+## 权限说明
+
+| 权限 | 说明 |
+|------|------|
+| **读取 (read)** | 查看应用、版本、原生包信息 |
+| **写入 (write)** | 创建和更新应用、发布版本、上传原生包 |
+| **删除 (delete)** | 删除应用、版本、原生包 |
+
+<Callout type="info">
+创建 Token 时至少需要选择一个权限。根据实际需求选择最小必要权限是最佳实践。
+</Callout>
+
+## 使用 Token 调用 API
+
+在调用 Pushy API 时，将 Token 添加到请求头中：
+
+```bash
+curl -X GET "https://update.reactnative.cn/api/app/list" \
+  -H "x-api-token: YOUR_API_TOKEN"
+```
+
+### 在命令行工具中使用
+
+如果使用 `react-native-update-cli` 命令行工具，可以通过环境变量设置 Token：
+
+```bash
+export PUSHY_API_TOKEN=your_api_token_here
+pushy bundle --platform android
+```
+
+### 在 CI/CD 中使用
+
+以 GitHub Actions 为例：
+
+```yaml
+# .github/workflows/publish.yml
+name: Publish Hot Update
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: npm install && npm i -g react-native-update-cli
+        
+      - name: Publish update
+        env:
+          PUSHY_API_TOKEN: ${{ secrets.PUSHY_API_TOKEN }}
+        run: pushy bundle --platform android
+```
+
+<Callout type="tip">
+在 CI/CD 环境中，建议将 Token 存储在密钥管理中（如 GitHub Secrets），而不是直接写入代码。
+</Callout>
+
+## 管理 Token
+
+### 查看 Token 列表
+
+在「API Token」页面可以看到所有已创建的 Token，包括：
+- Token 名称
+- 权限
+- 过期时间
+- 最后使用时间
+- 状态（正常/已过期/已撤销）
+
+### 撤销 Token
+
+如果 Token 泄露或不再需要，可以随时撤销：
+
+1. 在 Token 列表中找到目标 Token
+2. 点击「撤销」按钮
+3. 确认撤销
+
+<Callout type="warning">
+Token 撤销后立即生效，使用该 Token 的所有请求将被拒绝。请确保在撤销前更新相关的 CI/CD 配置。
+</Callout>
+
+## 安全建议
+
+1. **最小权限原则**：只授予 Token 必要的权限
+2. **设置过期时间**：为临时使用的 Token 设置合理的过期时间
+3. **定期轮换**：定期撤销旧 Token 并创建新 Token
+4. **安全存储**：不要将 Token 提交到代码仓库，使用环境变量或密钥管理工具
+5. **监控使用**：定期检查 Token 的最后使用时间，及时清理不再使用的 Token
+
+## 限制
+
+- 每个用户最多可创建 **10 个** API Token
+- 如需创建更多，请先撤销不再使用的 Token
