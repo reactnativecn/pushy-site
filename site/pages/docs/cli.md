@@ -169,33 +169,31 @@ pushy bundle --platform android --name "1.0.0" --description "热更新版本 1.
 
 #### pushy uploadIpa [ipaFile]
 
-上传 ipa 文件到开放平台。
-
-- note: 备注（cli 需 1.24.0 +）
+上传 ipa 文件到开放平台。（cli 需 1.24.0 +）
 
 ---
 
 #### pushy uploadApk [apkFile]
 
-上传 apk 文件到开放平台。
-
-- note: 备注（cli 需 1.24.0 +）
+上传 apk 文件到开放平台。（cli 需 1.24.0 +）
 
 ---
 
 #### pushy uploadApp [appFile]
 
-上传 app 文件到开放平台。
-
-- note: 备注（cli 需 1.24.0 +）
+上传 app 文件到开放平台。（cli 需 1.24.0 +）
 
 ---
 
 #### pushy uploadAab [aabFile]
 
-上传 aab 文件到开放平台。
+上传 aab 文件到开放平台。（cli 需 2.6.0 +）
 
-- note: 备注（cli 需 2.6.0 +）
+---
+
+#### pushy extractApk [aabFile]
+
+从 aab 文件中提取 apk 文件。备注（cli 需 2.6.0 +）
 
 ---
 

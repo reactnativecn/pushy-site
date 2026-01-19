@@ -7,7 +7,7 @@
     "type": "separator",
     "title": ""
   },
-  "api": "API文档",
+  "api": "API 文档",
   "api-token": "API Token",
   "cli": "命令行工具（内置）",
   "cli_module": "命令行工具（自定义模块）",
