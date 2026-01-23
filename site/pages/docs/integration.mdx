@@ -94,7 +94,9 @@ const pushyClient = new Pushy({
 });
 ```
 
-如需更大程度的自定义，如自定义触发时机，以及修改界面提示等，请参考下面的自定义更新界面。
+检查策略和更新策略是一个完整更新流水线的上下游，两者可以独立开关，自由搭配，以便不同程度的介入检查频率的控制，或是下载相关的界面交互。
+
+下面的章节提供了一个自定义更新策略和界面交互的参考实现。
 
 ### 自定义更新界面
 
@@ -108,7 +110,7 @@ const pushyClient = new Pushy({
 });
 ```
 
-所有更新相关的数据可以通过一个单一的[`useUpdate()`](/docs/api#useupdate)hook 函数来获取（此函数也有别名`usePushy()`），然后可以根据其提供的数据来自行渲染自定义的界面，如下面的例子：
+所有更新相关的数据可以通过一个单一的[`useUpdate()`](/docs/api#useupdate)hook 函数来获取，然后可以根据其提供的数据来自行渲染自定义的界面，如下面的例子：
 
 ```js
 import { Text, View, TouchableOpacity } from 'react-native';

@@ -338,10 +338,12 @@ interface UpdateContext {
 #### function parseTestQrCode(qrCode: string)
 
 解析测试二维码，一般用于给 QA 人员测试热更新。如果在应用中已有扫码功能，则可以在应用中扫描 pushy 后台的测试二维码来测试任意版本的热更包。
+注意如果你使用自定义的(更新策略（updateStrategy）)[https://pushy.reactnative.cn/docs/integration#updatestrategy%E6%9B%B4%E6%96%B0%E5%BA%94%E7%94%A8%E7%AD%96%E7%95%A5]，请务必从 `useUpdate()` 中获取 `updateInfo` ，而不要依赖 checkUpdate 方法的返回值，否则扫码不会有后续动作。
 
 ![testqrcode](./assets/testqrcode.png)
 
 注意使用此方法，上述界面中的"使用 Deep Link"选项 <u><b>请不要</b></u> 勾选。
+
 
 代码示例：
 
