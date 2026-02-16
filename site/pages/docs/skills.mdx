@@ -1,0 +1,109 @@
+---
+order: 9
+title: Skills 安装与使用
+type: 进阶指南
+---
+
+import { Callout, Tabs } from "nextra/components";
+
+本文介绍如何安装和使用 `react-native-update` 的 Skills，方便你在不同 AI 编程助手里快速获得接入指导与排障能力。
+
+## 适用场景
+
+- 你希望让 AI 助手按统一最佳实践帮你接入 Pushy 热更新
+- 你希望在 OpenClaw / Claude Code 等环境中复用同一份接入知识
+- 你希望团队内统一安装和升级 Skill
+
+## Skill 名称
+
+统一维护的 Skill 名称为：`react-native-update`
+
+## 方式一：通过 ClawHub 安装（OpenClaw 生态推荐）
+
+### 安装 ClawHub CLI
+
+```bash
+npm i -g clawhub
+```
+
+### 登录
+
+```bash
+clawhub login
+```
+
+### 安装 Skill
+
+```bash
+clawhub install react-native-update
+```
+
+### 更新 Skill
+
+```bash
+clawhub update react-native-update
+```
+
+<Callout type="info">
+  ClawHub 页面：
+  <a href="https://clawhub.ai/skills/react-native-update" target="_blank">
+    https://clawhub.ai/skills/react-native-update
+  </a>
+</Callout>
+
+## 方式二：通过 skills.sh 安装（多 Agent 通用）
+
+如果你在使用 Claude Code、Codex、Cursor 等工具，建议使用 `skills` CLI。
+
+### 直接安装
+
+```bash
+npx skills add reactnativecn/react-native-update-skill --skill react-native-update -a claude-code
+```
+
+### 安装到所有支持的 Agent
+
+```bash
+npx skills add reactnativecn/react-native-update-skill --skill react-native-update -a '*'
+```
+
+### 检查与更新
+
+```bash
+npx skills check
+npx skills update
+```
+
+## 如何使用这个 Skill
+
+安装后，你可以直接给 AI 助手如下任务：
+
+- “帮我在 Expo 项目里接入 react-native-update，给最小改动方案”
+- “我是 RN CLI + class 组件根节点，给我接入代码”
+- “帮我做灰度发布：自定义白名单，只让内测用户更新”
+- “检查我项目为什么热更新不生效，给出逐项排查结果”
+
+## 典型能力（内置）
+
+- 安装配置（RN CLI / Expo）
+- `update.json` / `appKey` 接线
+- iOS / Android 关键改动检查
+- 更新策略建议（`checkStrategy` / `updateStrategy`）
+- `expo-updates` 冲突排查
+- class 组件接入示例
+- 自定义白名单（灰度）示例
+
+## 源码与发布
+
+- Skill 源码仓库：
+  <a href="https://github.com/reactnativecn/react-native-update-skill" target="_blank">
+    https://github.com/reactnativecn/react-native-update-skill
+  </a>
+- Release 下载：
+  <a href="https://github.com/reactnativecn/react-native-update-skill/releases" target="_blank">
+    https://github.com/reactnativecn/react-native-update-skill/releases
+  </a>
+
+<Callout type="warning">
+  建议只使用统一 slug：`react-native-update`。历史实验版本（如 claude-code/unified 后缀）已不再维护。
+</Callout>

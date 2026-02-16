@@ -12,6 +12,7 @@
   "cli": "命令行工具（内置）",
   "cli_module": "命令行工具（自定义模块）",
   "bestpractice": "场景实践",
+  "skills": "Skills 安装与使用",
   "---2": {
     "type": "separator",
     "title": ""
