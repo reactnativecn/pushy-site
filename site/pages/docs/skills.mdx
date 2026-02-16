@@ -1,23 +1,27 @@
 ---
 order: 9
-title: 安装 Skill（AI 接入助手）
+title: 安装与使用 Skill
 type: 进阶指南
 ---
 
 import { Callout } from "nextra/components";
 
-这篇文档只服务一个目标：
-**让你更快把 `react-native-update` 接进项目。**
+本文介绍如何安装并使用 `react-native-update` 的官方 Skill，帮助你在 AI 编程工具中更高效地完成接入、配置与排查。
 
-如果你正在用 Claude Code、Codex、Cursor 等 AI 编程工具，先安装这个统一 Skill：`react-native-update`。
+## Skill 信息
 
-## 一条命令安装（推荐）
+- Skill 名称：`react-native-update`
+- 源仓库：`reactnativecn/react-native-update-skill`
+
+## 安装（推荐）
+
+安装到当前环境支持的所有 Agent：
 
 ```bash
 npx skills add reactnativecn/react-native-update-skill --skill react-native-update -a '*'
 ```
 
-如果你只想给 Claude Code 安装：
+仅安装到 Claude Code：
 
 ```bash
 npx skills add reactnativecn/react-native-update-skill --skill react-native-update -a claude-code
@@ -30,35 +34,34 @@ npx skills check
 npx skills update
 ```
 
-## 安装后怎么用
+## 使用方式
 
-直接给 AI 助手下需求，例如：
+安装后，可以直接向 AI 助手提出接入需求，例如：
 
-- “帮我在 Expo 项目接入 react-native-update，给最小改动方案”
-- “我是 class 组件根节点，给我可直接粘贴的接入代码”
-- “帮我做灰度发布，用白名单控制更新范围”
-- “热更新没生效，按清单帮我排查”
+- 在 Expo 项目中接入 `react-native-update`
+- 在 class 组件根节点中完成接入改造
+- 配置白名单灰度发布策略
+- 排查“热更新未生效”问题
 
-## 这个 Skill 能做什么
+## Skill 覆盖内容
 
-- RN CLI / Expo 接入步骤
-- `update.json` / `appKey` 配置检查
+- RN CLI / Expo 接入流程
+- `update.json` 与 `appKey` 配置检查
 - iOS / Android 关键改动提示
 - 更新策略建议（`checkStrategy` / `updateStrategy`）
 - 常见冲突排查（如 `expo-updates`）
-- class 组件与白名单灰度示例
+- class 组件与白名单示例
 
 <Callout type="info">
-  统一维护的 Skill 名称：`react-native-update`。请使用这个名称，避免历史版本混淆。
+  为避免版本混淆，请统一使用 slug：`react-native-update`。
 </Callout>
 
-## 发布地址
+## 相关链接
 
-- Skills 仓库：
+- 仓库：
   <a href="https://github.com/reactnativecn/react-native-update-skill" target="_blank">
     https://github.com/reactnativecn/react-native-update-skill
   </a>
-- skills.sh / CLI 安装来源：`reactnativecn/react-native-update-skill`
 - ClawHub 页面（可选）：
   <a href="https://clawhub.ai/skills/react-native-update" target="_blank">
     https://clawhub.ai/skills/react-native-update
