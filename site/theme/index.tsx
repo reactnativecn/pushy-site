@@ -1,6 +1,6 @@
-import { Layout } from 'rspress/theme';
+import { Layout as BasicLayout } from '@rspress/core/theme-original';
 import '../styles/index.scss';
 import '../components/home/home.scss';
 
-export { Layout };
-export * from 'rspress/theme';
+export const Layout = () => <BasicLayout />;
+export * from '@rspress/core/theme-original';

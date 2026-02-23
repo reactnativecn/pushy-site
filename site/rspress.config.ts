@@ -1,6 +1,7 @@
 import * as path from 'path';
 import { defineConfig } from 'rspress/config';
 import { pluginSass } from '@rsbuild/plugin-sass';
+import rspressPluginMermaid from 'rspress-plugin-mermaid';
 
 export default defineConfig({
   root: path.join(__dirname, 'pages'),
@@ -11,6 +12,7 @@ export default defineConfig({
     light: '/images/logo.svg',
     dark: '/images/logo.svg',
   },
+  logoText: 'Pushy 极速热更新',
   themeConfig: {
     socialLinks: [
       { icon: 'github', mode: 'link', content: 'https://github.com/reactnativecn/react-native-update' },
@@ -69,4 +71,5 @@ export default defineConfig({
       ],
     },
   },
+  plugins: [rspressPluginMermaid()],
 });
