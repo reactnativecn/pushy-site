@@ -4,11 +4,11 @@ title: 安装配置
 type: 快速入门
 ---
 
-import { Callout, Steps, Tabs } from "nextra/components";
+import { Steps, Tabs, Tab } from "rspress/theme";
 
-<Callout type="info">
-  请注意，当前版本的api经过了完全重构，与之前的版本(v10.0以下)不兼容。如果你需要查看之前版本的文档，请点击[这里](https://v9--pushy-site.netlify.app/)
-</Callout>
+:::info
+请注意，当前版本的api经过了完全重构，与之前的版本(v10.0以下)不兼容。如果你需要查看之前版本的文档，请点击[这里](https://v9--pushy-site.netlify.app/)
+:::
 
 首先你应该有一个基于 React Native 开发的应用，我们把具有 package.json 的目录叫做你的`应用根目录`。
 如果你还没有初始化应用，请参阅[开始使用 React Native](https://reactnative.cn/docs/getting-started)。
@@ -21,7 +21,7 @@ import { Callout, Steps, Tabs } from "nextra/components";
 在你的项目根目录下运行以下命令（如果你使用 yarn 等其他包管理器，请自行替换命令）：
 
 <Tabs items={['React Native', 'Expo']}>
-<Tabs.Tab>
+<Tab>
 
 ```bash
 # 先全局安装命令行工具
@@ -35,9 +35,9 @@ cd ios && pod install
 
 ```
 
-</Tabs.Tab>
+</Tab>
 
-<Tabs.Tab>
+<Tab>
 
 ```bash
 # 先全局安装命令行工具
@@ -54,40 +54,40 @@ cd ios && pod install
 
 ```
 
-<Callout type="warning">
-  注意：如果使用
+:::warning
+注意：如果使用
   expo，请不要同时安装`expo-updates`，否则会导致热更新功能冲突。另外，expo 51
   版本以下的新架构支持并不完整，可能无法正常使用。如需使用新架构，建议使用尽可能新的
   expo 版本。
-</Callout>
+:::
 
-</Tabs.Tab>
+</Tab>
 </Tabs>
 
-<Callout type="info">
-  如果下载极慢或者显示网络失败，请设置使用淘宝镜像 `npx nrm use taobao`
-</Callout>
+:::info
+如果下载极慢或者显示网络失败，请设置使用淘宝镜像 `npx nrm use taobao`
+:::
 
-<Callout type="warning">
-  注意请不要混用`npm/yarn/pnpm`等包管理器及对应的`lock`文件，团队成员请坚持使用同一包管理器，且仅保留统一格式的`lock`文件
-</Callout>
+:::warning
+注意请不要混用`npm/yarn/pnpm`等包管理器及对应的`lock`文件，团队成员请坚持使用同一包管理器，且仅保留统一格式的`lock`文件
+:::
 
-<Callout type="info">
-  请记得，任意在 ios 和 android 目录下的修改，一定要重新编译（使用 npx
+:::info
+请记得，任意在 ios 和 android 目录下的修改，一定要重新编译（使用 npx
   react-native run-ios 或 run-android 命令编译，或在 Xcode/Android Studio
   中重新编译）才能生效。
-</Callout>
+:::
 
 ### 手动 link
 
 如果 RN 版本 >= 0.60 则不需要此手动 link 步骤。
 
-<Callout type="warning">
-  注意：如果是混编 RN
+:::warning
+注意：如果是混编 RN
   项目，或monorepo，或任何其他自定义的情况，由于自定义的配置可能不完整或不适应RN的目录结构，导致自动
   link 的功能可能不能正常工作。此时即便 RN 版本 >= 0.60，你可能也需要执行手动
   link 操作。
-</Callout>
+:::
 
 #### iOS
 
@@ -159,15 +159,15 @@ date +%s > "$DEST/pushy_build_time.txt"
 
 在你的 AppDelegate.mm 或 AppDelegate.m 或 AppDelegate.swift 文件（不同 RN 版本可能后缀名不同）中增加如下代码：
 
-<Callout type="warning">
-  注意：如果你是混编原生的项目，务必注意**不能直接指定 bundleURL 来初始化**
+:::warning
+注意：如果你是混编原生的项目，务必注意**不能直接指定 bundleURL 来初始化**
   rootView，需要先使用`initWithDelegate`方法来初始化
   bridge，然后使用`initWithBridge`方法来初始化
   rootView。否则热更新功能可能无法正常工作。
-</Callout>
+:::
 
 <Tabs items={['Objective-C', 'Swift']}>
-<Tabs.Tab>
+<Tab>
 
 ```c
 // ... 其它代码
@@ -208,8 +208,8 @@ date +%s > "$DEST/pushy_build_time.txt"
 
 ```
 
-</Tabs.Tab>
-<Tabs.Tab>
+</Tab>
+<Tab>
 
 ```swift
 import UIKit
@@ -234,7 +234,7 @@ class AppDelegate: RCTAppDelegate {
 }
 ```
 
-</Tabs.Tab>
+</Tab>
 </Tabs>
 
 #### Android
@@ -242,7 +242,7 @@ class AppDelegate: RCTAppDelegate {
 在 MainApplication 中增加如下代码（如果是混编原生的项目或其他原因没有使用 ReactApplication，请[使用此 api 集成](api#updatecontextsetcustominstancemanagerreactinstancemanager-instancemanager))：
 
 <Tabs items={['Kotlin（RN 0.82 或以上）','Kotlin（RN 0.81 或以下）', 'Java']}>
-<Tabs.Tab>
+<Tab>
 
 ```kotlin
 // ... 其它代码
@@ -273,8 +273,8 @@ class MainApplication : Application(), ReactApplication {
 
 ```
 
-</Tabs.Tab>
-<Tabs.Tab>
+</Tab>
+<Tab>
 
 ```kotlin
 // ... 其它代码
@@ -299,8 +299,8 @@ class MainApplication : Application(), ReactApplication {
 }
 ```
 
-</Tabs.Tab>
-<Tabs.Tab>
+</Tab>
+<Tab>
 
 ```java
 // ... 其它代码
@@ -327,14 +327,14 @@ public class MainApplication extends Application implements ReactApplication {
 }
 ```
 
-</Tabs.Tab>
+</Tab>
 </Tabs>
 
-<Callout type="info">
-  请记得，任意在 ios 和 android 目录下的修改，一定要重新编译（npx react-native
+:::info
+请记得，任意在 ios 和 android 目录下的修改，一定要重新编译（npx react-native
   run-ios 或 run-android 命令编译，或在 Xcode/Android Studio
   中重新编译）才能生效。
-</Callout>
+:::
 
 #### Harmony
 
@@ -472,11 +472,11 @@ struct Index {
 }
 ```
 
-<Callout type="info">
-  请记得，任意在 ios 和 android 目录下的修改，一定要重新编译（npx react-native
+:::info
+请记得，任意在 ios 和 android 目录下的修改，一定要重新编译（npx react-native
   run-ios 或 run-android 命令编译，或在 Xcode/Android Studio
   中重新编译）才能生效。
-</Callout>
+:::
 
 ### 覆盖 android 的 onCreate
 
@@ -484,7 +484,7 @@ struct Index {
 更多说明可以参考 `react-native-screens` 的 [readme](https://github.com/software-mansion/react-native-screens?tab=readme-ov-file#android)
 
 <Tabs items={['Kotlin', 'Java']}>
-<Tabs.Tab>
+<Tab>
 
 ```kotlin
 // android/app/src/main/java/[...]/MainActivity.kt
@@ -503,8 +503,8 @@ class MainActivity : ReactActivity() {
 }
 ```
 
-</Tabs.Tab>
-<Tabs.Tab>
+</Tab>
+<Tab>
 
 ```java
 // android/app/src/main/java/[...]/MainActivity.java
@@ -524,7 +524,7 @@ public class MainActivity extends ReactActivity {
 }
 ```
 
-</Tabs.Tab>
+</Tab>
 </Tabs>
 
 ### 添加测试用的 Deep Link
@@ -532,7 +532,7 @@ public class MainActivity extends ReactActivity {
 此步骤可以极其便利的在和用户完全一致的环境中安全地测试热更新，无需额外的设备注册步骤，也不影响现有的热更新流程。
 
 <Tabs items={['Android', 'iOS']}>
-<Tabs.Tab>
+<Tab>
 
 在 `android/app/src/main/AndroidManifest.xml` 中添加如下代码：
 
@@ -567,12 +567,12 @@ public class MainActivity extends ReactActivity {
 </manifest>
 ```
 
-</Tabs.Tab>
-<Tabs.Tab>
+</Tab>
+<Tab>
 
 请参考 [React Native 的文档](https://reactnative.cn/docs/next/linking#%E5%90%AF%E7%94%A8-deep-links)
 
-</Tabs.Tab>
+</Tab>
 </Tabs>
 
 ---
@@ -653,7 +653,9 @@ $ pushy createApp --platform harmony
 App Name: <输入应用名字>
 ```
 
-<Callout type="info">应用的名字可以相同，这没有关系。</Callout>
+:::info
+应用的名字可以相同，这没有关系。
+:::
 
 如果你已经在网页端或者其它地方创建过应用，也可以直接选择应用：
 

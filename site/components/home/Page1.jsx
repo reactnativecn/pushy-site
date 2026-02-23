@@ -5,13 +5,12 @@ import Parallax from "rc-scroll-anim/es/ScrollParallax";
 import QueueAnim from "rc-queue-anim";
 import TweenOne, { TweenOneGroup } from "rc-tween-one";
 
-import deltaIcon from "../../public/images/smartphone-3.svg";
-import publishIcon from "../../public/images/internet-1.svg";
-import downloadIcon from "../../public/images/wifi.svg";
-import strategyIcon from "../../public/images/strategy.svg";
-import reliableIcon from "../../public/images/circuit.svg";
-import supportIcon from "../../public/images/chat.svg";
-import Image from "next/image";
+import deltaIcon from "../../pages/public/images/smartphone-3.svg";
+import publishIcon from "../../pages/public/images/internet-1.svg";
+import downloadIcon from "../../pages/public/images/wifi.svg";
+import strategyIcon from "../../pages/public/images/strategy.svg";
+import reliableIcon from "../../pages/public/images/circuit.svg";
+import supportIcon from "../../pages/public/images/chat.svg";
 
 const featuresCN = [
   {
@@ -150,7 +149,7 @@ class Page1 extends React.Component {
                 }`,
               }}
             >
-              <Image
+              <img
                 src={item.src}
                 alt="img"
                 style={i === 4 ? { marginLeft: -15 } : {}}

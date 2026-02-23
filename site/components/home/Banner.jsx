@@ -2,12 +2,8 @@ import GitHubButton from "react-github-button";
 // import QueueAnim from 'rc-queue-anim';
 // import TweenOne from 'rc-tween-one';
 import { Button } from "antd";
-import Link from "next/link";
-
-// import BannerSVGAnim from './BannerSVGAnim';
-import logo from "../../public/images/logo.svg";
-import hero from "../../public/images/home_hero.svg";
-import Image from "next/image";
+import logo from "../../pages/public/images/logo.svg";
+import hero from "../../pages/public/images/home_hero.svg";
 
 function Banner(props) {
   const { isMobile } = props;
@@ -20,7 +16,7 @@ function Banner(props) {
       )} */}
       <div className="banner-title-wrapper">
         {/* <h1 key="h1">Pushy</h1> */}
-        <Image src={logo} style={{ margin: "0 0 25px 20px" }} alt="Pushy" />
+        <img src={logo} style={{ margin: "0 0 25px 20px" }} alt="Pushy" />
         <p>极速热更新框架 for React Native</p>
         <hr />
         <p style={{ marginTop: 30, fontSize: 16 }}>
@@ -29,11 +25,11 @@ function Banner(props) {
           增量算法尽优化 &nbsp;&nbsp;&nbsp;字节四两拨千斤
         </p>
         <div className="button-wrapper">
-          <Link href="/docs/intro">
+          <a href="/docs/intro">
             <Button size="large" className="mr-4" type="primary" ghost>
               立即免费体验
             </Button>
-          </Link>
+          </a>
           <GitHubButton
             key="github-button"
             type="stargazers"
@@ -44,7 +40,7 @@ function Banner(props) {
       </div>
       {!isMobile && (
         <div className="banner-image-wrapper">
-          <Image height={420} src={hero} alt="" />
+          <img height={420} src={hero} alt="" />
         </div>
       )}
     </div>

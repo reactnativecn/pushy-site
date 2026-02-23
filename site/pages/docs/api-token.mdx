@@ -4,7 +4,7 @@ title: API Token
 type: 开发指南
 ---
 
-import { Callout } from "nextra/components";
+
 
 # API Token
 
@@ -26,9 +26,9 @@ API Token 是一种用于在 CI/CD 流程或自动化脚本中调用 [Pushy API]
 6. 可选设置过期时间
 7. 点击创建后，**立即复制并安全保存 Token**
 
-<Callout type="warning">
+:::warning
 Token 只会在创建时显示一次，之后无法再次查看。请务必在创建后立即复制保存！
-</Callout>
+:::
 
 ## 权限说明
 
@@ -38,9 +38,9 @@ Token 只会在创建时显示一次，之后无法再次查看。请务必在�
 | **写入 (write)** | 创建和更新应用、发布版本、上传原生包 |
 | **删除 (delete)** | 删除应用、版本、原生包 |
 
-<Callout type="info">
+:::info
 创建 Token 时至少需要选择一个权限。根据实际需求选择最小必要权限是最佳实践。
-</Callout>
+:::
 
 ## 使用 Token 调用 API
 
@@ -92,9 +92,9 @@ jobs:
         run: pushy bundle --platform android
 ```
 
-<Callout type="tip">
+:::tip
 在 CI/CD 环境中，建议将 Token 存储在密钥管理中（如 GitHub Secrets），而不是直接写入代码。
-</Callout>
+:::
 
 ## 管理 Token
 
@@ -115,9 +115,9 @@ jobs:
 2. 点击「撤销」按钮
 3. 确认撤销
 
-<Callout type="warning">
+:::warning
 Token 撤销后立即生效，使用该 Token 的所有请求将被拒绝。请确保在撤销前更新相关的 CI/CD 配置。
-</Callout>
+:::
 
 ## 安全建议
 

@@ -4,7 +4,7 @@ title: 发布热更新
 type: 快速入门
 ---
 
-import { Callout } from "nextra/components";
+
 
 现在你的应用已经具备了检测更新的功能，下面我们来尝试发布并更新它。流程可参考下图：
 
@@ -99,14 +99,13 @@ $ pushy uploadApp harmony/build/outputs/default/harmony-default-unsigned.app
 
 你可以尝试修改一行代码(譬如将版本一修改为版本二)，然后使用`pushy bundle --platform <ios|android|harmony>`命令来生成新的热更新版本。
 
-<Callout type="info">
-  如果你使用了较新版本的`expo`或其他没有`index.js`的框架，执行`bundle`命令时会报错。此时请手动创建一个`index.js`文件，在其中引用框架自身的入口文件即可。具体入口文件的路径如何，请参考框架的说明文档或者`package.json`中的`main`字段。例如针对`expo`的`index.js`可能是如下这样写：
+:::info
+如果你使用了较新版本的`expo`或其他没有`index.js`的框架，执行`bundle`命令时会报错。此时请手动创建一个`index.js`文件，在其中引用框架自身的入口文件即可。具体入口文件的路径如何，请参考框架的说明文档或者`package.json`中的`main`字段。例如针对`expo`的`index.js`可能是如下这样写：
 
 ```js
 import "expo-router/entry";
 ```
-
-</Callout>
+:::
 
 ```bash
 $ pushy bundle --platform android
@@ -187,9 +186,9 @@ Would you like to bind packages to this version?(Y/N)
 
 ### 注意事项
 
-<Callout type="warning">
-  **重要提示**：灰度版本与全量版本是独立的绑定关系。
-</Callout>
+:::warning
+**重要提示**：灰度版本与全量版本是独立的绑定关系。
+:::
 
 - **同时只能有一个灰度版本**：每个原生包版本只能绑定一个灰度热更版本（比例小于100%）和一个全量热更版本
 - **优先级**：如果同时存在灰度版本和全量版本，灰度范围内命中的用户会收到灰度版本，没有命中的用户会收到全量版本

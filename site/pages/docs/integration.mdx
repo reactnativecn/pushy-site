@@ -4,11 +4,11 @@ title: 代码集成
 type: 快速入门
 ---
 
-import { Callout, Steps, Tabs } from "nextra/components";
+import { Steps, Tabs, Tab } from "rspress/theme";
 
-<Callout type="info">
-  请注意，当前版本的api经过了完全重构，与之前的版本(v10.0以下)不兼容。如果你需要查看之前版本的文档，请点击[这里](https://v9--pushy-site.netlify.app/)
-</Callout>
+:::info
+请注意，当前版本的api经过了完全重构，与之前的版本(v10.0以下)不兼容。如果你需要查看之前版本的文档，请点击[这里](https://v9--pushy-site.netlify.app/)
+:::
 
 
 安装配置完成后，确定应用编译顺利通过，下面我们来进行代码集成。
@@ -192,11 +192,11 @@ function App() {
 
 其中`checkUpdate`方法可以用来手动触发更新检查。虽然这个方法会返回[`updateInfo`](api#async-function-checkupdate)（仅限 v10.26.0+ 版本），但我们仍然推荐优先使用`useUpdate()`来获取`updateInfo`。
 
-<Callout type="info">
+:::info
 依赖`useUpdate()`而不是`checkUpdate`来获取`updateInfo`，这样做虽然一开始可能觉得不太直观，但可以将**检查逻辑**和**更新逻辑**完全解耦，使更新流程上的各个组件不需要互相依赖和影响。
 比如检查更新的按钮只管调用`checkUpdate`，某个显示小红点的组件只管从 `useUpdate()` 中获取`updateInfo`，而主要的下载流程可以写一个单独的`useEffect`，这几者之间并不需要考虑先后顺序、组件层级或者传递数据。
 又比如你可能在多处都有检查更新的调用，比如 app 启动时、前后台切换时，又或者使用 deeplink 和扫码，这些不同的检查逻辑也不用重复去实现后续的更新逻辑。
-</Callout>
+:::
 
 
 `updateInfo` 有三种情况：

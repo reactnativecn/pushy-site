@@ -4,7 +4,7 @@ title: API参考
 type: 开发指南
 ---
 
-import { Callout } from "nextra/components";
+
 
 ### JavaScript 方法
 
@@ -129,9 +129,9 @@ interface EventData {
 
 热更相关的工具函数。此方法也可使用别名 `usePushy` 引入。
 
-<Callout type="info">
+:::info
 注意，在使用 `<UpdateProvider>` 的当前组件（一般是根组件）中无法直接调用`useUpdate`，只有当前组件的子组件才能调用。
-</Callout>
+:::
 
 ```js
 const {

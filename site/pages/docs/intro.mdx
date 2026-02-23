@@ -4,14 +4,14 @@ title: 产品简介
 type: 关于
 ---
 
-import { Callout } from "nextra/components";
+
 import { AppleOutlined, AndroidOutlined, HarmonyOSOutlined } from '@ant-design/icons';
 
 # Pushy - 专业的热更新解决方案
 
-<Callout type="info">
+:::info
 **现已全面支持鸿蒙系统以及 React Native 新架构！**
-</Callout>
+:::
 
 Pushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-native-update) <a href="https://www.npmjs.com/package/react-native-update"><img src="https://badge.fury.io/js/react-native-update.svg" alt="npm version" style={{display: 'inline', verticalAlign: 'middle', margin: '0 4px'}} /></a>) 是面向 React Native 应用提供的**专业热更新服务**，由 [React Native 中文网](https://reactnative.cn)独家研发并持续维护。我们致力于为全球 React Native 开发者提供最快速、最稳定、最经济的热更新体验。
 
@@ -45,9 +45,9 @@ Pushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-n
 | **国内速度** | ⭐⭐⭐⭐⭐ 极快 | ⭐⭐ 较慢 |
 | **鸿蒙支持** | ✅ 支持 | ❌ 不支持 |
 
-<Callout type="warning">
+:::warning
 **注意**：Microsoft App Center（Code Push）已于 2025 年 3 月 31 日正式停止服务。如果你正在使用 Code Push，现在正是迁移到 Pushy 的最佳时机！
-</Callout>  
+:::  
 
 使用 Pushy 后，你的团队将获得：
 
@@ -84,9 +84,9 @@ const pushyClient = new Pushy({ appKey });
 2. **[代码集成](/docs/integration)** - 几行代码即可接入
 3. **[发布更新](/docs/publish)** - 一条命令推送新版本
 
-<Callout>
+:::info
 不确定是否适合你的项目？查看[常见问题](/docs/faq)或者可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。
-</Callout>
+:::
 
 
 立即开始使用 Pushy，让你的 React Native 应用拥有极致的热更新体验！
