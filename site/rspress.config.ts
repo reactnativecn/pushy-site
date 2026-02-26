@@ -4,6 +4,7 @@ import { pluginSass } from '@rsbuild/plugin-sass';
 import rspressPluginMermaid from 'rspress-plugin-mermaid';
 
 export default defineConfig({
+  llms: true,
   outDir: 'out',
   root: path.join(__dirname, 'pages'),
   title: 'Pushy 极速热更新',
