@@ -1,0 +1,586 @@
+# 安装配置
+
+:::info
+请注意，当前版本的api经过了完全重构，与之前的版本(v10.0以下)不兼容。如果你需要查看之前版本的文档，请点击[这里](https://v9--pushy-site.netlify.app/)
+:::
+
+首先你应该有一个基于 React Native 开发的应用，我们把具有 package.json 的目录叫做你的`应用根目录`。
+如果你还没有初始化应用，请参阅[开始使用 React Native](https://reactnative.cn/docs/getting-started)。
+
+我们假设你已经拥有了开发 React Native 应用的一切环境，包括`Node.js`、`Xcode`、`Android SDK`等等。
+
+### 安装
+在你的项目根目录下运行以下命令（如果你使用 yarn 等其他包管理器，请自行替换命令）：
+
+**React Native**
+
+```bash
+# 先全局安装命令行工具
+npm i -g react-native-update-cli
+
+# 然后在项目目录中安装热更新模块
+npm i react-native-update
+
+# 如果没有使用 expo，则进入 iOS 目录安装 iOS 模块
+cd ios && pod install
+
+```
+
+
+**Expo**
+
+```bash
+# 先全局安装命令行工具
+npm i -g react-native-update-cli
+
+# 然后在项目目录中安装热更新模块
+npm i react-native-update
+
+# 如果使用 expo, 要求 expo 50 或更高版本，需要使用 prebuild 命令预构建项目
+npx expo prebuild
+
+# 然后进入 iOS 目录安装 iOS 模块
+cd ios && pod install
+
+```
+:::warning
+注意：如果使用
+expo，请不要同时安装`expo-updates`，否则会导致热更新功能冲突。另外，expo 51
+版本以下的新架构支持并不完整，可能无法正常使用。如需使用新架构，建议使用尽可能新的
+expo 版本。
+:::
+
+:::info
+如果下载极慢或者显示网络失败，请设置使用淘宝镜像 `npx nrm use taobao`
+:::
+:::warning
+注意请不要混用`npm/yarn/pnpm`等包管理器及对应的`lock`文件，团队成员请坚持使用同一包管理器，且仅保留统一格式的`lock`文件
+:::
+:::info
+请记得，任意在 ios 和 android 目录下的修改，一定要重新编译（使用 npx
+react-native run-ios 或 run-android 命令编译，或在 Xcode/Android Studio
+中重新编译）才能生效。
+:::
+### 手动 link
+如果 RN 版本 >= 0.60 则不需要此手动 link 步骤。
+:::warning
+注意：如果是混编 RN
+项目，或monorepo，或任何其他自定义的情况，由于自定义的配置可能不完整或不适应RN的目录结构，导致自动
+link 的功能可能不能正常工作。此时即便 RN 版本 >= 0.60，你可能也需要执行手动
+link 操作。
+:::
+#### iOS
+RN < 0.60且使用CocoaPods（推荐）
+1. 在 ios/Podfile 中添加
+```
+pod 'react-native-update', path: '../node_modules/react-native-update'
+```
+2. 在项目的 ios 目录下运行`pod install`
+3. 重新编译
+RN < 0.60且不使用CocoaPods
+1. 在 XCode 中的 Project Navigator 里,右键点击`Libraries` ➜ `Add Files to [你的工程名]`
+2. 进入`node_modules` ➜ `react-native-update` ➜ `ios 并选中`RCTPushy.xcodeproj\`
+3. 在 XCode 中的 project navigator 里,选中你的工程,在 `Build Phases` ➜ `Link Binary With Libraries` 中添加 `libRCTPushy.a`、`libz.tbd`、`libbz2.1.0.tbd`
+4. 继续在`Build Settings`里搜索`Header Search Path`，添加`$(SRCROOT)/../node_modules/react-native-update/ios`，勾选`recursive`。
+5. 在`Build Phases`添加一个`New Run Script Phase`运行脚本，内容如下
+```
+#!/bin/bash
+set -x
+DEST="../node_modules/react-native-update/ios/"
+date +%s > "$DEST/pushy_build_time.txt"
+```
+7. 尝试编译一下，顺利的话就会在`../node_modules/react-native-update/ios/`文件夹下面生成一个`pushy_build_time.txt`文件。然后在`Copy Bundle Resources`里把生成的`pushy_build_time.txt`文件添加进去。
+#### Android
+RN < 0.60 或其他不能自动 link 的情况
+1. 在`android/settings.gradle`中添加如下代码:
+
+   ```
+   include ':react-native-update'
+   project(':react-native-update').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-update/android')
+   ```
+
+2. 在`android/app/build.gradle`的 dependencies 部分增加如下代码:
+
+   ```
+   implementation project(':react-native-update')
+   ```
+
+3. 打开`android/app/src/main/java/[...]/MainApplication.java`,
+- 在文件开头增加 `import cn.reactnative.modules.update.UpdatePackage;`
+- 在`getPackages()` 方法中增加 `new UpdatePackage()`(注意上一行可能要增加一个逗号)
+### 配置 Bundle URL
+如果你使用 `expo` 48 或更高版本，且 `react-native-update` >= 10.28.2，则可以自动配置 bundle url，请直接去往[下一个步骤](#添加测试用的-deep-link)。
+如果你没有使用 `expo`，或 `expo` 版本低于 48，则需要按以下步骤手动配置。
+#### iOS
+在你的 AppDelegate.mm 或 AppDelegate.m 或 AppDelegate.swift 文件（不同 RN 版本可能后缀名不同）中增加如下代码：
+:::warning
+注意：如果你是混编原生的项目，务必注意**不能直接指定 bundleURL 来初始化**
+rootView，需要先使用`initWithDelegate`方法来初始化
+bridge，然后使用`initWithBridge`方法来初始化
+rootView。否则热更新功能可能无法正常工作。
+:::
+
+**Objective-C**
+
+```c
+// ... 其它代码
+#import "AppDelegate.h"
+
+#import "RCTPushy.h"  // <-- import头文件，注意要放到if条件外面
+
+// 可能项目里有一些条件编译语句，例如有些版本RN自带的flipper
+// #if DEBUG
+// 注意**不要**在这里面引入"RCTPushy.h"
+// #import <FlipperKit/FlipperClient.h>
+// ...
+// #endif
+
+
+// rn 版本 >= 0.74 需要修改 bundleURL 方法
+- (NSURL *)bundleURL
+{
+#if DEBUG
+  // 原先DEBUG这里的写法不作修改
+  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
+#else
+  return [RCTPushy bundleURL];  // <--  把这里非DEBUG的情况替换为热更新bundle
+#endif
+}
+
+
+// rn 版本 < 0.74 需要修改sourceURLForBridge方法
+- (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
+{
+#if DEBUG
+  // 原先DEBUG这里的写法不作修改
+  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
+#else
+  return [RCTPushy bundleURL];  // <--  把这里非DEBUG的情况替换为热更新bundle
+#endif
+}
+
+```
+
+
+**Swift**
+
+```swift
+import UIKit
+import React
+import React_RCTAppDelegate
+import ReactAppDependencyProvider
+import react_native_update    // <-- 在这里引入，需要 pushy v10.22.0+ 版本
+
+
+@main
+class AppDelegate: RCTAppDelegate {
+  // ... 其他代码
+
+  override func bundleURL() -> URL? {
+#if DEBUG
+    // 原先 DEBUG 这里的写法不作修改(所以 DEBUG 模式下不可热更新)
+    RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+#else
+    RCTPushy.bundleURL()  // <--  把这里非 DEBUG 的情况替换为热更新 bundle
+#endif
+  }
+}
+```
+
+#### Android
+在 MainApplication 中增加如下代码（如果是混编原生的项目或其他原因没有使用 ReactApplication，请[使用此 api 集成](/docs/api.md#updatecontextsetcustominstancemanagerreactinstancemanager-instancemanager))：
+
+**Kotlin（RN 0.82 或以上）**
+
+```kotlin
+// ... 其它代码
+
+// ↓↓↓请注意不要少了这句import
+import cn.reactnative.modules.update.UpdateContext
+// ↑↑↑
+
+class MainApplication : Application(), ReactApplication {
+
+  override val reactHost: ReactHost by lazy {
+    getDefaultReactHost(
+      context = applicationContext,
+      packageList =
+        PackageList(this).packages.apply {
+          // Packages that cannot be auto-linked yet can be added manually here, for example:
+          // add(MyReactNativePackage())
+        },
+      // ↓↓↓ 添加下面这一段参数
+      jsBundleFilePath = UpdateContext.getBundleUrl(this),
+      // ↑↑↑
+    )
+  }
+
+  // ...其他代码
+}
+
+
+```
+
+
+**Kotlin（RN 0.81 或以下）**
+
+```kotlin
+// ... 其它代码
+
+// ↓↓↓请注意不要少了这句import
+import cn.reactnative.modules.update.UpdateContext
+// ↑↑↑
+
+class MainApplication : Application(), ReactApplication {
+
+  override val reactNativeHost: ReactNativeHost =
+      object : DefaultReactNativeHost(this) {
+
+        // ↓↓↓将下面这一段添加到 DefaultReactNativeHost 内部！
+        override fun getJSBundleFile(): String? {
+          return UpdateContext.getBundleUrl(this@MainApplication)
+        }
+        // ↑↑↑
+
+        // ...其他代码
+      }
+}
+```
+
+
+**Java**
+
+```java
+// ... 其它代码
+
+// ↓↓↓请注意不要少了这句import
+import cn.reactnative.modules.update.UpdateContext;
+// ↑↑↑
+
+public class MainApplication extends Application implements ReactApplication {
+
+  private final ReactNativeHost mReactNativeHost =
+    // 老版本 RN 这里可能是 new ReactNativeHost(this)
+    new DefaultReactNativeHost(this) {
+
+    // ↓↓↓将下面这一段添加到 DefaultReactNativeHost 内部！
+    @Override
+    protected String getJSBundleFile() {
+        return UpdateContext.getBundleUrl(MainApplication.this);
+    }
+    // ↑↑↑
+
+    // ...其他代码
+  }
+}
+```
+
+:::info
+请记得，任意在 ios 和 android 目录下的修改，一定要重新编译（npx react-native
+run-ios 或 run-android 命令编译，或在 Xcode/Android Studio
+中重新编译）才能生效。
+:::
+#### Harmony
+在 `harmony/entry/src/main/cpp/CMakeLists.txt` 中增加如下依赖：
+```c
+add_subdirectory("${OH_MODULES}/pushy/src/main/cpp" ./pushy)
+target_link_libraries(rnoh_app PUBLIC rnoh_pushy)
+```
+在 `harmony/entry/src/main/cpp/PackageProvider.cpp` 中增加如下依赖：
+```c
+#include "RNOH/PackageProvider.h"
+#include "PushyPackage.h"
+using namespace rnoh;
+
+std::vector<std::shared_ptr<Package>> PackageProvider::getPackages(Package::Context ctx) {
+    return {
+         std::make_shared<PushyPackage>(ctx)
+    };
+}
+```
+在 `harmony/entry/oh-package.json5` 中增加如下依赖：
+```json5
+"dependencies": {
+  "pushy": "file:../../node_modules/react-native-update/harmony/pushy",
+
+}
+```
+在 `harmony/build-profile.json5` 中增加如下配置：
+```json5
+  modules: [
+    // ↓↓↓将下面这一段添加到 modules 内部！
+    {
+      name: 'pushy',
+      srcPath: '../node_modules/react-native-update/harmony/pushy',
+    },
+  ],
+```
+在 `harmony/hvigor/hvigor-config.json5` 中增加如下配置：
+```json5
+{
+  dependencies: {
+    pushy: "file:../../node_modules/react-native-update/harmony/pushy",
+  },
+}
+```
+在 `harmony/entry/hvigorfile.ts` 中增加如下配置：
+```ts
+import { hapTasks } from "@ohos/hvigor-ohos-plugin";
+import { reactNativeUpdatePlugin } from "pushy/hvigor-plugin";
+
+export default {
+  system: hapTasks /* Built-in plugin of Hvigor. It cannot be modified. */,
+  plugins: [
+    reactNativeUpdatePlugin(),
+  ] /* Custom plugin to extend the functionality of Hvigor. */,
+};
+```
+在 `harmony/entry/src/main/ets/RNPackagesFactory.ts` 代码如下：
+```ts
+import type {
+  RNPackageContext,
+  RNPackage,
+} from "@rnoh/react-native-openharmony/ts";
+import { PushyPackage } from "pushy/ts";
+
+export function createRNPackages(ctx: RNPackageContext): RNPackage[] {
+  return [new PushyPackage(ctx)];
+}
+```
+在 `harmony/entry/src/main/ets/pages/Index.ets` 中增加如下代码：
+```ts
+// ... 其它代码
+
+// ↓↓↓请注意不要少了这句import
+import { PushyFileJSBundleProvider } from 'pushy/src/main/ets/PushyFileJSBundleProvider';
+// ↑↑↑
+
+@Entry
+@Component
+struct Index {
+  @StorageLink('RNOHCoreContext') private rnohCoreContext: RNOHCoreContext | undefined = undefined
+  @State shouldShow: boolean = false
+
+  aboutToAppear(): void {
+    this.shouldShow = true
+  }
+
+  onBackPress(): boolean | undefined {
+    // NOTE: this is required since `Ability`'s `onBackPressed` function always
+    // terminates or puts the app in the background, but we want Ark to ignore it completely
+    // when handled by RN
+    this.rnohCoreContext!.dispatchBackPress()
+
+    // this.preferences = preferences.getPreferencesSync(this.context, {name:'update'});
+    return true
+  }
+
+  build() {
+    Column() {
+      if (this.rnohCoreContext && this.shouldShow) {
+        RNApp({
+          // ... 其他代码
+          jsBundleProvider: new TraceJSBundleProviderDecorator(
+            new AnyJSBundleProvider([
+              // MetroJSBundleProvider.fromServerIp('127.0.0.1'),
+              // new ResourceJSBundleProvider(rnohCoreContext.uiAbilityContext.resourceManager, 'hermes_bundle.hbc'),
+              // ↓↓↓将下面这一段添加到 AnyJSBundleProvider 内部！
+              new PushyFileJSBundleProvider(this.rnohCoreContext.uiAbilityContext),
+
+              // 注意无论是否使用 hermes 格式，请保持 bundle 文件名为 bundle.harmony.js
+              new ResourceJSBundleProvider(this.rnohCoreContext.uiAbilityContext.resourceManager, 'bundle.harmony.js')
+            ]),
+            this.rnohCoreContext.logger),
+        })
+      }
+    }
+    .height('100%')
+    .width('100%')
+  }
+}
+```
+:::info
+请记得，任意在 ios 和 android 目录下的修改，一定要重新编译（npx react-native
+run-ios 或 run-android 命令编译，或在 Xcode/Android Studio
+中重新编译）才能生效。
+:::
+### 覆盖 android 的 onCreate
+如果你有安装 `react-native-screens` (使用 `react-navigation` 一般都会要求安装)，则安卓端在热更后重启可能会白屏。此时需要在 Android 的 `MainActivity` 中设置 `RNScreensFragmentFactory`，以确保 Fragment 恢复流程一致，避免崩溃。注意不要把这段覆盖写在 `MainActivityDelegate` 里，而是直接放在 `MainActivity` 中。
+更多说明可以参考 `react-native-screens` 的 [readme](https://github.com/software-mansion/react-native-screens?tab=readme-ov-file#android)
+
+**Kotlin**
+
+```kotlin
+// android/app/src/main/java/[...]/MainActivity.kt
+import android.os.Bundle
+import com.swmansion.rnscreens.fragment.restoration.RNScreensFragmentFactory
+
+class MainActivity : ReactActivity() {
+  // ...其他代码
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    supportFragmentManager.fragmentFactory = RNScreensFragmentFactory()
+    super.onCreate(savedInstanceState)
+    // 如果你用的版本比较老，没有 RNScreensFragmentFactory，则使用下面的写法
+    // super.onCreate(null)
+  }
+}
+```
+
+
+**Java**
+
+```java
+// android/app/src/main/java/[...]/MainActivity.java
+import android.os.Bundle;
+import com.swmansion.rnscreens.fragment.restoration.RNScreensFragmentFactory;
+
+public class MainActivity extends ReactActivity {
+  // ...其他代码
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    getSupportFragmentManager().setFragmentFactory(new RNScreensFragmentFactory());
+    super.onCreate(savedInstanceState);
+    // 如果你用的版本比较老，没有 RNScreensFragmentFactory，则使用下面的写法
+    // super.onCreate(null);
+  }
+}
+```
+
+### 添加测试用的 Deep Link
+此步骤可以极其便利的在和用户完全一致的环境中安全地测试热更新，无需额外的设备注册步骤，也不影响现有的热更新流程。
+
+**Android**
+
+在 `android/app/src/main/AndroidManifest.xml` 中添加如下代码：
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+
+    <!-- 其他代码 -->
+
+    <!-- ↓↓↓ 注意 activity 的 launchMode 需要设置为 singleTask -->
+    <activity
+      android:launchMode="singleTask">
+      <!-- ↑↑↑ -->
+
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+
+      <!-- ↓↓↓ 添加如下 intent-filter， 注意和上面的 intent-filter 是不同的 action 和 category -->
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <!-- 添加你自定义的 scheme -->
+        <data android:scheme="你自定义的协议名，请不要和常见协议名或其他app冲突" />
+      </intent-filter>
+      <!-- ↑↑↑ -->
+
+    </activity>
+  </application>
+</manifest>
+```
+
+
+**iOS**
+
+请参考 [React Native 的文档](https://reactnative.cn/docs/next/linking#%E5%90%AF%E7%94%A8-deep-links)
+
+***
+在完成上述配置并编译，并且日后上传了热更包，在后台能看到热更版本之后，你就可以将鼠标移到网页后台的二维码图标上，如下图所示：
+<img alt="Deep Link二维码" src={image0} />
+勾选`使用 Deep Link`选项，在后面的输入框中填入你自定义的协议名，在二维码刷新后，即可在设备上直接使用系统相机或扫码功能（注意不能使用微信扫码）来扫描，即可自动触发热更检查功能。
+第一次扫码后可能只是触发服务器任务队列，会弹出提示 10 秒后重新扫码，此时会获得热更包，触发内置或自定义的更新策略。
+注意如果你使用自定义的更新策略，请务必从`useUpdate()`中获取`updateInfo`，而不要依赖`checkUpdate`方法的返回值，否则扫码不会有后续动作。
+### 禁用 android 的 crunch 优化
+android 会在生成 apk 时自动对 png 图片进行压缩，此操作既耗时又影响增量补丁的生成。为了保证补丁能正常生成，您需要在`android/app/build.gradle`中关闭此操作：
+```groovy
+// 在 android/app/build.gradle 文件中
+
+android {
+    // ...
+    signingConfigs {
+      // ...
+    }
+    buildTypes {
+        release {
+            // ...
+            // 添加下面这行以禁用crunch
+            crunchPngs false
+        }
+    }
+}
+
+```
+### 禁用 aab 包的资源分割（如果你需要在 Google Play 上架）
+如果你需要打 aab 包以在 Google Play 上架，且 react-native-update 版本 低于 10.36.0，则需要禁用 aab 包的资源分割。若已升级到 10.36.0+ 版本，则不需要此设置。
+```groovy
+// 在 android/app/build.gradle 文件中
+
+android {
+    bundle {
+        density {
+            // 请禁用资源分割
+            // 否则热更后可能遇到图片无法显示的问题
+            // v10.36.0 版本之后不需要此设置
+            enableSplit = false
+        }
+    }
+}
+
+```
+### 登录与创建应用
+首先请在 [https://pushy-admin.reactnative.cn](https://pushy-admin.reactnative.cn) 注册帐号，然后在你的项目根目录下运行以下命令：
+```bash
+$ pushy login
+email: <输入你的注册邮箱>
+password: <输入你的密码>
+```
+这会在项目文件夹下创建一个`.update`文件，注意不要把这个文件上传到 Git 等 CVS 系统上。你可以在`.gitignore`末尾增加一行`.update`来忽略这个文件。
+登录之后可以创建应用。注意 iOS 平台、安卓平台、鸿蒙平台需要分别创建：
+```bash
+$ pushy createApp --platform ios
+App Name: <输入应用名字>
+$ pushy createApp --platform android
+App Name: <输入应用名字>
+$ pushy createApp --platform harmony
+App Name: <输入应用名字>
+```
+:::info
+应用的名字可以相同，这没有关系。
+:::
+如果你已经在网页端或者其它地方创建过应用，也可以直接选择应用：
+```bash
+$ pushy selectApp --platform ios
+1) 鱼多多(ios)
+2) 招财旺(ios)
+
+Total 2 ios apps
+Enter appId: <输入应用前面的编号>
+```
+选择或者创建过应用后，你将可以在文件夹下看到`update.json`文件，其内容类似如下形式：
+```bash
+{
+    "ios": {
+        "appId": 1,
+        "appKey": "<一串随机字符串>"
+    },
+    "android": {
+        "appId": 2,
+        "appKey": "<一串随机字符串>"
+    },
+    "harmony": {
+        "appId": 3,
+        "appKey": "<一串随机字符串>"
+    }
+}
+```
+你可以安全的把`update.json`上传到 Git 等 CVS 系统上，与你的团队共享这个文件，它不包含任何敏感信息。当然，他们在使用任何功能之前，都必须首先输入`pushy login`进行登录。
+至此应用的创建/选择就已经成功了。下一步，你需要给代码添加相应的功能，请参阅[代码集成](/docs/integration.md)。
+
+```
+```

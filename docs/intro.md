@@ -1,0 +1,83 @@
+# Pushy - 专业的热更新解决方案
+
+:::info
+**现已全面支持鸿蒙系统以及 React Native 新架构！**
+:::
+
+Pushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-native-update)
+ [![npm version](https://badge.fury.io/js/react-native-update.svg)](https://www.npmjs.com/package/react-native-update)) 是面向 React Native 应用提供的**专业热更新服务**
+，由 [React Native 中文网](https://reactnative.cn)
+独家研发并持续维护。我们致力于为全球 React Native 开发者提供最快速、最稳定、最经济的热更新体验。
+## 🚀 为什么选择 Pushy？
+
+### 极致的更新体验
+
+- **🎯 超小更新包**：基于 bsdiff/hdiff 算法的增量更新，通常只需**几十至几百 KB**（相比其他全量更新服务的几十 MB，节省流量 99%+）
+- **⚡️ 极速分发**：国内用户使用阿里云高速 CDN，国外用户智能分流至 Cloudflare，在各地区都使用覆盖率最好的 CDN 服务商，更新成功率高达 **99.9%+**
+- **🛡️ 安全可靠**：内置崩溃回滚机制，出现问题自动回退，确保应用稳定运行
+- **🌐 全平台覆盖**：完美支持 <AppleOutlined style={{fontSize: '16px', color: '#555', marginRight: '6px'}} /> **iOS** <AndroidOutlined style={{fontSize: '16px', color: '#3DDC84', marginRight: '6px'}} /> **Android**, 且业内独家第一方支持 <HarmonyOSOutlined style={{fontSize: '16px', color: '#000', marginRight: '6px'}} /> **鸿蒙（HarmonyOS）**
+- **🔍 深耕 React Native 生态**：
+  - ✅ **Expo** - 无缝集成
+  - ✅ **新架构** - 第一时间跟进支持
+  - ✅ **Hermes** - 完整支持字节码格式
+- **📖 核心逻辑完全开源**：客户端、命令行工具以及管理界面代码都[完全开源](https://github.com/reactnativecn)，接受社区审计，代码透明可信，你可以随时迁移到自建服务器或其他服务
+- **🔒 数据安全**：可以自行插入数据埋点，完全掌控自己的数据
+- **💬 专业人工支持**：提供付费专人技术支持，有问必答，确保你的应用稳定运行
+- **🏆 多年稳定运营**：从 2016 年开始运营至今，服务众多知名企业和应用
+
+## 💰 性价比之选
+
+相比同类服务，Pushy 不仅功能更强大，价格也更亲民：
+
+| 对比项       | Pushy        | Expo Update |
+| --------- | ------------ | ----------- |
+| **起步价**   | ¥66/月        | \~¥136/月    |
+| **流量计费**  | 不单独计费        | 超出需额外付费     |
+| **更新包大小** | 几十至几百 KB（增量） | 几十 MB（全量）   |
+| **国内速度**  | ⭐⭐⭐⭐⭐ 极快     | ⭐⭐ 较慢       |
+| **鸿蒙支持**  | ✅ 支持         | ❌ 不支持       |
+
+:::warning
+**注意**：Microsoft App Center（Code Push）已于 2025 年 3 月 31 日正式停止服务。如果你正在使用 Code Push，现在正是迁移到 Pushy 的最佳时机！
+:::
+
+使用 Pushy 后，你的团队将获得：
+
+- ✅ **节省 90% 以上的流量成本**
+- ✅ **发版速度提升 10 倍以上**（无需等待应用商店审核）
+- ✅ **Bug 修复时间缩短至分钟级**
+- ✅ **用户更新率提升至 99%+**（相比应用商店的自然更新率）
+- ✅ **开发迭代更加灵活自由**
+
+### 简单易用
+
+```js
+// 三行代码即可集成
+import { UpdateProvider, Pushy } from "react-native-update";
+
+const pushyClient = new Pushy({ appKey });
+
+<UpdateProvider client={pushyClient}>
+  <App />
+</UpdateProvider>
+```
+
+内置多种更新策略，开箱即用：
+
+- 🔕 **静默更新** - 后台自动下载，用户无感知
+- 💬 **提示更新** - 友好的系统弹窗提醒
+- ⚙️ **自定义策略** - 完全可控的更新流程
+
+## 🚦 开始使用
+
+只需三步，即可为你的 React Native 应用添加热更新能力：
+
+1. **[安装配置](/docs/getting-started.md)** - 5 分钟完成基础配置
+2. **[代码集成](/docs/integration.md)** - 几行代码即可接入
+3. **[发布更新](/docs/publish.md)** - 一条命令推送新版本
+
+:::info
+不确定是否适合你的项目？查看[常见问题](/docs/faq.md)或者可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。
+:::
+
+立即开始使用 Pushy，让你的 React Native 应用拥有极致的热更新体验！

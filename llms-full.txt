@@ -1,0 +1,2647 @@
+---
+url: /docs/api-token.md
+---
+
+# API Token
+
+API Token 是一种用于在 CI/CD 流程或自动化脚本中调用 [Pushy API](https://update.reactnative.cn/api/openapi) 的认证方式。相比直接使用账号密码，API Token 更加安全且便于管理。
+
+## 使用场景
+
+- **持续集成/持续部署 (CI/CD)**：在 GitHub Actions、GitLab CI、Jenkins 等平台中自动发布热更新
+- **自动化脚本**：编写脚本批量管理应用、版本或原生包
+- **第三方工具集成**：将 Pushy 与其他开发工具集成
+
+## 创建 API Token
+
+1. 登录 [Pushy 管理后台](https://pushy-admin.reactnative.cn)
+2. 在左侧菜单中点击「API Token」
+3. 点击「创建 Token」按钮
+4. 填写 Token 名称（如：CI/CD Pipeline）
+5. 选择所需权限
+6. 可选设置过期时间
+7. 点击创建后，**立即复制并安全保存 Token**
+
+:::warning
+Token 只会在创建时显示一次，之后无法再次查看。请务必在创建后立即复制保存！
+:::
+
+## 权限说明
+
+| 权限              | 说明                 |
+| --------------- | ------------------ |
+| **读取 (read)**   | 查看应用、版本、原生包信息      |
+| **写入 (write)**  | 创建和更新应用、发布版本、上传原生包 |
+| **删除 (delete)** | 删除应用、版本、原生包        |
+
+:::info
+创建 Token 时至少需要选择一个权限。根据实际需求选择最小必要权限是最佳实践。
+:::
+
+## 使用 Token 调用 API
+
+在调用 Pushy API 时，将 Token 添加到请求头中：
+
+```bash
+curl -X GET "https://update.reactnative.cn/api/app/list" \
+  -H "x-api-token: YOUR_API_TOKEN"
+```
+
+### 在命令行工具中使用
+
+如果使用 `react-native-update-cli` 命令行工具（需 v2.7.0+），可以通过环境变量设置 Token：
+
+```bash
+export PUSHY_API_TOKEN=your_api_token_here
+pushy bundle --platform android
+```
+
+### 在 CI/CD 中使用
+
+以 GitHub Actions 为例：
+
+```yaml
+# .github/workflows/publish.yml
+name: Publish Hot Update
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: npm install && npm i -g react-native-update-cli
+        
+      - name: Publish update
+        env:
+          PUSHY_API_TOKEN: ${{ secrets.PUSHY_API_TOKEN }}
+        run: pushy bundle --platform android
+```
+
+:::tip
+在 CI/CD 环境中，建议将 Token 存储在密钥管理中（如 GitHub Secrets），而不是直接写入代码。
+:::
+
+## 管理 Token
+
+### 查看 Token 列表
+
+在「API Token」页面可以看到所有已创建的 Token，包括：
+
+- Token 名称
+- 权限
+- 过期时间
+- 最后使用时间
+- 状态（正常/已过期/已撤销）
+
+### 撤销 Token
+
+如果 Token 泄露或不再需要，可以随时撤销：
+
+1. 在 Token 列表中找到目标 Token
+2. 点击「撤销」按钮
+3. 确认撤销
+
+:::warning
+Token 撤销后立即生效，使用该 Token 的所有请求将被拒绝。请确保在撤销前更新相关的 CI/CD 配置。
+:::
+
+## 安全建议
+
+1. **最小权限原则**：只授予 Token 必要的权限
+2. **设置过期时间**：为临时使用的 Token 设置合理的过期时间
+3. **定期轮换**：定期撤销旧 Token 并创建新 Token
+4. **安全存储**：不要将 Token 提交到代码仓库，使用环境变量或密钥管理工具
+5. **监控使用**：定期检查 Token 的最后使用时间，及时清理不再使用的 Token
+
+## 限制
+
+- 每个用户最多可创建 **10 个** API Token
+- 如需创建更多，请先撤销不再使用的 Token
+
+
+
+---
+url: /docs/api.md
+---
+
+# API参考
+
+### JavaScript 方法
+
+#### new Pushy(options: PushyOptions)
+
+创建 Pushy 热更新服务实例，其构造参数如下：
+
+```ts
+interface PushyOptions {
+  // 必填，通过pushy createApp或selectApp命令，或在网页管理端获取
+  appKey: string;
+
+  // 自定义日志输出，也可用于上报统计数据
+  logger?: ({ type, data }: { type: EventType; data: EventData }) => void;
+
+  // 触发自动检查更新的策略
+  checkStrategy?:
+    | "onAppStart" // 仅在app启动时
+    | "onAppResume" // 仅在app从后台切换到前台时
+    | "both"; // 默认值，同时包含前两个场景
+    | null; // 不自动检查更新，必须手动调用checkUpdate方法，此选项需 v10.4.2+ 版本
+
+  // 自动下载和应用更新的策略
+  updateStrategy?:
+    | "alwaysAlert" // 调试环境（__DEV__）默认值，使用系统默认的alert页面提示热更且会在有报错时弹出提示
+    | "alertUpdateAndIgnoreError" // 生产环境默认值，在有热更时使用系统默认的alert页面提示热更，但不弹出任何报错提示
+    | "silentAndNow" // 自动静默下载并立刻应用热更
+    | "silentAndLater"; // 自动静默下载，但仅在用户退出app后重启时应用更新
+    | null; // 不自动下载和应用更新，如需自定义热更界面请选择此项
+
+  // 是否在热更重启后自动标记为成功，默认为true
+  // 一般情况下不建议手动标记
+  autoMarkSuccess?: boolean;
+
+  // 是否在若干ms后自动清除最后的报错，默认为不清除
+  dismissErrorAfter?: number;
+
+  // 是否在开发环境中检查热更，默认为false。如需在开发环境中调试热更，请打开此选项。
+  // 但即便打开此选项，也仅能检查、下载热更，并不能实际应用热更。实际应用热更必须在release包中进行。
+  // 此选项需 v10.4.2+ 版本
+  debug?: boolean;
+
+  // 是否在调用 checkUpdate 和 downloadUpdate 时抛出错误，默认为不抛出错误，通过 lastError 获取错误信息
+  // 启用后可以使用 try catch 语句 捕获错误，同时 lastError 也仍然可用
+  // try {
+  //   await checkUpdate();
+  // } catch (e) {
+  //   console.error(e);
+  // }
+  // 此选项需 v10.15.2+ 版本
+  throwError?: boolean;
+
+  // 在检查更新前执行，返回 false 则取消检查更新
+  // 此选项需 v10.12.0+ 版本
+  beforeCheckUpdate?: () => Promise<boolean>;
+
+  // 在下载更新前执行，返回 false 则取消下载更新，可以配合自定义的 metaInfo 做一些条件控制
+  // 此选项需 v10.12.0+ 版本
+  beforeDownloadUpdate?: (info: UpdateInfo) => Promise<boolean>;
+
+  // 在下载更新后执行，返回 false 则取消内置策略进一步执行，可以配合自定义的 metaInfo 做一些条件控制
+  // 此选项需 v10.27.0+ 版本
+  afterDownloadUpdate?: (info: UpdateInfo) => Promise<boolean>;
+
+  // 在原生包过期时执行，返回 false 则取消内置策略进一步执行，可以配合自定义的 metaInfo 做一些条件控制
+  // 此选项需 v10.28.2+ 版本
+  onPackageExpired?: (info: UpdateInfo) => Promise<boolean>;
+}
+
+// 日志事件类型
+type EventType =
+  // 更新失败，重启后发生回滚
+  | "rollback"
+  // 检查更新时报错
+  | "errorChecking"
+  // 正在发起检查
+  | "checking"
+  // 正在下载更新
+  | "downloading"
+  // 已下载更新
+  | "downloadSuccess"
+  // 更新失败
+  | "errorUpdate"
+  // 更新成功
+  | "markSuccess"
+  // 下载apk
+  | "downloadingApk"
+  // 下载apk前申请存储权限被用户拒绝
+  | "rejectStoragePermission"
+  // 下载apk前申请存储权限发生错误
+  | "errorStoragePermission"
+  // 下载apk时发生错误
+  | "errorDownloadAndInstallApk";
+
+// 日志事件数据
+interface EventData {
+  // 当前已完成的热更hash值，如尚未热更则为空字符串
+  currentVersion: string;
+  // 客户端版本信息
+  cInfo: {
+    rnu: string; // 当前 react-native-update 版本
+    rn: string; // 当前 react-native 版本
+    os: string; // 当前操作系统及版本
+    uuid: string; // 用户标识符
+  };
+  // 客户端原生版本号
+  packageVersion: string;
+  // 编译时间戳
+  buildTime: number;
+  // 报错相关的信息
+  message?: string;
+  // 发生回滚的版本hash值
+  rolledBackVersion?: string;
+  // 更新失败的新版本hash值
+  newVersion?: string;
+  // 其他一些数据
+  [key: string]: any;
+}
+```
+
+#### useUpdate()
+
+热更相关的工具函数。此方法也可使用别名 `usePushy` 引入。
+
+:::info
+注意，在使用 `<UpdateProvider>` 的当前组件（一般是根组件）中无法直接调用`useUpdate`，只有当前组件的子组件才能调用。
+:::
+
+```js
+const {
+  checkUpdate,
+  switchVersion,
+  switchVersionLater,
+  markSuccess,
+  dismissError,
+  downloadUpdate,
+  downloadAndInstallApk,
+  getCurrentVersionInfo,
+  currentVersionInfo,
+  parseTestQrCode,
+  currentHash,
+  packageVersion,
+  client,
+  progress,
+  updateInfo,
+  lastError,
+  restartApp,
+} = useUpdate();
+```
+
+其类型定义和功能如下：
+
+```ts
+interface UpdateContext {
+  // 检查更新（注意在 v10.26.0 版本之前，`checkUpdate`方法本身没有返回值，只能从`useUpdate()`返回的`updateInfo`中获取）
+  // 我们也仍然推荐优先从`useUpdate()`中获取`updateInfo`
+  checkUpdate: () => Promise<void | UpdateInfo>;
+  // 下载热更完成后调用，立即重启切换新版本
+  switchVersion: () => void;
+  // 下载热更完成后调用，用户手动重启app后切换新版本（静默更新）
+  switchVersionLater: () => void;
+  // 热更完成重启后，手动标记热更完成
+  markSuccess: () => void;
+  // 清除最后的报错状态
+  dismissError: () => void;
+  // 下载热更, v10.16.0+ 版本返回值为`boolean`，表示是否下载成功
+  downloadUpdate: () => Promise<boolean | void>;
+  // 下载并安装apk
+  downloadAndInstallApk: (url: string) => Promise<void>;
+  // 异步获取当前已热更版本的信息，v10.31.2 版本后用 `currentVersionInfo` 代替
+  getCurrentVersionInfo: () => Promise<{
+    name?: string;
+    description?: string;
+    metaInfo?: string;
+  }>;
+  // 当前已热更版本的信息，需 v10.31.2+ 版本
+  currentVersionInfo: {
+    name?: string;
+    description?: string;
+    metaInfo?: string;
+  };
+  // 解析测试二维码，此方法需 v10.11.2+ 版本
+  parseTestQrCode: (qrCode: string) => void;
+  // 当前的版本hash
+  currentHash: string;
+  // 当前的原生版本号
+  packageVersion: string;
+  // 当前的pushy热更服务实例
+  client?: Pushy;
+  // 下载开始后的进度数据
+  progress?: {
+    hash: string;
+    // 已下载的字节数
+    received: number;
+    // 待下载的总字节数
+    total: number;
+  };
+  // 热更相关信息
+  updateInfo?: {
+    // 已是最新版本，无需热更
+    upToDate?: true;
+    // 当前原生版本已过期，需要下载新的原生版本
+    expired?: true;
+    // 在pushy网页管理端设置的原生版本下载地址
+    downloadUrl?: string;
+    // 是否存在新的热更
+    update?: true;
+    // 新热更的版本名称
+    name?: string;
+    // 新热更的hash值
+    hash?: string;
+    // 新热更的更新说明
+    description?: string;
+    // 新热更携带的额外元数据
+    metaInfo?: string;
+    // 当前热更是否已暂停
+    paused?:
+      | "app" // 当前应用所有原生版本暂停
+      | "package" // 仅当前原生版本暂停
+      | "quota"; // 因检查次数超限而暂停
+    // 其他信息
+    message?: string;
+  };
+  // 检查、下载、应用热更等过程中的最近一次报错
+  lastError?: Error;
+}
+```
+
+***
+
+#### async function checkUpdate()
+
+触发更新检查，返回`updateInfo`（注意在 v10.26.0 版本之前，`checkUpdate`方法本身没有返回值，只能从`useUpdate()`返回的`updateInfo`中获取，且我们仍然推荐优先使用`useUpdate()`来获取），返回值有三种情形：
+
+1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），需要引导用户下载或跳转到应用市场(需要在网页管理端设置中填写`downloadUrl`)。如需在应用内执行 apk 更新，还需配置[安装权限](/docs/api.md#async-function-downloadandinstallapkurl)。
+
+```js
+{
+    expired: true,
+    downloadUrl: 'http://appstore/downloadUrl',
+}
+```
+
+2. `{upToDate: true}`：当前已经更新到最新，无需进行更新。
+
+3. `{update: true}`：当前有新版本可以更新。`name`、`description`字段可以用于展示给用户版本号，更新内容等信息，而`metaInfo`字段则可以根据你的需求自定义一些标记(如是否静默更新、是否强制更新等等，自己根据标记的属性做一些条件流程控制)，具体用法可参考[场景实践](/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了热更新文件的下载地址，
+
+```js
+{
+    update: true,
+    name: '1.0.3-rc',
+    hash: 'hash',
+    description: '添加聊天功能\n修复商城页面BUG',
+    metaInfo: '{"silent":true}',
+    pdiffUrl: 'http://update-packages.reactnative.cn/hash',
+    diffUrl: 'http://update-packages.reactnative.cn/hash',
+}
+```
+
+***
+
+#### async function downloadUpdate()
+
+下载热更包。仅当`update:true`时实际进行下载。会更新`progress`数据。v10.16.0+ 版本返回值为`boolean`，表示是否下载成功。
+
+***
+
+#### async function downloadAndInstallApk(url)
+
+下载更新的 apk 包并直接安装。`url`必须为可直接下载到 apk 文件的地址。
+
+由于系统安全限制等各种外部因素，此功能并不能保证一定正常调用。在应用当前运行周期内，如果下载或者安装失败，则再次调用时不会重试，只会静默失败。
+
+注意要使用这个功能还需要在`AndroidManifest.xml`中手动添加安装权限，如果需要考虑 Android 7.0 以下的客户，则还需要添加外部存储权限。
+
+```xml
+<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+<!-- 如果需要考虑Android 7.0以下的客户，则还需要添加外部存储权限 -->
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+```
+
+注意某些应用市场可能会因为上述权限拒绝应用上架。去掉上述两个权限并不影响热更新功能。
+
+***
+
+#### function markSuccess()
+
+**一般情况下请勿手动调用此函数**。调用此函数作为更新成功的标记（否则下次启动会默认失败自动回滚）。
+
+***
+
+#### async function getCurrentVersionInfo()
+
+获取当前已热更版本的信息（如尚未热更过则返回空对象）。v10.31.2 版本之后可以直接用 `currentVersionInfo` 代替。
+
+返回值示例：
+
+```js
+{
+    name: '1.0.3-rc',
+    description: '添加聊天功能\n修复商城页面BUG',
+    metaInfo: '{"silent":true}',
+}
+```
+
+***
+
+#### function restartApp()
+
+立即重启应用。v10.28.2+ 版本可用。
+
+***
+
+#### function switchVersion()
+
+立即重启应用，并加载已经下载完毕的版本。
+
+> 注意!不可依赖`progress`来判断下载完成，必须要在`await downloadUpdate()`之后再调用此方法。
+
+***
+
+#### function switchVersionLater()
+
+在下一次启动应用的时候加载已经下载完毕的版本。
+
+> 注意!不可依赖`progress`来判断下载完成，必须要在`await downloadUpdate()`之后再调用此方法。
+
+***
+
+#### function parseTestQrCode(qrCode: string)
+
+解析测试二维码，一般用于给 QA 人员测试热更新。如果在应用中已有扫码功能，则可以在应用中扫描 pushy 后台的测试二维码来测试任意版本的热更包。
+注意如果你使用自定义的(更新策略（updateStrategy）)\[[https://pushy.reactnative.cn/docs/integration#updatestrategy%E6%9B%B4%E6%96%B0%E5%BA%94%E7%94%A8%E7%AD%96%E7%95%A5\]，请务必从](https://pushy.reactnative.cn/docs/integration#updatestrategy%E6%9B%B4%E6%96%B0%E5%BA%94%E7%94%A8%E7%AD%96%E7%95%A5]，请务必从) `useUpdate()` 中获取 `updateInfo` ，而不要依赖 checkUpdate 方法的返回值，否则扫码不会有后续动作。
+
+![testqrcode](/static/image/testqrcode.24c22c1ebe.png)
+注意使用此方法，上述界面中的"使用 Deep Link"选项 **请不要
+** 勾选。
+代码示例：
+
+```js
+<Camera
+  onReadCode={({ nativeEvent: { codeStringValue } }) => {
+    // 识别到二维码后先关闭相机
+    setShowCamera(false);
+    // 先解析是否是pushy的测试二维码
+    if (parseTestQrCode(codeStringValue)) {
+      // 如果是pushy的测试二维码，则不再做其他业务扫码逻辑
+      return;
+    }
+    // 如果不是，继续处理其他业务扫码逻辑
+  }}
+/>
+```
+
+***
+
+### Android 方法
+
+#### UpdateContext.setCustomInstanceManager(ReactInstanceManager instanceManager)
+
+如果是集成/混编 Android 方案，则可以使用此方法传入你自行创建的 ReactInstanceManager。自`v5.5.8`版本起可用。
+
+示例：
+
+```java
+import cn.reactnative.modules.update.UpdateContext
+
+mReactInstanceManager = ReactInstanceManager.builder()
+                // ...各种setter，但注意不要调用setBundleAssetName
+                .setJSBundleFile(UpdateContext.getBundleUrl(mContext, "assets://index.android.bundle"))
+                .build();
+UpdateContext.setCustomInstanceManager(mReactInstanceManager);
+```
+
+
+
+---
+url: /docs/bestpractice.md
+---
+
+# 场景实践
+
+#### 优化原生和热更包体积
+
+##### iOS 原生包优化(ipa)
+
+对于同一份 archive（其版本号、编译时间和内置 bundle 已固定，不会受导出方式所影响），可以用不同选项多次导出 ipa，选择其中最小的上传到 pushy 服务器作为热更基准包。
+
+![bitcode](/static/image/exportipa.91920cd4bf.png)
+##### Android 原生包优化(apk)
+
+apk 的优化主要考虑两个方向：
+
+- [启用 proguard 压缩混淆源码](https://reactnative.cn/docs/signed-apk-android#%E5%90%AF%E7%94%A8proguard%E6%9D%A5%E5%87%8F%E5%B0%91apk%E7%9A%84%E5%A4%A7%E5%B0%8F%EF%BC%88%E5%8F%AF%E9%80%89%EF%BC%89)。但这一步可能导致一些使用反射的代码运行时报错，启用后需要充分测试每个页面和功能，以及需要阅读一些第三方关于 proguard 的特别设置说明。
+- [分开编译不同的 cpu 架构](https://reactnative.cn/docs/signed-apk-android#%E9%92%88%E5%AF%B9%E4%B8%8D%E5%90%8C%E7%9A%84-cpu-%E6%9E%B6%E6%9E%84%E7%94%9F%E6%88%90-apk-%E4%BB%A5%E5%87%8F%E5%B0%8F-apk-%E6%96%87%E4%BB%B6%E7%9A%84%E5%A4%A7%E5%B0%8F)。找到`android/app/build.gradle`中的 cpu 架构部分，如下所示启用`enable`选项：
+
+```diff
+splits {
+    abi {
+        reset()
+-       enable enableSeparateBuildPerCPUArchitecture
++       enable true        // 启用单独的 cpu 架构编译
+        universalApk false  // If true, also generate a universal APK
+    }
+}
+```
+
+如此一来会在编译目录中输出多个 apk 文件，分发和上传到热更新服务时只需要使用`app-arm64-v8a-release.apk`文件，可以大幅减小 apk 的大小。
+
+##### 热更新包优化(ppk)
+
+热更新包的主要内容是 js 包和其所引用的静态资源（主要是图片）。
+
+- js 包成分分析。可以借助一些第三方工具（如[react-native-bundle-visualizer](https://github.com/IjzerenHein/react-native-bundle-visualizer)）来分析 js 文件中哪些占比较大，是否可以用其他库替换等（如 dayjs 替换 moment，lodash-es 替换 lodash）。
+- 图片优化。
+  - 在保证体验的情况下，使用一些工具对图片进行裁剪压缩。
+  - 如不需要图片的透明像素，可以考虑将 png 格式转为 jpg 格式。
+  - 还可以进一步考虑压缩比更高的图片格式，例如 webp 格式（需要第三方原生插件例如[react-native-webp-format](https://github.com/Aleksefo/react-native-webp-format#readme)），heif 格式（iOS 11 和 Android 10 以上原生支持）等。这里有个图片格式对比可供参考 [https://compare.rokka.io/\_compare/#heif=40\&jpeg=80\&webp=80\&av1=40\&width=800](https://compare.rokka.io/_compare/#heif=40\&jpeg=80\&webp=80\&av1=40\&width=800)。
+
+#### 有很多渠道包需要热更，如何操作比较方便？
+
+1. 如果渠道包的`js代码和初始资源`有差别（无论多么细微的差别都会生成不同的 jsbundle），那么只能单独生成 apk，分别上传和绑定。可以考虑写一些脚本自动调用 cli 来执行批量操作。
+2. 如果渠道包的`js代码和初始资源`完全一致，可以考虑使用[Flavor 构建](https://developer.android.com/studio/build/build-variants?hl=zh-cn)，或其他一些动态生成渠道包的方案（比如[腾讯的 VasDolly](https://github.com/Tencent/VasDolly)，[美团的 walle](https://github.com/Meituan-Dianping/walle)等），这样所有的渠道包基于同一个基础 apk 生成（因而会有相同的编译时间戳和 jsbundle）。这样可以只用上传一个基础 apk，对此 apk 的热更操作可以对所有渠道包生效。
+3. 如果您是`高级版`、`专业版`或`大客户VIP版`客户，也可以考虑在管理后台的应用设置中启用`忽略编译时间戳`。此选项仅对比版本号，不校验时间戳，可提供更宽容的热更策略，但可能消耗更多流量。
+
+#### 如何支持 aab 格式的原生包？
+
+将 react-native-update-cli 更新到 v2.6.0 以上版本，即可使用 pushy parseAab 和 pushy uploadAab 命令来支持 aab 格式的原生包。
+
+#### 测试与回滚
+
+自 v10.11.2 版本开始，可以使用以下两种快捷扫码方案来测试热更，而无需提前进行绑定：
+
+![testqrcode](/static/image/testqrcode.24c22c1ebe.png)
+- 若应用启用了 [DeepLink](https://reactnative.cn/docs/next/linking#%E5%90%AF%E7%94%A8-deep-links) 功能
+
+代码中无需任何改动，只需在上述界面中勾选“使用 Deep Link”，填入您应用的协议名，例如"pushy://"，然后使用系统相机或系统内置的扫一扫功能扫码（注意不能使用微信扫码），即可自动调起应用并触发更新。
+
+- 若应用自带扫码功能
+
+请参考 [parseTestQrCode](/docs/api.md#function-parsetestqrcodeqrcode-string) 方法的说明。
+
+<details>
+<summary>若您的应用不具有上述两项功能，或 pushy 版本低于 v10.11.2，则可以参考如下测试方式（不推荐）</summary>
+
+先发布一个**测试包**，再发布一个除了版本号以外均完全相同的**正式包**。
+
+例如，假设我们有一个正式包，版本为`1.6.0`，那么可以修改版本号重新打包一个`1001.6.0`，以一个明显不太正常的版本号来标识它是一个测试版本，同时后几位相同，可以表明它和某个正式版本存在关联（内容/依赖一致）。
+
+在每次往发布包发起热更新之前，先对**测试包**`1001.6.0`进行更新操作，基本测试通过之后，再在网页后台上将热更包重新绑定到**正式包**`1.6.0`上。如果在测试包中发现了重大问题，你就可以先进行修复，更新测试确认通过后再部署到正式线上环境。这样，可以最大程度的避免发生线上事故。
+
+</details>
+
+若您用来测试的原生包当前已经有发布的热更版本且更新策略是立即应用，那么和扫码测试之间可能产生策略冲突，比如扫码更新后又立即强制更新到发布版本，对测试带来不便。此时可以考虑在扫码更新之后，利用 beforeCheckUpdate 回调临时禁止更新检查，直到下次启动再恢复。
+
+```js
+
+// isFirstTimeDebug 这个标志位需要 v10.37.0+ 版本，表示当前是扫码热更后的第一次启动
+import { isFirstTimeDebug } from 'react-native-update/src/core';
+
+const pushyClient = new Pushy({
+  beforeCheckUpdate: () => {
+    if (isFirstTimeDebug) {
+      // 如果当前是扫码热更后的第一次启动，则跳过热更检查
+      return false;
+    }
+    return true;
+  },
+})
+```
+
+万一确实发生线上事故需要回滚的话，先立即对原生包或者整个应用设置暂停热更，然后更改绑定到之前正常的版本，或者利用版本控制系统回滚代码到正常的状态，然后重新生成热更包并推送。
+
+#### 元信息(Meta Info)的使用
+
+在发布热更新版本时，或者在网页端，你可以编辑版本的元信息。这是一段在检查更新时可以获得的字符串，你可以在其中按你所想的格式（一般建议用[JSON 格式](https://developer.mozilla.org/zh-CN/docs/Learn/JavaScript/Objects/JSON)）保存一些信息。
+
+比如我们可以在元信息中约定字段标志`silent`，表示需要静默更新。当我们上传热更包填写 metainfo 时，以[JSON 格式](https://developer.mozilla.org/zh-CN/docs/Learn/JavaScript/Objects/JSON)输入：
+
+```json
+{ "silent": true }
+```
+
+> 请注意，我们并不对输入做任何格式校验和约束，请自行校验输入是否正确。
+
+此时在客户端检查更新时，能获取到我们刚刚输入的元信息，但它并不具备任何功能，只是一个字符串而已。所以我们其实需要**预先**在更新流程中加入对应的处理逻辑：
+
+```js
+// 调用 useUpdate() 获取 updateInfo
+if (updateInfo.expired) {
+  // ... 原生包版本过期，下载或跳转下载页面
+} else if (updateInfo.upToDate) {
+  // ... 没有更新，弹提示或忽略
+} else {
+  // 有更新，一般来说我们在这里给用户弹窗提示，让用户选择是否更新
+  // 那么静默更新的本质其实就是不弹窗，直接执行，所以可以在这里加入额外的判断流程
+  // ...
+}
+```
+
+我们在原有的更新流程中加入元信息的读取和判断：
+
+```js
+let metaInfo = {};
+try {
+  // 注意 JSON 输入有可能有错误，需要用 try 语句来避免应用被带崩
+  metaInfo = JSON.parse(updateInfo.metaInfo);
+} catch (e) {
+  // 异常处理，忽略或上报？
+}
+
+if (metaInfo.silent) {
+  // 如果热更包携带有 silent 字段，不询问用户，直接执行更新
+  switchVersion();
+} else {
+  // 否则还是走之前的询问流程
+  // Alert.alert('提示', '检查到新的版本.......
+}
+```
+
+又比如，可能某个版本包含一些重要的公告内容，所以还可以在上面插入一个公告字段等等。如何使用元信息，完全取决于您的想象力！
+
+
+
+---
+url: /docs/cli.md
+---
+
+# 命令行工具（内置）
+
+### 安装
+
+```
+$ npm install -g react-native-update-cli
+```
+
+### 命令
+
+#### pushy bundle
+
+生成热更资源包。会自动探测项目中是否使用了 expo、taro 等框架并自动调用对应的命令行打包。如果探测不准确或使用对应命令行打包时报错，可尝试使用 `--rncli` 参数来指定官方命令行打包。
+
+- platform: ios|android|harmony 对应的平台
+- entryFile: 入口脚本文件
+- intermediaDir: 临时文件输出目录
+- output: 最终 ppk 文件输出路径
+- dev: 是否打包开发版本
+- sourcemap: 是否生成 sourcemap(需 cli 版本 1.11.0+)
+- no-interactive: 不进行交互式提示
+- rncli: 指定使用官方命令行打包 (需 cli 版本 1.40.0+)
+- expo: 指定使用 expo 的命令行打包 (需 cli 版本 1.40.0+)
+- taro: 指定使用 taro 的命令行打包 (需 cli 版本 1.40.0+)
+
+从 v1.44.2 版本开始，新增了以下直接上传发布的参数（等同于打包完成后连续调用 `pushy publish` 命令）：
+
+- name: 指定热更新版本的名字(热更自身的版本号)
+- description: 指定热更新版本的描述信息，可以对用户进行展示
+- metaInfo: 指定热更新版本的元信息，可以用来保存一些额外信息，具体用法可参考[场景实践](/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。
+
+从 v1.46.1 版本开始，在传入 `name`， `description`， `metaInfo` 参数的同时，可继续叠加以下参数（等同于在调用`pushy publish` 命令后，再连续调用 `pushy update` 命令）：
+
+- packageId: 要绑定的原生包 ID （多选一）
+- packageVersion: 要绑定的原生包版本名（多选一）
+- minPackageVersion: 要绑定的最低原生包版本，大于等于此版本的将逐个绑定（多选一）
+- maxPackageVersion: 要绑定的最高原生包版本，小于等于此版本的将逐个绑定（多选一）
+- packageVersionRange: 要绑定的原生包版本范围（多选一），范围格式遵循 semver 的语法，可参考 [https://quickref.cnxiaobai.com/docs/semver.html](https://quickref.cnxiaobai.com/docs/semver.html) 或 [https://devhints.io/semver](https://devhints.io/semver)
+
+示例：
+
+```bash
+
+pushy bundle --platform android --name "1.0.0" --description "热更新版本 1.0.0" --metaInfo '{"key": "value"}' --packageVersionRange ">=1.0 <3.0"
+```
+
+***
+
+#### pushy parseIpa \[ipaFile]
+
+解析 ipa 文件并输出一些相关信息，如版本号，编译时间戳等。
+
+***
+
+#### pushy parseApk \[apkFile]
+
+解析 apk 文件并输出一些相关信息，如版本号，编译时间戳等。
+
+***
+
+#### pushy parseApp \[appFile]
+
+解析 app 文件并输出一些相关信息，如版本号，编译时间戳等。
+
+***
+
+#### pushy parseAab \[aabFile]
+
+解析 aab 文件并输出一些相关信息，如版本号，编译时间戳等。
+
+***
+
+#### pushy diff \[origin]\[next]
+
+提供两个 ppk 文件，生成从 origin 到 next 版本的差异更新包。
+
+- output: diff 文件输出路径
+
+***
+
+#### pushy diffFromApk \[apkFile]\[next]
+
+提供一个 apk 文件和一个 ppk 文件，生成从 apk 文件到 next 版本的差异更新包。
+
+如果使用热更新开放平台，你不需要自己执行此命令。
+
+- output: diff 文件输出路径
+
+***
+
+#### pushy diffFromApp \[appFile]\[next]
+
+提供一个 app 文件和一个 ppk 文件，生成从 app 文件到 next 版本的差异更新包。
+
+如果使用热更新开放平台，你不需要自己执行此命令。
+
+- output: diff 文件输出路径
+
+***
+
+#### pushy diffFromIpa \[ipaFile]\[next]
+
+提供一个 ipa 文件和一个 ppk 文件，生成从 ipa 文件到 next 版本的差异更新包。
+
+如果使用热更新开放平台，你不需要自己执行此命令。
+
+- output: diff 文件输出路径
+
+***
+
+#### pushy login \[email]\[pwd]
+
+登录热更新开放平台。你需要先登录才能使用下面的命令。
+
+***
+
+#### pushy logout
+
+登出并清除本地的登录信息
+
+***
+
+#### pushy me
+
+查看自己是否已经登录，以及昵称等信息。
+
+***
+
+#### pushy createApp
+
+创建应用并立刻绑定到当前工程。这项操作也可以在网页管理端进行。
+
+- platform: ios|android|harmony 对应的平台
+- name: 应用名称
+- downloadUrl: 应用安装包的下载地址
+
+***
+
+#### pushy deleteApp \[appId]
+
+删除已有应用。所有已创建的应用包、热更新版本都会被同时删除。这项操作也可以在网页管理端进行。
+
+- appId: 要删除的应用 ID
+
+***
+
+#### pushy apps
+
+查看当前已创建的全部应用。这项操作也可以在网页管理端进行。
+
+- platform: ios|android|harmony 对应的平台
+
+***
+
+#### pushy selectApp \[appId]
+
+绑定应用到当前工程。
+
+- platform: ios|android|harmony 对应的平台
+
+***
+
+#### pushy uploadIpa \[ipaFile]
+
+上传 ipa 文件到开放平台。（cli 需 1.24.0 +）
+
+***
+
+#### pushy uploadApk \[apkFile]
+
+上传 apk 文件到开放平台。（cli 需 1.24.0 +）
+
+***
+
+#### pushy uploadApp \[appFile]
+
+上传 app 文件到开放平台。（cli 需 1.24.0 +）
+
+***
+
+#### pushy uploadAab \[aabFile]
+
+上传 aab 文件到开放平台。（cli 需 2.6.0 +）
+
+***
+
+#### pushy extractApk \[aabFile]
+
+从 aab 文件中提取 apk 文件。备注（cli 需 2.6.0 +）
+
+***
+
+#### pushy packages
+
+查看已经上传的原生包。这项操作也可以在网页管理端进行。
+
+- platform: ios|android|harmony 对应的平台
+
+***
+
+#### pushy deletePackage
+
+删除已经上传的原生包。
+
+- appId: 要删除的原生包所属的应用 ID
+- packageId: 要删除的原生包 ID
+
+***
+
+#### pushy publish \[ppkFile]
+
+发布新的热更新版本（ppk 文件）。
+
+- platform: ios|android|harmony 对应的平台
+- name: 当前热更新版本的名字(版本号)
+- description: 当前热更新版本的描述信息，可以对用户进行展示
+- metaInfo: 当前热更新版本的元信息，可以用来保存一些额外信息，具体用法可参考[场景实践](/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。
+
+从 v1.46.1 版本开始，支持以下参数（等同于在 调用`pushy publish` 命令后，再连续调用 `pushy update` 命令）：
+
+- packageId: 要绑定的原生包 ID （多选一）
+- packageVersion: 要绑定的原生包版本名（多选一）
+- minPackageVersion: 要绑定的最低原生包版本，大于等于此版本的将逐个绑定（多选一）
+- maxPackageVersion: 要绑定的最高原生包版本，小于等于此版本的将逐个绑定（多选一）
+- packageVersionRange: 要绑定的原生包版本范围（多选一），范围格式遵循 semver 的语法，可参考 [https://quickref.cnxiaobai.com/docs/semver.html](https://quickref.cnxiaobai.com/docs/semver.html) 或 [https://devhints.io/semver](https://devhints.io/semver)
+
+示例：
+
+```bash
+
+pushy publish .pushy/output/android.1750423283653.ppk --platform android --name "1.0.0" --description "热更新版本 1.0.0" --metaInfo '{"key": "value"}' --packageVersionRange ">=1.0 <3.0"
+```
+
+***
+
+#### pushy versions
+
+分页列举可用的版本。这项操作也可以在网页管理端进行。
+
+- platform: ios|android|harmony 对应的平台
+
+***
+
+#### pushy deleteVersion
+
+删除已经发布的热更新版本。
+
+- appId: 要删除的热更新版本所属的应用 ID
+- versionId: 要删除的热更新版本 ID
+
+***
+
+#### pushy update
+
+为一个原生包版本绑定发布一个热更新版本。这项操作也可以在网页管理端进行。以下参数中`packageId`，`packageVersion`，`minPackageVersion`，`maxPackageVersion`和`packageVersionRange`中多选一即可。
+
+cli 2.4.0 版本开始可以同时绑定一个全量和一个灰度版本。2.4.0 之前全量和灰度版本会互相覆盖，后设置的生效。
+
+- platform: ios|android|harmony 对应的平台
+- versionId: 要绑定的热更新版本 ID
+- rollout: 灰度发布范围（整数取值 1 - 100，对应 1% - 100% 终端设备覆盖率），默认为 100（需 cli 版本 1.31.0+）
+- dryRun: 是否只进行预览，不进行实际绑定（需 cli 版本 1.45.4+）
+- packageId: 要绑定的原生包 ID （多选一）
+- packageVersion: 要绑定的原生包版本名（多选一，需 cli 版本 1.7.2+）
+- minPackageVersion: 要绑定的最低原生包版本，大于等于此版本的将逐个绑定（多选一，需 cli 版本 1.27.0+）
+- maxPackageVersion: 要绑定的最高原生包版本，小于等于此版本的将逐个绑定（多选一，需 cli 版本 1.27.0+）
+- packageVersionRange: 要绑定的原生包版本范围（多选一，需 cli 版本 1.45.4+），范围格式遵循 semver 的语法，可参考 [https://quickref.cnxiaobai.com/docs/semver.html](https://quickref.cnxiaobai.com/docs/semver.html) 或 [https://devhints.io/semver](https://devhints.io/semver)
+
+示例：
+
+```bash
+❯ pushy update --versionId 211343 --platform android --packageVersionRange ">=1.0 <3.0" --dryRun
+react-native-update-cli: 1.45.4 （最新：1.45.4）
+react-native-update: 10.28.11 （最新：10.28.11）
+以下是 dry-run 模拟运行结果，不会实际执行任何操作：
+已将热更包 211343 绑定到原生版本 1.28.1 (id: 75219)
+已将热更包 211343 绑定到原生版本 1.28 (id: 75184)
+已将热更包 211343 绑定到原生版本 1.5 (id: 73396)
+已将热更包 211343 绑定到原生版本 2.0 (id: 68219)
+已将热更包 211343 绑定到原生版本 1.0 (id: 68158)
+操作完成，共已绑定 5 个原生版本
+```
+
+
+
+---
+url: /docs/cli_module.md
+---
+
+# 命令行工具（自定义模块）
+
+## 模块化功能 (Module System)
+
+从 v2.0.0 版本开始，CLI 支持模块化扩展，允许开发者自定义命令和工作流。
+
+### 核心概念
+
+- **CLI Module**: 包含自定义命令和工作流的模块
+- **Command**: 单个可执行的命令
+- **Workflow**: 由多个步骤组成的复杂工作流
+- **Module Manager**: 管理模块注册和执行的核心组件
+
+### 模块注册
+
+```typescript
+import { moduleManager } from 'react-native-update-cli';
+import { myCustomModule } from './my-custom-module';
+
+// 注册自定义模块
+moduleManager.registerModule(myCustomModule);
+```
+
+### 创建自定义模块
+
+```typescript
+import type { CLIModule, CommandContext, CommandResult } from 'react-native-update-cli';
+
+export const myCustomModule: CLIModule = {
+  name: 'my-module',
+  version: '1.0.0',
+  commands: [
+    {
+      name: 'my-command',
+      description: '我的自定义命令',
+      handler: async (context: CommandContext): Promise<CommandResult> => {
+        // 命令执行逻辑
+        return { success: true, data: 'Hello from custom command!' };
+      },
+      options: {
+        flag: {
+          hasValue: true,
+          description: '自定义参数'
+        }
+      }
+    }
+  ],
+  workflows: [
+    {
+      name: 'my-workflow',
+      description: '我的自定义工作流',
+      steps: [
+        {
+          name: 'step1',
+          description: '第一步',
+          execute: async (context: CommandContext) => {
+            console.log('执行第一步...');
+            return { step1Result: 'completed' };
+          }
+        },
+        {
+          name: 'step2',
+          description: '第二步',
+          execute: async (context: CommandContext, previousResult: any) => {
+            console.log('执行第二步，前一步结果:', previousResult);
+            return { ...previousResult, step2Result: 'completed' };
+          }
+        }
+      ]
+    }
+  ],
+  init: (provider) => {
+    console.log('模块初始化完成');
+  }
+};
+```
+
+### 查看已注册模块命令
+
+```bash
+# 查看所有可用模块命令
+pushy list
+```
+
+***
+
+## 工作流系统 (Workflow System)
+
+工作流是由多个步骤组成的复杂任务执行流程，支持条件执行、错误处理和结果传递。
+
+### 内置工作流
+
+#### 1. 用户认证工作流
+
+##### pushy auth-check
+
+检查用户认证状态
+
+```bash
+pushy workflow auth-check
+```
+
+##### pushy login-flow
+
+完整的用户登录流程
+
+```bash
+pushy workflow login-flow
+```
+
+#### 2. 应用管理工作流
+
+##### pushy workflow multi-platform-app-management
+
+跨平台应用统一管理
+
+```bash
+pushy workflow multi-platform-app-management
+```
+
+##### pushy workflow incremental-build
+
+增量构建工作流，生成差异更新包
+
+```bash
+pushy workflow incremental-build
+```
+
+### 工作流管理命令
+
+列出所有可用工作流
+
+```bash
+pushy list
+```
+
+##### pushy workflow
+
+执行指定工作流
+
+```bash
+pushy workflow <workflowName>
+```
+
+##### pushy list
+
+列出所有已注册的模块
+
+```bash
+pushy list
+```
+
+### 工作流特性
+
+1. **步骤化执行**: 工作流由多个步骤组成，按顺序执行
+2. **结果传递**: 每个步骤的结果可以传递给下一个步骤
+3. **条件执行**: 支持根据条件决定是否执行某个步骤
+4. **错误处理**: 内置错误处理和回滚机制
+5. **进度反馈**: 实时显示执行进度和状态
+6. **参数验证**: 执行前自动验证必需参数
+
+***
+
+## 示例项目
+
+在项目的 `example/` 目录中提供了完整的模块和工作流使用示例：
+
+- `example/modules/` - 自定义模块示例
+- `example/workflows/` - 自定义工作流示例
+- `example/scripts/` - 使用脚本示例
+
+运行示例：
+
+```bash
+# 模块注册和执行示例
+npx ts-node example/scripts/register-modules.ts
+
+# 工作流演示
+npx ts-node example/scripts/workflow-demo.ts
+
+# 增强工作流演示
+npx ts-node example/scripts/enhanced-workflow-demo.ts
+```
+
+
+
+---
+url: /docs/faq.md
+---
+
+# 常见问题
+
+如果本页面没能回答您的疑问，您可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。
+
+### 业务问题
+
+#### 热更新究竟能否上架？
+
+您可能听说过各种说法，但大量实践表明，热更新目前能够顺利上架 AppStore 和其他各种应用市场。唯一需要注意的是，在审核期间请不要发布热更新，不要让审核人员看到各种更新相关的提示和弹窗，即可顺利通过。
+
+***
+
+#### 是否可以在海外使用？
+
+可以的，国内外都有高速 CDN 节点。
+
+***
+
+#### 哪些修改可以热更新？哪些不能？
+
+我们把对应用的修改分为两类：
+
+- 不可热更新 —— 原生修改，即所有需要`编译`后才能生效的修改：
+  - 任何在 iOS 或者 Android 目录中的修改、增删。
+  - 任何含有原生代码的第三方组件的更新、修改。
+- 可以热更新 —— 非原生修改，即所有`无需编译`，刷新即可生效的修改：
+
+  - js 代码修改，包括第三方纯 js 组件的更新、修改。
+  - 可以在 js 代码中 require/import 的资源文件，例如图片。
+
+需要注意的是，即便资源文件可以热更新，但这些热更新后的资源文件会以`file://`协议的形式提供访问，某些读取资源文件的第三方可能并不支持`file://`协议。
+
+***
+
+#### 热更新成功完成，但是重启后又回滚了是怎么回事？
+
+可以正常更新，但是重启后回滚，一般有两种可能的情况：
+
+- 没有正确[配置 bundleUrl](/docs/getting-started.md#配置-bundle-url)
+- （仅有 v10 以下版本存在此可能性，v10 及更高版本不存在此情况）没有正确[调用 markSuccess](https://v9--pushy-site.netlify.app/docs/integration#%E9%A6%96%E6%AC%A1%E5%90%AF%E5%8A%A8%E5%9B%9E%E6%BB%9A)
+
+如果你确定上述两个步骤都正确无误，请在[issues 区](https://github.com/reactnativecn/react-native-update/issues)给我们留言反馈。
+
+***
+
+#### 热更新报错：“热更新已暂停，原因：编译时间戳与服务器记录不一致。”
+
+当您每次编译产生一个原生包时，其中都会记录一个编译时间戳`buildTime`(可以使用`pushy parseIpa a.ipa`或是`pushy parseApk a.apk`命令来查看)。如果您需要把这个包发给客户并希望使用热更新功能，那么就需要使用 upload 命令来上传到我们的服务器，而服务器端会记录这个包的版本号和编译时间戳以便后续比对记录。
+
+举例来说，假如我已经上传了一个 1.0 版本原生包（`1A包`），但后来由于种种原因我又重新打包了（`1B包`）但没有上传，这两个包有相同的版本号，但会有不同的编译时间戳。此时有几种可能的情况：
+
+1. 我忘记上传过`1A包`，`1B包`没有实质更改且还没有客户安装。此时应当放弃`1B包`，只让客户下载安装`1A包`。
+2. 我忘记上传过`1A包`，又生成了`1B包`且已有客户安装。此时`1A包`客户可以获取热更新，`1B包`客户无法获取热更新。要使两批客户都能获取热更新，要么想办法通知`1B包`客户装回`1A包`，要么重新发布一个`高于1.0`版本的原生包且上传到 pushy 服务器，并删除`1.0`版本的记录，此时`1A包`和`1B包`的客户都会收到版本过期需要下载新版本的通知。
+3. 我知道上传过`1A包`，但我有原生方面的修改需要打了一个新的`1B包`。此时若将`1B包`上传到 pushy 服务器会提示版本验证错误，因为已经存在有相同的`1.0`版本。所以需要首先更改原生版本号再次打包，并`首先`将此新版本上传到服务器，`然后`分发给客户。这样`1.0版本`和`新版本`可以并存且都可以获得热更新。
+
+请谨记，任何时候生成原生包，请 1)先修改原生版本号，2)并上传到 pushy 服务器，才可以正常获得热更新。
+
+:::info
+如果您是`高级版`、`专业版`或`大客户VIP版`客户，也可以考虑在管理后台的应用设置中启用`忽略编译时间戳`。此选项仅对比版本号，不校验时间戳，可提供更宽容的热更策略，但可能消耗更多流量，适合需要管理多个分发渠道的客户。
+:::
+
+***
+
+### 付费问题
+
+#### 我应该选择哪个业务版本呢？
+
+其实完全无需考虑，先从最高配额的`专业版`开始体验（新用户注册验证通过后，将自动获得 7 天`专业版`试用），各个版本的使用流程完全一致！当试用时间到期后，若当前版本的配额不能满足需求，可随时补差价升级到更高配额的版本。升级自动按天数计算差价，绝无额外费用。
+
+目前仅有一项额外的付费专用功能，即`忽略编译时间戳`设置（在管理后台的应用设置中），此选项仅对比版本号，不校验时间戳，可提供更宽容的热更策略，但可能消耗更多流量，适合需要管理多个分发渠道的客户。此功能目前仅支持`高级版`、`专业版`和`大客户VIP版`。
+
+***
+
+#### 我可以试用付费版本先评估一下效果吗？
+
+新用户注册验证通过后，将自动获得 7 天`专业版`试用。如您需要更长的评估时间，可将注册用户名、邮箱、公司（或个人）名称发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，标题注明“pushy 评估试用延长”，我们会为您酌情延长评估时间。
+试用期间只能选择续费专业版或升级到更高版本，如需购买其他版本，请等待试用期过期，或者联系客服去除试用。
+
+***
+
+#### 配额具体如何计算？
+
+配额主要分为 4 种：
+
+1. 可创建的应用数量，注意 iOS 和 Android 版本记做不同的应用。
+2. 原生包数量及大小，不同应用分开计算。原生包指通过`pushy uploadIpa/uploadApk`命令上传到 Pushy 服务器上作为热更新起始版本的完整 apk/ipa 安装包。
+3. 热更包数量及大小，不同应用分开计算。热更包指通过`pushy bundle`所命令生成的 ppk 文件。注意这不是用户实际下载的更新文件，用户下载的是通过比对生成的增量 diff 文件（比 ppk 文件要小得多）。
+4. 每日总热更查询次数，所有应用累加计算。每次用户打开应用时，会向服务器查询是否有新的热更新。这个查询次数会被计入每日总热更查询次数。当日超过限额次数后，接口将不再返回新的热更新信息，直到次日重置。
+
+> 这里有一些对[包大小的优化建议](/docs/bestpractice.md#优化原生和热更包体积)可供参考。
+
+以上 2、3 条为账户下每个应用单独计算，第 4 条为账户下所有应用累加计算。具体配额和费用由于运营成本可能会有调整，请以[价格表](/pricing.md)页面为准。已购买的用户在续费前不受调整影响。
+
+***
+
+#### 达到配额后还可以正常使用吗？
+
+当应用、原生包、热更包数量达到配额限制后，您将无法执行相应的新增操作。但用户端仍可正常检查更新，下载已发布的更新。您可选择升级到更高配额，或是通过删除已不再使用的应用、原生包、热更包来使数量降低到配额以内，以便继续执行新增操作。\
+若原生包、热更包大小超过限额，则会导致上传失败。您可以选择升级到更高配额，或是想办法进行[精简优化](/docs/bestpractice.md#优化原生和热更包体积)。
+若当日热更检查次数超过限额，则会导致接口返回空数据。您可以选择升级到更高配额，或是优化热更策略，减少用户端检查更新的频率。
+
+***
+
+#### 我可以单独升级某项配额吗？
+
+如果您需要单独升级某些配额（需要达到高级版以上），请通过邮件 [hi@charmlot.com](mailto:hi@charmlot.com) 或 QQ 34731408 与我们联系，我们将根据您的个性化需求为您定制方案和报价。
+
+***
+
+#### 付费业务到期后不续费，现有应用还能否正常使用？
+
+到期后按免费版额度执行。如您现有应用已超出配额，则必须通过删除操作降低到配额以内，方可执行新的操作（如创建应用，上传热更等），但不影响用户获取之前已发布的热更。
+
+***
+
+#### 如何获取付费的专人技术支持？
+
+请将您的用户名和订单截图发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，同时提供您希望的技术联系方式（QQ、微信等），核实后会有技术专员添加您为好友。
+
+***
+
+#### 如何开具发票？
+
+请将具体开票需求发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，并附上注册邮箱和订单截图。我们默认会回复普通电子发票到`注册邮箱`，类目为软件服务。如需指定接受邮箱或手机，请在`邮件正文`中注明。如需要邮寄纸质发票请注明邮寄地址，邮费为到付。
+如邮件发送后三个工作日内未收到回复，请联系 QQ 客服 34731408。
+
+***
+
+#### 可以使用银行转账付款吗？
+
+可以的。请对照[价格表](/pricing.md)，将对应版本的款项转账至：
+
+| 公司名称  | 武汉青罗网络科技有限公司     |
+| ----- | ---------------- |
+| 账号    | 8888888048825564 |
+| 开户行名称 | 浙江网商银行           |
+| 开户地区  | 浙江省杭州市           |
+| 支行名称  | 浙江网商银行股份有限公司     |
+| 联行号   | 323331000001     |
+
+转账完成后请截图发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，并写明注册邮箱，我们将在一个工作日内开通对应服务。
+
+***
+
+#### 可以按月付款吗？
+
+需要月付的客户请联系 QQ 客服 34731408，月付价格为年付价格 / 8。如标准版当前价格为 800 元每年，则月付价格为 100 元每月。
+月付客户需累计支付满 500 元后才能开具发票。`大客户VIP版`不支持月付。
+
+***
+
+#### 大客户方案
+
+如果您的应用有大规模的活跃用户，日均所有应用累计总查询次数超过 100 万次，则建议选择我们专门针对大规模应用优化的`大客户VIP版`。
+`大客户VIP版`在应用数量、原生包数量、热更包数量等方面配额与`专业版`相同。
+
+当前价格如下表：
+
+| 服务版本 | 日均总热更查询次数 | 价格（元/年） |
+| ---- | --------- | ------- |
+| VIP1 | 1000 万次   | 30000   |
+| VIP2 | 5000 万次   | 60000   |
+| VIP3 | 1 亿次      | 120000  |
+| VIP4 | 1 亿次以上    | 请联系客服   |
+
+具体试用和对接请联系 QQ 客服 34731408
+
+
+
+---
+url: /docs/getting-started.md
+---
+
+# 安装配置
+
+:::info
+请注意，当前版本的api经过了完全重构，与之前的版本(v10.0以下)不兼容。如果你需要查看之前版本的文档，请点击[这里](https://v9--pushy-site.netlify.app/)
+:::
+
+首先你应该有一个基于 React Native 开发的应用，我们把具有 package.json 的目录叫做你的`应用根目录`。
+如果你还没有初始化应用，请参阅[开始使用 React Native](https://reactnative.cn/docs/getting-started)。
+
+我们假设你已经拥有了开发 React Native 应用的一切环境，包括`Node.js`、`Xcode`、`Android SDK`等等。
+
+### 安装
+在你的项目根目录下运行以下命令（如果你使用 yarn 等其他包管理器，请自行替换命令）：
+
+**React Native**
+
+```bash
+# 先全局安装命令行工具
+npm i -g react-native-update-cli
+
+# 然后在项目目录中安装热更新模块
+npm i react-native-update
+
+# 如果没有使用 expo，则进入 iOS 目录安装 iOS 模块
+cd ios && pod install
+
+```
+
+
+**Expo**
+
+```bash
+# 先全局安装命令行工具
+npm i -g react-native-update-cli
+
+# 然后在项目目录中安装热更新模块
+npm i react-native-update
+
+# 如果使用 expo, 要求 expo 50 或更高版本，需要使用 prebuild 命令预构建项目
+npx expo prebuild
+
+# 然后进入 iOS 目录安装 iOS 模块
+cd ios && pod install
+
+```
+:::warning
+注意：如果使用
+expo，请不要同时安装`expo-updates`，否则会导致热更新功能冲突。另外，expo 51
+版本以下的新架构支持并不完整，可能无法正常使用。如需使用新架构，建议使用尽可能新的
+expo 版本。
+:::
+
+:::info
+如果下载极慢或者显示网络失败，请设置使用淘宝镜像 `npx nrm use taobao`
+:::
+:::warning
+注意请不要混用`npm/yarn/pnpm`等包管理器及对应的`lock`文件，团队成员请坚持使用同一包管理器，且仅保留统一格式的`lock`文件
+:::
+:::info
+请记得，任意在 ios 和 android 目录下的修改，一定要重新编译（使用 npx
+react-native run-ios 或 run-android 命令编译，或在 Xcode/Android Studio
+中重新编译）才能生效。
+:::
+### 手动 link
+如果 RN 版本 >= 0.60 则不需要此手动 link 步骤。
+:::warning
+注意：如果是混编 RN
+项目，或monorepo，或任何其他自定义的情况，由于自定义的配置可能不完整或不适应RN的目录结构，导致自动
+link 的功能可能不能正常工作。此时即便 RN 版本 >= 0.60，你可能也需要执行手动
+link 操作。
+:::
+#### iOS
+RN < 0.60且使用CocoaPods（推荐）
+1. 在 ios/Podfile 中添加
+```
+pod 'react-native-update', path: '../node_modules/react-native-update'
+```
+2. 在项目的 ios 目录下运行`pod install`
+3. 重新编译
+RN < 0.60且不使用CocoaPods
+1. 在 XCode 中的 Project Navigator 里,右键点击`Libraries` ➜ `Add Files to [你的工程名]`
+2. 进入`node_modules` ➜ `react-native-update` ➜ `ios 并选中`RCTPushy.xcodeproj\`
+3. 在 XCode 中的 project navigator 里,选中你的工程,在 `Build Phases` ➜ `Link Binary With Libraries` 中添加 `libRCTPushy.a`、`libz.tbd`、`libbz2.1.0.tbd`
+4. 继续在`Build Settings`里搜索`Header Search Path`，添加`$(SRCROOT)/../node_modules/react-native-update/ios`，勾选`recursive`。
+5. 在`Build Phases`添加一个`New Run Script Phase`运行脚本，内容如下
+```
+#!/bin/bash
+set -x
+DEST="../node_modules/react-native-update/ios/"
+date +%s > "$DEST/pushy_build_time.txt"
+```
+7. 尝试编译一下，顺利的话就会在`../node_modules/react-native-update/ios/`文件夹下面生成一个`pushy_build_time.txt`文件。然后在`Copy Bundle Resources`里把生成的`pushy_build_time.txt`文件添加进去。
+#### Android
+RN < 0.60 或其他不能自动 link 的情况
+1. 在`android/settings.gradle`中添加如下代码:
+
+   ```
+   include ':react-native-update'
+   project(':react-native-update').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-update/android')
+   ```
+
+2. 在`android/app/build.gradle`的 dependencies 部分增加如下代码:
+
+   ```
+   implementation project(':react-native-update')
+   ```
+
+3. 打开`android/app/src/main/java/[...]/MainApplication.java`,
+- 在文件开头增加 `import cn.reactnative.modules.update.UpdatePackage;`
+- 在`getPackages()` 方法中增加 `new UpdatePackage()`(注意上一行可能要增加一个逗号)
+### 配置 Bundle URL
+如果你使用 `expo` 48 或更高版本，且 `react-native-update` >= 10.28.2，则可以自动配置 bundle url，请直接去往[下一个步骤](#添加测试用的-deep-link)。
+如果你没有使用 `expo`，或 `expo` 版本低于 48，则需要按以下步骤手动配置。
+#### iOS
+在你的 AppDelegate.mm 或 AppDelegate.m 或 AppDelegate.swift 文件（不同 RN 版本可能后缀名不同）中增加如下代码：
+:::warning
+注意：如果你是混编原生的项目，务必注意**不能直接指定 bundleURL 来初始化**
+rootView，需要先使用`initWithDelegate`方法来初始化
+bridge，然后使用`initWithBridge`方法来初始化
+rootView。否则热更新功能可能无法正常工作。
+:::
+
+**Objective-C**
+
+```c
+// ... 其它代码
+#import "AppDelegate.h"
+
+#import "RCTPushy.h"  // <-- import头文件，注意要放到if条件外面
+
+// 可能项目里有一些条件编译语句，例如有些版本RN自带的flipper
+// #if DEBUG
+// 注意**不要**在这里面引入"RCTPushy.h"
+// #import <FlipperKit/FlipperClient.h>
+// ...
+// #endif
+
+
+// rn 版本 >= 0.74 需要修改 bundleURL 方法
+- (NSURL *)bundleURL
+{
+#if DEBUG
+  // 原先DEBUG这里的写法不作修改
+  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
+#else
+  return [RCTPushy bundleURL];  // <--  把这里非DEBUG的情况替换为热更新bundle
+#endif
+}
+
+
+// rn 版本 < 0.74 需要修改sourceURLForBridge方法
+- (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
+{
+#if DEBUG
+  // 原先DEBUG这里的写法不作修改
+  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
+#else
+  return [RCTPushy bundleURL];  // <--  把这里非DEBUG的情况替换为热更新bundle
+#endif
+}
+
+```
+
+
+**Swift**
+
+```swift
+import UIKit
+import React
+import React_RCTAppDelegate
+import ReactAppDependencyProvider
+import react_native_update    // <-- 在这里引入，需要 pushy v10.22.0+ 版本
+
+
+@main
+class AppDelegate: RCTAppDelegate {
+  // ... 其他代码
+
+  override func bundleURL() -> URL? {
+#if DEBUG
+    // 原先 DEBUG 这里的写法不作修改(所以 DEBUG 模式下不可热更新)
+    RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+#else
+    RCTPushy.bundleURL()  // <--  把这里非 DEBUG 的情况替换为热更新 bundle
+#endif
+  }
+}
+```
+
+#### Android
+在 MainApplication 中增加如下代码（如果是混编原生的项目或其他原因没有使用 ReactApplication，请[使用此 api 集成](/docs/api.md#updatecontextsetcustominstancemanagerreactinstancemanager-instancemanager))：
+
+**Kotlin（RN 0.82 或以上）**
+
+```kotlin
+// ... 其它代码
+
+// ↓↓↓请注意不要少了这句import
+import cn.reactnative.modules.update.UpdateContext
+// ↑↑↑
+
+class MainApplication : Application(), ReactApplication {
+
+  override val reactHost: ReactHost by lazy {
+    getDefaultReactHost(
+      context = applicationContext,
+      packageList =
+        PackageList(this).packages.apply {
+          // Packages that cannot be auto-linked yet can be added manually here, for example:
+          // add(MyReactNativePackage())
+        },
+      // ↓↓↓ 添加下面这一段参数
+      jsBundleFilePath = UpdateContext.getBundleUrl(this),
+      // ↑↑↑
+    )
+  }
+
+  // ...其他代码
+}
+
+
+```
+
+
+**Kotlin（RN 0.81 或以下）**
+
+```kotlin
+// ... 其它代码
+
+// ↓↓↓请注意不要少了这句import
+import cn.reactnative.modules.update.UpdateContext
+// ↑↑↑
+
+class MainApplication : Application(), ReactApplication {
+
+  override val reactNativeHost: ReactNativeHost =
+      object : DefaultReactNativeHost(this) {
+
+        // ↓↓↓将下面这一段添加到 DefaultReactNativeHost 内部！
+        override fun getJSBundleFile(): String? {
+          return UpdateContext.getBundleUrl(this@MainApplication)
+        }
+        // ↑↑↑
+
+        // ...其他代码
+      }
+}
+```
+
+
+**Java**
+
+```java
+// ... 其它代码
+
+// ↓↓↓请注意不要少了这句import
+import cn.reactnative.modules.update.UpdateContext;
+// ↑↑↑
+
+public class MainApplication extends Application implements ReactApplication {
+
+  private final ReactNativeHost mReactNativeHost =
+    // 老版本 RN 这里可能是 new ReactNativeHost(this)
+    new DefaultReactNativeHost(this) {
+
+    // ↓↓↓将下面这一段添加到 DefaultReactNativeHost 内部！
+    @Override
+    protected String getJSBundleFile() {
+        return UpdateContext.getBundleUrl(MainApplication.this);
+    }
+    // ↑↑↑
+
+    // ...其他代码
+  }
+}
+```
+
+:::info
+请记得，任意在 ios 和 android 目录下的修改，一定要重新编译（npx react-native
+run-ios 或 run-android 命令编译，或在 Xcode/Android Studio
+中重新编译）才能生效。
+:::
+#### Harmony
+在 `harmony/entry/src/main/cpp/CMakeLists.txt` 中增加如下依赖：
+```c
+add_subdirectory("${OH_MODULES}/pushy/src/main/cpp" ./pushy)
+target_link_libraries(rnoh_app PUBLIC rnoh_pushy)
+```
+在 `harmony/entry/src/main/cpp/PackageProvider.cpp` 中增加如下依赖：
+```c
+#include "RNOH/PackageProvider.h"
+#include "PushyPackage.h"
+using namespace rnoh;
+
+std::vector<std::shared_ptr<Package>> PackageProvider::getPackages(Package::Context ctx) {
+    return {
+         std::make_shared<PushyPackage>(ctx)
+    };
+}
+```
+在 `harmony/entry/oh-package.json5` 中增加如下依赖：
+```json5
+"dependencies": {
+  "pushy": "file:../../node_modules/react-native-update/harmony/pushy",
+
+}
+```
+在 `harmony/build-profile.json5` 中增加如下配置：
+```json5
+  modules: [
+    // ↓↓↓将下面这一段添加到 modules 内部！
+    {
+      name: 'pushy',
+      srcPath: '../node_modules/react-native-update/harmony/pushy',
+    },
+  ],
+```
+在 `harmony/hvigor/hvigor-config.json5` 中增加如下配置：
+```json5
+{
+  dependencies: {
+    pushy: "file:../../node_modules/react-native-update/harmony/pushy",
+  },
+}
+```
+在 `harmony/entry/hvigorfile.ts` 中增加如下配置：
+```ts
+import { hapTasks } from "@ohos/hvigor-ohos-plugin";
+import { reactNativeUpdatePlugin } from "pushy/hvigor-plugin";
+
+export default {
+  system: hapTasks /* Built-in plugin of Hvigor. It cannot be modified. */,
+  plugins: [
+    reactNativeUpdatePlugin(),
+  ] /* Custom plugin to extend the functionality of Hvigor. */,
+};
+```
+在 `harmony/entry/src/main/ets/RNPackagesFactory.ts` 代码如下：
+```ts
+import type {
+  RNPackageContext,
+  RNPackage,
+} from "@rnoh/react-native-openharmony/ts";
+import { PushyPackage } from "pushy/ts";
+
+export function createRNPackages(ctx: RNPackageContext): RNPackage[] {
+  return [new PushyPackage(ctx)];
+}
+```
+在 `harmony/entry/src/main/ets/pages/Index.ets` 中增加如下代码：
+```ts
+// ... 其它代码
+
+// ↓↓↓请注意不要少了这句import
+import { PushyFileJSBundleProvider } from 'pushy/src/main/ets/PushyFileJSBundleProvider';
+// ↑↑↑
+
+@Entry
+@Component
+struct Index {
+  @StorageLink('RNOHCoreContext') private rnohCoreContext: RNOHCoreContext | undefined = undefined
+  @State shouldShow: boolean = false
+
+  aboutToAppear(): void {
+    this.shouldShow = true
+  }
+
+  onBackPress(): boolean | undefined {
+    // NOTE: this is required since `Ability`'s `onBackPressed` function always
+    // terminates or puts the app in the background, but we want Ark to ignore it completely
+    // when handled by RN
+    this.rnohCoreContext!.dispatchBackPress()
+
+    // this.preferences = preferences.getPreferencesSync(this.context, {name:'update'});
+    return true
+  }
+
+  build() {
+    Column() {
+      if (this.rnohCoreContext && this.shouldShow) {
+        RNApp({
+          // ... 其他代码
+          jsBundleProvider: new TraceJSBundleProviderDecorator(
+            new AnyJSBundleProvider([
+              // MetroJSBundleProvider.fromServerIp('127.0.0.1'),
+              // new ResourceJSBundleProvider(rnohCoreContext.uiAbilityContext.resourceManager, 'hermes_bundle.hbc'),
+              // ↓↓↓将下面这一段添加到 AnyJSBundleProvider 内部！
+              new PushyFileJSBundleProvider(this.rnohCoreContext.uiAbilityContext),
+
+              // 注意无论是否使用 hermes 格式，请保持 bundle 文件名为 bundle.harmony.js
+              new ResourceJSBundleProvider(this.rnohCoreContext.uiAbilityContext.resourceManager, 'bundle.harmony.js')
+            ]),
+            this.rnohCoreContext.logger),
+        })
+      }
+    }
+    .height('100%')
+    .width('100%')
+  }
+}
+```
+:::info
+请记得，任意在 ios 和 android 目录下的修改，一定要重新编译（npx react-native
+run-ios 或 run-android 命令编译，或在 Xcode/Android Studio
+中重新编译）才能生效。
+:::
+### 覆盖 android 的 onCreate
+如果你有安装 `react-native-screens` (使用 `react-navigation` 一般都会要求安装)，则安卓端在热更后重启可能会白屏。此时需要在 Android 的 `MainActivity` 中设置 `RNScreensFragmentFactory`，以确保 Fragment 恢复流程一致，避免崩溃。注意不要把这段覆盖写在 `MainActivityDelegate` 里，而是直接放在 `MainActivity` 中。
+更多说明可以参考 `react-native-screens` 的 [readme](https://github.com/software-mansion/react-native-screens?tab=readme-ov-file#android)
+
+**Kotlin**
+
+```kotlin
+// android/app/src/main/java/[...]/MainActivity.kt
+import android.os.Bundle
+import com.swmansion.rnscreens.fragment.restoration.RNScreensFragmentFactory
+
+class MainActivity : ReactActivity() {
+  // ...其他代码
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    supportFragmentManager.fragmentFactory = RNScreensFragmentFactory()
+    super.onCreate(savedInstanceState)
+    // 如果你用的版本比较老，没有 RNScreensFragmentFactory，则使用下面的写法
+    // super.onCreate(null)
+  }
+}
+```
+
+
+**Java**
+
+```java
+// android/app/src/main/java/[...]/MainActivity.java
+import android.os.Bundle;
+import com.swmansion.rnscreens.fragment.restoration.RNScreensFragmentFactory;
+
+public class MainActivity extends ReactActivity {
+  // ...其他代码
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    getSupportFragmentManager().setFragmentFactory(new RNScreensFragmentFactory());
+    super.onCreate(savedInstanceState);
+    // 如果你用的版本比较老，没有 RNScreensFragmentFactory，则使用下面的写法
+    // super.onCreate(null);
+  }
+}
+```
+
+### 添加测试用的 Deep Link
+此步骤可以极其便利的在和用户完全一致的环境中安全地测试热更新，无需额外的设备注册步骤，也不影响现有的热更新流程。
+
+**Android**
+
+在 `android/app/src/main/AndroidManifest.xml` 中添加如下代码：
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+
+    <!-- 其他代码 -->
+
+    <!-- ↓↓↓ 注意 activity 的 launchMode 需要设置为 singleTask -->
+    <activity
+      android:launchMode="singleTask">
+      <!-- ↑↑↑ -->
+
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+
+      <!-- ↓↓↓ 添加如下 intent-filter， 注意和上面的 intent-filter 是不同的 action 和 category -->
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <!-- 添加你自定义的 scheme -->
+        <data android:scheme="你自定义的协议名，请不要和常见协议名或其他app冲突" />
+      </intent-filter>
+      <!-- ↑↑↑ -->
+
+    </activity>
+  </application>
+</manifest>
+```
+
+
+**iOS**
+
+请参考 [React Native 的文档](https://reactnative.cn/docs/next/linking#%E5%90%AF%E7%94%A8-deep-links)
+
+***
+在完成上述配置并编译，并且日后上传了热更包，在后台能看到热更版本之后，你就可以将鼠标移到网页后台的二维码图标上，如下图所示：
+<img alt="Deep Link二维码" src={image0} />
+勾选`使用 Deep Link`选项，在后面的输入框中填入你自定义的协议名，在二维码刷新后，即可在设备上直接使用系统相机或扫码功能（注意不能使用微信扫码）来扫描，即可自动触发热更检查功能。
+第一次扫码后可能只是触发服务器任务队列，会弹出提示 10 秒后重新扫码，此时会获得热更包，触发内置或自定义的更新策略。
+注意如果你使用自定义的更新策略，请务必从`useUpdate()`中获取`updateInfo`，而不要依赖`checkUpdate`方法的返回值，否则扫码不会有后续动作。
+### 禁用 android 的 crunch 优化
+android 会在生成 apk 时自动对 png 图片进行压缩，此操作既耗时又影响增量补丁的生成。为了保证补丁能正常生成，您需要在`android/app/build.gradle`中关闭此操作：
+```groovy
+// 在 android/app/build.gradle 文件中
+
+android {
+    // ...
+    signingConfigs {
+      // ...
+    }
+    buildTypes {
+        release {
+            // ...
+            // 添加下面这行以禁用crunch
+            crunchPngs false
+        }
+    }
+}
+
+```
+### 禁用 aab 包的资源分割（如果你需要在 Google Play 上架）
+如果你需要打 aab 包以在 Google Play 上架，且 react-native-update 版本 低于 10.36.0，则需要禁用 aab 包的资源分割。若已升级到 10.36.0+ 版本，则不需要此设置。
+```groovy
+// 在 android/app/build.gradle 文件中
+
+android {
+    bundle {
+        density {
+            // 请禁用资源分割
+            // 否则热更后可能遇到图片无法显示的问题
+            // v10.36.0 版本之后不需要此设置
+            enableSplit = false
+        }
+    }
+}
+
+```
+### 登录与创建应用
+首先请在 [https://pushy-admin.reactnative.cn](https://pushy-admin.reactnative.cn) 注册帐号，然后在你的项目根目录下运行以下命令：
+```bash
+$ pushy login
+email: <输入你的注册邮箱>
+password: <输入你的密码>
+```
+这会在项目文件夹下创建一个`.update`文件，注意不要把这个文件上传到 Git 等 CVS 系统上。你可以在`.gitignore`末尾增加一行`.update`来忽略这个文件。
+登录之后可以创建应用。注意 iOS 平台、安卓平台、鸿蒙平台需要分别创建：
+```bash
+$ pushy createApp --platform ios
+App Name: <输入应用名字>
+$ pushy createApp --platform android
+App Name: <输入应用名字>
+$ pushy createApp --platform harmony
+App Name: <输入应用名字>
+```
+:::info
+应用的名字可以相同，这没有关系。
+:::
+如果你已经在网页端或者其它地方创建过应用，也可以直接选择应用：
+```bash
+$ pushy selectApp --platform ios
+1) 鱼多多(ios)
+2) 招财旺(ios)
+
+Total 2 ios apps
+Enter appId: <输入应用前面的编号>
+```
+选择或者创建过应用后，你将可以在文件夹下看到`update.json`文件，其内容类似如下形式：
+```bash
+{
+    "ios": {
+        "appId": 1,
+        "appKey": "<一串随机字符串>"
+    },
+    "android": {
+        "appId": 2,
+        "appKey": "<一串随机字符串>"
+    },
+    "harmony": {
+        "appId": 3,
+        "appKey": "<一串随机字符串>"
+    }
+}
+```
+你可以安全的把`update.json`上传到 Git 等 CVS 系统上，与你的团队共享这个文件，它不包含任何敏感信息。当然，他们在使用任何功能之前，都必须首先输入`pushy login`进行登录。
+至此应用的创建/选择就已经成功了。下一步，你需要给代码添加相应的功能，请参阅[代码集成](/docs/integration.md)。
+
+```
+```
+
+
+
+---
+url: /docs/integration.md
+---
+
+# 代码集成
+
+:::info
+请注意，当前版本的api经过了完全重构，与之前的版本(v10.0以下)不兼容。如果你需要查看之前版本的文档，请点击[这里](https://v9--pushy-site.netlify.app/)
+:::
+
+安装配置完成后，确定应用编译顺利通过，下面我们来进行代码集成。
+
+### 获取 appKey
+
+检查更新时必须提供你的`appKey`，这个值保存在`update.json`中（使用`pushy createApp`或`pushy selectApp`命令后会自动生成），并且根据平台不同而不同。你可以用如下的代码获取`appKey`：
+
+```javascript
+import { Platform } from "react-native";
+
+import _updateConfig from "./update.json";
+const { appKey } = _updateConfig[Platform.OS];
+```
+
+也可以在网页端的应用设置中查看应用的 appKey。
+
+### 初始化服务
+
+```js
+import { UpdateProvider, Pushy } from "react-native-update";
+
+// 唯一必填参数是appKey，其他选项请参阅 api 文档
+const pushyClient = new Pushy({
+  appKey,
+  // 注意，默认情况下，在开发环境中不会检查更新
+  // 如需在开发环境中调试更新，请设置debug为true
+  // 但即便打开此选项，也仅能检查、下载热更，并不能实际应用热更。实际应用热更必须在release包中进行。
+  // debug: true
+});
+
+// 在根组件外加上 UpdateProvider 后导出
+export default function Root() {
+  // 注意，在使用 UpdateProvider 的当前组件中，无法直接调用 useUpdate
+  // 只有当前组件的子组件才能调用 useUpdate
+  return (
+    <UpdateProvider client={pushyClient}>
+      {/* ↓ 整个应用的根组件放到 UpdateProvider 中 */}
+      <App />
+    </UpdateProvider>
+  );
+}
+```
+
+如没有特别的自定义需求，那么到此热更新已经可以开始正常运作（如需在应用内执行 apk 更新，还需配置[安装权限](/docs/api.md#async-function-downloadandinstallapkurl)）。在默认的配置下，在 App 启动，以及从后台切换到前台时会触发更新检查，弹出提示的内容也固定。
+
+如需简单调整检查和更新策略，可参考以下内置的策略参数：
+
+#### checkStrategy（检查更新策略）
+
+用于控制自动检查更新的触发时机：
+
+- `"both"`（默认值）：在 App 启动时和从后台切换到前台时都会检查更新
+- `"onAppStart"`：仅在 App 启动时检查更新
+- `"onAppResume"`：仅在 App 从后台切换到前台时检查更新
+- `null`：不自动检查更新，必须手动调用 `checkUpdate` 方法（需 v10.4.2+ 版本）
+
+示例：
+
+```js
+const pushyClient = new Pushy({
+  appKey,
+  checkStrategy: "onAppStart", // 仅在启动时检查
+});
+```
+
+#### updateStrategy（更新应用策略）
+
+用于控制检测到更新后的自动下载和应用行为：
+
+- `"alwaysAlert"`：调试环境（`__DEV__`）的默认值，使用系统 alert 提示热更，并在有报错时弹出提示
+- `"alertUpdateAndIgnoreError"`：生产环境的默认值，有热更时使用系统 alert 提示，但不弹出报错提示
+- `"silentAndNow"`：自动静默下载并立即应用热更（会立即重启应用）
+- `"silentAndLater"`：自动静默下载，但仅在用户杀掉 App 后重启时应用更新
+- `null`：不自动下载和应用更新，需完全自定义热更界面
+
+示例：
+
+```js
+const pushyClient = new Pushy({
+  appKey,
+  updateStrategy: "silentAndLater", // 静默下载，下次启动时更新
+});
+```
+
+检查策略和更新策略是一个完整更新流水线的上下游，两者可以独立开关，自由搭配，以便不同程度的介入检查频率的控制，或是下载相关的界面交互。
+
+下面的章节提供了一个自定义更新策略和界面交互的参考实现。
+
+### 自定义更新界面
+
+默认配置下，pushy 会以系统 alert 的形式来弹出更新提示，如需自定义更新界面，首先请关闭默认的 updateStrategy 更新策略，并打开 debug 选项以便调试：
+
+```diff
+const pushyClient = new Pushy({
+  appKey,
++  updateStrategy: null,
++  debug: true,
+});
+```
+
+所有更新相关的数据可以通过一个单一的[`useUpdate()`](/docs/api.md#useupdate)hook 函数来获取，然后可以根据其提供的数据来自行渲染自定义的界面，如下面的例子：
+
+```js
+import { Text, View, TouchableOpacity } from 'react-native';
+import { useUpdate } from "react-native-update";
+import { Icon, PaperProvider, Snackbar, Banner } from "react-native-paper";
+function App() {
+  const {
+    client,
+    checkUpdate,
+    downloadUpdate,
+    switchVersionLater,
+    switchVersion,
+    updateInfo,
+    packageVersion,
+    currentHash,
+    progress: { received, total } = {},
+  } = useUpdate();
+  const [showUpdateBanner, setShowUpdateBanner] = useState(false);
+  const [showUpdateSnackbar, setShowUpdateSnackbar] = useState(false);
+  const snackbarVisible = showUpdateSnackbar && updateInfo?.update;
+  return (
+    <View style={styles.container}>
+      <Text>
+        更新下载进度：{received} / {total}
+      </Text>
+      <TouchableOpacity
+        onPress={() => {
+          checkUpdate();
+          setShowUpdateSnackbar(true);
+        }}
+      >
+        <Text>点击这里检查更新</Text>
+      </TouchableOpacity>
+      {snackbarVisible && (
+        <Snackbar
+          visible={true}
+          onDismiss={() => {
+            setShowUpdateSnackbar(false);
+          }}
+          action={{
+            label: "更新",
+            onPress: async () => {
+              setShowUpdateSnackbar(false);
+              if (await downloadUpdate()) {
+                setShowUpdateBanner(true);
+              }
+            },
+          }}
+        >
+          <Text>有新版本({updateInfo.name})可用，是否更新？</Text>
+        </Snackbar>
+      )}
+      <Banner
+        style={{ width: "100%", position: "absolute", top: 0 }}
+        visible={showUpdateBanner}
+        actions={[
+          {
+            label: "立即重启",
+            onPress: switchVersion,
+          },
+          {
+            label: "下次再说",
+            onPress: () => {
+              switchVersionLater();
+              setShowUpdateBanner(false);
+            },
+          },
+        ]}
+        icon={({ size }) => (
+          <Icon name="checkcircleo" size={size} color="#00f" />
+        )}
+      >
+        更新已完成，是否立即重启？
+      </Banner>
+    </View>
+  );
+}
+```
+
+其中`checkUpdate`方法可以用来手动触发更新检查。虽然这个方法会返回[`updateInfo`](/docs/api.md#async-function-checkupdate)（仅限 v10.26.0+ 版本），但我们仍然推荐优先使用`useUpdate()`来获取`updateInfo`。
+
+:::info
+依赖`useUpdate()`而不是`checkUpdate`来获取`updateInfo`，这样做虽然一开始可能觉得不太直观，但可以将**检查逻辑**和**更新逻辑**完全解耦，使更新流程上的各个组件不需要互相依赖和影响。
+比如检查更新的按钮只管调用`checkUpdate`，某个显示小红点的组件只管从 `useUpdate()` 中获取`updateInfo`，而主要的下载流程可以写一个单独的`useEffect`，这几者之间并不需要考虑先后顺序、组件层级或者传递数据。
+又比如你可能在多处都有检查更新的调用，比如 app 启动时、前后台切换时，又或者使用 deeplink 和扫码，这些不同的检查逻辑也不用重复去实现后续的更新逻辑。
+:::
+
+`updateInfo` 有三种情况：
+
+1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），开发者应该在 pushy 的管理后台添加一个更新下载链接，并自行提示用户下载。如需在应用内执行 apk 更新，还需配置[安装权限](/docs/api.md#async-function-downloadandinstallapkurl)。
+
+2. `{upToDate: true}`：当前已经更新到最新，无需进行更新。
+
+3. `{update: true}`：当前有新版本可以更新。info 的`name`、`description`字段可以用于提示用户，而`metaInfo`字段则可以根据你的需求自定义其它属性(如是否静默更新、是否强制更新等等)，具体用法可参考[场景实践](/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了补丁包的下载地址等。 pushy 会首先尝试耗费流量更少的更新方式。
+
+当返回的`updateInfo`中`update`字段为 true 时，即可调用`downloadUpdate`方法来下载更新，此时可以获取到下载的进度数据`progress`。下载完成后（注意!不可依赖`progress`来判断下载完成，必须要`await downloadUpdate()`之后）可以调用`switchVersion`来立即重启更新，也可以使用`switchVersionLater`来标记下次启动时更新。
+
+### 统计数据
+
+初始化 Pushy 客户端时可以传入自定义的 logger 函数，其中可以自己记录日志或上报统计数据，比如下面的例子使用 Google Analytics 来上报事件：
+
+```ts
+import { getAnalytics, logEvent } from "firebase/analytics";
+const analytics = getAnalytics();
+
+const pushyClient = new Pushy({
+  appKey,
+  logger: ({ type, data }) => {
+    logEvent(analytics, "pushy_" + type, data);
+  },
+});
+```
+
+以上提及的所有 api 的说明文档可在[这里](/docs/api.md)查看。还有一些其他常见的场景可以参考[场景实践](/docs/bestpractice.md)。
+
+现在，你的应用已经可以通过 pushy 服务检查版本并进行更新了。下一步，你可以开始尝试发布应用包和版本，请参阅[发布热更新](/docs/publish.md)。
+
+
+
+---
+url: /docs/intro.md
+---
+
+# Pushy - 专业的热更新解决方案
+
+:::info
+**现已全面支持鸿蒙系统以及 React Native 新架构！**
+:::
+
+Pushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-native-update)
+ [![npm version](https://badge.fury.io/js/react-native-update.svg)](https://www.npmjs.com/package/react-native-update)) 是面向 React Native 应用提供的**专业热更新服务**
+，由 [React Native 中文网](https://reactnative.cn)
+独家研发并持续维护。我们致力于为全球 React Native 开发者提供最快速、最稳定、最经济的热更新体验。
+## 🚀 为什么选择 Pushy？
+
+### 极致的更新体验
+
+- **🎯 超小更新包**：基于 bsdiff/hdiff 算法的增量更新，通常只需**几十至几百 KB**（相比其他全量更新服务的几十 MB，节省流量 99%+）
+- **⚡️ 极速分发**：国内用户使用阿里云高速 CDN，国外用户智能分流至 Cloudflare，在各地区都使用覆盖率最好的 CDN 服务商，更新成功率高达 **99.9%+**
+- **🛡️ 安全可靠**：内置崩溃回滚机制，出现问题自动回退，确保应用稳定运行
+- **🌐 全平台覆盖**：完美支持 <AppleOutlined style={{fontSize: '16px', color: '#555', marginRight: '6px'}} /> **iOS** <AndroidOutlined style={{fontSize: '16px', color: '#3DDC84', marginRight: '6px'}} /> **Android**, 且业内独家第一方支持 <HarmonyOSOutlined style={{fontSize: '16px', color: '#000', marginRight: '6px'}} /> **鸿蒙（HarmonyOS）**
+- **🔍 深耕 React Native 生态**：
+  - ✅ **Expo** - 无缝集成
+  - ✅ **新架构** - 第一时间跟进支持
+  - ✅ **Hermes** - 完整支持字节码格式
+- **📖 核心逻辑完全开源**：客户端、命令行工具以及管理界面代码都[完全开源](https://github.com/reactnativecn)，接受社区审计，代码透明可信，你可以随时迁移到自建服务器或其他服务
+- **🔒 数据安全**：可以自行插入数据埋点，完全掌控自己的数据
+- **💬 专业人工支持**：提供付费专人技术支持，有问必答，确保你的应用稳定运行
+- **🏆 多年稳定运营**：从 2016 年开始运营至今，服务众多知名企业和应用
+
+## 💰 性价比之选
+
+相比同类服务，Pushy 不仅功能更强大，价格也更亲民：
+
+| 对比项       | Pushy        | Expo Update |
+| --------- | ------------ | ----------- |
+| **起步价**   | ¥66/月        | \~¥136/月    |
+| **流量计费**  | 不单独计费        | 超出需额外付费     |
+| **更新包大小** | 几十至几百 KB（增量） | 几十 MB（全量）   |
+| **国内速度**  | ⭐⭐⭐⭐⭐ 极快     | ⭐⭐ 较慢       |
+| **鸿蒙支持**  | ✅ 支持         | ❌ 不支持       |
+
+:::warning
+**注意**：Microsoft App Center（Code Push）已于 2025 年 3 月 31 日正式停止服务。如果你正在使用 Code Push，现在正是迁移到 Pushy 的最佳时机！
+:::
+
+使用 Pushy 后，你的团队将获得：
+
+- ✅ **节省 90% 以上的流量成本**
+- ✅ **发版速度提升 10 倍以上**（无需等待应用商店审核）
+- ✅ **Bug 修复时间缩短至分钟级**
+- ✅ **用户更新率提升至 99%+**（相比应用商店的自然更新率）
+- ✅ **开发迭代更加灵活自由**
+
+### 简单易用
+
+```js
+// 三行代码即可集成
+import { UpdateProvider, Pushy } from "react-native-update";
+
+const pushyClient = new Pushy({ appKey });
+
+<UpdateProvider client={pushyClient}>
+  <App />
+</UpdateProvider>
+```
+
+内置多种更新策略，开箱即用：
+
+- 🔕 **静默更新** - 后台自动下载，用户无感知
+- 💬 **提示更新** - 友好的系统弹窗提醒
+- ⚙️ **自定义策略** - 完全可控的更新流程
+
+## 🚦 开始使用
+
+只需三步，即可为你的 React Native 应用添加热更新能力：
+
+1. **[安装配置](/docs/getting-started.md)** - 5 分钟完成基础配置
+2. **[代码集成](/docs/integration.md)** - 几行代码即可接入
+3. **[发布更新](/docs/publish.md)** - 一条命令推送新版本
+
+:::info
+不确定是否适合你的项目？查看[常见问题](/docs/faq.md)或者可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。
+:::
+
+立即开始使用 Pushy，让你的 React Native 应用拥有极致的热更新体验！
+
+
+
+---
+url: /docs/publish.md
+---
+
+# 发布热更新
+
+现在你的应用已经具备了检测更新的功能，下面我们来尝试发布并更新它。流程可参考下图：
+
+```mermaid
+flowchart TD
+    codebase["🖥️&nbsp;&nbsp;项目代码库"]
+    subgraph 发布原生基准版本
+    tagNativeVersion["🏷️&nbsp;&nbsp;(在 git 上)标记原生版本号"]
+    newNativeVersion["🗂️&nbsp;&nbsp;新的原生基准版本"]
+    nativePackage["📦&nbsp;&nbsp;原生完整包(apk或ipa文件)"]
+    tagNativeVersion--"🔨&nbsp;&nbsp;编译"-->nativePackage
+    nativePackage--"⬆️&nbsp;&nbsp;使用<br/>pushy uploadApk/uploadIpa<br/>命令上传"-->newNativeVersion
+    end
+    subgraph 发布热更新版本
+    tagBundleVersion["🏷️&nbsp;&nbsp;(在 git 上)标记热更新版本号"]
+    bundlePackage["🎁&nbsp;&nbsp;js代码与资源包(ppk文件)"]
+    tagBundleVersion--"🔨&nbsp;&nbsp;使用<br/>pushy bundle<br/>命令生成并上传"-->bundlePackage
+    someNativeVersions["🗂️&nbsp;&nbsp;一个或多个原生基准版本"]
+    bundlePackage--"🖇️&nbsp;&nbsp;绑定"-->someNativeVersions
+    end
+    user["👨‍👩‍👧‍👦&nbsp;&nbsp;安装有对应原生基准版本的用户"]
+    codebase--"✏️&nbsp;&nbsp;改动js代码，<br/>或添加、更新js组件，<br/>或添加、更新js代码中引用的图片等资源"-->发布热更新版本
+    codebase--"🖊️&nbsp;&nbsp;改动原生代码、设置，<br/>或添加、更新原生组件，<br/>或添加、更新原生代码中引用的图片等资源"-->发布原生基准版本
+    发布热更新版本--"📲&nbsp;&nbsp;推送增量热更新(diff文件)"-->user
+```
+
+流程总结如下：
+
+1. 我们需要先打包一个原生 release 版本，在打包前请确保已集成了`react-native-update`并在调试过程中运行正常，安卓端[关闭了`crunchPngs`设置](/docs/getting-started.md#%E7%A6%81%E7%94%A8-android-%E7%9A%84-crunch-%E4%BC%98%E5%8C%96)，打包说明可参考[iOS 打包](https://reactnative.cn/docs/publishing-to-app-store)和[android 打包](https://reactnative.cn/docs/signed-apk-android)。打包完成后请使用`pushy uploadIpa`或者`pushy uploadApk`命令来把这个安装包上传到 pushy 服务器端，以作为之后热更差量对比的基准。同时请保留好这个安装包，上架和分发给用户所使用的安装包`需要和服务器端完全一致`。建议使用 git tag 功能来标记原生版本号（例如`v1.0.0`）。
+2. 然后在基准版本之上迭代业务逻辑（增删 js 代码，增删图片等静态资源），使用`pushy bundle`命令来生成和发布热更新版本，而不需要重新打包。建议使用 git tag 功能来标记热更版本号（例如`v1.0.1`）。
+3. 如果迭代过程中有原生方面的修改，则需要发布并上传新的原生基准版本（重复步骤 1，但需要设置不同的原生版本号）。可以只保留一个原生基准版本，也可以多版本同时维护。
+
+## 发布原生基准版本
+
+### iOS
+
+首先参考[文档-在设备上运行](https://reactnative.cn/docs/running-on-device)，确定你正在使用离线包。然后点击菜单。
+
+按照正常的发布流程打包`.ipa`文件：
+
+1. Xcode 中运行设备选真机或 Generic iOS Device
+2. 菜单中选择 Product - Archive
+3. Archive 完成后选择`Export`生成.ipa 文件
+4. 然后运行如下命令上传到 pushy 服务器以供后续版本比对之用
+
+```bash
+$ pushy uploadIpa <ipa后缀文件>
+```
+
+此 ipa 的`CFBundleShortVersionString`字段(位于`ios/项目名/Info.plist`中)会被记录为原生版本号`packageVersion`。
+
+随后你可以选择往 AppStore 上传这个版本（可以重新 export 并调整相关选项，但请不要重新 archive），也可以先通过[Test flight](https://developer.apple.com/cn/testflight/)或[蒲公英](https://www.pgyer.com/doc/view/build_ipa)等渠道进行真机安装测试。请注意：暂不支持通过 Xcode 直接进行热更新测试。
+
+如果后续需要再次 archive 打包（例如修改原生代码或配置。如果只是修改 js 代码则不需要重新打包。），请先**更改版本号**，并在打包完成后再次`uploadIpa`到服务器端记录，否则后续生成的相同版本的原生包会由于[编译时间戳不一致而`无法获取热更新`](/docs/faq.md#热更新报错：热更新已暂停，原因：buildtime-mismatch。)。
+
+### Android
+
+首先参考[文档-打包 APK](https://reactnative.cn/docs/signed-apk-android)设置签名，然后在 android 文件夹下运行`./gradlew assembleRelease`或`./gradlew aR`，你就可以在`android/app/build/outputs/apk/release/app-release.apk`中找到你的应用包。
+
+然后运行如下命令
+
+```bash
+$ pushy uploadApk android/app/build/outputs/apk/release/app-release.apk
+# 如果你打的是 aab 格式的包，则请使用以下命令
+# pushy uploadAab android/app/build/outputs/bundle/release/app-release.aab
+```
+
+即可上传 apk 以供后续版本比对之用。此 apk 的`versionName`字段(位于`android/app/build.gradle`中)会被记录为原生版本号`packageVersion`。
+
+随后你可以选择往应用市场发布这个版本，也可以先往设备上直接安装这个 apk 文件以进行测试。
+
+如果后续需要再次打包（例如修改原生代码或配置。如果只是修改 js 代码则不需要重新打包。），请先**更改版本号**，并再次`uploadApk`到服务器端记录，否则后续生成的相同版本的原生包会由于[编译时间戳不一致而`无法获取热更新`](/docs/faq.md#热更新报错：热更新已暂停，原因：buildtime-mismatch。)。
+
+### Harmony
+
+首先下载鸿蒙开发IDE DevEco-Studio，然后通过Build => Build Hap(s)/App(s) => Build App(s)，你就可以在`harmony/build/outputs/default/harmony-default-unsigned.app`中找到你的应用包。
+
+然后运行如下命令
+
+```bash
+$ pushy uploadApp harmony/build/outputs/default/harmony-default-unsigned.app
+```
+
+即可上传 app 以供后续版本比对之用。此 app 的`versionName`字段(位于`harmony/AppScope/app.json5`中)会被记录为原生版本号`packageVersion`。
+
+随后你可以选择往华为应用市场发布这个版本，也可以先往设备上通过命令`hdc shell`命令安装这个 app 文件以进行测试。
+
+如果后续需要再次打包（例如修改原生代码或配置。如果只是修改 js 代码则不需要重新打包。），请先**更改版本号**，并再次`uploadApp`到服务器端记录，否则后续生成的相同版本的原生包会由于[编译时间戳不一致而`无法获取热更新`](/docs/faq.md#热更新报错：热更新已暂停，原因：buildtime-mismatch。)。
+
+## 发布热更新版本
+
+你可以尝试修改一行代码(譬如将版本一修改为版本二)，然后使用`pushy bundle --platform <ios|android|harmony>`命令来生成新的热更新版本。
+
+:::info
+如果你使用了较新版本的`expo`或其他没有`index.js`的框架，执行`bundle`命令时会报错。此时请手动创建一个`index.js`文件，在其中引用框架自身的入口文件即可。具体入口文件的路径如何，请参考框架的说明文档或者`package.json`中的`main`字段。例如针对`expo`的`index.js`可能是如下这样写：
+
+```js
+import "expo-router/entry";
+```
+
+:::
+
+```bash
+$ pushy bundle --platform android
+Bundling with React Native version:  0.22.2
+<各种进度输出>
+Bundled saved to: build/output/android.1459850548545.ppk
+Would you like to publish it?(Y/N)
+```
+
+如果想要立即上传，此时输入 Y。当然，你也可以在将来使用`pushy publish --platform android build/output/android.1459850548545.ppk`来上传刚才打包好的热更新包。
+
+```
+  Uploading [========================================================] 100% 0.0s
+Enter version name: <输入热更新版本名字，如1.0.0-rc>
+Enter description: <输入热更新版本描述>
+Enter meta info: {"ok":1}
+Ok.
+Would you like to bind packages to this version?(Y/N)
+```
+
+此时版本已经提交到 pushy 服务，但用户暂时看不到此更新，你需要先将特定的原生包版本绑定到此热更新版本上。
+
+此时输入 Y 立即绑定，你也可以在将来使用`pushy update --platform <ios|android|harmony>`来对已上传的热更包和原生包进行绑定。除此以外，你还可以在网页端操作，简单的将对应的原生包版本拖到需要的热更新版本下即可。
+
+```
+┌────────────┬──────────────────────────────────────┐
+│ Package Id │               Version                │
+├────────────┼──────────────────────────────────────┤
+│   46272    │ 2.0(normal)                          │
+├────────────┼──────────────────────────────────────┤
+│   45577    │ 1.0(normal)                          │
+└────────────┴──────────────────────────────────────┘
+共 2 个包
+输入原生包 id: 46272
+```
+
+版本绑定完毕后，服务器会在几秒内生成差量补丁，客户端就可以获取到更新了。
+
+后续要继续发布新的热更新，只需反复执行`pushy bundle`命令即可，不需要重新打包。
+
+恭喜你，至此为止，你已经完成了植入代码热更新的全部工作。
+
+## 灰度发布
+
+灰度发布（又称金丝雀发布、渐进式发布）是一种降低热更新发布风险的策略，通过逐步扩大更新范围来验证新版本的稳定性。
+
+### 什么是灰度发布
+
+灰度发布是指在正式全量发布热更新之前，先将更新推送给一小部分用户（如 5%、10%），观察这部分用户的使用情况后，再逐步扩大更新比例，直到最终推送给所有用户。
+
+### 灰度发布的作用
+
+- **降低风险**：如果新版本存在 bug，只会影响小部分用户，可以及时发现并回滚
+- **验证稳定性**：通过小范围用户的真实使用反馈，验证新版本在各种设备和网络环境下的表现
+- **平滑过渡**：避免突然的全量更新对服务器造成的压力峰值
+- **快速止损**：一旦发现问题，可以立即停止灰度，将影响范围控制在最小
+
+### 工作原理
+
+当你设置了灰度比例（如 10%）后，检查更新时会根据每个用户的设备 UUID 进行哈希计算，确定该用户是否在灰度范围内：
+
+- 灰度范围内的用户会收到新版本的更新推送
+- 灰度范围外的用户会收到上一个全量版本（如果有），或显示为已是最新
+- 同一用户的灰度状态是稳定的，不会因为多次检查更新而变化
+
+### 使用方法
+
+#### 通过网页端操作
+
+1. 登录 [Pushy 管理后台](https://update.reactnative.cn)
+2. 选择对应的应用和原生包版本
+3. 点击"发布"按钮
+4. 选择灰度发布比例
+
+#### 通过命令行操作
+
+请查看[命令行工具文档中的 rollout 参数](/docs/cli.md#pushy-update)
+
+### 注意事项
+
+:::warning
+**重要提示**：灰度版本与全量版本是独立的绑定关系。
+:::
+
+- **同时只能有一个灰度版本**：每个原生包版本只能绑定一个灰度热更版本（比例小于100%）和一个全量热更版本
+- **优先级**：如果同时存在灰度版本和全量版本，灰度范围内命中的用户会收到灰度版本，没有命中的用户会收到全量版本
+- **提升为全量**：将灰度比例设置为 100% 后，该版本会自动提升为全量版本，替换原有的全量版本
+- **客户端版本要求**：`react-native-update` >= 10.32.0 才能支持同时发布灰度和全量版本。
+
+
+
+---
+url: /docs/skills.md
+---
+
+# 安装与使用 Skill
+
+本文介绍如何安装并使用 `react-native-update` 的 Skill，帮助你在 AI 编程工具中更高效地完成接入、配置与排查。
+
+## Skill 信息
+
+- Skill 名称：`react-native-update`
+- 源仓库：`reactnativecn/react-native-update-skill`
+
+## 安装（推荐）
+
+安装到当前环境支持的所有 Agent：
+
+```bash
+npx skills add reactnativecn/react-native-update-skill --skill react-native-update -a '*'
+```
+
+仅安装到 Claude Code：
+
+```bash
+npx skills add reactnativecn/react-native-update-skill --skill react-native-update -a claude-code
+```
+
+## 更新 Skill
+
+```bash
+npx skills check
+npx skills update
+```
+
+## 使用方式
+
+安装后，可以直接向 AI 助手提出接入需求，例如：
+
+- 在 Expo 项目中接入 `react-native-update`
+- 在 class 组件根节点中完成接入改造
+- 配置白名单灰度发布策略
+- 排查“热更新未生效”问题
+
+## Skill 覆盖内容
+
+- RN CLI / Expo 接入流程
+- `update.json` 与 `appKey` 配置检查
+- iOS / Android 关键改动提示
+- 更新策略建议（`checkStrategy` / `updateStrategy`）
+- 常见冲突排查（如 `expo-updates`）
+- class 组件与白名单示例
+
+## 相关链接
+
+- 仓库：
+  <a href="https://github.com/reactnativecn/react-native-update-skill" target="_blank">
+    [https://github.com/reactnativecn/react-native-update-skill](https://github.com/reactnativecn/react-native-update-skill)
+  </a>
+- ClawHub 页面（可选）：
+  <a href="https://clawhub.ai/skills/react-native-update" target="_blank">
+    [https://clawhub.ai/skills/react-native-update](https://clawhub.ai/skills/react-native-update)
+  </a>
+
+
+
+---
+url: /pricing.md
+---
+
+## 公平透明的价格体系
+
+新注册用户将自动获得7 天的**专业版**试用评估。
+到期后转为免费版。如需按月购买或寻求大客户方案，请联系 QQ 客服 34731408。
+
+### 免费版
+
+适用于小型应用或个人项目，满足轻度热更新需求
+
+¥0/ 年- 可创建 3 个 应用
+- 每应用 30 个 原生包 (最大 30M/个)
+- 每应用 30 个 热更包 (最大 3M/个)
+- **CDN 流量全包**，无额外费用
+所有应用累加
+
+每天1 千次更新查询
+[开始使用](docs/getting-started)### 标准版
+
+适用于一般应用，满足中度应用迭代与热更频率
+
+¥800/ 年或 ¥100 / 月- 可创建 5 个 应用
+- 每应用 50 个 原生包 (最大 150M/个)
+- 每应用 50 个 热更包 (最大 15M/个)
+- **CDN 流量全包**，无额外费用
+- 提供专人技术支持
+所有应用累加
+
+每天1 万次更新查询
+[立即升级](https://pushy-admin.reactnative.cn/#/user)最受欢迎### 高级版
+
+适用于中大型商业应用，快速可靠的线上问题修复
+
+¥2400/ 年或 ¥300 / 月- 可创建 10 个 应用
+- 每应用 60 个 原生包 (最大 500M/个)
+- 每应用 60 个 热更包 (最大 50M/个)
+- **CDN 流量全包**，无额外费用
+- **优先**专人技术支持
+所有应用累加
+
+每天10 万次更新查询
+[立刻抢购](https://pushy-admin.reactnative.cn/#/user)### 专业版
+
+适用于企业级多业务线舰队应用，极高的资源上限
+
+¥7200/ 年或 ¥900 / 月- 可创建 50 个 应用
+- 每应用 100 个 原生包 (最大 2000M/个)
+- 每应用 100 个 热更包 (最大 200M/个)
+- **CDN 流量全包**，无额外费用
+- **最高优**企业级技术支持
+所有应用累加
+
+每天100 万次更新查询
+[联系办理](https://pushy-admin.reactnative.cn/#/user)* **注：**iOS 和 Android 版本记做不同的应用。原生包和热更包的数量限制均为**单个应用**维度。
+原生包指完整的 apk/ipa 安装包。热更包指 pushy bundle 命令生成的 ppk 文件（非用户实际下载的增量更新文件）。
+**所有版本均包含 CDN 流量费用，无需额外付费。**
+为了最大化利用您的定额，您可随时在控制台删除已不再使用的应用、原生包和热更包。
+
+对于付费业务还有其他疑问？请参考我们的[常见问题解答](docs/faq#%E4%BB%98%E8%B4%B9%E9%97%AE%E9%A2%98)。
+
+
+### 联系我们
+
+- [邮箱 hi@charmlot.com](mailto:hi@charmlot.com)
+- QQ群 729013783
+
+### 用户协议
+
+- [用户协议](/agreement/)
+- [隐私政策](/agreement/#privacy)
+
+### 帮助
+
+- [常见问题](/docs/faq)
+- [Issue 讨论区](https://github.com/reactnativecn/react-native-update/issues)
+
+### 链接
+
+- [React Native 中文网](https://reactnative.cn/)
+- [ReactJS](https://zh-hans.react.dev/)
+
+React Native 中文网 © 2026 武汉青罗网络科技有限公司
+
+|[鄂ICP备20002031号-3](https://beian.miit.gov.cn/)[![](https://img.alicdn.com/tfs/TB1..50QpXXXXX7XpXXXXXXXXXX-40-40.png)鄂公网安备 42011202001821号](http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=42011202001821)
+
+
+---
+url: /index.md
+---
+
+![Pushy Logo](/static/svg/logo.8f6d66882a.svg)# Pushy
+
+极速热更新框架 for React Native
+
+高速节点勤分发山河浩广若比邻
+增量算法尽优化字节四两拨千斤
+
+[立即免费体验](/docs/intro)[Star](//github.com/reactnativecn/react-native-update/)[](//github.com/reactnativecn/react-native-update/stargazers/)## 他们选择了 Pushy
+
+![中国联通](/static/image/zglt.a8272b3a12.png)![网易游戏](/static/image/wyyx.e81ec9afd2.png)![华中师范大学](/static/image/hzsfdx.bff67934ac.jpg)![蓝月亮](/static/image/lyl.5ba41a257d.png)![欧普照明](data:image/png;base64,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)![平安不动产](/static/image/pabdc.b5d61c85a7.png)![天津公交](/static/image/tjgj.43712fe8de.png)![锐捷网络](/static/svg/rjwl.c16bdaa1ff.svg)![环球时报](/static/image/hqsb.ed1da880b1.png)![航天信息](/static/image/htxx.4755a497ad.png)## 为什么选择 Pushy
+
+![增量更新](data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTkuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiCgkgdmlld0JveD0iMCAwIDUxMiA1MTIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDUxMiA1MTI7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPHBvbHlnb24gc3R5bGU9ImZpbGw6IzgxQTRFMzsiIHBvaW50cz0iNDUxLjc4NCwzNzUuNjM4IDQ2Ni4zOTMsMzMxLjgxNCA0MjIuNTczLDM0Ni40MjQgIi8+CjxwYXRoIHN0eWxlPSJmaWxsOiNFQUVBRUE7IiBkPSJNMTMwLjI5OSw0MDAuMTA2YzMuMzc5LTMuMzgzLDMuMzc5LTguODg0LDAtMTIuMjY4Yy0zLjI1Mi0zLjI2OS04Ljk3Ny0zLjI3My0xMi4yNjMsMC4wMDQKCWMtMy4zNzksMy4zNzktMy4zNzksOC44OCwwLDEyLjI2M0MxMjEuMzEzLDQwMy4zODQsMTI3LjAzOSw0MDMuMzc1LDEzMC4yOTksNDAwLjEwNnoiLz4KPHBhdGggc3R5bGU9ImZpbGw6IzczQzlDOTsiIGQ9Ik0xOS45MiwzMjYuNTIxYy0xLjY2LDEuNjYtMi41NzUsMy44NDEtMi41NzUsNi4xNGMwLDIuMjkxLDAuODk4LDQuNDUxLDIuNTMyLDYuMDg1bDE1My4zOTUsMTUzLjM5MQoJYzMuMzYyLDMuMzY2LDguODU5LDMuMzQxLDEyLjIyMS0wLjA0Mmw0Mi45MzEtNDIuOTI2TDYyLjg1LDI4My41OTRMMTkuOTIsMzI2LjUyMXogTTEwNS43NzMsMzc1LjU3NQoJYzkuODI0LTkuODMzLDI2Ljk2Ni05LjgxNiwzNi43OTEsMGMxMC4xNDYsMTAuMTQyLDEwLjE0NiwyNi42NTMsMCwzNi43OTVjLTQuOTEyLDQuOTEyLTExLjQ0Miw3LjYxOC0xOC4zOTUsNy42MTgKCWMtNi45NDUsMC0xMy40ODMtMi43MDYtMTguMzk1LTcuNjE0di0wLjAwNEM5NS42MjYsNDAyLjIyNyw5NS42MjYsMzg1LjcxNywxMDUuNzczLDM3NS41NzV6Ii8+Cjxwb2x5Z29uIHN0eWxlPSJmaWxsOiM4MUE0RTM7IiBwb2ludHM9IjE3MS41MjgsMzYuOTQ5IDEyNy43MDgsNTEuNTU4IDE1Ni45MTgsODAuNzczICIvPgo8cGF0aCBzdHlsZT0iZmlsbDojRUFFQUVBOyIgZD0iTTMzOC43NjEsMTkuODU4Yy0zLjM3MS0zLjM2Mi04Ljg1OS0zLjMyNC0xMi4yNDYsMC4wNjRMNzUuMjU4LDI3MS4xODNsMTY1LjU3NCwxNjUuNTc0CglMNDkyLjA4OSwxODUuNWMxLjY1MS0xLjY1MSwyLjU1OC0zLjgzNywyLjU2Ni02LjE2MWMwLjAwOC0yLjMwOC0wLjg4MS00LjQ2Ny0yLjQ5OC02LjA4OUwzMzguNzYxLDE5Ljg1OHogTTM4MS43NjgsMTk3LjQ1NEgyNTEuNjgxCgl2LTE3LjM0NWgxMzAuMDg4VjE5Ny40NTR6IE00NDIuNDc2LDE3MS40MzZIMzEyLjM4OHYtMTcuMzQ1aDEzMC4wODhWMTcxLjQzNnoiLz4KPGc+Cgk8cGF0aCBzdHlsZT0iZmlsbDojMzE0RTU1OyIgZD0iTTQ3Ny4zNjEsMzA5Ljg3NWwtNzMuNTg5LDI0LjUzMWMtMi44NTQsMC45NTMtNS4wMDUsMy4zMTEtNS43LDYuMjM4CgkJYy0wLjY4NiwyLjkyMiwwLjE4Niw1Ljk5NiwyLjMxMiw4LjEyMmwxMi4yNjQsMTIuMjYzTDMwOC4zOTksNDY1LjI4MWwxMi4yNjMsMTIuMjYzbDEwNC4yNDktMTA0LjI1M2wyNC41MzQsMjQuNTMyCgkJYzEuNjQzLDEuNjQ3LDMuODYyLDIuNTQxLDYuMTMyLDIuNTQxYzAuNjYxLDAsMS4zMy0wLjA3NiwxLjk5LTAuMjMzYzIuOTMtMC42OSw1LjI4NS0yLjg0Niw2LjIzMy01LjY5NmwyNC41MjctNzMuNTg5CgkJYzEuMDQyLTMuMTE3LDAuMjI5LTYuNTU1LTIuMDkyLTguODc2QzQ4My45MTYsMzA5LjY0Miw0ODAuNDg2LDMwOC44MjksNDc3LjM2MSwzMDkuODc1eiBNNDUxLjc4NCwzNzUuNjM4bC0yOS4yMTEtMjkuMjE1CgkJbDQzLjgyLTE0LjYwOUw0NTEuNzg0LDM3NS42Mzh6Ii8+Cgk8cGF0aCBzdHlsZT0iZmlsbDojMzE0RTU1OyIgZD0iTTI1Ljc5NywxODIuNjc5TDEzMC4wNDYsNzguNDI2bDI0LjUzNCwyNC41MzJjMS42NDMsMS42NDcsMy44NjIsMi41NDEsNi4xMzIsMi41NDEKCQljMC42NjEsMCwxLjMzLTAuMDc2LDEuOTktMC4yMzNjMi45My0wLjY5LDUuMjg1LTIuODQ2LDYuMjMzLTUuNjk2bDI0LjUyNy03My41ODljMS4wNDItMy4xMTcsMC4yMjktNi41NTUtMi4wOTItOC44NzYKCQljLTIuMzIxLTIuMzI5LTUuNzUxLTMuMTQyLTguODc2LTIuMDk2bC03My41ODksMjQuNTMxYy0yLjg1NCwwLjk1My01LjAwNSwzLjMxMS01LjcsNi4yMzhjLTAuNjg2LDIuOTIyLDAuMTg2LDUuOTk2LDIuMzEyLDguMTIyCgkJbDEyLjI2NCwxMi4yNjNMMTMuNTM0LDE3MC40MTZMMjUuNzk3LDE4Mi42Nzl6IE0xNzEuNTI4LDM2Ljk0OWwtMTQuNjA5LDQzLjgyNGwtMjkuMjExLTI5LjIxNUwxNzEuNTI4LDM2Ljk0OXoiLz4KCTxwYXRoIHN0eWxlPSJmaWxsOiMzMTRFNTU7IiBkPSJNNTA0LjQyLDE2MC45ODVMMzUxLjAyNSw3LjU5NGMtMTAuMTIxLTEwLjEyOS0yNi42MTktMTAuMDkxLTM2Ljc3MywwLjA2NEw1MC43MzEsMjcxLjE4MwoJCWwwLjAwMSwwLjAwMUw3LjY1NiwzMTQuMjUzQzIuNzI3LDMxOS4xODYsMC4wMDgsMzI1LjcyMSwwLDMzMi42NTdjMCw2LjkyOCwyLjcwMiwxMy40NDUsNy42MTQsMTguMzUzTDE2MS4wMDksNTA0LjQKCQljNS4wNTYsNS4wNTIsMTEuNjg4LDcuNTgsMTguMzM2LDcuNThjNi42NjUsMCwxMy4zMzEtMi41NDEsMTguNDEyLTcuNjE4bDU1LjE5NC01NS4xOTRsLTAuMDAyLTAuMDAybDI1MS40MDMtMjUxLjM5OQoJCWM0LjkxMi00LjkxMiw3LjYzMS0xMS40MzgsNy42NDgtMTguMzc4QzUxMi4wMjUsMTcyLjQyNyw1MDkuMzMyLDE2NS44OTMsNTA0LjQyLDE2MC45ODV6IE0xODUuNDkzLDQ5Mi4wOTUKCQljLTMuMzYyLDMuMzgzLTguODU5LDMuNDA5LTEyLjIyMSwwLjA0MkwxOS44NzcsMzM4Ljc0NmMtMS42MzUtMS42MzUtMi41MzItMy43OTQtMi41MzItNi4wODVjMC0yLjI5OSwwLjkxNS00LjQ4LDIuNTc1LTYuMTQKCQlsNDIuOTMxLTQyLjkyNmwxNjUuNTc0LDE2NS41NzRMMTg1LjQ5Myw0OTIuMDk1eiBNNDkyLjA4OSwxODUuNUwyNDAuODMxLDQzNi43NTdMNzUuMjU4LDI3MS4xODNMMzI2LjUxNSwxOS45MjEKCQljMy4zODgtMy4zODgsOC44NzYtMy40MjYsMTIuMjQ2LTAuMDY0bDE1My4zOTUsMTUzLjM5MWMxLjYxOCwxLjYyMiwyLjUwNywzLjc4MSwyLjQ5OCw2LjA4OQoJCUM0OTQuNjQ2LDE4MS42NjMsNDkzLjc0LDE4My44NDgsNDkyLjA4OSwxODUuNXoiLz4KCTxwYXRoIHN0eWxlPSJmaWxsOiMzMTRFNTU7IiBkPSJNMTA1Ljc3Myw0MTIuMzc0YzQuOTEyLDQuOTA4LDExLjQ1LDcuNjE0LDE4LjM5NSw3LjYxNGM2Ljk1MywwLDEzLjQ4My0yLjcwNiwxOC4zOTUtNy42MTgKCQljMTAuMTQ2LTEwLjE0MiwxMC4xNDYtMjYuNjUzLDAtMzYuNzk1Yy05LjgyNC05LjgxNi0yNi45NjYtOS44MzMtMzYuNzkxLDBjLTEwLjE0NiwxMC4xNDItMTAuMTQ2LDI2LjY1MywwLDM2Ljc5NVY0MTIuMzc0egoJCSBNMTE4LjAzNiwzODcuODQyYzMuMjg2LTMuMjc4LDkuMDExLTMuMjczLDEyLjI2My0wLjAwNGMzLjM3OSwzLjM4MywzLjM3OSw4Ljg4NCwwLDEyLjI2OGMtMy4yNjEsMy4yNjktOC45ODYsMy4yNzgtMTIuMjYzLDAKCQlDMTE0LjY1NywzOTYuNzIyLDExNC42NTcsMzkxLjIyMiwxMTguMDM2LDM4Ny44NDJ6Ii8+Cgk8cmVjdCB4PSIzMTIuMzg0IiB5PSIxNTQuMDg3IiBzdHlsZT0iZmlsbDojMzE0RTU1OyIgd2lkdGg9IjEzMC4wODgiIGhlaWdodD0iMTcuMzQ1Ii8+Cgk8cmVjdCB4PSIyNTEuNjc2IiB5PSIxODAuMTA0IiBzdHlsZT0iZmlsbDojMzE0RTU1OyIgd2lkdGg9IjEzMC4wODgiIGhlaWdodD0iMTcuMzQ1Ii8+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPC9zdmc+Cg==)### 增量更新
+
+基于 bsdiff/hdiff 算法创建，实现 kb 级别极小更新包。
+
+![快捷发布](data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTkuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiCgkgdmlld0JveD0iMCAwIDUxMiA1MTIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDUxMiA1MTI7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPGc+Cgk8cGF0aCBzdHlsZT0iZmlsbDojNzNDOUM5OyIgZD0iTTIwMy40MjEsMTQyLjY2NmMwLDM2LjMxLTkuNjIyLDY4LjM1MS0yNS4wODIsOTAuNTY1YzMyLjg5OC0xOC40NzYsNTUuMjA1LTUzLjY2LDU1LjIwNS05NC4wMDMKCQloLTMwLjIzQzIwMy4zMzQsMTQwLjM4MiwyMDMuNDIxLDE0MS41MDQsMjAzLjQyMSwxNDIuNjY2eiIvPgoJPHBhdGggc3R5bGU9ImZpbGw6IzczQzlDOTsiIGQ9Ik0yMDIuMjA1LDEyMS4yNjNoMjkuNzE3Yy02LjEwNi0zNi4xNzItMzAuMjA1LTY2LjI1OS02Mi44MjEtODAuNjUyCgkJQzE4Ni4zODcsNTguNjM0LDE5OC41NDYsODcuMzcsMjAyLjIwNSwxMjEuMjYzeiIvPgoJPHBhdGggc3R5bGU9ImZpbGw6IzczQzlDOTsiIGQ9Ik0xMTYuNzcyLDEyMS4yNjNWMzkuNjc4Yy0yNC4yNDIsNi43MjgtNDQuMTg5LDM5LjkzMS00OS4zODgsODEuNTg1SDExNi43NzJ6Ii8+Cgk8cGF0aCBzdHlsZT0iZmlsbDojNzNDOUM5OyIgZD0iTTQ5LjI5NiwxMjEuMjYzYzMuNjU5LTMzLjg5MSwxNS44Mi02Mi42MjYsMzMuMTA3LTgwLjY0OQoJCWMtMzIuNjE0LDE0LjM5NC01Ni43MDksNDQuNDc5LTYyLjgxNiw4MC42NDlINDkuMjk2eiIvPgoJPHBhdGggc3R5bGU9ImZpbGw6IzczQzlDOTsiIGQ9Ik0xMzQuNzM3LDM5LjY3OXY4MS41ODVoNDkuMzc5QzE3OC45MTcsNzkuNjEsMTU4Ljk3Myw0Ni40MDgsMTM0LjczNywzOS42Nzl6Ii8+Cgk8cGF0aCBzdHlsZT0iZmlsbDojNzNDOUM5OyIgZD0iTTEzNC43MzcsMjQ1LjY0NmMyOC4yNzEtNy44NSw1MC43MTktNTEuNzUyLDUwLjcxOS0xMDIuOTc5YzAtMS4xNTktMC4wODEtMi4yODgtMC4xMDMtMy40MzgKCQloLTUwLjYxNlYyNDUuNjQ2eiIvPgoJPHBhdGggc3R5bGU9ImZpbGw6IzczQzlDOTsiIGQ9Ik0xMTYuNzcyLDI0NS42NDZWMTM5LjIyOEg2Ni4xNDdjLTAuMDIyLDEuMTUxLTAuMTAzLDIuMjgtMC4xMDMsMy40MzgKCQlDNjYuMDQ0LDE5My44OTUsODguNDk0LDIzNy43OTgsMTE2Ljc3MiwyNDUuNjQ2eiIvPgoJPHBhdGggc3R5bGU9ImZpbGw6IzczQzlDOTsiIGQ9Ik00OC4wNzksMTQyLjY2NmMwLTEuMTYzLDAuMDg3LTIuMjg0LDAuMTA3LTMuNDM4SDE3Ljk2NWMwLDQwLjM0LDIyLjMwNSw3NS41MjMsNTUuMTk4LDkzLjk5OQoJCUM1Ny43MDIsMjExLjAxNCw0OC4wNzksMTc4Ljk3NCw0OC4wNzksMTQyLjY2NnoiLz4KPC9nPgo8cmVjdCB4PSIyOTYuNDIxIiB5PSIzNDUuODI1IiBzdHlsZT0iZmlsbDojRUFFQUVBOyIgd2lkdGg9IjE3OS42NDkiIGhlaWdodD0iODkuODI1Ii8+Cjxwb2x5Z29uIHN0eWxlPSJmaWxsOiNEOEQ4RDg7IiBwb2ludHM9IjI5My41MTgsNDUzLjYxNCAyODIuNzM3LDQ4MC41NjIgNDg5Ljc1NSw0ODAuNTYyIDQ3OC45NzQsNDUzLjYxNCAiLz4KPGc+Cgk8cGF0aCBzdHlsZT0iZmlsbDojMzE0RTU1OyIgZD0iTTI1MS41MDksMTM5LjIyOGMwLTY5LjM0Mi01Ni40MTItMTI1Ljc1NC0xMjUuNzU0LTEyNS43NTRTMCw2OS44ODYsMCwxMzkuMjI4CgkJczU2LjQxMiwxMjUuNzU0LDEyNS43NTQsMTI1Ljc1NFMyNTEuNTA5LDIwOC41NywyNTEuNTA5LDEzOS4yMjh6IE02Ni4xNDcsMTM5LjIyOGg1MC42MjV2MTA2LjQxOAoJCWMtMjguMjc4LTcuODQ4LTUwLjcyOC01MS43NTItNTAuNzI4LTEwMi45OEM2Ni4wNDQsMTQxLjUwOCw2Ni4xMjQsMTQwLjM3OSw2Ni4xNDcsMTM5LjIyOHogTTE4NS40NTYsMTQyLjY2NgoJCWMwLDUxLjIyNy0yMi40NDksOTUuMTI5LTUwLjcxOSwxMDIuOTc5VjEzOS4yMjhoNTAuNjE2QzE4NS4zNzYsMTQwLjM3OSwxODUuNDU2LDE0MS41MDgsMTg1LjQ1NiwxNDIuNjY2eiBNMTM0LjczNywxMjEuMjYzVjM5LjY3OQoJCWMyNC4yMzYsNi43Myw0NC4xOCwzOS45MzIsNDkuMzc5LDgxLjU4NUgxMzQuNzM3eiBNMTE2Ljc3MiwzOS42Nzh2ODEuNTg1SDY3LjM4NEM3Mi41ODMsNzkuNjA5LDkyLjUzLDQ2LjQwNiwxMTYuNzcyLDM5LjY3OHoKCQkgTTE3OC4zMzksMjMzLjIzMWMxNS40Ni0yMi4yMTQsMjUuMDgyLTU0LjI1NSwyNS4wODItOTAuNTY1YzAtMS4xNjMtMC4wODctMi4yODQtMC4xMDctMy40MzhoMzAuMjMKCQlDMjMzLjU0NCwxNzkuNTcxLDIxMS4yMzcsMjE0Ljc1NSwxNzguMzM5LDIzMy4yMzF6IE0yMzEuOTIyLDEyMS4yNjNoLTI5LjcxN2MtMy42NTktMzMuODkzLTE1LjgxNy02Mi42MjktMzMuMTA0LTgwLjY1MgoJCUMyMDEuNzE3LDU1LjAwNCwyMjUuODE1LDg1LjA5MSwyMzEuOTIyLDEyMS4yNjN6IE04Mi40MDMsNDAuNjE0Yy0xNy4yODcsMTguMDIzLTI5LjQ0Nyw0Ni43NTgtMzMuMTA3LDgwLjY0OUgxOS41ODcKCQlDMjUuNjk0LDg1LjA5Myw0OS43ODksNTUuMDA4LDgyLjQwMyw0MC42MTR6IE0xNy45NjUsMTM5LjIyOGgzMC4yMjFjLTAuMDIsMS4xNTQtMC4xMDcsMi4yNzYtMC4xMDcsMy40MzgKCQljMCwzNi4zMDcsOS42MjMsNjguMzQ3LDI1LjA4NCw5MC41NjFDNDAuMjcsMjE0Ljc1MSwxNy45NjUsMTc5LjU2OCwxNy45NjUsMTM5LjIyOHoiLz4KCTxwYXRoIHN0eWxlPSJmaWxsOiMzMTRFNTU7IiBkPSJNNTExLjM2LDQ4Ni4yMTFsLTE3LjMyNC00My4zMTFWMzM2Ljg0MmMwLTQuOTY1LTQuMDE4LTguOTgyLTguOTgyLTguOTgySDI4Ny40MzkKCQljLTQuOTY1LDAtOC45ODIsNC4wMTgtOC45ODIsOC45ODJ2MTA2LjA1N2wtMTcuMzI0LDQzLjMxMWMtMS4xMDUsMi43NjMtMC43NjMsNS45MDQsMC45MDMsOC4zNjgKCQljMS42NzUsMi40NjUsNC40NTYsMy45NDcsNy40MzksMy45NDdoMjMzLjU0NGMyLjk4MiwwLDUuNzYzLTEuNDgzLDcuNDM5LTMuOTQ3QzUxMi4xMjMsNDkyLjExNCw1MTIuNDY1LDQ4OC45NzQsNTExLjM2LDQ4Ni4yMTF6CgkJIE0yOTYuNDIxLDM0NS44MjVoMTc5LjY0OXY4OS44MjVIMjk2LjQyMVYzNDUuODI1eiBNMjgyLjczNyw0ODAuNTYybDEwLjc4MS0yNi45NDdoMTg1LjQ1NmwxMC43ODEsMjYuOTQ3SDI4Mi43Mzd6Ii8+Cgk8cGF0aCBzdHlsZT0iZmlsbDojMzE0RTU1OyIgZD0iTTIzMC45MTIsMzg1LjkzYy0zLjUwOS0zLjUwOS05LjE5My0zLjUwOS0xMi43MDIsMGMtMy41MDksMy41MDktMy41MDksOS4xOTMsMCwxMi43MDJsMTAuMDcsMTAuMDcKCQloLTkzLjU0NHYtNzUuNTc5bDEwLjA3LDEwLjA3YzEuNzU0LDEuNzU0LDQuMDUzLDIuNjMxLDYuMzUxLDIuNjMxYzIuMjk4LDAsNC41OTctMC44NzcsNi4zNTEtMi42MzIKCQljMy41MDktMy41MDksMy41MDktOS4xOTMsMC0xMi43MDJsLTIzLjMyMS0yMy4zMjFjLTEuMTY2LTMuNjA3LTQuNDM1LTYuMjU4LTguNDMzLTYuMjU4Yy0zLjk5OCwwLTcuMjY2LDIuNjUtOC40MzMsNi4yNTcKCQlMOTQsMzMwLjQ5MWMtMy41MDksMy41MDktMy41MDksOS4xOTMsMCwxMi43MDJzOS4xOTMsMy41MDksMTIuNzAyLDBsMTAuMDctMTAuMDd2ODQuNTYxYzAsNC45NjUsNC4wMTgsOC45ODIsOC45ODIsOC45ODJoMTAyLjUyNgoJCWwtMTAuMDcsMTAuMDdjLTMuNTA5LDMuNTA5LTMuNTA5LDkuMTkzLDAsMTIuNzAyYzEuNzU0LDEuNzU0LDQuMDUzLDIuNjMyLDYuMzUxLDIuNjMyYzIuMjk4LDAsNC41OTctMC44NzcsNi4zNTEtMi42MzIKCQlsMjUuNDA0LTI1LjQwNGMzLjUwOS0zLjUwOSwzLjUwOS05LjE5MywwLTEyLjcwMkwyMzAuOTEyLDM4NS45M3oiLz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8L3N2Zz4K)### 快捷发布
+
+提供好用的命令行工具与网页双端管理，原生支持 CI/CD 自动部署。
+
+![极速下载](data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTkuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiCgkgdmlld0JveD0iMCAwIDUxMiA1MTIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDUxMiA1MTI7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPHBhdGggc3R5bGU9ImZpbGw6I0U0QUQ0MDsiIGQ9Ik0zMS40MzksMzI3Ljg2djEzNC43MzdoNzEuODZWMzI3Ljg2SDMxLjQzOXogTTU4LjM4NiwzOTAuNzM3SDQwLjQyMXYtMTcuOTY1aDE3Ljk2NVYzOTAuNzM3egoJIE01OC4zODYsMzU0LjgwN0g0MC40MjF2LTE3Ljk2NWgxNy45NjVWMzU0LjgwN3oiLz4KPHBhdGggc3R5bGU9ImZpbGw6I0VBRUFFQTsiIGQ9Ik0xOTMuMTIzLDk0LjMxNmgtNzEuODZ2MTQzLjcxOXY3MS44NnYxNTIuNzAyaDcxLjg2VjI2NC45ODJWOTQuMzE2eiBNMTQ4LjIxMSw0MDguNzAyaC0xNy45NjUKCXYtMTcuOTY1aDE3Ljk2NVY0MDguNzAyeiBNMTQ4LjIxMSwzNzIuNzcyaC0xNy45NjV2LTE3Ljk2NWgxNy45NjVWMzcyLjc3MnogTTE4NC4xNCwzOTAuNzM3aC0xNy45NjV2LTE3Ljk2NWgxNy45NjVWMzkwLjczN3oKCSBNMTg0LjE0LDM1NC44MDdoLTE3Ljk2NXYtMTcuOTY1aDE3Ljk2NVYzNTQuODA3eiIvPgo8Zz4KCTxyZWN0IHg9IjIxMS4wODgiIHk9IjI4Mi45NDciIHN0eWxlPSJmaWxsOiNFNEFENDA7IiB3aWR0aD0iMzUuOTMiIGhlaWdodD0iMTc5LjY0OSIvPgoJPHJlY3QgeD0iMzEuNDM5IiB5PSIyNTYiIHN0eWxlPSJmaWxsOiNFNEFENDA7IiB3aWR0aD0iNzEuODYiIGhlaWdodD0iNTMuODk1Ii8+CjwvZz4KPGc+Cgk8cmVjdCB4PSIzNjMuNzg5IiB5PSIzMjcuODYiIHN0eWxlPSJmaWxsOiNFQUVBRUE7IiB3aWR0aD0iMTE2Ljc3MiIgaGVpZ2h0PSIyNi45NDciLz4KCTxwYXRoIHN0eWxlPSJmaWxsOiNFQUVBRUE7IiBkPSJNMzQ1LjgyNSwzNTQuODA3di00NC45MTJ2LTEwMS41TDI2NC45ODIsMTc5djg1Ljk4MnYxOTcuNjE0aDgwLjg0MnYtODkuODI1VjM1NC44MDd6CgkJIE0yOTEuOTMsMzkwLjczN2gtMTcuOTY1di0xNy45NjVoMTcuOTY1VjM5MC43Mzd6IE0yOTEuOTMsMzU0LjgwN2gtMTcuOTY1di0xNy45NjVoMTcuOTY1VjM1NC44MDd6Ii8+CjwvZz4KPHBhdGggc3R5bGU9ImZpbGw6I0U0QUQ0MDsiIGQ9Ik0zNjMuNzg5LDM3Mi43NzJ2ODkuODI1aDExNi43NzJ2LTg5LjgyNUgzNjMuNzg5eiBNMzkwLjczNywzOTkuNzE5aC0xNy45NjV2LTE3Ljk2NWgxNy45NjVWMzk5LjcxOXoKCSIvPgo8Zz4KCTxwYXRoIHN0eWxlPSJmaWxsOiMzMTRFNTU7IiBkPSJNNDk4LjUyNiw0NjIuNTk2di04OS44MjV2LTE3Ljk2NXYtNDQuOTEySDM2My43ODlWMTk1LjgxNmwtMTE2Ljc3Mi00Mi40NjV2MTExLjYzMmgtMzUuOTNWNzYuMzUxCgkJSDEwMy4yOTh2MTYxLjY4NEgxMy40NzR2NzEuODZ2MTUyLjcwMkgwdjE3Ljk2NWgxMy40NzRoODkuODI1aDE3Ljk2NWg3MS44NmgxNy45NjVoMzUuOTNoMTcuOTY1aDgwLjg0MmgxNy45NjVoMTM0LjczN0g1MTIKCQl2LTE3Ljk2NUg0OTguNTI2eiBNNDgwLjU2MSwzMjcuODZ2MjYuOTQ3SDM2My43ODlWMzI3Ljg2SDQ4MC41NjF6IE0zMS40MzksMjU2aDcxLjg2djUzLjg5NWgtNzEuODZWMjU2eiBNMzEuNDM5LDQ2Mi41OTZWMzI3Ljg2CgkJaDcxLjg2djEzNC43MzdIMzEuNDM5eiBNMTIxLjI2Myw0NjIuNTk2VjMwOS44OTV2LTcxLjg2Vjk0LjMxNmg3MS44NnYxNzAuNjY3djE5Ny42MTRIMTIxLjI2M3ogTTIxMS4wODgsNDYyLjU5NlYyODIuOTQ3aDM1LjkzCgkJdjE3OS42NDlIMjExLjA4OHogTTI2NC45ODIsNDYyLjU5NlYyNjQuOTgyVjE3OWw4MC44NDIsMjkuMzk1djEwMS41djQ0LjkxMnYxNy45NjV2ODkuODI1SDI2NC45ODJ6IE0zNjMuNzg5LDQ2Mi41OTZ2LTg5LjgyNQoJCWgxMTYuNzcydjg5LjgyNUgzNjMuNzg5eiIvPgoJPHJlY3QgeD0iNDAuNDIxIiB5PSIzMzYuODQyIiBzdHlsZT0iZmlsbDojMzE0RTU1OyIgd2lkdGg9IjE3Ljk2NSIgaGVpZ2h0PSIxNy45NjUiLz4KCTxyZWN0IHg9IjI3My45NjUiIHk9IjMzNi44NDIiIHN0eWxlPSJmaWxsOiMzMTRFNTU7IiB3aWR0aD0iMTcuOTY1IiBoZWlnaHQ9IjE3Ljk2NSIvPgoJPHJlY3QgeD0iMTMwLjI0NiIgeT0iMzU0LjgwNyIgc3R5bGU9ImZpbGw6IzMxNEU1NTsiIHdpZHRoPSIxNy45NjUiIGhlaWdodD0iMTcuOTY1Ii8+Cgk8cmVjdCB4PSIxNjYuMTc1IiB5PSIzMzYuODQyIiBzdHlsZT0iZmlsbDojMzE0RTU1OyIgd2lkdGg9IjE3Ljk2NSIgaGVpZ2h0PSIxNy45NjUiLz4KCTxyZWN0IHg9IjM3Mi43NzIiIHk9IjM4MS43NTQiIHN0eWxlPSJmaWxsOiMzMTRFNTU7IiB3aWR0aD0iMTcuOTY1IiBoZWlnaHQ9IjE3Ljk2NSIvPgoJPHJlY3QgeD0iMjczLjk2NSIgeT0iMzcyLjc3MiIgc3R5bGU9ImZpbGw6IzMxNEU1NTsiIHdpZHRoPSIxNy45NjUiIGhlaWdodD0iMTcuOTY1Ii8+Cgk8cmVjdCB4PSIxMzAuMjQ2IiB5PSIzOTAuNzM3IiBzdHlsZT0iZmlsbDojMzE0RTU1OyIgd2lkdGg9IjE3Ljk2NSIgaGVpZ2h0PSIxNy45NjUiLz4KCTxyZWN0IHg9IjE2Ni4xNzUiIHk9IjM3Mi43NzIiIHN0eWxlPSJmaWxsOiMzMTRFNTU7IiB3aWR0aD0iMTcuOTY1IiBoZWlnaHQ9IjE3Ljk2NSIvPgoJPHJlY3QgeD0iNDAuNDIxIiB5PSIzNzIuNzcyIiBzdHlsZT0iZmlsbDojMzE0RTU1OyIgd2lkdGg9IjE3Ljk2NSIgaGVpZ2h0PSIxNy45NjUiLz4KCTxwYXRoIHN0eWxlPSJmaWxsOiMzMTRFNTU7IiBkPSJNMzM2Ljg0Miw5NC4zMTZjNDkuNTI2LDAsODkuODI1LDQwLjI5NCw4OS44MjUsODkuODI1YzAsNC45NjEsNC4wMTgsOC45ODIsOC45ODIsOC45ODIKCQlzOC45ODItNC4wMjIsOC45ODItOC45ODJjMC01OS40MzQtNDguMzUxLTEwNy43ODktMTA3Ljc4OS0xMDcuNzg5Yy00Ljk2NSwwLTguOTgyLDQuMDIyLTguOTgyLDguOTgyCgkJQzMyNy44Niw5MC4yOTQsMzMxLjg3Nyw5NC4zMTYsMzM2Ljg0Miw5NC4zMTZ6Ii8+Cgk8cGF0aCBzdHlsZT0iZmlsbDojMzE0RTU1OyIgZD0iTTMzNi44NDIsNDkuNDA0Yzc0LjI5OCwwLDEzNC43MzcsNjAuNDQzLDEzNC43MzcsMTM0LjczN2MwLDQuOTYxLDQuMDE4LDguOTgyLDguOTgyLDguOTgyCgkJczguOTgyLTQuMDIyLDguOTgyLTguOTgyYzAtODQuMjAyLTY4LjUtMTUyLjcwMi0xNTIuNzAyLTE1Mi43MDJjLTQuOTY1LDAtOC45ODIsNC4wMjItOC45ODIsOC45ODJTMzMxLjg3Nyw0OS40MDQsMzM2Ljg0Miw0OS40MDR6CgkJIi8+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPC9zdmc+Cg==)### 极速下载
+
+全网基于阿里云高速 CDN 分发，保障全国各地客户端秒速更新。
+
+![稳定可靠](data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTkuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiCgkgdmlld0JveD0iMCAwIDUxMiA1MTIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDUxMiA1MTI7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPGc+Cgk8cGF0aCBzdHlsZT0iZmlsbDojNUVDQzY2OyIgZD0iTTU0Ljg1NywyNTEuNDI5Yy0yMC4xNjUsMC0zNi41NzEsMTYuNDA2LTM2LjU3MSwzNi41NzFzMTYuNDA2LDM2LjU3MSwzNi41NzEsMzYuNTcxCgkJUzkxLjQyOSwzMDguMTY1LDkxLjQyOSwyODhTNzUuMDIyLDI1MS40MjksNTQuODU3LDI1MS40Mjl6Ii8+Cgk8cGF0aCBzdHlsZT0iZmlsbDojNUVDQzY2OyIgZD0iTTExOC44NTcsMTA1LjE0M2MtMjAuMTY1LDAtMzYuNTcxLDE2LjQwNi0zNi41NzEsMzYuNTcxczE2LjQwNiwzNi41NzEsMzYuNTcxLDM2LjU3MQoJCXMzNi41NzEtMTYuNDA2LDM2LjU3MS0zNi41NzFTMTM5LjAyMiwxMDUuMTQzLDExOC44NTcsMTA1LjE0M3oiLz4KCTxwYXRoIHN0eWxlPSJmaWxsOiM1RUNDNjY7IiBkPSJNNDU3LjE0MywyOTcuMTQzYy0yMC4xNjUsMC0zNi41NzEsMTYuNDA2LTM2LjU3MSwzNi41NzFzMTYuNDA2LDM2LjU3MSwzNi41NzEsMzYuNTcxCgkJczM2LjU3MS0xNi40MDYsMzYuNTcxLTM2LjU3MVM0NzcuMzA4LDI5Ny4xNDMsNDU3LjE0MywyOTcuMTQzeiIvPgo8L2c+CjxwYXRoIHN0eWxlPSJmaWxsOiNFNjVGNTg7IiBkPSJNNDU3LjE0MywyNDIuMjg2YzIwLjE2NSwwLDM2LjU3MS0xNi40MDYsMzYuNTcxLTM2LjU3MXMtMTYuNDA2LTM2LjU3MS0zNi41NzEtMzYuNTcxCglzLTM2LjU3MSwxNi40MDYtMzYuNTcxLDM2LjU3MVM0MzYuOTc4LDI0Mi4yODYsNDU3LjE0MywyNDIuMjg2eiIvPgo8Zz4KCTxwYXRoIHN0eWxlPSJmaWxsOiMzMTRFNTU7IiBkPSJNNDU3LjE0MywyNzguODU3Yy0yNy4xMjksMC00OS42NTgsMTkuODEzLTU0LjAzMSw0NS43MTRoLTM3LjM5NwoJCWMtMzAuMjUsMC01NC44NTcsMjQuNTk0LTU0Ljg1Nyw1NC44MjZWNDgwaDE4LjI4NlYzNzkuMzk3YzAtMjAuMTQ3LDE2LjQwNi0zNi41NCwzNi41NzEtMzYuNTRoMzcuMzk3CgkJYzQuMzczLDI1LjkwMiwyNi45MDIsNDUuNzE0LDU0LjAzMSw0NS43MTRjMzAuMjUsMCw1NC44NTctMjQuNjA3LDU0Ljg1Ny01NC44NTdDNTEyLDMwMy40NjQsNDg3LjM5MywyNzguODU3LDQ1Ny4xNDMsMjc4Ljg1N3oKCQkgTTQ1Ny4xNDMsMzcwLjI4NmMtMjAuMTY1LDAtMzYuNTcxLTE2LjQwNi0zNi41NzEtMzYuNTcxczE2LjQwNi0zNi41NzEsMzYuNTcxLTM2LjU3MXMzNi41NzEsMTYuNDA2LDM2LjU3MSwzNi41NzEKCQlTNDc3LjMwOCwzNzAuMjg2LDQ1Ny4xNDMsMzcwLjI4NnoiLz4KCTxwYXRoIHN0eWxlPSJmaWxsOiMzMTRFNTU7IiBkPSJNMjEwLjI4NiwxNDEuNzE0aC0zNi41NzFjMC0zMC4yNS0yNC42MDctNTQuODU3LTU0Ljg1Ny01NC44NTdTNjQsMTExLjQ2NCw2NCwxNDEuNzE0CgkJczI0LjYwNyw1NC44NTcsNTQuODU3LDU0Ljg1N2MyMy44MzEsMCw0NC4xMDItMTUuMjk5LDUxLjY1Ny0zNi41NzFoMzkuNzcyYzIwLjE2NSwwLDM2LjU3MSwxNi40MjksMzYuNTcxLDM2LjYyNVY0ODBoMTguMjg2CgkJVjE5Ni42MjVDMjY1LjE0MywxNjYuMzQ4LDI0MC41MzYsMTQxLjcxNCwyMTAuMjg2LDE0MS43MTR6IE0xMTguODU3LDE3OC4yODZjLTIwLjE2NSwwLTM2LjU3MS0xNi40MDYtMzYuNTcxLTM2LjU3MQoJCXMxNi40MDYtMzYuNTcxLDM2LjU3MS0zNi41NzFzMzYuNTcxLDE2LjQwNiwzNi41NzEsMzYuNTcxUzEzOS4wMjIsMTc4LjI4NiwxMTguODU3LDE3OC4yODZ6Ii8+Cgk8cGF0aCBzdHlsZT0iZmlsbDojMzE0RTU1OyIgZD0iTTE0Ni4yODYsMjc4Ljg1N2gtMzcuMzk3Yy00LjM3My0yNS45MDItMjYuOTAyLTQ1LjcxNC01NC4wMzEtNDUuNzE0QzI0LjYwNywyMzMuMTQzLDAsMjU3Ljc1LDAsMjg4CgkJczI0LjYwNyw1NC44NTcsNTQuODU3LDU0Ljg1N2MyNy4xMjksMCw0OS42NTgtMTkuODEzLDU0LjAzMS00NS43MTRoMzcuMzk3YzIwLjE2NSwwLDM2LjU3MSwxNi40MiwzNi41NzEsMzYuNjAzVjQ4MGgxOC4yODYKCQlWMzMzLjc0NkMyMDEuMTQzLDMwMy40ODIsMTc2LjUzNiwyNzguODU3LDE0Ni4yODYsMjc4Ljg1N3ogTTU0Ljg1NywzMjQuNTcxYy0yMC4xNjUsMC0zNi41NzEtMTYuNDA2LTM2LjU3MS0zNi41NzEKCQlzMTYuNDA2LTM2LjU3MSwzNi41NzEtMzYuNTcxUzkxLjQyOSwyNjcuODM1LDkxLjQyOSwyODhTNzUuMDIyLDMyNC41NzEsNTQuODU3LDMyNC41NzF6Ii8+Cgk8cGF0aCBzdHlsZT0iZmlsbDojMzE0RTU1OyIgZD0iTTM3My42MjUsMjE0Ljg1N2gyOS40ODdjNC4zNzMsMjUuOTAyLDI2LjkwMiw0NS43MTQsNTQuMDMxLDQ1LjcxNAoJCWMzMC4yNSwwLDU0Ljg1Ny0yNC42MDcsNTQuODU3LTU0Ljg1N3MtMjQuNjA3LTU0Ljg1Ny01NC44NTctNTQuODU3Yy0yNy4xMjksMC00OS42NTgsMTkuODEzLTU0LjAzMSw0NS43MTRoLTI5LjQ4NwoJCWMtMTQuMzkzLDAtMjYuMTAzLTExLjcxNC0yNi4xMDMtMjYuMTE2VjMyaC0xOC4yODZ2MTM4LjQ1NUMzMjkuMjM3LDE5NC45MzgsMzQ5LjE0NywyMTQuODU3LDM3My42MjUsMjE0Ljg1N3ogTTQ1Ny4xNDMsMTY5LjE0MwoJCWMyMC4xNjUsMCwzNi41NzEsMTYuNDA2LDM2LjU3MSwzNi41NzFzLTE2LjQwNiwzNi41NzEtMzYuNTcxLDM2LjU3MXMtMzYuNTcxLTE2LjQwNi0zNi41NzEtMzYuNTcxCgkJUzQzNi45NzgsMTY5LjE0Myw0NTcuMTQzLDE2OS4xNDN6Ii8+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPC9zdmc+Cg==)### 稳定可靠
+
+内置完善的崩溃捕获与回滚机制，保障线上业务安全无忧。
+
+![灵活扩展](data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTkuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiCgkgdmlld0JveD0iMCAwIDUxMiA1MTIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDUxMiA1MTI7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPGc+Cgk8cGF0aCBzdHlsZT0iZmlsbDojNUVDQzY2OyIgZD0iTTEyOCwzODRjMCwxNS4xMjUsMTIuMzA0LDI3LjQyOSwyNy40MjksMjcuNDI5YzE1LjEyNSwwLDI3LjQyOS0xMi4zMDQsMjcuNDI5LTI3LjQyOQoJCWMwLTE1LjEyNS0xMi4zMDQtMjcuNDI5LTI3LjQyOS0yNy40MjlDMTQwLjMwNCwzNTYuNTcxLDEyOCwzNjguODc1LDEyOCwzODR6Ii8+Cgk8cGF0aCBzdHlsZT0iZmlsbDojNUVDQzY2OyIgZD0iTTQwMi4yODYsMTI4Yy0xNS4xMjUsMC0yNy40MjksMTIuMzA0LTI3LjQyOSwyNy40MjljMCwxNS4xMjUsMTIuMzA0LDI3LjQyOSwyNy40MjksMjcuNDI5CgkJczI3LjQyOS0xMi4zMDQsMjcuNDI5LTI3LjQyOUM0MjkuNzE0LDE0MC4zMDQsNDE3LjQxMSwxMjgsNDAyLjI4NiwxMjh6Ii8+CjwvZz4KPHBhdGggc3R5bGU9ImZpbGw6I0U5RTdEMTsiIGQ9Ik0yNTYsMTguMjg2QzEyNC45MjQsMTguMjg2LDE4LjI4NiwxMjQuOTIsMTguMjg2LDI1NlMxMjQuOTI0LDQ5My43MTQsMjU2LDQ5My43MTQKCVM0OTMuNzE0LDM4Ny4wOCw0OTMuNzE0LDI1NlMzODcuMDc2LDE4LjI4NiwyNTYsMTguMjg2eiBNMTE2LjYzOCwxMjYuNDI5bDEyLjkyOC0xMi45MjhsMjUuODYyLDI1Ljg2MUwxODEuMjksMTEzLjVsMTIuOTI4LDEyLjkyOAoJbC0yNS44NjIsMjUuODYybDI1Ljg2MiwyNS44NjJMMTgxLjI5LDE5MS4wOGwtMjUuODYyLTI1Ljg2MmwtMjUuODYyLDI1Ljg2MmwtMTIuOTI4LTEyLjkyOEwxNDIuNSwxNTIuMjlMMTE2LjYzOCwxMjYuNDI5egoJIE0xNjUuOTg0LDMzOS42MzdjMjAuMTExLDQuNzk1LDM1LjE1OSwyMi44MDYsMzUuMTU5LDQ0LjM2M2MwLDI1LjIwNS0yMC41MDksNDUuNzE0LTQ1LjcxNCw0NS43MTRTMTA5LjcxNCw0MDkuMjA1LDEwOS43MTQsMzg0CgljMC0yMi41MjQsMTYuNDEyLTQxLjE4MywzNy44ODMtNDQuOTIzYzIuNTE3LTI3LjE3NywyMC43OC0xMTEuMzA3LDE0Ny44MDUtMTUyLjcxNmwtMzAuMDc3LTEyLjc2MwoJYy00LjY0Ny0xLjk3My02LjgxNy03LjM0OC00Ljg0NC0xMS45OTFjMS45NzgtNC42NTIsNy4zMzktNi44MTMsMTEuOTg3LTQuODQ4bDUwLjQ5NiwyMS40MzdjNC42NDcsMS45NzMsNi44MTcsNy4zNDgsNC44NDQsMTEuOTkxCglsLTIxLjQzMyw1MC40OTFjLTEuNDc4LDMuNDgyLTQuODYyLDUuNTcxLTguNDIsNS41NzFjLTEuMTkyLDAtMi40MDItMC4yMzItMy41NjctMC43MjNjLTQuNjQ3LTEuOTczLTYuODE3LTcuMzQ4LTQuODQ0LTExLjk5MQoJbDEyLjgzNS0zMC4yMzhDMTg2LjcwNiwyNDAuNTE2LDE2OC43MzYsMzE1LjcxNiwxNjUuOTg0LDMzOS42Mzd6IE0zNjEuOTI0LDM4OC40MzhsLTEyLjkyOCwxMi45MjhsLTI1Ljg1OS0yNS44NjFsLTI1Ljg1OSwyNS44NjEKCWwtMTIuOTI4LTEyLjkyOGwyNS44Ni0yNS44NjJsLTI1Ljg2LTI1Ljg2MmwxMi45MjgtMTIuOTI4bDI1Ljg1OSwyNS44NjFsMjUuODU5LTI1Ljg2MWwxMi45MjgsMTIuOTI4bC0yNS44NiwyNS44NjIKCUwzNjEuOTI0LDM4OC40Mzh6IE00MDIuMjg2LDIwMS4xNDNjLTI1LjIwNSwwLTQ1LjcxNC0yMC41MDktNDUuNzE0LTQ1LjcxNHMyMC41MDktNDUuNzE0LDQ1LjcxNC00NS43MTRTNDQ4LDEzMC4yMjMsNDQ4LDE1NS40MjkKCVM0MjcuNDkxLDIwMS4xNDMsNDAyLjI4NiwyMDEuMTQzeiIvPgo8Zz4KCTxwYXRoIHN0eWxlPSJmaWxsOiMzMTRFNTU7IiBkPSJNMjU2LDBDMTE0LjgzOSwwLDAsMTE0LjgzOSwwLDI1NnMxMTQuODM5LDI1NiwyNTYsMjU2czI1Ni0xMTQuODM5LDI1Ni0yNTZTMzk3LjE2MSwwLDI1NiwwegoJCSBNMjU2LDQ5My43MTRDMTI0LjkyNCw0OTMuNzE0LDE4LjI4NiwzODcuMDgsMTguMjg2LDI1NlMxMjQuOTI0LDE4LjI4NiwyNTYsMTguMjg2UzQ5My43MTQsMTI0LjkyLDQ5My43MTQsMjU2CgkJUzM4Ny4wNzYsNDkzLjcxNCwyNTYsNDkzLjcxNHoiLz4KCTxwb2x5Z29uIHN0eWxlPSJmaWxsOiMzMTRFNTU7IiBwb2ludHM9IjEyOS41NjcsMTkxLjA4IDE1NS40MjksMTY1LjIxOSAxODEuMjksMTkxLjA4IDE5NC4yMTksMTc4LjE1MiAxNjguMzU3LDE1Mi4yOSAKCQkxOTQuMjE5LDEyNi40MjkgMTgxLjI5LDExMy41IDE1NS40MjksMTM5LjM2MiAxMjkuNTY3LDExMy41IDExNi42MzgsMTI2LjQyOSAxNDIuNSwxNTIuMjkgMTE2LjYzOCwxNzguMTUyIAkiLz4KCTxwb2x5Z29uIHN0eWxlPSJmaWxsOiMzMTRFNTU7IiBwb2ludHM9IjM0OC45OTUsMzIzLjc4NiAzMjMuMTM2LDM0OS42NDcgMjk3LjI3NywzMjMuNzg2IDI4NC4zNDgsMzM2LjcxNCAzMTAuMjA4LDM2Mi41NzYgCgkJMjg0LjM0OCwzODguNDM4IDI5Ny4yNzcsNDAxLjM2NiAzMjMuMTM2LDM3NS41MDUgMzQ4Ljk5NSw0MDEuMzY2IDM2MS45MjQsMzg4LjQzOCAzMzYuMDY0LDM2Mi41NzYgMzYxLjkyNCwzMzYuNzE0IAkiLz4KCTxwYXRoIHN0eWxlPSJmaWxsOiMzMTRFNTU7IiBkPSJNMjg5LjU0NSwyMzMuNTM2Yy0xLjk3Myw0LjY0MywwLjE5NiwxMC4wMTgsNC44NDQsMTEuOTkxYzEuMTY1LDAuNDkxLDIuMzc1LDAuNzIzLDMuNTY3LDAuNzIzCgkJYzMuNTU4LDAsNi45NDItMi4wODksOC40Mi01LjU3MWwyMS40MzMtNTAuNDkxYzEuOTczLTQuNjQzLTAuMTk2LTEwLjAxOC00Ljg0NC0xMS45OTFsLTUwLjQ5Ni0yMS40MzcKCQljLTQuNjQ3LTEuOTY0LTEwLjAwOSwwLjE5Ni0xMS45ODcsNC44NDhjLTEuOTczLDQuNjQzLDAuMTk2LDEwLjAxOCw0Ljg0NCwxMS45OTFsMzAuMDc3LDEyLjc2MwoJCWMtMTI3LjAyNSw0MS40MDktMTQ1LjI4OCwxMjUuNTM5LTE0Ny44MDUsMTUyLjcxNmMtMjEuNDcxLDMuNzM5LTM3Ljg4MywyMi4zOTgtMzcuODgzLDQ0LjkyMgoJCWMwLDI1LjIwNSwyMC41MDksNDUuNzE0LDQ1LjcxNCw0NS43MTRzNDUuNzE0LTIwLjUwOSw0NS43MTQtNDUuNzE0YzAtMjEuNTU3LTE1LjA0OC0zOS41NjgtMzUuMTU5LTQ0LjM2MwoJCWMyLjc1Mi0yMy45MjEsMjAuNzIyLTk5LjEyMiwxMzYuMzk2LTEzNi4zNEwyODkuNTQ1LDIzMy41MzZ6IE0xODIuODU3LDM4NGMwLDE1LjEyNS0xMi4zMDQsMjcuNDI5LTI3LjQyOSwyNy40MjkKCQlDMTQwLjMwNCw0MTEuNDI5LDEyOCwzOTkuMTI1LDEyOCwzODRjMC0xNS4xMjUsMTIuMzA0LTI3LjQyOSwyNy40MjktMjcuNDI5QzE3MC41NTQsMzU2LjU3MSwxODIuODU3LDM2OC44NzUsMTgyLjg1NywzODR6Ii8+Cgk8cGF0aCBzdHlsZT0iZmlsbDojMzE0RTU1OyIgZD0iTTQwMi4yODYsMTA5LjcxNGMtMjUuMjA1LDAtNDUuNzE0LDIwLjUwOS00NS43MTQsNDUuNzE0czIwLjUwOSw0NS43MTQsNDUuNzE0LDQ1LjcxNAoJCVM0NDgsMTgwLjYzNCw0NDgsMTU1LjQyOVM0MjcuNDkxLDEwOS43MTQsNDAyLjI4NiwxMDkuNzE0eiBNNDAyLjI4NiwxODIuODU3Yy0xNS4xMjUsMC0yNy40MjktMTIuMzA0LTI3LjQyOS0yNy40MjkKCQljMC0xNS4xMjUsMTIuMzA0LTI3LjQyOSwyNy40MjktMjcuNDI5czI3LjQyOSwxMi4zMDQsMjcuNDI5LDI3LjQyOUM0MjkuNzE0LDE3MC41NTQsNDE3LjQxMSwxODIuODU3LDQwMi4yODYsMTgyLjg1N3oiLz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8L3N2Zz4K)### 灵活扩展
+
+开放强大的定制元信息接口，提供灵活自由的更新下发策略。
+
+![技术支持](data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTkuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiCgkgdmlld0JveD0iMCAwIDUxMiA1MTIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDUxMiA1MTI7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPGc+Cgk8Y2lyY2xlIHN0eWxlPSJmaWxsOiM1RUNDNjY7IiBjeD0iMzYwLjk3MyIgY3k9IjIzNy40MjgiIHI9IjEzLjY5MSIvPgoJPGNpcmNsZSBzdHlsZT0iZmlsbDojNUVDQzY2OyIgY3g9IjI2OS42OTciIGN5PSIyMzcuNDI4IiByPSIxMy42OTEiLz4KPC9nPgo8cGF0aCBzdHlsZT0iZmlsbDojODFBNEUzOyIgZD0iTTM4My40MTIsMTIzLjI4NGMtMjEuNDExLDAtNDIuMTYyLDYuMDg4LTYwLjAzMywxNy42MTNsLTkuMDAzLDUuODEybC00LjMwNS05LjgxNAoJYy0xNi4yNzYtMzcuMTE3LTUzLjEyNS02MS4wOTQtOTMuODg3LTYxLjA5NGMtNTAuNjIxLDAtOTQuMTgyLDM3LjQ1NS0xMDEuMzIyLDg3LjEzMWwtMS4xMzIsNy44MjZoLTkuMDM4CgljLTQ3LjY2MSwwLTg2LjQzNiwzOC40OTgtODYuNDM2LDg1LjgyMVM1Ny4wMywzNDIuNCwxMDQuNjkxLDM0Mi40aDQyLjI1MXY2NC4wOThsNTcuMDU2LTY0LjA5OGgxODEuMjk1CgljNTkuNzM5LTAuOTI3LDEwOC40NTItNTAuMDc3LDEwOC40NTItMTA5LjU1OEM0OTMuNzQ1LDE3Mi40MzQsNDQ0LjI0NywxMjMuMjg0LDM4My40MTIsMTIzLjI4NHogTTE3OC40MTYsMjY5LjM3OQoJYy0xNy42MTMsMC0zMS45NDctMTQuMzMzLTMxLjk0Ny0zMS45NDdzMTQuMzMzLTMxLjk0NywzMS45NDctMzEuOTQ3czMxLjk0NywxNC4zMzMsMzEuOTQ3LDMxLjk0N1MxOTYuMDI5LDI2OS4zNzksMTc4LjQxNiwyNjkuMzc5egoJIE0yNjkuNjkxLDI2OS4zNzljLTE3LjYxMywwLTMxLjk0Ny0xNC4zMzMtMzEuOTQ3LTMxLjk0N3MxNC4zMzMtMzEuOTQ3LDMxLjk0Ny0zMS45NDdzMzEuOTQ3LDE0LjMzMywzMS45NDcsMzEuOTQ3CglTMjg3LjMwNSwyNjkuMzc5LDI2OS42OTEsMjY5LjM3OXogTTM2MC45NjcsMjY5LjM3OWMtMTcuNjEzLDAtMzEuOTQ3LTE0LjMzMy0zMS45NDctMzEuOTQ3czE0LjMzMy0zMS45NDcsMzEuOTQ3LTMxLjk0NwoJYzE3LjYxMywwLDMxLjk0NywxNC4zMzMsMzEuOTQ3LDMxLjk0N1MzNzguNTgsMjY5LjM3OSwzNjAuOTY3LDI2OS4zNzl6Ii8+CjxjaXJjbGUgc3R5bGU9ImZpbGw6IzVFQ0M2NjsiIGN4PSIxNzguNDIxIiBjeT0iMjM3LjQyOCIgcj0iMTMuNjkxIi8+CjxnPgoJPHBhdGggc3R5bGU9ImZpbGw6IzMxNEU1NTsiIGQ9Ik0zODMuNDEyLDEwNS4wMjljLTIxLjQ5MSwwLTQyLjQyLDUuMjc3LTYxLjEzLDE1LjM0Yy0yMC45NDctMzguNDcxLTYxLjU0OS02Mi44MjQtMTA2LjA5OS02Mi44MjQKCQljLTU3LjAyMSwwLTEwNi40NDcsNDAuMzk3LTExOC4wNDQsOTUuMTYyQzQzLjQ1NCwxNTYuMDc4LDAsMjAxLjM3NywwLDI1Ni41NzljMCw1Ny4zODYsNDYuOTY2LDEwNC4wNzYsMTA0LjY5MSwxMDQuMDc2aDIzLjk5NQoJCXY5My43OThsODMuNDk0LTkzLjc5OGwxNzMuMjU1LTAuMDE4QzQ1NS4yMiwzNTkuNTc3LDUxMiwzMDIuMjQ0LDUxMiwyMzIuODQyQzUxMiwxNjIuMzYyLDQ1NC4zMiwxMDUuMDI5LDM4My40MTIsMTA1LjAyOXoKCQkgTTM4NS4yOTMsMzQyLjRIMjAzLjk5OGwtNTcuMDU2LDY0LjA5OFYzNDIuNGgtNDIuMjUxYy00Ny42NjEsMC04Ni40MzYtMzguNDk4LTg2LjQzNi04NS44MnMzOC43NzQtODUuODIxLDg2LjQzNi04NS44MjFoOS4wMzgKCQlsMS4xMzItNy44MjZjNy4xNC00OS42NzYsNTAuNzAxLTg3LjEzMSwxMDEuMzIyLTg3LjEzMWM0MC43NjIsMCw3Ny42MTEsMjMuOTc4LDkzLjg4Nyw2MS4wOTRsNC4zMDUsOS44MTRsOS4wMDMtNS44MTIKCQljMTcuODcyLTExLjUyNSwzOC42MjMtMTcuNjEzLDYwLjAzMy0xNy42MTNjNjAuODM2LDAsMTEwLjMzMyw0OS4xNSwxMTAuMzMzLDEwOS41NTgKCQlDNDkzLjc0NSwyOTIuMzIzLDQ0NS4wMzIsMzQxLjQ3MywzODUuMjkzLDM0Mi40eiIvPgoJPHBhdGggc3R5bGU9ImZpbGw6IzMxNEU1NTsiIGQ9Ik0xNzguNDE2LDIwNS40ODZjLTE3LjYxMywwLTMxLjk0NywxNC4zMzMtMzEuOTQ3LDMxLjk0N3MxNC4zMzMsMzEuOTQ3LDMxLjk0NywzMS45NDcKCQlzMzEuOTQ3LTE0LjMzMywzMS45NDctMzEuOTQ3UzE5Ni4wMjksMjA1LjQ4NiwxNzguNDE2LDIwNS40ODZ6IE0xNzguNDE2LDI1MS4xMjRjLTcuNTUsMC0xMy42OTEtNi4xNDEtMTMuNjkxLTEzLjY5MQoJCWMwLTcuNTUsNi4xNDEtMTMuNjkxLDEzLjY5MS0xMy42OTFzMTMuNjkxLDYuMTQxLDEzLjY5MSwxMy42OTFDMTkyLjEwNywyNDQuOTgyLDE4NS45NjUsMjUxLjEyNCwxNzguNDE2LDI1MS4xMjR6Ii8+Cgk8cGF0aCBzdHlsZT0iZmlsbDojMzE0RTU1OyIgZD0iTTI2OS42OTEsMjA1LjQ4NmMtMTcuNjEzLDAtMzEuOTQ3LDE0LjMzMy0zMS45NDcsMzEuOTQ3czE0LjMzMywzMS45NDcsMzEuOTQ3LDMxLjk0NwoJCXMzMS45NDctMTQuMzMzLDMxLjk0Ny0zMS45NDdTMjg3LjMwNSwyMDUuNDg2LDI2OS42OTEsMjA1LjQ4NnogTTI2OS42OTEsMjUxLjEyNGMtNy41NSwwLTEzLjY5MS02LjE0MS0xMy42OTEtMTMuNjkxCgkJYzAtNy41NSw2LjE0MS0xMy42OTEsMTMuNjkxLTEzLjY5MWM3LjU1LDAsMTMuNjkxLDYuMTQxLDEzLjY5MSwxMy42OTFDMjgzLjM4MywyNDQuOTgyLDI3Ny4yNDEsMjUxLjEyNCwyNjkuNjkxLDI1MS4xMjR6Ii8+Cgk8cGF0aCBzdHlsZT0iZmlsbDojMzE0RTU1OyIgZD0iTTM2MC45NjcsMjA1LjQ4NmMtMTcuNjEzLDAtMzEuOTQ3LDE0LjMzMy0zMS45NDcsMzEuOTQ3czE0LjMzMywzMS45NDcsMzEuOTQ3LDMxLjk0NwoJCWMxNy42MTMsMCwzMS45NDctMTQuMzMzLDMxLjk0Ny0zMS45NDdTMzc4LjU4LDIwNS40ODYsMzYwLjk2NywyMDUuNDg2eiBNMzYwLjk2NywyNTEuMTI0Yy03LjU1LDAtMTMuNjkxLTYuMTQxLTEzLjY5MS0xMy42OTEKCQljMC03LjU1LDYuMTQxLTEzLjY5MSwxMy42OTEtMTMuNjkxczEzLjY5MSw2LjE0MSwxMy42OTEsMTMuNjkxQzM3NC42NTksMjQ0Ljk4MiwzNjguNTE3LDI1MS4xMjQsMzYwLjk2NywyNTEuMTI0eiIvPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+Cjwvc3ZnPgo=)### 技术支持
+
+提供专业的技术支持群，工作时间内享受小时级别高效响应保障。
+
+Icons made by [Swifticons](https://www.flaticon.com/authors/swifticons) from [www.flaticon.com](https://www.flaticon.com/)## Let's Pushy
+
+仅需三步，即可将千万级下发能力集成到您的应用中
+
+bash - pushy-cli# 1. 全局安装命令行工具$npm i -g react-native-update-cli# 2. 上传原生基础包 (只需一次)$pushy uploadIpa yourApp.ipa
+$pushy uploadApk yourApp.apk# 3. 生成并上传热更包$pushy bundle --platform android
+$pushy bundle --platform ios$[查看详细集成文档](/docs/getting-started)### 联系我们
+
+- [邮箱 hi@charmlot.com](mailto:hi@charmlot.com)
+- QQ群 729013783
+
+### 用户协议
+
+- [用户协议](/agreement/)
+- [隐私政策](/agreement/#privacy)
+
+### 帮助
+
+- [常见问题](/docs/faq)
+- [Issue 讨论区](https://github.com/reactnativecn/react-native-update/issues)
+
+### 链接
+
+- [React Native 中文网](https://reactnative.cn/)
+- [ReactJS](https://zh-hans.react.dev/)
+
+React Native 中文网 © 2026 武汉青罗网络科技有限公司
+
+|[鄂ICP备20002031号-3](https://beian.miit.gov.cn/)[![](https://img.alicdn.com/tfs/TB1..50QpXXXXX7XpXXXXXXXXXX-40-40.png)鄂公网安备 42011202001821号](http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=42011202001821)
+
