@@ -13,3 +13,11 @@
 .rspress-logo {
   height: 2.2rem;
 }
+
+html:not(.dark) .rp-nav__title__logo-image--dark {
+  display: none !important;
+}
+
+html.dark .rp-nav__title__logo-image--light {
+  display: none !important;
+}
