@@ -34,7 +34,11 @@ interface FloatingIcon {
 
 const PARTICLE_COUNT = 50;
 const CONNECTION_DIST = 130;
+const CONNECTION_DIST_SQ = CONNECTION_DIST * CONNECTION_DIST;
 const MOUSE_RADIUS = 200;
+const MOUSE_RADIUS_SQ = MOUSE_RADIUS * MOUSE_RADIUS;
+const MOUSE_RADIUS_ICON = MOUSE_RADIUS * 1.2;
+const MOUSE_RADIUS_ICON_SQ = MOUSE_RADIUS_ICON * MOUSE_RADIUS_ICON;
 const ICON_COUNT = 12;
 
 const ICON_COLORS = [
@@ -267,8 +271,9 @@ function ParticleNetwork() {
         for (let j = i + 1; j < pts.length; j++) {
           const dx = pts[i].x - pts[j].x;
           const dy = pts[i].y - pts[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < CONNECTION_DIST) {
+          const distSq = dx * dx + dy * dy;
+          if (distSq < CONNECTION_DIST_SQ) {
+            const dist = Math.sqrt(distSq);
             const alph = (1 - dist / CONNECTION_DIST) * 0.15;
             ctx.beginPath();
             ctx.moveTo(pts[i].x, pts[i].y);
@@ -284,8 +289,15 @@ function ParticleNetwork() {
       for (const p of pts) {
         const mdx = p.x - mx;
         const mdy = p.y - my;
-        const mDist = Math.sqrt(mdx * mdx + mdy * mdy);
-        const glow = mDist < MOUSE_RADIUS ? 1 - mDist / MOUSE_RADIUS : 0;
+        const mDistSq = mdx * mdx + mdy * mdy;
+        let mDist = 0;
+        let glow = 0;
+
+        if (mDistSq < MOUSE_RADIUS_SQ) {
+          mDist = Math.sqrt(mDistSq);
+          glow = 1 - mDist / MOUSE_RADIUS;
+        }
+
         const r = p.radius + glow * 2;
         const o = Math.min(p.opacity + glow * 0.5, 1);
 
@@ -302,7 +314,7 @@ function ParticleNetwork() {
         ctx.fillStyle = `rgba(68,131,237,${o})`;
         ctx.fill();
 
-        if (mDist < MOUSE_RADIUS) {
+        if (mDistSq < MOUSE_RADIUS_SQ) {
           ctx.beginPath();
           ctx.moveTo(p.x, p.y);
           ctx.lineTo(mx, my);
@@ -321,8 +333,14 @@ function ParticleNetwork() {
       for (const icon of icons.current) {
         const mdx = icon.x - mx;
         const mdy = icon.y - my;
-        const mDist = Math.sqrt(mdx * mdx + mdy * mdy);
-        const glow = mDist < MOUSE_RADIUS * 1.2 ? 1 - mDist / (MOUSE_RADIUS * 1.2) : 0;
+        const mDistSq = mdx * mdx + mdy * mdy;
+        let glow = 0;
+
+        if (mDistSq < MOUSE_RADIUS_ICON_SQ) {
+          const mDist = Math.sqrt(mDistSq);
+          glow = 1 - mDist / MOUSE_RADIUS_ICON;
+        }
+
         const o = icon.opacity + glow * 0.35;
 
         ctx.save();
