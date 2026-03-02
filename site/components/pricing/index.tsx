@@ -37,6 +37,7 @@ const CheckLimitText = ({ children }: { children: ReactNode }) => (
             指每次客户端向服务器端发起更新检查请求，无论检查结果是否存在新版本。如日更新检查次数超过百万次，请点此查看
             <a
               target="_blank"
+              rel="noopener noreferrer"
               className="text-white underline ml-1 font-bold"
               href="docs/faq#大客户方案"
             >
@@ -152,6 +153,7 @@ function Pricing() {
             <a
               href="https://pushy-admin.reactnative.cn/#/user"
               target="_blank"
+              rel="noopener noreferrer"
               className="mt-auto block w-full py-4 px-6 rounded-xl font-bold text-center bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/30 transition-all"
             >
               立即升级
@@ -195,6 +197,7 @@ function Pricing() {
             <a
               href="https://pushy-admin.reactnative.cn/#/user"
               target="_blank"
+              rel="noopener noreferrer"
               className="mt-auto block w-full py-4 px-6 rounded-xl font-bold text-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-500 hover:to-purple-500 hover:shadow-xl hover:shadow-indigo-500/40 transition-all"
             >
               立刻抢购
@@ -232,6 +235,7 @@ function Pricing() {
             <a
               href="https://pushy-admin.reactnative.cn/#/user"
               target="_blank"
+              rel="noopener noreferrer"
               className="mt-auto block w-full py-4 px-6 rounded-xl font-bold text-center bg-slate-900 text-white hover:bg-slate-800 hover:shadow-lg hover:shadow-slate-900/30 transition-all"
             >
               联系办理
