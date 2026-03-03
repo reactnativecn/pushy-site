@@ -41,12 +41,20 @@ const MOUSE_RADIUS_ICON = MOUSE_RADIUS * 1.2;
 const MOUSE_RADIUS_ICON_SQ = MOUSE_RADIUS_ICON * MOUSE_RADIUS_ICON;
 const ICON_COUNT = 12;
 
+const COLORS = {
+  BLUE: "68,131,237",
+  INDIGO: "99,102,241",
+  VIOLET: "139,92,246",
+  BLUE_500: "59,130,246",
+  INDIGO_600: "79,70,229",
+};
+
 const ICON_COLORS = [
-  "rgba(68,131,237,",   // brand blue
-  "rgba(99,102,241,",   // indigo
-  "rgba(139,92,246,",   // violet
-  "rgba(59,130,246,",   // blue-500
-  "rgba(79,70,229,",    // indigo-600
+  COLORS.BLUE,
+  COLORS.INDIGO,
+  COLORS.VIOLET,
+  COLORS.BLUE_500,
+  COLORS.INDIGO_600,
 ];
 
 // ---------- icon drawing functions ----------
@@ -251,14 +259,14 @@ function ParticleNetwork() {
 
       // --- gradient washes ---
       const g1 = ctx.createRadialGradient(w * 0.15, h * 0.2, 0, w * 0.15, h * 0.2, w * 0.45);
-      g1.addColorStop(0, "rgba(68,131,237,0.06)");
-      g1.addColorStop(1, "rgba(68,131,237,0)");
+      g1.addColorStop(0, `rgba(${COLORS.BLUE}, 0.06)`);
+      g1.addColorStop(1, `rgba(${COLORS.BLUE}, 0)`);
       ctx.fillStyle = g1;
       ctx.fillRect(0, 0, w, h);
 
       const g2 = ctx.createRadialGradient(w * 0.85, h * 0.75, 0, w * 0.85, h * 0.75, w * 0.45);
-      g2.addColorStop(0, "rgba(99,102,241,0.05)");
-      g2.addColorStop(1, "rgba(99,102,241,0)");
+      g2.addColorStop(0, `rgba(${COLORS.INDIGO}, 0.05)`);
+      g2.addColorStop(1, `rgba(${COLORS.INDIGO}, 0)`);
       ctx.fillStyle = g2;
       ctx.fillRect(0, 0, w, h);
 
@@ -278,7 +286,7 @@ function ParticleNetwork() {
             ctx.beginPath();
             ctx.moveTo(pts[i].x, pts[i].y);
             ctx.lineTo(pts[j].x, pts[j].y);
-            ctx.strokeStyle = `rgba(68,131,237,${alph})`;
+            ctx.strokeStyle = `rgba(${COLORS.BLUE}, ${alph})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
@@ -303,22 +311,22 @@ function ParticleNetwork() {
 
         if (glow > 0.15) {
           const gr = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 4);
-          gr.addColorStop(0, `rgba(68,131,237,${glow * 0.2})`);
-          gr.addColorStop(1, "rgba(68,131,237,0)");
+          gr.addColorStop(0, `rgba(${COLORS.BLUE}, ${glow * 0.2})`);
+          gr.addColorStop(1, `rgba(${COLORS.BLUE}, 0)`);
           ctx.fillStyle = gr;
           ctx.fillRect(p.x - r * 4, p.y - r * 4, r * 8, r * 8);
         }
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(68,131,237,${o})`;
+        ctx.fillStyle = `rgba(${COLORS.BLUE}, ${o})`;
         ctx.fill();
 
         if (mDistSq < MOUSE_RADIUS_SQ) {
           ctx.beginPath();
           ctx.moveTo(p.x, p.y);
           ctx.lineTo(mx, my);
-          ctx.strokeStyle = `rgba(99,102,241,${glow * 0.1})`;
+          ctx.strokeStyle = `rgba(${COLORS.INDIGO}, ${glow * 0.1})`;
           ctx.lineWidth = 0.4;
           ctx.stroke();
         }
@@ -346,8 +354,8 @@ function ParticleNetwork() {
         ctx.save();
         ctx.translate(icon.x, icon.y);
         ctx.rotate(icon.rotation);
-        ctx.strokeStyle = `${icon.color}${o})`;
-        ctx.fillStyle = `${icon.color}${o})`;
+        ctx.strokeStyle = `rgba(${icon.color}, ${o})`;
+        ctx.fillStyle = `rgba(${icon.color}, ${o})`;
         ctx.lineWidth = 1.2;
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
@@ -358,8 +366,8 @@ function ParticleNetwork() {
         // glow halo around icon when mouse is near
         if (glow > 0.1) {
           const gr = ctx.createRadialGradient(icon.x, icon.y, 0, icon.x, icon.y, icon.size * 1.5);
-          gr.addColorStop(0, `${icon.color}${glow * 0.12})`);
-          gr.addColorStop(1, `${icon.color}0)`);
+          gr.addColorStop(0, `rgba(${icon.color}, ${glow * 0.12})`);
+          gr.addColorStop(1, `rgba(${icon.color}, 0)`);
           ctx.fillStyle = gr;
           ctx.fillRect(icon.x - icon.size * 1.5, icon.y - icon.size * 1.5, icon.size * 3, icon.size * 3);
         }
