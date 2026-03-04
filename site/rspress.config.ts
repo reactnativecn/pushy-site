@@ -4,9 +4,7 @@ import { pluginSass } from '@rsbuild/plugin-sass';
 import rspressPluginMermaid from 'rspress-plugin-mermaid';
 
 export default defineConfig({
-  ssg: {
-    experimentalWorker: true,
-  },
+  ssg: false,
   llms: true,
   outDir: 'out',
   root: path.join(__dirname, 'pages'),
