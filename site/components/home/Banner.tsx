@@ -1,5 +1,5 @@
-import GitHubButton from "react-github-button";
 import logo from "../../pages/public/images/logo.svg";
+import GitHubButton from "./GitHubButton";
 import ParticleNetwork from "./ParticleNetwork";
 
 interface BannerProps {
@@ -66,4 +66,3 @@ function Banner({ isMobile }: BannerProps) {
 }
 
 export default Banner;
-
