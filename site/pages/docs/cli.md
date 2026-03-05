@@ -193,7 +193,21 @@ pushy bundle --platform android --name "1.0.0" --description "热更新版本 1.
 
 #### pushy extractApk [aabFile]
 
-从 aab 文件中提取 apk 文件。备注（cli 需 2.6.0 +）
+从 aab 文件中提取通用 apk 文件。（cli 需 2.6.0+）
+
+用法：`pushy extractApk aab后缀文件 [--output apk文件] [--includeAllSplits] [--splits 分包名列表]`
+
+- output: 指定导出的 apk 文件路径（默认与 aab 同目录同名 `.apk`）
+- includeAllSplits: 提取时包含全部 split（默认仅包含 `base`）
+- splits: 指定额外包含的 split 名称，多个值用英文逗号分隔
+
+示例：
+
+```bash
+pushy extractApk android/app/build/outputs/bundle/release/app-release.aab --output app-release.apk
+pushy extractApk android/app/build/outputs/bundle/release/app-release.aab --splits config.zh,arm64_v8a
+pushy extractApk android/app/build/outputs/bundle/release/app-release.aab --includeAllSplits
+```
 
 ---
 
