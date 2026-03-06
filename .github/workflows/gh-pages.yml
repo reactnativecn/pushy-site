@@ -21,7 +21,7 @@ jobs:
 
       - name: Build
         run: |
-          cd site && npm i -g bun && bun i && bun run build && cd -
+          cd site && npm i && npm run build && cd -
           mv site/out ./
           cp CNAME out/
           mv agreement out/agreement
