@@ -12,9 +12,7 @@
 - [常见问题](/docs/faq.md)
 - [安装配置](/docs/getting-started.md)
 - [代码集成](/docs/integration.md)
-- [产品简介](/docs/intro.md): :::info
-现已全面支持鸿蒙系统以及 React Native 新架构！
-::: Pushy (npm 包名: react-native-update <a href="https://www.npmjs.com/package/react-native-update"><img src="https://badge.fury.io/js/react-native-update.svg" alt="npm version" style={{display: 'inline', verticalAlign: 'middle', margin: '0 4px'}} /></a>) 是面向 React Native 应用提供的专业热更新服务，由 React Native 中文网独家研发并持续维护。我们致力于为全球 React Native 开发者提供最快速、最稳定、最经济的热更新体验。
+- [产品简介](/docs/intro.md): Pushy (npm 包名: react-native-update <a href="https://www.npmjs.com/package/react-native-update"><img src="https://badge.fury.io/js/react-native-update.svg" alt="npm version" style={{display: 'inline', verticalAlign: 'middle', margin: '0 4px'}} /></a>) 是面向 React Native 应用提供的专业热更新服务，由 React Native 中文网独家研发并持续维护。我们致力于为全球 React Native 开发者提供最快速、最稳定、最经济的热更新体验。
 - [发布热更新](/docs/publish.md)
 - [安装与使用 Skill](/docs/skills.md)
 
