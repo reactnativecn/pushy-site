@@ -146,3 +146,100 @@ html:not(.dark) .rp-nav__title__logo-image--dark {
 html.dark .rp-nav__title__logo-image--light {
   display: none !important;
 }
+
+.pushy-global-service-notice {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 1200;
+  width: min(420px, calc(100vw - 32px));
+  border: 1px solid rgb(96 165 250 / 20%);
+  border-radius: 20px;
+  background:
+    linear-gradient(135deg, rgb(15 23 42 / 96%), rgb(30 41 59 / 94%));
+  box-shadow:
+    0 24px 48px rgb(15 23 42 / 28%),
+    0 8px 20px rgb(15 23 42 / 18%);
+  color: #e2e8f0;
+  backdrop-filter: blur(18px);
+}
+
+.pushy-global-service-notice__body {
+  padding: 18px 18px 14px;
+}
+
+.pushy-global-service-notice__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: #f8fafc;
+}
+
+.pushy-global-service-notice__description {
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.65;
+  color: #cbd5e1;
+}
+
+.pushy-global-service-notice__actions {
+  display: flex;
+  gap: 10px;
+  padding: 0 18px 18px;
+}
+
+.pushy-global-service-notice__primary,
+.pushy-global-service-notice__secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+}
+
+.pushy-global-service-notice__primary {
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  color: #fff;
+  box-shadow: 0 12px 24px rgb(37 99 235 / 22%);
+}
+
+.pushy-global-service-notice__primary:hover {
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.pushy-global-service-notice__secondary {
+  border: 1px solid rgb(148 163 184 / 28%);
+  background: rgb(255 255 255 / 4%);
+  color: #cbd5e1;
+  cursor: pointer;
+}
+
+.pushy-global-service-notice__secondary:hover {
+  transform: translateY(-1px);
+  border-color: rgb(148 163 184 / 40%);
+  color: #f8fafc;
+}
+
+@media (max-width: 640px) {
+  .pushy-global-service-notice {
+    right: 16px;
+    bottom: 16px;
+    left: 16px;
+    width: auto;
+  }
+
+  .pushy-global-service-notice__actions {
+    flex-direction: column;
+  }
+}
