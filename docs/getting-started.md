@@ -281,13 +281,14 @@ run-ios 或 run-android 命令编译，或在 Xcode/Android Studio
 中重新编译）才能生效。
 :::
 #### Harmony
-在 `harmony/entry/src/main/cpp/CMakeLists.txt` 中增加如下依赖：
-```c
-add_subdirectory("${OH_MODULES}/pushy/src/main/cpp" ./pushy)
-target_link_libraries(rnoh_app PUBLIC rnoh_pushy)
+在 `harmony/entry/src/main/cpp/CMakeLists.txt` 中，`add_library(rnoh_app ...)` 之后增加如下配置即可：
+```cmake
+set(PUSHY_CPP_DIR "${NODE_MODULES}/react-native-update/harmony/pushy/src/main/cpp")
+target_include_directories(rnoh_app PRIVATE "${PUSHY_CPP_DIR}")
+target_sources(rnoh_app PRIVATE "${PUSHY_CPP_DIR}/PushyTurboModule.cpp")
 ```
 在 `harmony/entry/src/main/cpp/PackageProvider.cpp` 中增加如下依赖：
-```c
+```cpp
 #include "RNOH/PackageProvider.h"
 #include "PushyPackage.h"
 using namespace rnoh;
@@ -301,19 +302,8 @@ std::vector<std::shared_ptr<Package>> PackageProvider::getPackages(Package::Cont
 在 `harmony/entry/oh-package.json5` 中增加如下依赖：
 ```json5
 "dependencies": {
-  "pushy": "file:../../node_modules/react-native-update/harmony/pushy",
-
+  "pushy": "file:../../node_modules/react-native-update/harmony/pushy.har",
 }
-```
-在 `harmony/build-profile.json5` 中增加如下配置：
-```json5
-  modules: [
-    // ↓↓↓将下面这一段添加到 modules 内部！
-    {
-      name: 'pushy',
-      srcPath: '../node_modules/react-native-update/harmony/pushy',
-    },
-  ],
 ```
 在 `harmony/hvigor/hvigor-config.json5` 中增加如下配置：
 ```json5
@@ -325,8 +315,8 @@ std::vector<std::shared_ptr<Package>> PackageProvider::getPackages(Package::Cont
 ```
 在 `harmony/entry/hvigorfile.ts` 中增加如下配置：
 ```ts
-import { hapTasks } from "@ohos/hvigor-ohos-plugin";
-import { reactNativeUpdatePlugin } from "pushy/hvigor-plugin";
+import {hapTasks} from '@ohos/hvigor-ohos-plugin';
+import {reactNativeUpdatePlugin} from 'pushy/hvigor-plugin';
 
 export default {
   system: hapTasks /* Built-in plugin of Hvigor. It cannot be modified. */,
@@ -400,9 +390,7 @@ struct Index {
 }
 ```
 :::info
-请记得，任意在 ios 和 android 目录下的修改，一定要重新编译（npx react-native
-run-ios 或 run-android 命令编译，或在 Xcode/Android Studio
-中重新编译）才能生效。
+请记得，任意在 `ios`、`android` 或 `harmony` 目录下的修改，都需要重新编译后才能生效。
 :::
 ### 覆盖 android 的 onCreate
 如果你有安装 `react-native-screens` (使用 `react-navigation` 一般都会要求安装)，则安卓端在热更后重启可能会白屏。此时需要在 Android 的 `MainActivity` 中设置 `RNScreensFragmentFactory`，以确保 Fragment 恢复流程一致，避免崩溃。注意不要把这段覆盖写在 `MainActivityDelegate` 里，而是直接放在 `MainActivity` 中。
