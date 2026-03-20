@@ -197,6 +197,28 @@ const iconTypes: FloatingIcon["type"][] = ["phone", "app", "cloud", "signal", "c
 
 // ---------- component ----------
 
+const glowCache = new Map<string, HTMLCanvasElement>();
+
+function getGlowCanvas(color: string): HTMLCanvasElement {
+  if (glowCache.has(color)) return glowCache.get(color)!;
+  const c = document.createElement("canvas");
+  const s = 128; // fixed offscreen size
+  c.width = s;
+  c.height = s;
+  const cctx = c.getContext("2d");
+  if (cctx) {
+    const gr = cctx.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+    gr.addColorStop(0, `rgba(${color}, 1)`);
+    gr.addColorStop(1, `rgba(${color}, 0)`);
+    cctx.fillStyle = gr;
+    cctx.fillRect(0, 0, s, s);
+  }
+  glowCache.set(color, c);
+  return c;
+}
+
+
+
 function ParticleNetwork() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particles = useRef<Particle[]>([]);
@@ -258,17 +280,19 @@ function ParticleNetwork() {
       ctx.clearRect(0, 0, w, h);
 
       // --- gradient washes ---
-      const g1 = ctx.createRadialGradient(w * 0.15, h * 0.2, 0, w * 0.15, h * 0.2, w * 0.45);
-      g1.addColorStop(0, `rgba(${COLORS.BLUE}, 0.06)`);
-      g1.addColorStop(1, `rgba(${COLORS.BLUE}, 0)`);
-      ctx.fillStyle = g1;
-      ctx.fillRect(0, 0, w, h);
+      ctx.save();
 
-      const g2 = ctx.createRadialGradient(w * 0.85, h * 0.75, 0, w * 0.85, h * 0.75, w * 0.45);
-      g2.addColorStop(0, `rgba(${COLORS.INDIGO}, 0.05)`);
-      g2.addColorStop(1, `rgba(${COLORS.INDIGO}, 0)`);
-      ctx.fillStyle = g2;
-      ctx.fillRect(0, 0, w, h);
+      const blueImg = getGlowCanvas(COLORS.BLUE);
+      const s1 = w * 0.9;
+      ctx.globalAlpha = 0.06;
+      ctx.drawImage(blueImg, w * 0.15 - s1 / 2, h * 0.2 - s1 / 2, s1, s1);
+
+      const indigoImg = getGlowCanvas(COLORS.INDIGO);
+      const s2 = w * 0.9;
+      ctx.globalAlpha = 0.05;
+      ctx.drawImage(indigoImg, w * 0.85 - s2 / 2, h * 0.75 - s2 / 2, s2, s2);
+
+      ctx.restore();
 
       const pts = particles.current;
       const mx = mouse.current.x;
@@ -310,11 +334,12 @@ function ParticleNetwork() {
         const o = Math.min(p.opacity + glow * 0.5, 1);
 
         if (glow > 0.15) {
-          const gr = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 4);
-          gr.addColorStop(0, `rgba(${COLORS.BLUE}, ${glow * 0.2})`);
-          gr.addColorStop(1, `rgba(${COLORS.BLUE}, 0)`);
-          ctx.fillStyle = gr;
-          ctx.fillRect(p.x - r * 4, p.y - r * 4, r * 8, r * 8);
+          const glowImg = getGlowCanvas(COLORS.BLUE);
+          const size = r * 8;
+          ctx.save();
+          ctx.globalAlpha = glow * 0.2;
+          ctx.drawImage(glowImg, p.x - size / 2, p.y - size / 2, size, size);
+          ctx.restore();
         }
 
         ctx.beginPath();
@@ -365,11 +390,12 @@ function ParticleNetwork() {
 
         // glow halo around icon when mouse is near
         if (glow > 0.1) {
-          const gr = ctx.createRadialGradient(icon.x, icon.y, 0, icon.x, icon.y, icon.size * 1.5);
-          gr.addColorStop(0, `rgba(${icon.color}, ${glow * 0.12})`);
-          gr.addColorStop(1, `rgba(${icon.color}, 0)`);
-          ctx.fillStyle = gr;
-          ctx.fillRect(icon.x - icon.size * 1.5, icon.y - icon.size * 1.5, icon.size * 3, icon.size * 3);
+          const glowImg = getGlowCanvas(icon.color);
+          const size = icon.size * 3;
+          ctx.save();
+          ctx.globalAlpha = glow * 0.12;
+          ctx.drawImage(glowImg, icon.x - size / 2, icon.y - size / 2, size, size);
+          ctx.restore();
         }
 
         icon.x += icon.vx;
