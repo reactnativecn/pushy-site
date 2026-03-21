@@ -1,1331 +1,90 @@
 ---
-url: /docs/api-token.md
+url: /docs/intro.md
 ---
 
-# API Token
+# Pushy - 专业的热更新解决方案
 
-API Token 是一种用于在 CI/CD 流程或自动化脚本中调用 [Pushy API](https://update.reactnative.cn/api/openapi) 的认证方式。相比直接使用账号密码，API Token 更加安全且便于管理。
+:::info
+**现已全面支持鸿蒙系统以及 React Native 新架构！**
+:::
 
-## 使用场景
+Pushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-native-update)
+ [![npm version](https://badge.fury.io/js/react-native-update.svg)](https://www.npmjs.com/package/react-native-update)) 是面向 React Native 应用提供的**专业热更新服务**
+，由 [React Native 中文网](https://reactnative.cn)
+独家研发并持续维护。我们致力于为全球 React Native 开发者提供最快速、最稳定、最经济的热更新体验。
+## 🚀 为什么选择 Pushy？
 
-- **持续集成/持续部署 (CI/CD)**：在 GitHub Actions、GitLab CI、Jenkins 等平台中自动发布热更新
-- **自动化脚本**：编写脚本批量管理应用、版本或原生包
-- **第三方工具集成**：将 Pushy 与其他开发工具集成
+### 极致的更新体验
 
-## 创建 API Token
+- **🎯 超小更新包**：基于 bsdiff/hdiff 算法的增量更新，通常只需**几十至几百 KB**（相比其他全量更新服务的几十 MB，节省流量 99%+）
+- **⚡️ 极速分发**：国内用户使用阿里云高速 CDN，国外用户智能分流至 Cloudflare，在各地区都使用覆盖率最好的 CDN 服务商，更新成功率高达 **99.9%+**
+- **🛡️ 安全可靠**：内置崩溃回滚机制，出现问题自动回退，确保应用稳定运行
+- **🌐 全平台覆盖**：完美支持 <span style={{whiteSpace: 'nowrap'}}><AppleOutlined style={{fontSize: '16px', color: '#555', marginRight: '6px'}} /> **iOS**</span> <span style={{whiteSpace: 'nowrap'}}><AndroidOutlined style={{fontSize: '16px', color: '#3DDC84', marginRight: '6px'}} /> **Android**</span>, 且业内独家第一方支持 <span style={{whiteSpace: 'nowrap'}}><HarmonyOSOutlined style={{fontSize: '16px', color: '#000', marginRight: '6px'}} /> **鸿蒙（HarmonyOS）**</span>
+- **🔍 深耕 React Native 生态**：
+  - ✅ **Expo** - 无缝集成
+  - ✅ **新架构** - 第一时间跟进支持
+  - ✅ **Hermes** - 完整支持字节码格式
+- **📖 核心逻辑完全开源**：客户端、命令行工具以及管理界面代码都[完全开源](https://github.com/reactnativecn)，接受社区审计，代码透明可信，你可以随时迁移到自建服务器或其他服务
+- **🔒 数据安全**：可以自行插入数据埋点，完全掌控自己的数据
+- **💬 专业人工支持**：提供付费专人技术支持，有问必答，确保你的应用稳定运行
+- **🏆 多年稳定运营**：从 2016 年开始运营至今，服务众多知名企业和应用
 
-1. 登录 [Pushy 管理后台](https://pushy-admin.reactnative.cn)
-2. 在左侧菜单中点击「API Token」
-3. 点击「创建 Token」按钮
-4. 填写 Token 名称（如：CI/CD Pipeline）
-5. 选择所需权限
-6. 可选设置过期时间
-7. 点击创建后，**立即复制并安全保存 Token**
+## 💰 性价比之选
+
+相比同类服务，Pushy 不仅功能更强大，价格也更亲民：
+
+| 对比项       | Pushy        | Expo Update |
+| --------- | ------------ | ----------- |
+| **起步价**   | ¥66/月        | \~¥136/月    |
+| **流量计费**  | 不单独计费        | 超出需额外付费     |
+| **更新包大小** | 几十至几百 KB（增量） | 几十 MB（全量）   |
+| **国内速度**  | ⭐⭐⭐⭐⭐ 极快     | ⭐⭐ 较慢       |
+| **鸿蒙支持**  | ✅ 支持         | ❌ 不支持       |
 
 :::warning
-Token 只会在创建时显示一次，之后无法再次查看。请务必在创建后立即复制保存！
+**注意**：Microsoft App Center（Code Push）已于 2025 年 3 月 31 日正式停止服务。如果你正在使用 Code Push，现在正是迁移到 Pushy 的最佳时机！
 :::
 
-## 权限说明
+使用 Pushy 后，你的团队将获得：
 
-| 权限              | 说明                 |
-| --------------- | ------------------ |
-| **读取 (read)**   | 查看应用、版本、原生包信息      |
-| **写入 (write)**  | 创建和更新应用、发布版本、上传原生包 |
-| **删除 (delete)** | 删除应用、版本、原生包        |
+- ✅ **节省 90% 以上的流量成本**
+- ✅ **发版速度提升 10 倍以上**（无需等待应用商店审核）
+- ✅ **Bug 修复时间缩短至分钟级**
+- ✅ **用户更新率提升至 99%+**（相比应用商店的自然更新率）
+- ✅ **开发迭代更加灵活自由**
+
+### 简单易用
+
+```js
+// 三行代码即可集成
+import { UpdateProvider, Pushy } from "react-native-update";
+
+const pushyClient = new Pushy({ appKey });
+
+<UpdateProvider client={pushyClient}>
+  <App />
+</UpdateProvider>
+```
+
+内置多种更新策略，开箱即用：
+
+- 🔕 **静默更新** - 后台自动下载，用户无感知
+- 💬 **提示更新** - 友好的系统弹窗提醒
+- ⚙️ **自定义策略** - 完全可控的更新流程
+
+## 🚦 开始使用
+
+只需三步，即可为你的 React Native 应用添加热更新能力：
+
+1. **[安装配置](/docs/getting-started.md)** - 5 分钟完成基础配置
+2. **[代码集成](/docs/integration.md)** - 几行代码即可接入
+3. **[发布更新](/docs/publish.md)** - 一条命令推送新版本
 
 :::info
-创建 Token 时至少需要选择一个权限。根据实际需求选择最小必要权限是最佳实践。
+不确定是否适合你的项目？查看[常见问题](/docs/faq.md)或者可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。
 :::
 
-## 使用 Token 调用 API
-
-在调用 Pushy API 时，将 Token 添加到请求头中：
-
-```bash
-curl -X GET "https://update.reactnative.cn/api/app/list" \
-  -H "x-api-token: YOUR_API_TOKEN"
-```
-
-### 在命令行工具中使用
-
-如果使用 `react-native-update-cli` 命令行工具（需 v2.7.0+），可以通过环境变量设置 Token：
-
-```bash
-export PUSHY_API_TOKEN=your_api_token_here
-pushy bundle --platform android
-```
-
-### 在 CI/CD 中使用
-
-以 GitHub Actions 为例：
-
-```yaml
-# .github/workflows/publish.yml
-name: Publish Hot Update
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  publish:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          
-      - name: Install dependencies
-        run: npm install && npm i -g react-native-update-cli
-        
-      - name: Publish update
-        env:
-          PUSHY_API_TOKEN: ${{ secrets.PUSHY_API_TOKEN }}
-        run: pushy bundle --platform android
-```
-
-:::tip
-在 CI/CD 环境中，建议将 Token 存储在密钥管理中（如 GitHub Secrets），而不是直接写入代码。
-:::
-
-## 管理 Token
-
-### 查看 Token 列表
-
-在「API Token」页面可以看到所有已创建的 Token，包括：
-
-- Token 名称
-- 权限
-- 过期时间
-- 最后使用时间
-- 状态（正常/已过期/已撤销）
-
-### 撤销 Token
-
-如果 Token 泄露或不再需要，可以随时撤销：
-
-1. 在 Token 列表中找到目标 Token
-2. 点击「撤销」按钮
-3. 确认撤销
-
-:::warning
-Token 撤销后立即生效，使用该 Token 的所有请求将被拒绝。请确保在撤销前更新相关的 CI/CD 配置。
-:::
-
-## 安全建议
-
-1. **最小权限原则**：只授予 Token 必要的权限
-2. **设置过期时间**：为临时使用的 Token 设置合理的过期时间
-3. **定期轮换**：定期撤销旧 Token 并创建新 Token
-4. **安全存储**：不要将 Token 提交到代码仓库，使用环境变量或密钥管理工具
-5. **监控使用**：定期检查 Token 的最后使用时间，及时清理不再使用的 Token
-
-## 限制
-
-- 每个用户最多可创建 **10 个** API Token
-- 如需创建更多，请先撤销不再使用的 Token
-
-
-
----
-url: /docs/api.md
----
-
-# API参考
-
-### JavaScript 方法
-
-#### new Pushy(options: PushyOptions)
-
-创建 Pushy 热更新服务实例，其构造参数如下：
-
-```ts
-interface PushyOptions {
-  // 必填，通过pushy createApp或selectApp命令，或在网页管理端获取
-  appKey: string;
-
-  // 自定义日志输出，也可用于上报统计数据
-  logger?: ({ type, data }: { type: EventType; data: EventData }) => void;
-
-  // 触发自动检查更新的策略
-  checkStrategy?:
-    | "onAppStart" // 仅在app启动时
-    | "onAppResume" // 仅在app从后台切换到前台时
-    | "both"; // 默认值，同时包含前两个场景
-    | null; // 不自动检查更新，必须手动调用checkUpdate方法，此选项需 v10.4.2+ 版本
-
-  // 自动下载和应用更新的策略
-  updateStrategy?:
-    | "alwaysAlert" // 调试环境（__DEV__）默认值，使用系统默认的alert页面提示热更且会在有报错时弹出提示
-    | "alertUpdateAndIgnoreError" // 生产环境默认值，在有热更时使用系统默认的alert页面提示热更，但不弹出任何报错提示
-    | "silentAndNow" // 自动静默下载并立刻应用热更
-    | "silentAndLater"; // 自动静默下载，但仅在用户退出app后重启时应用更新
-    | null; // 不自动下载和应用更新，如需自定义热更界面请选择此项
-
-  // 是否在热更重启后自动标记为成功，默认为true
-  // 一般情况下不建议手动标记
-  autoMarkSuccess?: boolean;
-
-  // 是否在若干ms后自动清除最后的报错，默认为不清除
-  dismissErrorAfter?: number;
-
-  // 是否在开发环境中检查热更，默认为false。如需在开发环境中调试热更，请打开此选项。
-  // 但即便打开此选项，也仅能检查、下载热更，并不能实际应用热更。实际应用热更必须在release包中进行。
-  // 此选项需 v10.4.2+ 版本
-  debug?: boolean;
-
-  // 是否在调用 checkUpdate 和 downloadUpdate 时抛出错误，默认为不抛出错误，通过 lastError 获取错误信息
-  // 启用后可以使用 try catch 语句 捕获错误，同时 lastError 也仍然可用
-  // try {
-  //   await checkUpdate();
-  // } catch (e) {
-  //   console.error(e);
-  // }
-  // 此选项需 v10.15.2+ 版本
-  throwError?: boolean;
-
-  // 在检查更新前执行，返回 false 则取消检查更新
-  // 此选项需 v10.12.0+ 版本
-  beforeCheckUpdate?: () => Promise<boolean>;
-
-  // 在下载更新前执行，返回 false 则取消下载更新，可以配合自定义的 metaInfo 做一些条件控制
-  // 此选项需 v10.12.0+ 版本
-  beforeDownloadUpdate?: (info: UpdateInfo) => Promise<boolean>;
-
-  // 在下载更新后执行，返回 false 则取消内置策略进一步执行，可以配合自定义的 metaInfo 做一些条件控制
-  // 此选项需 v10.27.0+ 版本
-  afterDownloadUpdate?: (info: UpdateInfo) => Promise<boolean>;
-
-  // 在原生包过期时执行，返回 false 则取消内置策略进一步执行，可以配合自定义的 metaInfo 做一些条件控制
-  // 此选项需 v10.28.2+ 版本
-  onPackageExpired?: (info: UpdateInfo) => Promise<boolean>;
-}
-
-// 日志事件类型
-type EventType =
-  // 更新失败，重启后发生回滚
-  | "rollback"
-  // 检查更新时报错
-  | "errorChecking"
-  // 正在发起检查
-  | "checking"
-  // 正在下载更新
-  | "downloading"
-  // 已下载更新
-  | "downloadSuccess"
-  // 更新失败
-  | "errorUpdate"
-  // 更新成功
-  | "markSuccess"
-  // 下载apk
-  | "downloadingApk"
-  // 下载apk前申请存储权限被用户拒绝
-  | "rejectStoragePermission"
-  // 下载apk前申请存储权限发生错误
-  | "errorStoragePermission"
-  // 下载apk时发生错误
-  | "errorDownloadAndInstallApk";
-
-// 日志事件数据
-interface EventData {
-  // 当前已完成的热更hash值，如尚未热更则为空字符串
-  currentVersion: string;
-  // 客户端版本信息
-  cInfo: {
-    rnu: string; // 当前 react-native-update 版本
-    rn: string; // 当前 react-native 版本
-    os: string; // 当前操作系统及版本
-    uuid: string; // 用户标识符
-  };
-  // 客户端原生版本号
-  packageVersion: string;
-  // 编译时间戳
-  buildTime: number;
-  // 报错相关的信息
-  message?: string;
-  // 发生回滚的版本hash值
-  rolledBackVersion?: string;
-  // 更新失败的新版本hash值
-  newVersion?: string;
-  // 其他一些数据
-  [key: string]: any;
-}
-```
-
-#### useUpdate()
-
-热更相关的工具函数。此方法也可使用别名 `usePushy` 引入。
-
-:::info
-注意，在使用 `<UpdateProvider>` 的当前组件（一般是根组件）中无法直接调用`useUpdate`，只有当前组件的子组件才能调用。
-:::
-
-```js
-const {
-  checkUpdate,
-  switchVersion,
-  switchVersionLater,
-  markSuccess,
-  dismissError,
-  downloadUpdate,
-  downloadAndInstallApk,
-  getCurrentVersionInfo,
-  currentVersionInfo,
-  parseTestQrCode,
-  currentHash,
-  packageVersion,
-  client,
-  progress,
-  updateInfo,
-  lastError,
-  restartApp,
-} = useUpdate();
-```
-
-其类型定义和功能如下：
-
-```ts
-interface UpdateContext {
-  // 检查更新（注意在 v10.26.0 版本之前，`checkUpdate`方法本身没有返回值，只能从`useUpdate()`返回的`updateInfo`中获取）
-  // 我们也仍然推荐优先从`useUpdate()`中获取`updateInfo`
-  checkUpdate: () => Promise<void | UpdateInfo>;
-  // 下载热更完成后调用，立即重启切换新版本
-  switchVersion: () => void;
-  // 下载热更完成后调用，用户手动重启app后切换新版本（静默更新）
-  switchVersionLater: () => void;
-  // 热更完成重启后，手动标记热更完成
-  markSuccess: () => void;
-  // 清除最后的报错状态
-  dismissError: () => void;
-  // 下载热更, v10.16.0+ 版本返回值为`boolean`，表示是否下载成功
-  downloadUpdate: () => Promise<boolean | void>;
-  // 下载并安装apk
-  downloadAndInstallApk: (url: string) => Promise<void>;
-  // 异步获取当前已热更版本的信息，v10.31.2 版本后用 `currentVersionInfo` 代替
-  getCurrentVersionInfo: () => Promise<{
-    name?: string;
-    description?: string;
-    metaInfo?: string;
-  }>;
-  // 当前已热更版本的信息，需 v10.31.2+ 版本
-  currentVersionInfo: {
-    name?: string;
-    description?: string;
-    metaInfo?: string;
-  };
-  // 解析测试二维码，此方法需 v10.11.2+ 版本
-  parseTestQrCode: (qrCode: string) => void;
-  // 当前的版本hash
-  currentHash: string;
-  // 当前的原生版本号
-  packageVersion: string;
-  // 当前的pushy热更服务实例
-  client?: Pushy;
-  // 下载开始后的进度数据
-  progress?: {
-    hash: string;
-    // 已下载的字节数
-    received: number;
-    // 待下载的总字节数
-    total: number;
-  };
-  // 热更相关信息
-  updateInfo?: {
-    // 已是最新版本，无需热更
-    upToDate?: true;
-    // 当前原生版本已过期，需要下载新的原生版本
-    expired?: true;
-    // 在pushy网页管理端设置的原生版本下载地址
-    downloadUrl?: string;
-    // 是否存在新的热更
-    update?: true;
-    // 新热更的版本名称
-    name?: string;
-    // 新热更的hash值
-    hash?: string;
-    // 新热更的更新说明
-    description?: string;
-    // 新热更携带的额外元数据
-    metaInfo?: string;
-    // 当前热更是否已暂停
-    paused?:
-      | "app" // 当前应用所有原生版本暂停
-      | "package" // 仅当前原生版本暂停
-      | "quota"; // 因检查次数超限而暂停
-    // 其他信息
-    message?: string;
-  };
-  // 检查、下载、应用热更等过程中的最近一次报错
-  lastError?: Error;
-}
-```
-
-***
-
-#### async function checkUpdate()
-
-触发更新检查，返回`updateInfo`（注意在 v10.26.0 版本之前，`checkUpdate`方法本身没有返回值，只能从`useUpdate()`返回的`updateInfo`中获取，且我们仍然推荐优先使用`useUpdate()`来获取），返回值有三种情形：
-
-1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），需要引导用户下载或跳转到应用市场(需要在网页管理端设置中填写`downloadUrl`)。如需在应用内执行 apk 更新，还需配置[安装权限](/docs/api.md#async-function-downloadandinstallapkurl)。
-
-```js
-{
-    expired: true,
-    downloadUrl: 'http://appstore/downloadUrl',
-}
-```
-
-2. `{upToDate: true}`：当前已经更新到最新，无需进行更新。
-
-3. `{update: true}`：当前有新版本可以更新。`name`、`description`字段可以用于展示给用户版本号，更新内容等信息，而`metaInfo`字段则可以根据你的需求自定义一些标记(如是否静默更新、是否强制更新等等，自己根据标记的属性做一些条件流程控制)，具体用法可参考[场景实践](/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了热更新文件的下载地址，
-
-```js
-{
-    update: true,
-    name: '1.0.3-rc',
-    hash: 'hash',
-    description: '添加聊天功能\n修复商城页面BUG',
-    metaInfo: '{"silent":true}',
-    pdiffUrl: 'http://update-packages.reactnative.cn/hash',
-    diffUrl: 'http://update-packages.reactnative.cn/hash',
-}
-```
-
-***
-
-#### async function downloadUpdate()
-
-下载热更包。仅当`update:true`时实际进行下载。会更新`progress`数据。v10.16.0+ 版本返回值为`boolean`，表示是否下载成功。
-
-***
-
-#### async function downloadAndInstallApk(url)
-
-下载更新的 apk 包并直接安装。`url`必须为可直接下载到 apk 文件的地址。
-
-由于系统安全限制等各种外部因素，此功能并不能保证一定正常调用。在应用当前运行周期内，如果下载或者安装失败，则再次调用时不会重试，只会静默失败。
-
-注意要使用这个功能还需要在`AndroidManifest.xml`中手动添加安装权限，如果需要考虑 Android 7.0 以下的客户，则还需要添加外部存储权限。
-
-```xml
-<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-
-<!-- 如果需要考虑Android 7.0以下的客户，则还需要添加外部存储权限 -->
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-```
-
-注意某些应用市场可能会因为上述权限拒绝应用上架。去掉上述两个权限并不影响热更新功能。
-
-***
-
-#### function markSuccess()
-
-**一般情况下请勿手动调用此函数**。调用此函数作为更新成功的标记（否则下次启动会默认失败自动回滚）。
-
-***
-
-#### async function getCurrentVersionInfo()
-
-获取当前已热更版本的信息（如尚未热更过则返回空对象）。v10.31.2 版本之后可以直接用 `currentVersionInfo` 代替。
-
-返回值示例：
-
-```js
-{
-    name: '1.0.3-rc',
-    description: '添加聊天功能\n修复商城页面BUG',
-    metaInfo: '{"silent":true}',
-}
-```
-
-***
-
-#### function restartApp()
-
-立即重启应用。v10.28.2+ 版本可用。
-
-***
-
-#### function switchVersion()
-
-立即重启应用，并加载已经下载完毕的版本。
-
-> 注意!不可依赖`progress`来判断下载完成，必须要在`await downloadUpdate()`之后再调用此方法。
-
-***
-
-#### function switchVersionLater()
-
-在下一次启动应用的时候加载已经下载完毕的版本。
-
-> 注意!不可依赖`progress`来判断下载完成，必须要在`await downloadUpdate()`之后再调用此方法。
-
-***
-
-#### function parseTestQrCode(qrCode: string)
-
-解析测试二维码，一般用于给 QA 人员测试热更新。如果在应用中已有扫码功能，则可以在应用中扫描 pushy 后台的测试二维码来测试任意版本的热更包。
-注意如果你使用自定义的(更新策略（updateStrategy）)\[[https://pushy.reactnative.cn/docs/integration#updatestrategy%E6%9B%B4%E6%96%B0%E5%BA%94%E7%94%A8%E7%AD%96%E7%95%A5\]，请务必从](https://pushy.reactnative.cn/docs/integration#updatestrategy%E6%9B%B4%E6%96%B0%E5%BA%94%E7%94%A8%E7%AD%96%E7%95%A5]，请务必从) `useUpdate()` 中获取 `updateInfo` ，而不要依赖 checkUpdate 方法的返回值，否则扫码不会有后续动作。
-
-![testqrcode](/static/image/testqrcode.24c22c1ebe.png)
-注意使用此方法，上述界面中的"使用 Deep Link"选项 **请不要
-** 勾选。
-代码示例：
-
-```js
-<Camera
-  onReadCode={({ nativeEvent: { codeStringValue } }) => {
-    // 识别到二维码后先关闭相机
-    setShowCamera(false);
-    // 先解析是否是pushy的测试二维码
-    if (parseTestQrCode(codeStringValue)) {
-      // 如果是pushy的测试二维码，则不再做其他业务扫码逻辑
-      return;
-    }
-    // 如果不是，继续处理其他业务扫码逻辑
-  }}
-/>
-```
-
-***
-
-### Android 方法
-
-#### UpdateContext.setCustomInstanceManager(ReactInstanceManager instanceManager)
-
-如果是集成/混编 Android 方案，则可以使用此方法传入你自行创建的 ReactInstanceManager。自`v5.5.8`版本起可用。
-
-示例：
-
-```java
-import cn.reactnative.modules.update.UpdateContext
-
-mReactInstanceManager = ReactInstanceManager.builder()
-                // ...各种setter，但注意不要调用setBundleAssetName
-                .setJSBundleFile(UpdateContext.getBundleUrl(mContext, "assets://index.android.bundle"))
-                .build();
-UpdateContext.setCustomInstanceManager(mReactInstanceManager);
-```
-
-
-
----
-url: /docs/bestpractice.md
----
-
-# 场景实践
-
-#### 优化原生和热更包体积
-
-##### iOS 原生包优化(ipa)
-
-对于同一份 archive（其版本号、编译时间和内置 bundle 已固定，不会受导出方式所影响），可以用不同选项多次导出 ipa，选择其中最小的上传到 pushy 服务器作为热更基准包。
-
-![bitcode](/static/image/exportipa.91920cd4bf.png)
-##### Android 原生包优化(apk)
-
-apk 的优化主要考虑两个方向：
-
-- [启用 proguard 压缩混淆源码](https://reactnative.cn/docs/signed-apk-android#%E5%90%AF%E7%94%A8proguard%E6%9D%A5%E5%87%8F%E5%B0%91apk%E7%9A%84%E5%A4%A7%E5%B0%8F%EF%BC%88%E5%8F%AF%E9%80%89%EF%BC%89)。但这一步可能导致一些使用反射的代码运行时报错，启用后需要充分测试每个页面和功能，以及需要阅读一些第三方关于 proguard 的特别设置说明。
-- [分开编译不同的 cpu 架构](https://reactnative.cn/docs/signed-apk-android#%E9%92%88%E5%AF%B9%E4%B8%8D%E5%90%8C%E7%9A%84-cpu-%E6%9E%B6%E6%9E%84%E7%94%9F%E6%88%90-apk-%E4%BB%A5%E5%87%8F%E5%B0%8F-apk-%E6%96%87%E4%BB%B6%E7%9A%84%E5%A4%A7%E5%B0%8F)。找到`android/app/build.gradle`中的 cpu 架构部分，如下所示启用`enable`选项：
-
-```diff
-splits {
-    abi {
-        reset()
--       enable enableSeparateBuildPerCPUArchitecture
-+       enable true        // 启用单独的 cpu 架构编译
-        universalApk false  // If true, also generate a universal APK
-    }
-}
-```
-
-如此一来会在编译目录中输出多个 apk 文件，分发和上传到热更新服务时只需要使用`app-arm64-v8a-release.apk`文件，可以大幅减小 apk 的大小。
-
-##### 热更新包优化(ppk)
-
-热更新包的主要内容是 js 包和其所引用的静态资源（主要是图片）。
-
-- js 包成分分析。可以借助一些第三方工具（如[react-native-bundle-visualizer](https://github.com/IjzerenHein/react-native-bundle-visualizer)）来分析 js 文件中哪些占比较大，是否可以用其他库替换等（如 dayjs 替换 moment，lodash-es 替换 lodash）。
-- 图片优化。
-  - 在保证体验的情况下，使用一些工具对图片进行裁剪压缩。
-  - 如不需要图片的透明像素，可以考虑将 png 格式转为 jpg 格式。
-  - 还可以进一步考虑压缩比更高的图片格式，例如 webp 格式（需要第三方原生插件例如[react-native-webp-format](https://github.com/Aleksefo/react-native-webp-format#readme)），heif 格式（iOS 11 和 Android 10 以上原生支持）等。这里有个图片格式对比可供参考 [https://compare.rokka.io/\_compare/#heif=40\&jpeg=80\&webp=80\&av1=40\&width=800](https://compare.rokka.io/_compare/#heif=40\&jpeg=80\&webp=80\&av1=40\&width=800)。
-
-#### 有很多渠道包需要热更，如何操作比较方便？
-
-1. 如果渠道包的`js代码和初始资源`有差别（无论多么细微的差别都会生成不同的 jsbundle），那么只能单独生成 apk，分别上传和绑定。可以考虑写一些脚本自动调用 cli 来执行批量操作。
-2. 如果渠道包的`js代码和初始资源`完全一致，可以考虑使用[Flavor 构建](https://developer.android.com/studio/build/build-variants?hl=zh-cn)，或其他一些动态生成渠道包的方案（比如[腾讯的 VasDolly](https://github.com/Tencent/VasDolly)，[美团的 walle](https://github.com/Meituan-Dianping/walle)等），这样所有的渠道包基于同一个基础 apk 生成（因而会有相同的编译时间戳和 jsbundle）。这样可以只用上传一个基础 apk，对此 apk 的热更操作可以对所有渠道包生效。
-3. 如果您是`高级版`、`专业版`或`大客户VIP版`客户，也可以考虑在管理后台的应用设置中启用`忽略编译时间戳`。此选项仅对比版本号，不校验时间戳，可提供更宽容的热更策略，但可能消耗更多流量。
-
-#### 如何支持 aab 格式的原生包？
-
-将 react-native-update-cli 更新到 v2.6.0 以上版本，即可使用 pushy parseAab 和 pushy uploadAab 命令来支持 aab 格式的原生包。
-
-#### 测试与回滚
-
-自 v10.11.2 版本开始，可以使用以下两种快捷扫码方案来测试热更，而无需提前进行绑定：
-
-![testqrcode](/static/image/testqrcode.24c22c1ebe.png)
-- 若应用启用了 [DeepLink](https://reactnative.cn/docs/next/linking#%E5%90%AF%E7%94%A8-deep-links) 功能
-
-代码中无需任何改动，只需在上述界面中勾选“使用 Deep Link”，填入您应用的协议名，例如"pushy://"，然后使用系统相机或系统内置的扫一扫功能扫码（注意不能使用微信扫码），即可自动调起应用并触发更新。
-
-- 若应用自带扫码功能
-
-请参考 [parseTestQrCode](/docs/api.md#function-parsetestqrcodeqrcode-string) 方法的说明。
-
-<details>
-<summary>若您的应用不具有上述两项功能，或 pushy 版本低于 v10.11.2，则可以参考如下测试方式（不推荐）</summary>
-
-先发布一个**测试包**，再发布一个除了版本号以外均完全相同的**正式包**。
-
-例如，假设我们有一个正式包，版本为`1.6.0`，那么可以修改版本号重新打包一个`1001.6.0`，以一个明显不太正常的版本号来标识它是一个测试版本，同时后几位相同，可以表明它和某个正式版本存在关联（内容/依赖一致）。
-
-在每次往发布包发起热更新之前，先对**测试包**`1001.6.0`进行更新操作，基本测试通过之后，再在网页后台上将热更包重新绑定到**正式包**`1.6.0`上。如果在测试包中发现了重大问题，你就可以先进行修复，更新测试确认通过后再部署到正式线上环境。这样，可以最大程度的避免发生线上事故。
-
-</details>
-
-若您用来测试的原生包当前已经有发布的热更版本且更新策略是立即应用，那么和扫码测试之间可能产生策略冲突，比如扫码更新后又立即强制更新到发布版本，对测试带来不便。此时可以考虑在扫码更新之后，利用 beforeCheckUpdate 回调临时禁止更新检查，直到下次启动再恢复。
-
-```js
-
-// isFirstTimeDebug 这个标志位需要 v10.37.0+ 版本，表示当前是扫码热更后的第一次启动
-import { isFirstTimeDebug } from 'react-native-update/src/core';
-
-const pushyClient = new Pushy({
-  beforeCheckUpdate: () => {
-    if (isFirstTimeDebug) {
-      // 如果当前是扫码热更后的第一次启动，则跳过热更检查
-      return false;
-    }
-    return true;
-  },
-})
-```
-
-万一确实发生线上事故需要回滚的话，先立即对原生包或者整个应用设置暂停热更，然后更改绑定到之前正常的版本，或者利用版本控制系统回滚代码到正常的状态，然后重新生成热更包并推送。
-
-#### 元信息(Meta Info)的使用
-
-在发布热更新版本时，或者在网页端，你可以编辑版本的元信息。这是一段在检查更新时可以获得的字符串，你可以在其中按你所想的格式（一般建议用[JSON 格式](https://developer.mozilla.org/zh-CN/docs/Learn/JavaScript/Objects/JSON)）保存一些信息。
-
-比如我们可以在元信息中约定字段标志`silent`，表示需要静默更新。当我们上传热更包填写 metainfo 时，以[JSON 格式](https://developer.mozilla.org/zh-CN/docs/Learn/JavaScript/Objects/JSON)输入：
-
-```json
-{ "silent": true }
-```
-
-> 请注意，我们并不对输入做任何格式校验和约束，请自行校验输入是否正确。
-
-此时在客户端检查更新时，能获取到我们刚刚输入的元信息，但它并不具备任何功能，只是一个字符串而已。所以我们其实需要**预先**在更新流程中加入对应的处理逻辑：
-
-```js
-// 调用 useUpdate() 获取 updateInfo
-if (updateInfo.expired) {
-  // ... 原生包版本过期，下载或跳转下载页面
-} else if (updateInfo.upToDate) {
-  // ... 没有更新，弹提示或忽略
-} else {
-  // 有更新，一般来说我们在这里给用户弹窗提示，让用户选择是否更新
-  // 那么静默更新的本质其实就是不弹窗，直接执行，所以可以在这里加入额外的判断流程
-  // ...
-}
-```
-
-我们在原有的更新流程中加入元信息的读取和判断：
-
-```js
-let metaInfo = {};
-try {
-  // 注意 JSON 输入有可能有错误，需要用 try 语句来避免应用被带崩
-  metaInfo = JSON.parse(updateInfo.metaInfo);
-} catch (e) {
-  // 异常处理，忽略或上报？
-}
-
-if (metaInfo.silent) {
-  // 如果热更包携带有 silent 字段，不询问用户，直接执行更新
-  switchVersion();
-} else {
-  // 否则还是走之前的询问流程
-  // Alert.alert('提示', '检查到新的版本.......
-}
-```
-
-又比如，可能某个版本包含一些重要的公告内容，所以还可以在上面插入一个公告字段等等。如何使用元信息，完全取决于您的想象力！
-
-
-
----
-url: /docs/cli.md
----
-
-# 命令行工具（内置）
-
-### 安装
-
-```
-$ npm install -g react-native-update-cli
-```
-
-### 命令
-
-#### pushy bundle
-
-生成热更资源包。会自动探测项目中是否使用了 expo、taro 等框架并自动调用对应的命令行打包。如果探测不准确或使用对应命令行打包时报错，可尝试使用 `--rncli` 参数来指定官方命令行打包。
-
-- platform: ios|android|harmony 对应的平台
-- entryFile: 入口脚本文件
-- intermediaDir: 临时文件输出目录
-- output: 最终 ppk 文件输出路径
-- dev: 是否打包开发版本
-- sourcemap: 是否生成 sourcemap(需 cli 版本 1.11.0+)
-- no-interactive: 不进行交互式提示
-- rncli: 指定使用官方命令行打包 (需 cli 版本 1.40.0+)
-- expo: 指定使用 expo 的命令行打包 (需 cli 版本 1.40.0+)
-- taro: 指定使用 taro 的命令行打包 (需 cli 版本 1.40.0+)
-
-从 v1.44.2 版本开始，新增了以下直接上传发布的参数（等同于打包完成后连续调用 `pushy publish` 命令）：
-
-- name: 指定热更新版本的名字(热更自身的版本号)
-- description: 指定热更新版本的描述信息，可以对用户进行展示
-- metaInfo: 指定热更新版本的元信息，可以用来保存一些额外信息，具体用法可参考[场景实践](/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。
-
-从 v1.46.1 版本开始，在传入 `name`， `description`， `metaInfo` 参数的同时，可继续叠加以下参数（等同于在调用`pushy publish` 命令后，再连续调用 `pushy update` 命令）：
-
-- packageId: 要绑定的原生包 ID （多选一）
-- packageVersion: 要绑定的原生包版本名（多选一）
-- minPackageVersion: 要绑定的最低原生包版本，大于等于此版本的将逐个绑定（多选一）
-- maxPackageVersion: 要绑定的最高原生包版本，小于等于此版本的将逐个绑定（多选一）
-- packageVersionRange: 要绑定的原生包版本范围（多选一），范围格式遵循 semver 的语法，可参考 [https://quickref.cnxiaobai.com/docs/semver.html](https://quickref.cnxiaobai.com/docs/semver.html) 或 [https://devhints.io/semver](https://devhints.io/semver)
-
-示例：
-
-```bash
-
-pushy bundle --platform android --name "1.0.0" --description "热更新版本 1.0.0" --metaInfo '{"key": "value"}' --packageVersionRange ">=1.0 <3.0"
-```
-
-***
-
-#### pushy parseIpa \[ipaFile]
-
-解析 ipa 文件并输出一些相关信息，如版本号，编译时间戳等。
-
-***
-
-#### pushy parseApk \[apkFile]
-
-解析 apk 文件并输出一些相关信息，如版本号，编译时间戳等。
-
-***
-
-#### pushy parseApp \[appFile]
-
-解析 app 文件并输出一些相关信息，如版本号，编译时间戳等。
-
-***
-
-#### pushy parseAab \[aabFile]
-
-解析 aab 文件并输出一些相关信息，如版本号，编译时间戳等。
-
-***
-
-#### pushy diff \[origin]\[next]
-
-提供两个 ppk 文件，生成从 origin 到 next 版本的差异更新包。
-
-- output: diff 文件输出路径
-
-***
-
-#### pushy diffFromApk \[apkFile]\[next]
-
-提供一个 apk 文件和一个 ppk 文件，生成从 apk 文件到 next 版本的差异更新包。
-
-如果使用热更新开放平台，你不需要自己执行此命令。
-
-- output: diff 文件输出路径
-
-***
-
-#### pushy diffFromApp \[appFile]\[next]
-
-提供一个 app 文件和一个 ppk 文件，生成从 app 文件到 next 版本的差异更新包。
-
-如果使用热更新开放平台，你不需要自己执行此命令。
-
-- output: diff 文件输出路径
-
-***
-
-#### pushy diffFromIpa \[ipaFile]\[next]
-
-提供一个 ipa 文件和一个 ppk 文件，生成从 ipa 文件到 next 版本的差异更新包。
-
-如果使用热更新开放平台，你不需要自己执行此命令。
-
-- output: diff 文件输出路径
-
-***
-
-#### pushy login \[email]\[pwd]
-
-登录热更新开放平台。你需要先登录才能使用下面的命令。
-
-***
-
-#### pushy logout
-
-登出并清除本地的登录信息
-
-***
-
-#### pushy me
-
-查看自己是否已经登录，以及昵称等信息。
-
-***
-
-#### pushy createApp
-
-创建应用并立刻绑定到当前工程。这项操作也可以在网页管理端进行。
-
-- platform: ios|android|harmony 对应的平台
-- name: 应用名称
-- downloadUrl: 应用安装包的下载地址
-
-***
-
-#### pushy deleteApp \[appId]
-
-删除已有应用。所有已创建的应用包、热更新版本都会被同时删除。这项操作也可以在网页管理端进行。
-
-- appId: 要删除的应用 ID
-
-***
-
-#### pushy apps
-
-查看当前已创建的全部应用。这项操作也可以在网页管理端进行。
-
-- platform: ios|android|harmony 对应的平台
-
-***
-
-#### pushy selectApp \[appId]
-
-绑定应用到当前工程。
-
-- platform: ios|android|harmony 对应的平台
-
-***
-
-#### pushy uploadIpa \[ipaFile]
-
-上传 ipa 文件到开放平台。（cli 需 1.24.0 +）
-
-***
-
-#### pushy uploadApk \[apkFile]
-
-上传 apk 文件到开放平台。（cli 需 1.24.0 +）
-
-***
-
-#### pushy uploadApp \[appFile]
-
-上传 app 文件到开放平台。（cli 需 1.24.0 +）
-
-***
-
-#### pushy uploadAab \[aabFile]
-
-上传 aab 文件到开放平台。（cli 需 2.6.0 +）
-
-***
-
-#### pushy extractApk \[aabFile]
-
-从 aab 文件中提取通用 apk 文件。（cli 需 2.6.0+）
-
-用法：`pushy extractApk aab后缀文件 [--output apk文件] [--includeAllSplits] [--splits 分包名列表]`
-
-- output: 指定导出的 apk 文件路径（默认与 aab 同目录同名 `.apk`）
-- includeAllSplits: 提取时包含全部 split（默认仅包含 `base`）
-- splits: 指定额外包含的 split 名称，多个值用英文逗号分隔
-
-示例：
-
-```bash
-pushy extractApk android/app/build/outputs/bundle/release/app-release.aab --output app-release.apk
-pushy extractApk android/app/build/outputs/bundle/release/app-release.aab --splits config.zh,arm64_v8a
-pushy extractApk android/app/build/outputs/bundle/release/app-release.aab --includeAllSplits
-```
-
-***
-
-#### pushy packages
-
-查看已经上传的原生包。这项操作也可以在网页管理端进行。
-
-- platform: ios|android|harmony 对应的平台
-
-***
-
-#### pushy deletePackage
-
-删除已经上传的原生包。
-
-- appId: 要删除的原生包所属的应用 ID
-- packageId: 要删除的原生包 ID
-
-***
-
-#### pushy publish \[ppkFile]
-
-发布新的热更新版本（ppk 文件）。
-
-- platform: ios|android|harmony 对应的平台
-- name: 当前热更新版本的名字(版本号)
-- description: 当前热更新版本的描述信息，可以对用户进行展示
-- metaInfo: 当前热更新版本的元信息，可以用来保存一些额外信息，具体用法可参考[场景实践](/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。
-
-从 v1.46.1 版本开始，支持以下参数（等同于在 调用`pushy publish` 命令后，再连续调用 `pushy update` 命令）：
-
-- packageId: 要绑定的原生包 ID （多选一）
-- packageVersion: 要绑定的原生包版本名（多选一）
-- minPackageVersion: 要绑定的最低原生包版本，大于等于此版本的将逐个绑定（多选一）
-- maxPackageVersion: 要绑定的最高原生包版本，小于等于此版本的将逐个绑定（多选一）
-- packageVersionRange: 要绑定的原生包版本范围（多选一），范围格式遵循 semver 的语法，可参考 [https://quickref.cnxiaobai.com/docs/semver.html](https://quickref.cnxiaobai.com/docs/semver.html) 或 [https://devhints.io/semver](https://devhints.io/semver)
-
-示例：
-
-```bash
-
-pushy publish .pushy/output/android.1750423283653.ppk --platform android --name "1.0.0" --description "热更新版本 1.0.0" --metaInfo '{"key": "value"}' --packageVersionRange ">=1.0 <3.0"
-```
-
-***
-
-#### pushy versions
-
-分页列举可用的版本。这项操作也可以在网页管理端进行。
-
-- platform: ios|android|harmony 对应的平台
-
-***
-
-#### pushy deleteVersion
-
-删除已经发布的热更新版本。
-
-- appId: 要删除的热更新版本所属的应用 ID
-- versionId: 要删除的热更新版本 ID
-
-***
-
-#### pushy update
-
-为一个原生包版本绑定发布一个热更新版本。这项操作也可以在网页管理端进行。以下参数中`packageId`，`packageVersion`，`minPackageVersion`，`maxPackageVersion`和`packageVersionRange`中多选一即可。
-
-cli 2.4.0 版本开始可以同时绑定一个全量和一个灰度版本。2.4.0 之前全量和灰度版本会互相覆盖，后设置的生效。
-
-- platform: ios|android|harmony 对应的平台
-- versionId: 要绑定的热更新版本 ID
-- rollout: 灰度发布范围（整数取值 1 - 100，对应 1% - 100% 终端设备覆盖率），默认为 100（需 cli 版本 1.31.0+）
-- dryRun: 是否只进行预览，不进行实际绑定（需 cli 版本 1.45.4+）
-- packageId: 要绑定的原生包 ID （多选一）
-- packageVersion: 要绑定的原生包版本名（多选一，需 cli 版本 1.7.2+）
-- minPackageVersion: 要绑定的最低原生包版本，大于等于此版本的将逐个绑定（多选一，需 cli 版本 1.27.0+）
-- maxPackageVersion: 要绑定的最高原生包版本，小于等于此版本的将逐个绑定（多选一，需 cli 版本 1.27.0+）
-- packageVersionRange: 要绑定的原生包版本范围（多选一，需 cli 版本 1.45.4+），范围格式遵循 semver 的语法，可参考 [https://quickref.cnxiaobai.com/docs/semver.html](https://quickref.cnxiaobai.com/docs/semver.html) 或 [https://devhints.io/semver](https://devhints.io/semver)
-
-示例：
-
-```bash
-❯ pushy update --versionId 211343 --platform android --packageVersionRange ">=1.0 <3.0" --dryRun
-react-native-update-cli: 1.45.4 （最新：1.45.4）
-react-native-update: 10.28.11 （最新：10.28.11）
-以下是 dry-run 模拟运行结果，不会实际执行任何操作：
-已将热更包 211343 绑定到原生版本 1.28.1 (id: 75219)
-已将热更包 211343 绑定到原生版本 1.28 (id: 75184)
-已将热更包 211343 绑定到原生版本 1.5 (id: 73396)
-已将热更包 211343 绑定到原生版本 2.0 (id: 68219)
-已将热更包 211343 绑定到原生版本 1.0 (id: 68158)
-操作完成，共已绑定 5 个原生版本
-```
-
-
-
----
-url: /docs/cli_module.md
----
-
-# 命令行工具（自定义模块）
-
-## 模块化功能 (Module System)
-
-从 v2.0.0 版本开始，CLI 支持模块化扩展，允许开发者自定义命令和工作流。
-
-### 核心概念
-
-- **CLI Module**: 包含自定义命令和工作流的模块
-- **Command**: 单个可执行的命令
-- **Workflow**: 由多个步骤组成的复杂工作流
-- **Module Manager**: 管理模块注册和执行的核心组件
-
-### 模块注册
-
-```typescript
-import { moduleManager } from 'react-native-update-cli';
-import { myCustomModule } from './my-custom-module';
-
-// 注册自定义模块
-moduleManager.registerModule(myCustomModule);
-```
-
-### 创建自定义模块
-
-```typescript
-import type { CLIModule, CommandContext, CommandResult } from 'react-native-update-cli';
-
-export const myCustomModule: CLIModule = {
-  name: 'my-module',
-  version: '1.0.0',
-  commands: [
-    {
-      name: 'my-command',
-      description: '我的自定义命令',
-      handler: async (context: CommandContext): Promise<CommandResult> => {
-        // 命令执行逻辑
-        return { success: true, data: 'Hello from custom command!' };
-      },
-      options: {
-        flag: {
-          hasValue: true,
-          description: '自定义参数'
-        }
-      }
-    }
-  ],
-  workflows: [
-    {
-      name: 'my-workflow',
-      description: '我的自定义工作流',
-      steps: [
-        {
-          name: 'step1',
-          description: '第一步',
-          execute: async (context: CommandContext) => {
-            console.log('执行第一步...');
-            return { step1Result: 'completed' };
-          }
-        },
-        {
-          name: 'step2',
-          description: '第二步',
-          execute: async (context: CommandContext, previousResult: any) => {
-            console.log('执行第二步，前一步结果:', previousResult);
-            return { ...previousResult, step2Result: 'completed' };
-          }
-        }
-      ]
-    }
-  ],
-  init: (provider) => {
-    console.log('模块初始化完成');
-  }
-};
-```
-
-### 查看已注册模块命令
-
-```bash
-# 查看所有可用模块命令
-pushy list
-```
-
-***
-
-## 工作流系统 (Workflow System)
-
-工作流是由多个步骤组成的复杂任务执行流程，支持条件执行、错误处理和结果传递。
-
-### 内置工作流
-
-#### 1. 用户认证工作流
-
-##### pushy auth-check
-
-检查用户认证状态
-
-```bash
-pushy workflow auth-check
-```
-
-##### pushy login-flow
-
-完整的用户登录流程
-
-```bash
-pushy workflow login-flow
-```
-
-#### 2. 应用管理工作流
-
-##### pushy workflow multi-platform-app-management
-
-跨平台应用统一管理
-
-```bash
-pushy workflow multi-platform-app-management
-```
-
-##### pushy workflow incremental-build
-
-增量构建工作流，生成差异更新包
-
-```bash
-pushy workflow incremental-build
-```
-
-### 工作流管理命令
-
-列出所有可用工作流
-
-```bash
-pushy list
-```
-
-##### pushy workflow
-
-执行指定工作流
-
-```bash
-pushy workflow <workflowName>
-```
-
-##### pushy list
-
-列出所有已注册的模块
-
-```bash
-pushy list
-```
-
-### 工作流特性
-
-1. **步骤化执行**: 工作流由多个步骤组成，按顺序执行
-2. **结果传递**: 每个步骤的结果可以传递给下一个步骤
-3. **条件执行**: 支持根据条件决定是否执行某个步骤
-4. **错误处理**: 内置错误处理和回滚机制
-5. **进度反馈**: 实时显示执行进度和状态
-6. **参数验证**: 执行前自动验证必需参数
-
-***
-
-## 示例项目
-
-在项目的 `example/` 目录中提供了完整的模块和工作流使用示例：
-
-- `example/modules/` - 自定义模块示例
-- `example/workflows/` - 自定义工作流示例
-- `example/scripts/` - 使用脚本示例
-
-运行示例：
-
-```bash
-# 模块注册和执行示例
-npx ts-node example/scripts/register-modules.ts
-
-# 工作流演示
-npx ts-node example/scripts/workflow-demo.ts
-
-# 增强工作流演示
-npx ts-node example/scripts/enhanced-workflow-demo.ts
-```
-
-
-
----
-url: /docs/faq.md
----
-
-# 常见问题
-
-如果本页面没能回答您的疑问，您可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。
-
-### 业务问题
-
-#### 热更新究竟能否上架？
-
-您可能听说过各种说法，但大量实践表明，热更新目前能够顺利上架 AppStore 和其他各种应用市场。唯一需要注意的是，在审核期间请不要发布热更新，不要让审核人员看到各种更新相关的提示和弹窗，即可顺利通过。
-
-***
-
-#### 是否可以在海外使用？
-
-可以。Pushy 本身在国内外都部署有可用的 CDN 节点，能够满足大多数出海应用的热更新分发要求。
-
-如果您的项目对海外合规、数据存放位置、运营主体隔离等方面还有额外要求，则可以考虑使用由不同公司实体独立运营的全球服务 [Cresc](https://cresc.dev/)。
-
-***
-
-#### 哪些修改可以热更新？哪些不能？
-
-我们把对应用的修改分为两类：
-
-- 不可热更新 —— 原生修改，即所有需要`编译`后才能生效的修改：
-  - 任何在 iOS 或者 Android 目录中的修改、增删。
-  - 任何含有原生代码的第三方组件的更新、修改。
-- 可以热更新 —— 非原生修改，即所有`无需编译`，刷新即可生效的修改：
-
-  - js 代码修改，包括第三方纯 js 组件的更新、修改。
-  - 可以在 js 代码中 require/import 的资源文件，例如图片。
-
-需要注意的是，即便资源文件可以热更新，但这些热更新后的资源文件会以`file://`协议的形式提供访问，某些读取资源文件的第三方可能并不支持`file://`协议。
-
-***
-
-#### 热更新成功完成，但是重启后又回滚了是怎么回事？
-
-可以正常更新，但是重启后回滚，一般有两种可能的情况：
-
-- 没有正确[配置 bundleUrl](/docs/getting-started.md#配置-bundle-url)
-- （仅有 v10 以下版本存在此可能性，v10 及更高版本不存在此情况）没有正确[调用 markSuccess](https://v9--pushy-site.netlify.app/docs/integration#%E9%A6%96%E6%AC%A1%E5%90%AF%E5%8A%A8%E5%9B%9E%E6%BB%9A)
-
-如果你确定上述两个步骤都正确无误，请在[issues 区](https://github.com/reactnativecn/react-native-update/issues)给我们留言反馈。
-
-***
-
-#### 热更新报错：“热更新已暂停，原因：编译时间戳与服务器记录不一致。”
-
-当您每次编译产生一个原生包时，其中都会记录一个编译时间戳`buildTime`(可以使用`pushy parseIpa a.ipa`或是`pushy parseApk a.apk`命令来查看)。如果您需要把这个包发给客户并希望使用热更新功能，那么就需要使用 upload 命令来上传到我们的服务器，而服务器端会记录这个包的版本号和编译时间戳以便后续比对记录。
-
-举例来说，假如我已经上传了一个 1.0 版本原生包（`1A包`），但后来由于种种原因我又重新打包了（`1B包`）但没有上传，这两个包有相同的版本号，但会有不同的编译时间戳。此时有几种可能的情况：
-
-1. 我忘记上传过`1A包`，`1B包`没有实质更改且还没有客户安装。此时应当放弃`1B包`，只让客户下载安装`1A包`。
-2. 我忘记上传过`1A包`，又生成了`1B包`且已有客户安装。此时`1A包`客户可以获取热更新，`1B包`客户无法获取热更新。要使两批客户都能获取热更新，要么想办法通知`1B包`客户装回`1A包`，要么重新发布一个`高于1.0`版本的原生包且上传到 pushy 服务器，并删除`1.0`版本的记录，此时`1A包`和`1B包`的客户都会收到版本过期需要下载新版本的通知。
-3. 我知道上传过`1A包`，但我有原生方面的修改需要打了一个新的`1B包`。此时若将`1B包`上传到 pushy 服务器会提示版本验证错误，因为已经存在有相同的`1.0`版本。所以需要首先更改原生版本号再次打包，并`首先`将此新版本上传到服务器，`然后`分发给客户。这样`1.0版本`和`新版本`可以并存且都可以获得热更新。
-
-请谨记，任何时候生成原生包，请 1)先修改原生版本号，2)并上传到 pushy 服务器，才可以正常获得热更新。
-
-:::info
-如果您是`高级版`、`专业版`或`大客户VIP版`客户，也可以考虑在管理后台的应用设置中启用`忽略编译时间戳`。此选项仅对比版本号，不校验时间戳，可提供更宽容的热更策略，但可能消耗更多流量，适合需要管理多个分发渠道的客户。
-:::
-
-***
-
-### 付费问题
-
-#### 我应该选择哪个业务版本呢？
-
-其实完全无需考虑，先从最高配额的`专业版`开始体验（新用户注册验证通过后，将自动获得 7 天`专业版`试用），各个版本的使用流程完全一致！当试用时间到期后，若当前版本的配额不能满足需求，可随时补差价升级到更高配额的版本。升级自动按天数计算差价，绝无额外费用。
-
-目前仅有一项额外的付费专用功能，即`忽略编译时间戳`设置（在管理后台的应用设置中），此选项仅对比版本号，不校验时间戳，可提供更宽容的热更策略，但可能消耗更多流量，适合需要管理多个分发渠道的客户。此功能目前仅支持`高级版`、`专业版`和`大客户VIP版`。
-
-***
-
-#### 我可以试用付费版本先评估一下效果吗？
-
-新用户注册验证通过后，将自动获得 7 天`专业版`试用。如您需要更长的评估时间，可将注册用户名、邮箱、公司（或个人）名称发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，标题注明“pushy 评估试用延长”，我们会为您酌情延长评估时间。
-试用期间只能选择续费专业版或升级到更高版本，如需购买其他版本，请等待试用期过期，或者联系客服去除试用。
-
-***
-
-#### 配额具体如何计算？
-
-配额主要分为 4 种：
-
-1. 可创建的应用数量，注意 iOS 和 Android 版本记做不同的应用。
-2. 原生包数量及大小，不同应用分开计算。原生包指通过`pushy uploadIpa/uploadApk`命令上传到 Pushy 服务器上作为热更新起始版本的完整 apk/ipa 安装包。
-3. 热更包数量及大小，不同应用分开计算。热更包指通过`pushy bundle`所命令生成的 ppk 文件。注意这不是用户实际下载的更新文件，用户下载的是通过比对生成的增量 diff 文件（比 ppk 文件要小得多）。
-4. 每日总热更查询次数，所有应用累加计算。每次用户打开应用时，会向服务器查询是否有新的热更新。这个查询次数会被计入每日总热更查询次数。当日超过限额次数后，接口将不再返回新的热更新信息，直到次日重置。
-
-> 这里有一些对[包大小的优化建议](/docs/bestpractice.md#优化原生和热更包体积)可供参考。
-
-以上 2、3 条为账户下每个应用单独计算，第 4 条为账户下所有应用累加计算。具体配额和费用由于运营成本可能会有调整，请以[价格表](/pricing.md)页面为准。已购买的用户在续费前不受调整影响。
-
-***
-
-#### 达到配额后还可以正常使用吗？
-
-当应用、原生包、热更包数量达到配额限制后，您将无法执行相应的新增操作。但用户端仍可正常检查更新，下载已发布的更新。您可选择升级到更高配额，或是通过删除已不再使用的应用、原生包、热更包来使数量降低到配额以内，以便继续执行新增操作。\
-若原生包、热更包大小超过限额，则会导致上传失败。您可以选择升级到更高配额，或是想办法进行[精简优化](/docs/bestpractice.md#优化原生和热更包体积)。
-若当日热更检查次数超过限额，则会导致接口返回空数据。您可以选择升级到更高配额，或是优化热更策略，减少用户端检查更新的频率。
-
-***
-
-#### 我可以单独升级某项配额吗？
-
-如果您需要单独升级某些配额（需要达到高级版以上），请通过邮件 [hi@charmlot.com](mailto:hi@charmlot.com) 或 QQ 34731408 与我们联系，我们将根据您的个性化需求为您定制方案和报价。
-
-***
-
-#### 付费业务到期后不续费，现有应用还能否正常使用？
-
-到期后按免费版额度执行。如您现有应用已超出配额，则必须通过删除操作降低到配额以内，方可执行新的操作（如创建应用，上传热更等），但不影响用户获取之前已发布的热更。
-
-***
-
-#### 如何获取付费的专人技术支持？
-
-请将您的用户名和订单截图发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，同时提供您希望的技术联系方式（QQ、微信等），核实后会有技术专员添加您为好友。
-
-***
-
-#### 如何开具发票？
-
-请将具体开票需求发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，并附上注册邮箱和订单截图。我们默认会回复普通电子发票到`注册邮箱`，类目为软件服务。如需指定接受邮箱或手机，请在`邮件正文`中注明。如需要邮寄纸质发票请注明邮寄地址，邮费为到付。
-如邮件发送后三个工作日内未收到回复，请联系 QQ 客服 34731408。
-
-***
-
-#### 可以使用银行转账付款吗？
-
-可以的。请对照[价格表](/pricing.md)，将对应版本的款项转账至：
-
-| 公司名称  | 武汉青罗网络科技有限公司     |
-| ----- | ---------------- |
-| 账号    | 8888888048825564 |
-| 开户行名称 | 浙江网商银行           |
-| 开户地区  | 浙江省杭州市           |
-| 支行名称  | 浙江网商银行股份有限公司     |
-| 联行号   | 323331000001     |
-
-转账完成后请截图发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，并写明注册邮箱，我们将在一个工作日内开通对应服务。
-
-***
-
-#### 可以按月付款吗？
-
-需要月付的客户请联系 QQ 客服 34731408，月付价格为年付价格 / 8。如标准版当前价格为 800 元每年，则月付价格为 100 元每月。
-月付客户需累计支付满 500 元后才能开具发票。`大客户VIP版`不支持月付。
-
-***
-
-#### 大客户方案
-
-如果您的应用有大规模的活跃用户，日均所有应用累计总查询次数超过 100 万次，则建议选择我们专门针对大规模应用优化的`大客户VIP版`。
-`大客户VIP版`在应用数量、原生包数量、热更包数量等方面配额与`专业版`相同。
-
-当前价格如下表：
-
-| 服务版本 | 日均总热更查询次数 | 价格（元/年） |
-| ---- | --------- | ------- |
-| VIP1 | 1000 万次   | 30000   |
-| VIP2 | 5000 万次   | 60000   |
-| VIP3 | 1 亿次      | 120000  |
-| VIP4 | 1 亿次以上    | 请联系客服   |
-
-具体试用和对接请联系 QQ 客服 34731408
+立即开始使用 Pushy，让你的 React Native 应用拥有极致的热更新体验！
 
 
 
@@ -2137,96 +896,6 @@ const pushyClient = new Pushy({
 
 
 ---
-url: /docs/intro.md
----
-
-# Pushy - 专业的热更新解决方案
-
-:::info
-**现已全面支持鸿蒙系统以及 React Native 新架构！**
-:::
-
-Pushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-native-update)
- [![npm version](https://badge.fury.io/js/react-native-update.svg)](https://www.npmjs.com/package/react-native-update)) 是面向 React Native 应用提供的**专业热更新服务**
-，由 [React Native 中文网](https://reactnative.cn)
-独家研发并持续维护。我们致力于为全球 React Native 开发者提供最快速、最稳定、最经济的热更新体验。
-## 🚀 为什么选择 Pushy？
-
-### 极致的更新体验
-
-- **🎯 超小更新包**：基于 bsdiff/hdiff 算法的增量更新，通常只需**几十至几百 KB**（相比其他全量更新服务的几十 MB，节省流量 99%+）
-- **⚡️ 极速分发**：国内用户使用阿里云高速 CDN，国外用户智能分流至 Cloudflare，在各地区都使用覆盖率最好的 CDN 服务商，更新成功率高达 **99.9%+**
-- **🛡️ 安全可靠**：内置崩溃回滚机制，出现问题自动回退，确保应用稳定运行
-- **🌐 全平台覆盖**：完美支持 <span style={{whiteSpace: 'nowrap'}}><AppleOutlined style={{fontSize: '16px', color: '#555', marginRight: '6px'}} /> **iOS**</span> <span style={{whiteSpace: 'nowrap'}}><AndroidOutlined style={{fontSize: '16px', color: '#3DDC84', marginRight: '6px'}} /> **Android**</span>, 且业内独家第一方支持 <span style={{whiteSpace: 'nowrap'}}><HarmonyOSOutlined style={{fontSize: '16px', color: '#000', marginRight: '6px'}} /> **鸿蒙（HarmonyOS）**</span>
-- **🔍 深耕 React Native 生态**：
-  - ✅ **Expo** - 无缝集成
-  - ✅ **新架构** - 第一时间跟进支持
-  - ✅ **Hermes** - 完整支持字节码格式
-- **📖 核心逻辑完全开源**：客户端、命令行工具以及管理界面代码都[完全开源](https://github.com/reactnativecn)，接受社区审计，代码透明可信，你可以随时迁移到自建服务器或其他服务
-- **🔒 数据安全**：可以自行插入数据埋点，完全掌控自己的数据
-- **💬 专业人工支持**：提供付费专人技术支持，有问必答，确保你的应用稳定运行
-- **🏆 多年稳定运营**：从 2016 年开始运营至今，服务众多知名企业和应用
-
-## 💰 性价比之选
-
-相比同类服务，Pushy 不仅功能更强大，价格也更亲民：
-
-| 对比项       | Pushy        | Expo Update |
-| --------- | ------------ | ----------- |
-| **起步价**   | ¥66/月        | \~¥136/月    |
-| **流量计费**  | 不单独计费        | 超出需额外付费     |
-| **更新包大小** | 几十至几百 KB（增量） | 几十 MB（全量）   |
-| **国内速度**  | ⭐⭐⭐⭐⭐ 极快     | ⭐⭐ 较慢       |
-| **鸿蒙支持**  | ✅ 支持         | ❌ 不支持       |
-
-:::warning
-**注意**：Microsoft App Center（Code Push）已于 2025 年 3 月 31 日正式停止服务。如果你正在使用 Code Push，现在正是迁移到 Pushy 的最佳时机！
-:::
-
-使用 Pushy 后，你的团队将获得：
-
-- ✅ **节省 90% 以上的流量成本**
-- ✅ **发版速度提升 10 倍以上**（无需等待应用商店审核）
-- ✅ **Bug 修复时间缩短至分钟级**
-- ✅ **用户更新率提升至 99%+**（相比应用商店的自然更新率）
-- ✅ **开发迭代更加灵活自由**
-
-### 简单易用
-
-```js
-// 三行代码即可集成
-import { UpdateProvider, Pushy } from "react-native-update";
-
-const pushyClient = new Pushy({ appKey });
-
-<UpdateProvider client={pushyClient}>
-  <App />
-</UpdateProvider>
-```
-
-内置多种更新策略，开箱即用：
-
-- 🔕 **静默更新** - 后台自动下载，用户无感知
-- 💬 **提示更新** - 友好的系统弹窗提醒
-- ⚙️ **自定义策略** - 完全可控的更新流程
-
-## 🚦 开始使用
-
-只需三步，即可为你的 React Native 应用添加热更新能力：
-
-1. **[安装配置](/docs/getting-started.md)** - 5 分钟完成基础配置
-2. **[代码集成](/docs/integration.md)** - 几行代码即可接入
-3. **[发布更新](/docs/publish.md)** - 一条命令推送新版本
-
-:::info
-不确定是否适合你的项目？查看[常见问题](/docs/faq.md)或者可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。
-:::
-
-立即开始使用 Pushy，让你的 React Native 应用拥有极致的热更新体验！
-
-
-
----
 url: /docs/publish.md
 ---
 
@@ -2424,6 +1093,1162 @@ Would you like to bind packages to this version?(Y/N)
 
 
 ---
+url: /docs/api.md
+---
+
+# API参考
+
+### JavaScript 方法
+
+#### new Pushy(options: PushyOptions)
+
+创建 Pushy 热更新服务实例，其构造参数如下：
+
+```ts
+interface PushyOptions {
+  // 必填，通过pushy createApp或selectApp命令，或在网页管理端获取
+  appKey: string;
+
+  // 自定义日志输出，也可用于上报统计数据
+  logger?: ({ type, data }: { type: EventType; data: EventData }) => void;
+
+  // 触发自动检查更新的策略
+  checkStrategy?:
+    | "onAppStart" // 仅在app启动时
+    | "onAppResume" // 仅在app从后台切换到前台时
+    | "both"; // 默认值，同时包含前两个场景
+    | null; // 不自动检查更新，必须手动调用checkUpdate方法，此选项需 v10.4.2+ 版本
+
+  // 自动下载和应用更新的策略
+  updateStrategy?:
+    | "alwaysAlert" // 调试环境（__DEV__）默认值，使用系统默认的alert页面提示热更且会在有报错时弹出提示
+    | "alertUpdateAndIgnoreError" // 生产环境默认值，在有热更时使用系统默认的alert页面提示热更，但不弹出任何报错提示
+    | "silentAndNow" // 自动静默下载并立刻应用热更
+    | "silentAndLater"; // 自动静默下载，但仅在用户退出app后重启时应用更新
+    | null; // 不自动下载和应用更新，如需自定义热更界面请选择此项
+
+  // 是否在热更重启后自动标记为成功，默认为true
+  // 一般情况下不建议手动标记
+  autoMarkSuccess?: boolean;
+
+  // 是否在若干ms后自动清除最后的报错，默认为不清除
+  dismissErrorAfter?: number;
+
+  // 是否在开发环境中检查热更，默认为false。如需在开发环境中调试热更，请打开此选项。
+  // 但即便打开此选项，也仅能检查、下载热更，并不能实际应用热更。实际应用热更必须在release包中进行。
+  // 此选项需 v10.4.2+ 版本
+  debug?: boolean;
+
+  // 是否在调用 checkUpdate 和 downloadUpdate 时抛出错误，默认为不抛出错误，通过 lastError 获取错误信息
+  // 启用后可以使用 try catch 语句 捕获错误，同时 lastError 也仍然可用
+  // try {
+  //   await checkUpdate();
+  // } catch (e) {
+  //   console.error(e);
+  // }
+  // 此选项需 v10.15.2+ 版本
+  throwError?: boolean;
+
+  // 在检查更新前执行，返回 false 则取消检查更新
+  // 此选项需 v10.12.0+ 版本
+  beforeCheckUpdate?: () => Promise<boolean>;
+
+  // 在下载更新前执行，返回 false 则取消下载更新，可以配合自定义的 metaInfo 做一些条件控制
+  // 此选项需 v10.12.0+ 版本
+  beforeDownloadUpdate?: (info: UpdateInfo) => Promise<boolean>;
+
+  // 在下载更新后执行，返回 false 则取消内置策略进一步执行，可以配合自定义的 metaInfo 做一些条件控制
+  // 此选项需 v10.27.0+ 版本
+  afterDownloadUpdate?: (info: UpdateInfo) => Promise<boolean>;
+
+  // 在原生包过期时执行，返回 false 则取消内置策略进一步执行，可以配合自定义的 metaInfo 做一些条件控制
+  // 此选项需 v10.28.2+ 版本
+  onPackageExpired?: (info: UpdateInfo) => Promise<boolean>;
+}
+
+// 日志事件类型
+type EventType =
+  // 更新失败，重启后发生回滚
+  | "rollback"
+  // 检查更新时报错
+  | "errorChecking"
+  // 正在发起检查
+  | "checking"
+  // 正在下载更新
+  | "downloading"
+  // 已下载更新
+  | "downloadSuccess"
+  // 更新失败
+  | "errorUpdate"
+  // 更新成功
+  | "markSuccess"
+  // 下载apk
+  | "downloadingApk"
+  // 下载apk前申请存储权限被用户拒绝
+  | "rejectStoragePermission"
+  // 下载apk前申请存储权限发生错误
+  | "errorStoragePermission"
+  // 下载apk时发生错误
+  | "errorDownloadAndInstallApk";
+
+// 日志事件数据
+interface EventData {
+  // 当前已完成的热更hash值，如尚未热更则为空字符串
+  currentVersion: string;
+  // 客户端版本信息
+  cInfo: {
+    rnu: string; // 当前 react-native-update 版本
+    rn: string; // 当前 react-native 版本
+    os: string; // 当前操作系统及版本
+    uuid: string; // 用户标识符
+  };
+  // 客户端原生版本号
+  packageVersion: string;
+  // 编译时间戳
+  buildTime: number;
+  // 报错相关的信息
+  message?: string;
+  // 发生回滚的版本hash值
+  rolledBackVersion?: string;
+  // 更新失败的新版本hash值
+  newVersion?: string;
+  // 其他一些数据
+  [key: string]: any;
+}
+```
+
+#### useUpdate()
+
+热更相关的工具函数。此方法也可使用别名 `usePushy` 引入。
+
+:::info
+注意，在使用 `<UpdateProvider>` 的当前组件（一般是根组件）中无法直接调用`useUpdate`，只有当前组件的子组件才能调用。
+:::
+
+```js
+const {
+  checkUpdate,
+  switchVersion,
+  switchVersionLater,
+  markSuccess,
+  dismissError,
+  downloadUpdate,
+  downloadAndInstallApk,
+  getCurrentVersionInfo,
+  currentVersionInfo,
+  parseTestQrCode,
+  currentHash,
+  packageVersion,
+  client,
+  progress,
+  updateInfo,
+  lastError,
+  restartApp,
+} = useUpdate();
+```
+
+其类型定义和功能如下：
+
+```ts
+interface UpdateContext {
+  // 检查更新（注意在 v10.26.0 版本之前，`checkUpdate`方法本身没有返回值，只能从`useUpdate()`返回的`updateInfo`中获取）
+  // 我们也仍然推荐优先从`useUpdate()`中获取`updateInfo`
+  checkUpdate: () => Promise<void | UpdateInfo>;
+  // 下载热更完成后调用，立即重启切换新版本
+  switchVersion: () => void;
+  // 下载热更完成后调用，用户手动重启app后切换新版本（静默更新）
+  switchVersionLater: () => void;
+  // 热更完成重启后，手动标记热更完成
+  markSuccess: () => void;
+  // 清除最后的报错状态
+  dismissError: () => void;
+  // 下载热更, v10.16.0+ 版本返回值为`boolean`，表示是否下载成功
+  downloadUpdate: () => Promise<boolean | void>;
+  // 下载并安装apk
+  downloadAndInstallApk: (url: string) => Promise<void>;
+  // 异步获取当前已热更版本的信息，v10.31.2 版本后用 `currentVersionInfo` 代替
+  getCurrentVersionInfo: () => Promise<{
+    name?: string;
+    description?: string;
+    metaInfo?: string;
+  }>;
+  // 当前已热更版本的信息，需 v10.31.2+ 版本
+  currentVersionInfo: {
+    name?: string;
+    description?: string;
+    metaInfo?: string;
+  };
+  // 解析测试二维码，此方法需 v10.11.2+ 版本
+  parseTestQrCode: (qrCode: string) => void;
+  // 当前的版本hash
+  currentHash: string;
+  // 当前的原生版本号
+  packageVersion: string;
+  // 当前的pushy热更服务实例
+  client?: Pushy;
+  // 下载开始后的进度数据
+  progress?: {
+    hash: string;
+    // 已下载的字节数
+    received: number;
+    // 待下载的总字节数
+    total: number;
+  };
+  // 热更相关信息
+  updateInfo?: {
+    // 已是最新版本，无需热更
+    upToDate?: true;
+    // 当前原生版本已过期，需要下载新的原生版本
+    expired?: true;
+    // 在pushy网页管理端设置的原生版本下载地址
+    downloadUrl?: string;
+    // 是否存在新的热更
+    update?: true;
+    // 新热更的版本名称
+    name?: string;
+    // 新热更的hash值
+    hash?: string;
+    // 新热更的更新说明
+    description?: string;
+    // 新热更携带的额外元数据
+    metaInfo?: string;
+    // 当前热更是否已暂停
+    paused?:
+      | "app" // 当前应用所有原生版本暂停
+      | "package" // 仅当前原生版本暂停
+      | "quota"; // 因检查次数超限而暂停
+    // 其他信息
+    message?: string;
+  };
+  // 检查、下载、应用热更等过程中的最近一次报错
+  lastError?: Error;
+}
+```
+
+***
+
+#### async function checkUpdate()
+
+触发更新检查，返回`updateInfo`（注意在 v10.26.0 版本之前，`checkUpdate`方法本身没有返回值，只能从`useUpdate()`返回的`updateInfo`中获取，且我们仍然推荐优先使用`useUpdate()`来获取），返回值有三种情形：
+
+1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），需要引导用户下载或跳转到应用市场(需要在网页管理端设置中填写`downloadUrl`)。如需在应用内执行 apk 更新，还需配置[安装权限](/docs/api.md#async-function-downloadandinstallapkurl)。
+
+```js
+{
+    expired: true,
+    downloadUrl: 'http://appstore/downloadUrl',
+}
+```
+
+2. `{upToDate: true}`：当前已经更新到最新，无需进行更新。
+
+3. `{update: true}`：当前有新版本可以更新。`name`、`description`字段可以用于展示给用户版本号，更新内容等信息，而`metaInfo`字段则可以根据你的需求自定义一些标记(如是否静默更新、是否强制更新等等，自己根据标记的属性做一些条件流程控制)，具体用法可参考[场景实践](/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了热更新文件的下载地址，
+
+```js
+{
+    update: true,
+    name: '1.0.3-rc',
+    hash: 'hash',
+    description: '添加聊天功能\n修复商城页面BUG',
+    metaInfo: '{"silent":true}',
+    pdiffUrl: 'http://update-packages.reactnative.cn/hash',
+    diffUrl: 'http://update-packages.reactnative.cn/hash',
+}
+```
+
+***
+
+#### async function downloadUpdate()
+
+下载热更包。仅当`update:true`时实际进行下载。会更新`progress`数据。v10.16.0+ 版本返回值为`boolean`，表示是否下载成功。
+
+***
+
+#### async function downloadAndInstallApk(url)
+
+下载更新的 apk 包并直接安装。`url`必须为可直接下载到 apk 文件的地址。
+
+由于系统安全限制等各种外部因素，此功能并不能保证一定正常调用。在应用当前运行周期内，如果下载或者安装失败，则再次调用时不会重试，只会静默失败。
+
+注意要使用这个功能还需要在`AndroidManifest.xml`中手动添加安装权限，如果需要考虑 Android 7.0 以下的客户，则还需要添加外部存储权限。
+
+```xml
+<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+<!-- 如果需要考虑Android 7.0以下的客户，则还需要添加外部存储权限 -->
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+```
+
+注意某些应用市场可能会因为上述权限拒绝应用上架。去掉上述两个权限并不影响热更新功能。
+
+***
+
+#### function markSuccess()
+
+**一般情况下请勿手动调用此函数**。调用此函数作为更新成功的标记（否则下次启动会默认失败自动回滚）。
+
+***
+
+#### async function getCurrentVersionInfo()
+
+获取当前已热更版本的信息（如尚未热更过则返回空对象）。v10.31.2 版本之后可以直接用 `currentVersionInfo` 代替。
+
+返回值示例：
+
+```js
+{
+    name: '1.0.3-rc',
+    description: '添加聊天功能\n修复商城页面BUG',
+    metaInfo: '{"silent":true}',
+}
+```
+
+***
+
+#### function restartApp()
+
+立即重启应用。v10.28.2+ 版本可用。
+
+***
+
+#### function switchVersion()
+
+立即重启应用，并加载已经下载完毕的版本。
+
+> 注意!不可依赖`progress`来判断下载完成，必须要在`await downloadUpdate()`之后再调用此方法。
+
+***
+
+#### function switchVersionLater()
+
+在下一次启动应用的时候加载已经下载完毕的版本。
+
+> 注意!不可依赖`progress`来判断下载完成，必须要在`await downloadUpdate()`之后再调用此方法。
+
+***
+
+#### function parseTestQrCode(qrCode: string)
+
+解析测试二维码，一般用于给 QA 人员测试热更新。如果在应用中已有扫码功能，则可以在应用中扫描 pushy 后台的测试二维码来测试任意版本的热更包。
+注意如果你使用自定义的(更新策略（updateStrategy）)\[[https://pushy.reactnative.cn/docs/integration#updatestrategy%E6%9B%B4%E6%96%B0%E5%BA%94%E7%94%A8%E7%AD%96%E7%95%A5\]，请务必从](https://pushy.reactnative.cn/docs/integration#updatestrategy%E6%9B%B4%E6%96%B0%E5%BA%94%E7%94%A8%E7%AD%96%E7%95%A5]，请务必从) `useUpdate()` 中获取 `updateInfo` ，而不要依赖 checkUpdate 方法的返回值，否则扫码不会有后续动作。
+
+![testqrcode](/static/image/testqrcode.24c22c1ebe.png)
+注意使用此方法，上述界面中的"使用 Deep Link"选项 **请不要
+** 勾选。
+代码示例：
+
+```js
+<Camera
+  onReadCode={({ nativeEvent: { codeStringValue } }) => {
+    // 识别到二维码后先关闭相机
+    setShowCamera(false);
+    // 先解析是否是pushy的测试二维码
+    if (parseTestQrCode(codeStringValue)) {
+      // 如果是pushy的测试二维码，则不再做其他业务扫码逻辑
+      return;
+    }
+    // 如果不是，继续处理其他业务扫码逻辑
+  }}
+/>
+```
+
+***
+
+### Android 方法
+
+#### UpdateContext.setCustomInstanceManager(ReactInstanceManager instanceManager)
+
+如果是集成/混编 Android 方案，则可以使用此方法传入你自行创建的 ReactInstanceManager。自`v5.5.8`版本起可用。
+
+示例：
+
+```java
+import cn.reactnative.modules.update.UpdateContext
+
+mReactInstanceManager = ReactInstanceManager.builder()
+                // ...各种setter，但注意不要调用setBundleAssetName
+                .setJSBundleFile(UpdateContext.getBundleUrl(mContext, "assets://index.android.bundle"))
+                .build();
+UpdateContext.setCustomInstanceManager(mReactInstanceManager);
+```
+
+
+
+---
+url: /docs/api-token.md
+---
+
+# API Token
+
+API Token 是一种用于在 CI/CD 流程或自动化脚本中调用 [Pushy API](https://update.reactnative.cn/api/openapi) 的认证方式。相比直接使用账号密码，API Token 更加安全且便于管理。
+
+## 使用场景
+
+- **持续集成/持续部署 (CI/CD)**：在 GitHub Actions、GitLab CI、Jenkins 等平台中自动发布热更新
+- **自动化脚本**：编写脚本批量管理应用、版本或原生包
+- **第三方工具集成**：将 Pushy 与其他开发工具集成
+
+## 创建 API Token
+
+1. 登录 [Pushy 管理后台](https://pushy-admin.reactnative.cn)
+2. 在左侧菜单中点击「API Token」
+3. 点击「创建 Token」按钮
+4. 填写 Token 名称（如：CI/CD Pipeline）
+5. 选择所需权限
+6. 可选设置过期时间
+7. 点击创建后，**立即复制并安全保存 Token**
+
+:::warning
+Token 只会在创建时显示一次，之后无法再次查看。请务必在创建后立即复制保存！
+:::
+
+## 权限说明
+
+| 权限              | 说明                 |
+| --------------- | ------------------ |
+| **读取 (read)**   | 查看应用、版本、原生包信息      |
+| **写入 (write)**  | 创建和更新应用、发布版本、上传原生包 |
+| **删除 (delete)** | 删除应用、版本、原生包        |
+
+:::info
+创建 Token 时至少需要选择一个权限。根据实际需求选择最小必要权限是最佳实践。
+:::
+
+## 使用 Token 调用 API
+
+在调用 Pushy API 时，将 Token 添加到请求头中：
+
+```bash
+curl -X GET "https://update.reactnative.cn/api/app/list" \
+  -H "x-api-token: YOUR_API_TOKEN"
+```
+
+### 在命令行工具中使用
+
+如果使用 `react-native-update-cli` 命令行工具（需 v2.7.0+），可以通过环境变量设置 Token：
+
+```bash
+export PUSHY_API_TOKEN=your_api_token_here
+pushy bundle --platform android
+```
+
+### 在 CI/CD 中使用
+
+以 GitHub Actions 为例：
+
+```yaml
+# .github/workflows/publish.yml
+name: Publish Hot Update
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: npm install && npm i -g react-native-update-cli
+        
+      - name: Publish update
+        env:
+          PUSHY_API_TOKEN: ${{ secrets.PUSHY_API_TOKEN }}
+        run: pushy bundle --platform android
+```
+
+:::tip
+在 CI/CD 环境中，建议将 Token 存储在密钥管理中（如 GitHub Secrets），而不是直接写入代码。
+:::
+
+## 管理 Token
+
+### 查看 Token 列表
+
+在「API Token」页面可以看到所有已创建的 Token，包括：
+
+- Token 名称
+- 权限
+- 过期时间
+- 最后使用时间
+- 状态（正常/已过期/已撤销）
+
+### 撤销 Token
+
+如果 Token 泄露或不再需要，可以随时撤销：
+
+1. 在 Token 列表中找到目标 Token
+2. 点击「撤销」按钮
+3. 确认撤销
+
+:::warning
+Token 撤销后立即生效，使用该 Token 的所有请求将被拒绝。请确保在撤销前更新相关的 CI/CD 配置。
+:::
+
+## 安全建议
+
+1. **最小权限原则**：只授予 Token 必要的权限
+2. **设置过期时间**：为临时使用的 Token 设置合理的过期时间
+3. **定期轮换**：定期撤销旧 Token 并创建新 Token
+4. **安全存储**：不要将 Token 提交到代码仓库，使用环境变量或密钥管理工具
+5. **监控使用**：定期检查 Token 的最后使用时间，及时清理不再使用的 Token
+
+## 限制
+
+- 每个用户最多可创建 **10 个** API Token
+- 如需创建更多，请先撤销不再使用的 Token
+
+
+
+---
+url: /docs/cli.md
+---
+
+# 命令行工具（内置）
+
+### 安装
+
+```
+$ npm install -g react-native-update-cli
+```
+
+### 命令
+
+#### pushy bundle
+
+生成热更资源包。会自动探测项目中是否使用了 expo、taro 等框架并自动调用对应的命令行打包。如果探测不准确或使用对应命令行打包时报错，可尝试使用 `--rncli` 参数来指定官方命令行打包。
+
+- platform: ios|android|harmony 对应的平台
+- entryFile: 入口脚本文件
+- intermediaDir: 临时文件输出目录
+- output: 最终 ppk 文件输出路径
+- dev: 是否打包开发版本
+- sourcemap: 是否生成 sourcemap(需 cli 版本 1.11.0+)
+- no-interactive: 不进行交互式提示
+- rncli: 指定使用官方命令行打包 (需 cli 版本 1.40.0+)
+- expo: 指定使用 expo 的命令行打包 (需 cli 版本 1.40.0+)
+- taro: 指定使用 taro 的命令行打包 (需 cli 版本 1.40.0+)
+
+从 v1.44.2 版本开始，新增了以下直接上传发布的参数（等同于打包完成后连续调用 `pushy publish` 命令）：
+
+- name: 指定热更新版本的名字(热更自身的版本号)
+- description: 指定热更新版本的描述信息，可以对用户进行展示
+- metaInfo: 指定热更新版本的元信息，可以用来保存一些额外信息，具体用法可参考[场景实践](/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。
+
+从 v1.46.1 版本开始，在传入 `name`， `description`， `metaInfo` 参数的同时，可继续叠加以下参数（等同于在调用`pushy publish` 命令后，再连续调用 `pushy update` 命令）：
+
+- packageId: 要绑定的原生包 ID （多选一）
+- packageVersion: 要绑定的原生包版本名（多选一）
+- minPackageVersion: 要绑定的最低原生包版本，大于等于此版本的将逐个绑定（多选一）
+- maxPackageVersion: 要绑定的最高原生包版本，小于等于此版本的将逐个绑定（多选一）
+- packageVersionRange: 要绑定的原生包版本范围（多选一），范围格式遵循 semver 的语法，可参考 [https://quickref.cnxiaobai.com/docs/semver.html](https://quickref.cnxiaobai.com/docs/semver.html) 或 [https://devhints.io/semver](https://devhints.io/semver)
+
+示例：
+
+```bash
+
+pushy bundle --platform android --name "1.0.0" --description "热更新版本 1.0.0" --metaInfo '{"key": "value"}' --packageVersionRange ">=1.0 <3.0"
+```
+
+***
+
+#### pushy parseIpa \[ipaFile]
+
+解析 ipa 文件并输出一些相关信息，如版本号，编译时间戳等。
+
+***
+
+#### pushy parseApk \[apkFile]
+
+解析 apk 文件并输出一些相关信息，如版本号，编译时间戳等。
+
+***
+
+#### pushy parseApp \[appFile]
+
+解析 app 文件并输出一些相关信息，如版本号，编译时间戳等。
+
+***
+
+#### pushy parseAab \[aabFile]
+
+解析 aab 文件并输出一些相关信息，如版本号，编译时间戳等。
+
+***
+
+#### pushy diff \[origin]\[next]
+
+提供两个 ppk 文件，生成从 origin 到 next 版本的差异更新包。
+
+- output: diff 文件输出路径
+
+***
+
+#### pushy diffFromApk \[apkFile]\[next]
+
+提供一个 apk 文件和一个 ppk 文件，生成从 apk 文件到 next 版本的差异更新包。
+
+如果使用热更新开放平台，你不需要自己执行此命令。
+
+- output: diff 文件输出路径
+
+***
+
+#### pushy diffFromApp \[appFile]\[next]
+
+提供一个 app 文件和一个 ppk 文件，生成从 app 文件到 next 版本的差异更新包。
+
+如果使用热更新开放平台，你不需要自己执行此命令。
+
+- output: diff 文件输出路径
+
+***
+
+#### pushy diffFromIpa \[ipaFile]\[next]
+
+提供一个 ipa 文件和一个 ppk 文件，生成从 ipa 文件到 next 版本的差异更新包。
+
+如果使用热更新开放平台，你不需要自己执行此命令。
+
+- output: diff 文件输出路径
+
+***
+
+#### pushy login \[email]\[pwd]
+
+登录热更新开放平台。你需要先登录才能使用下面的命令。
+
+***
+
+#### pushy logout
+
+登出并清除本地的登录信息
+
+***
+
+#### pushy me
+
+查看自己是否已经登录，以及昵称等信息。
+
+***
+
+#### pushy createApp
+
+创建应用并立刻绑定到当前工程。这项操作也可以在网页管理端进行。
+
+- platform: ios|android|harmony 对应的平台
+- name: 应用名称
+- downloadUrl: 应用安装包的下载地址
+
+***
+
+#### pushy deleteApp \[appId]
+
+删除已有应用。所有已创建的应用包、热更新版本都会被同时删除。这项操作也可以在网页管理端进行。
+
+- appId: 要删除的应用 ID
+
+***
+
+#### pushy apps
+
+查看当前已创建的全部应用。这项操作也可以在网页管理端进行。
+
+- platform: ios|android|harmony 对应的平台
+
+***
+
+#### pushy selectApp \[appId]
+
+绑定应用到当前工程。
+
+- platform: ios|android|harmony 对应的平台
+
+***
+
+#### pushy uploadIpa \[ipaFile]
+
+上传 ipa 文件到开放平台。（cli 需 1.24.0 +）
+
+***
+
+#### pushy uploadApk \[apkFile]
+
+上传 apk 文件到开放平台。（cli 需 1.24.0 +）
+
+***
+
+#### pushy uploadApp \[appFile]
+
+上传 app 文件到开放平台。（cli 需 1.24.0 +）
+
+***
+
+#### pushy uploadAab \[aabFile]
+
+上传 aab 文件到开放平台。（cli 需 2.6.0 +）
+
+***
+
+#### pushy extractApk \[aabFile]
+
+从 aab 文件中提取通用 apk 文件。（cli 需 2.6.0+）
+
+用法：`pushy extractApk aab后缀文件 [--output apk文件] [--includeAllSplits] [--splits 分包名列表]`
+
+- output: 指定导出的 apk 文件路径（默认与 aab 同目录同名 `.apk`）
+- includeAllSplits: 提取时包含全部 split（默认仅包含 `base`）
+- splits: 指定额外包含的 split 名称，多个值用英文逗号分隔
+
+示例：
+
+```bash
+pushy extractApk android/app/build/outputs/bundle/release/app-release.aab --output app-release.apk
+pushy extractApk android/app/build/outputs/bundle/release/app-release.aab --splits config.zh,arm64_v8a
+pushy extractApk android/app/build/outputs/bundle/release/app-release.aab --includeAllSplits
+```
+
+***
+
+#### pushy packages
+
+查看已经上传的原生包。这项操作也可以在网页管理端进行。
+
+- platform: ios|android|harmony 对应的平台
+
+***
+
+#### pushy deletePackage
+
+删除已经上传的原生包。
+
+- appId: 要删除的原生包所属的应用 ID
+- packageId: 要删除的原生包 ID
+
+***
+
+#### pushy publish \[ppkFile]
+
+发布新的热更新版本（ppk 文件）。
+
+- platform: ios|android|harmony 对应的平台
+- name: 当前热更新版本的名字(版本号)
+- description: 当前热更新版本的描述信息，可以对用户进行展示
+- metaInfo: 当前热更新版本的元信息，可以用来保存一些额外信息，具体用法可参考[场景实践](/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。
+
+从 v1.46.1 版本开始，支持以下参数（等同于在 调用`pushy publish` 命令后，再连续调用 `pushy update` 命令）：
+
+- packageId: 要绑定的原生包 ID （多选一）
+- packageVersion: 要绑定的原生包版本名（多选一）
+- minPackageVersion: 要绑定的最低原生包版本，大于等于此版本的将逐个绑定（多选一）
+- maxPackageVersion: 要绑定的最高原生包版本，小于等于此版本的将逐个绑定（多选一）
+- packageVersionRange: 要绑定的原生包版本范围（多选一），范围格式遵循 semver 的语法，可参考 [https://quickref.cnxiaobai.com/docs/semver.html](https://quickref.cnxiaobai.com/docs/semver.html) 或 [https://devhints.io/semver](https://devhints.io/semver)
+
+示例：
+
+```bash
+
+pushy publish .pushy/output/android.1750423283653.ppk --platform android --name "1.0.0" --description "热更新版本 1.0.0" --metaInfo '{"key": "value"}' --packageVersionRange ">=1.0 <3.0"
+```
+
+***
+
+#### pushy versions
+
+分页列举可用的版本。这项操作也可以在网页管理端进行。
+
+- platform: ios|android|harmony 对应的平台
+
+***
+
+#### pushy deleteVersion
+
+删除已经发布的热更新版本。
+
+- appId: 要删除的热更新版本所属的应用 ID
+- versionId: 要删除的热更新版本 ID
+
+***
+
+#### pushy update
+
+为一个原生包版本绑定发布一个热更新版本。这项操作也可以在网页管理端进行。以下参数中`packageId`，`packageVersion`，`minPackageVersion`，`maxPackageVersion`和`packageVersionRange`中多选一即可。
+
+cli 2.4.0 版本开始可以同时绑定一个全量和一个灰度版本。2.4.0 之前全量和灰度版本会互相覆盖，后设置的生效。
+
+- platform: ios|android|harmony 对应的平台
+- versionId: 要绑定的热更新版本 ID
+- rollout: 灰度发布范围（整数取值 1 - 100，对应 1% - 100% 终端设备覆盖率），默认为 100（需 cli 版本 1.31.0+）
+- dryRun: 是否只进行预览，不进行实际绑定（需 cli 版本 1.45.4+）
+- packageId: 要绑定的原生包 ID （多选一）
+- packageVersion: 要绑定的原生包版本名（多选一，需 cli 版本 1.7.2+）
+- minPackageVersion: 要绑定的最低原生包版本，大于等于此版本的将逐个绑定（多选一，需 cli 版本 1.27.0+）
+- maxPackageVersion: 要绑定的最高原生包版本，小于等于此版本的将逐个绑定（多选一，需 cli 版本 1.27.0+）
+- packageVersionRange: 要绑定的原生包版本范围（多选一，需 cli 版本 1.45.4+），范围格式遵循 semver 的语法，可参考 [https://quickref.cnxiaobai.com/docs/semver.html](https://quickref.cnxiaobai.com/docs/semver.html) 或 [https://devhints.io/semver](https://devhints.io/semver)
+
+示例：
+
+```bash
+❯ pushy update --versionId 211343 --platform android --packageVersionRange ">=1.0 <3.0" --dryRun
+react-native-update-cli: 1.45.4 （最新：1.45.4）
+react-native-update: 10.28.11 （最新：10.28.11）
+以下是 dry-run 模拟运行结果，不会实际执行任何操作：
+已将热更包 211343 绑定到原生版本 1.28.1 (id: 75219)
+已将热更包 211343 绑定到原生版本 1.28 (id: 75184)
+已将热更包 211343 绑定到原生版本 1.5 (id: 73396)
+已将热更包 211343 绑定到原生版本 2.0 (id: 68219)
+已将热更包 211343 绑定到原生版本 1.0 (id: 68158)
+操作完成，共已绑定 5 个原生版本
+```
+
+
+
+---
+url: /docs/cli_module.md
+---
+
+# 命令行工具（自定义模块）
+
+## 模块化功能 (Module System)
+
+从 v2.0.0 版本开始，CLI 支持模块化扩展，允许开发者自定义命令和工作流。
+
+### 核心概念
+
+- **CLI Module**: 包含自定义命令和工作流的模块
+- **Command**: 单个可执行的命令
+- **Workflow**: 由多个步骤组成的复杂工作流
+- **Module Manager**: 管理模块注册和执行的核心组件
+
+### 模块注册
+
+```typescript
+import { moduleManager } from 'react-native-update-cli';
+import { myCustomModule } from './my-custom-module';
+
+// 注册自定义模块
+moduleManager.registerModule(myCustomModule);
+```
+
+### 创建自定义模块
+
+```typescript
+import type { CLIModule, CommandContext, CommandResult } from 'react-native-update-cli';
+
+export const myCustomModule: CLIModule = {
+  name: 'my-module',
+  version: '1.0.0',
+  commands: [
+    {
+      name: 'my-command',
+      description: '我的自定义命令',
+      handler: async (context: CommandContext): Promise<CommandResult> => {
+        // 命令执行逻辑
+        return { success: true, data: 'Hello from custom command!' };
+      },
+      options: {
+        flag: {
+          hasValue: true,
+          description: '自定义参数'
+        }
+      }
+    }
+  ],
+  workflows: [
+    {
+      name: 'my-workflow',
+      description: '我的自定义工作流',
+      steps: [
+        {
+          name: 'step1',
+          description: '第一步',
+          execute: async (context: CommandContext) => {
+            console.log('执行第一步...');
+            return { step1Result: 'completed' };
+          }
+        },
+        {
+          name: 'step2',
+          description: '第二步',
+          execute: async (context: CommandContext, previousResult: any) => {
+            console.log('执行第二步，前一步结果:', previousResult);
+            return { ...previousResult, step2Result: 'completed' };
+          }
+        }
+      ]
+    }
+  ],
+  init: (provider) => {
+    console.log('模块初始化完成');
+  }
+};
+```
+
+### 查看已注册模块命令
+
+```bash
+# 查看所有可用模块命令
+pushy list
+```
+
+***
+
+## 工作流系统 (Workflow System)
+
+工作流是由多个步骤组成的复杂任务执行流程，支持条件执行、错误处理和结果传递。
+
+### 内置工作流
+
+#### 1. 用户认证工作流
+
+##### pushy auth-check
+
+检查用户认证状态
+
+```bash
+pushy workflow auth-check
+```
+
+##### pushy login-flow
+
+完整的用户登录流程
+
+```bash
+pushy workflow login-flow
+```
+
+#### 2. 应用管理工作流
+
+##### pushy workflow multi-platform-app-management
+
+跨平台应用统一管理
+
+```bash
+pushy workflow multi-platform-app-management
+```
+
+##### pushy workflow incremental-build
+
+增量构建工作流，生成差异更新包
+
+```bash
+pushy workflow incremental-build
+```
+
+### 工作流管理命令
+
+列出所有可用工作流
+
+```bash
+pushy list
+```
+
+##### pushy workflow
+
+执行指定工作流
+
+```bash
+pushy workflow <workflowName>
+```
+
+##### pushy list
+
+列出所有已注册的模块
+
+```bash
+pushy list
+```
+
+### 工作流特性
+
+1. **步骤化执行**: 工作流由多个步骤组成，按顺序执行
+2. **结果传递**: 每个步骤的结果可以传递给下一个步骤
+3. **条件执行**: 支持根据条件决定是否执行某个步骤
+4. **错误处理**: 内置错误处理和回滚机制
+5. **进度反馈**: 实时显示执行进度和状态
+6. **参数验证**: 执行前自动验证必需参数
+
+***
+
+## 示例项目
+
+在项目的 `example/` 目录中提供了完整的模块和工作流使用示例：
+
+- `example/modules/` - 自定义模块示例
+- `example/workflows/` - 自定义工作流示例
+- `example/scripts/` - 使用脚本示例
+
+运行示例：
+
+```bash
+# 模块注册和执行示例
+npx ts-node example/scripts/register-modules.ts
+
+# 工作流演示
+npx ts-node example/scripts/workflow-demo.ts
+
+# 增强工作流演示
+npx ts-node example/scripts/enhanced-workflow-demo.ts
+```
+
+
+
+---
+url: /docs/bestpractice.md
+---
+
+# 场景实践
+
+#### 优化原生和热更包体积
+
+##### iOS 原生包优化(ipa)
+
+对于同一份 archive（其版本号、编译时间和内置 bundle 已固定，不会受导出方式所影响），可以用不同选项多次导出 ipa，选择其中最小的上传到 pushy 服务器作为热更基准包。
+
+![bitcode](/static/image/exportipa.91920cd4bf.png)
+##### Android 原生包优化(apk)
+
+apk 的优化主要考虑两个方向：
+
+- [启用 proguard 压缩混淆源码](https://reactnative.cn/docs/signed-apk-android#%E5%90%AF%E7%94%A8proguard%E6%9D%A5%E5%87%8F%E5%B0%91apk%E7%9A%84%E5%A4%A7%E5%B0%8F%EF%BC%88%E5%8F%AF%E9%80%89%EF%BC%89)。但这一步可能导致一些使用反射的代码运行时报错，启用后需要充分测试每个页面和功能，以及需要阅读一些第三方关于 proguard 的特别设置说明。
+- [分开编译不同的 cpu 架构](https://reactnative.cn/docs/signed-apk-android#%E9%92%88%E5%AF%B9%E4%B8%8D%E5%90%8C%E7%9A%84-cpu-%E6%9E%B6%E6%9E%84%E7%94%9F%E6%88%90-apk-%E4%BB%A5%E5%87%8F%E5%B0%8F-apk-%E6%96%87%E4%BB%B6%E7%9A%84%E5%A4%A7%E5%B0%8F)。找到`android/app/build.gradle`中的 cpu 架构部分，如下所示启用`enable`选项：
+
+```diff
+splits {
+    abi {
+        reset()
+-       enable enableSeparateBuildPerCPUArchitecture
++       enable true        // 启用单独的 cpu 架构编译
+        universalApk false  // If true, also generate a universal APK
+    }
+}
+```
+
+如此一来会在编译目录中输出多个 apk 文件，分发和上传到热更新服务时只需要使用`app-arm64-v8a-release.apk`文件，可以大幅减小 apk 的大小。
+
+##### 热更新包优化(ppk)
+
+热更新包的主要内容是 js 包和其所引用的静态资源（主要是图片）。
+
+- js 包成分分析。可以借助一些第三方工具（如[react-native-bundle-visualizer](https://github.com/IjzerenHein/react-native-bundle-visualizer)）来分析 js 文件中哪些占比较大，是否可以用其他库替换等（如 dayjs 替换 moment，lodash-es 替换 lodash）。
+- 图片优化。
+  - 在保证体验的情况下，使用一些工具对图片进行裁剪压缩。
+  - 如不需要图片的透明像素，可以考虑将 png 格式转为 jpg 格式。
+  - 还可以进一步考虑压缩比更高的图片格式，例如 webp 格式（需要第三方原生插件例如[react-native-webp-format](https://github.com/Aleksefo/react-native-webp-format#readme)），heif 格式（iOS 11 和 Android 10 以上原生支持）等。这里有个图片格式对比可供参考 [https://compare.rokka.io/\_compare/#heif=40\&jpeg=80\&webp=80\&av1=40\&width=800](https://compare.rokka.io/_compare/#heif=40\&jpeg=80\&webp=80\&av1=40\&width=800)。
+
+#### 有很多渠道包需要热更，如何操作比较方便？
+
+1. 如果渠道包的`js代码和初始资源`有差别（无论多么细微的差别都会生成不同的 jsbundle），那么只能单独生成 apk，分别上传和绑定。可以考虑写一些脚本自动调用 cli 来执行批量操作。
+2. 如果渠道包的`js代码和初始资源`完全一致，可以考虑使用[Flavor 构建](https://developer.android.com/studio/build/build-variants?hl=zh-cn)，或其他一些动态生成渠道包的方案（比如[腾讯的 VasDolly](https://github.com/Tencent/VasDolly)，[美团的 walle](https://github.com/Meituan-Dianping/walle)等），这样所有的渠道包基于同一个基础 apk 生成（因而会有相同的编译时间戳和 jsbundle）。这样可以只用上传一个基础 apk，对此 apk 的热更操作可以对所有渠道包生效。
+3. 如果您是`高级版`、`专业版`或`大客户VIP版`客户，也可以考虑在管理后台的应用设置中启用`忽略编译时间戳`。此选项仅对比版本号，不校验时间戳，可提供更宽容的热更策略，但可能消耗更多流量。
+
+#### 如何支持 aab 格式的原生包？
+
+将 react-native-update-cli 更新到 v2.6.0 以上版本，即可使用 pushy parseAab 和 pushy uploadAab 命令来支持 aab 格式的原生包。
+
+#### 测试与回滚
+
+自 v10.11.2 版本开始，可以使用以下两种快捷扫码方案来测试热更，而无需提前进行绑定：
+
+![testqrcode](/static/image/testqrcode.24c22c1ebe.png)
+- 若应用启用了 [DeepLink](https://reactnative.cn/docs/next/linking#%E5%90%AF%E7%94%A8-deep-links) 功能
+
+代码中无需任何改动，只需在上述界面中勾选“使用 Deep Link”，填入您应用的协议名，例如"pushy://"，然后使用系统相机或系统内置的扫一扫功能扫码（注意不能使用微信扫码），即可自动调起应用并触发更新。
+
+- 若应用自带扫码功能
+
+请参考 [parseTestQrCode](/docs/api.md#function-parsetestqrcodeqrcode-string) 方法的说明。
+
+<details>
+<summary>若您的应用不具有上述两项功能，或 pushy 版本低于 v10.11.2，则可以参考如下测试方式（不推荐）</summary>
+
+先发布一个**测试包**，再发布一个除了版本号以外均完全相同的**正式包**。
+
+例如，假设我们有一个正式包，版本为`1.6.0`，那么可以修改版本号重新打包一个`1001.6.0`，以一个明显不太正常的版本号来标识它是一个测试版本，同时后几位相同，可以表明它和某个正式版本存在关联（内容/依赖一致）。
+
+在每次往发布包发起热更新之前，先对**测试包**`1001.6.0`进行更新操作，基本测试通过之后，再在网页后台上将热更包重新绑定到**正式包**`1.6.0`上。如果在测试包中发现了重大问题，你就可以先进行修复，更新测试确认通过后再部署到正式线上环境。这样，可以最大程度的避免发生线上事故。
+
+</details>
+
+若您用来测试的原生包当前已经有发布的热更版本且更新策略是立即应用，那么和扫码测试之间可能产生策略冲突，比如扫码更新后又立即强制更新到发布版本，对测试带来不便。此时可以考虑在扫码更新之后，利用 beforeCheckUpdate 回调临时禁止更新检查，直到下次启动再恢复。
+
+```js
+
+// isFirstTimeDebug 这个标志位需要 v10.37.0+ 版本，表示当前是扫码热更后的第一次启动
+import { isFirstTimeDebug } from 'react-native-update/src/core';
+
+const pushyClient = new Pushy({
+  beforeCheckUpdate: () => {
+    if (isFirstTimeDebug) {
+      // 如果当前是扫码热更后的第一次启动，则跳过热更检查
+      return false;
+    }
+    return true;
+  },
+})
+```
+
+万一确实发生线上事故需要回滚的话，先立即对原生包或者整个应用设置暂停热更，然后更改绑定到之前正常的版本，或者利用版本控制系统回滚代码到正常的状态，然后重新生成热更包并推送。
+
+#### 元信息(Meta Info)的使用
+
+在发布热更新版本时，或者在网页端，你可以编辑版本的元信息。这是一段在检查更新时可以获得的字符串，你可以在其中按你所想的格式（一般建议用[JSON 格式](https://developer.mozilla.org/zh-CN/docs/Learn/JavaScript/Objects/JSON)）保存一些信息。
+
+比如我们可以在元信息中约定字段标志`silent`，表示需要静默更新。当我们上传热更包填写 metainfo 时，以[JSON 格式](https://developer.mozilla.org/zh-CN/docs/Learn/JavaScript/Objects/JSON)输入：
+
+```json
+{ "silent": true }
+```
+
+> 请注意，我们并不对输入做任何格式校验和约束，请自行校验输入是否正确。
+
+此时在客户端检查更新时，能获取到我们刚刚输入的元信息，但它并不具备任何功能，只是一个字符串而已。所以我们其实需要**预先**在更新流程中加入对应的处理逻辑：
+
+```js
+// 调用 useUpdate() 获取 updateInfo
+if (updateInfo.expired) {
+  // ... 原生包版本过期，下载或跳转下载页面
+} else if (updateInfo.upToDate) {
+  // ... 没有更新，弹提示或忽略
+} else {
+  // 有更新，一般来说我们在这里给用户弹窗提示，让用户选择是否更新
+  // 那么静默更新的本质其实就是不弹窗，直接执行，所以可以在这里加入额外的判断流程
+  // ...
+}
+```
+
+我们在原有的更新流程中加入元信息的读取和判断：
+
+```js
+let metaInfo = {};
+try {
+  // 注意 JSON 输入有可能有错误，需要用 try 语句来避免应用被带崩
+  metaInfo = JSON.parse(updateInfo.metaInfo);
+} catch (e) {
+  // 异常处理，忽略或上报？
+}
+
+if (metaInfo.silent) {
+  // 如果热更包携带有 silent 字段，不询问用户，直接执行更新
+  switchVersion();
+} else {
+  // 否则还是走之前的询问流程
+  // Alert.alert('提示', '检查到新的版本.......
+}
+```
+
+又比如，可能某个版本包含一些重要的公告内容，所以还可以在上面插入一个公告字段等等。如何使用元信息，完全取决于您的想象力！
+
+
+
+---
 url: /docs/skills.md
 ---
 
@@ -2485,6 +2310,181 @@ npx skills update
   <a href="https://clawhub.ai/skills/react-native-update" target="_blank" rel="noopener noreferrer">
     [https://clawhub.ai/skills/react-native-update](https://clawhub.ai/skills/react-native-update)
   </a>
+
+
+
+---
+url: /docs/faq.md
+---
+
+# 常见问题
+
+如果本页面没能回答您的疑问，您可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。
+
+### 业务问题
+
+#### 热更新究竟能否上架？
+
+您可能听说过各种说法，但大量实践表明，热更新目前能够顺利上架 AppStore 和其他各种应用市场。唯一需要注意的是，在审核期间请不要发布热更新，不要让审核人员看到各种更新相关的提示和弹窗，即可顺利通过。
+
+***
+
+#### 是否可以在海外使用？
+
+可以。Pushy 本身在国内外都部署有可用的 CDN 节点，能够满足大多数出海应用的热更新分发要求。
+
+如果您的项目对海外合规、数据存放位置、运营主体隔离等方面还有额外要求，则可以考虑使用由不同公司实体独立运营的全球服务 [Cresc](https://cresc.dev/)。
+
+***
+
+#### 哪些修改可以热更新？哪些不能？
+
+我们把对应用的修改分为两类：
+
+- 不可热更新 —— 原生修改，即所有需要`编译`后才能生效的修改：
+  - 任何在 iOS 或者 Android 目录中的修改、增删。
+  - 任何含有原生代码的第三方组件的更新、修改。
+- 可以热更新 —— 非原生修改，即所有`无需编译`，刷新即可生效的修改：
+
+  - js 代码修改，包括第三方纯 js 组件的更新、修改。
+  - 可以在 js 代码中 require/import 的资源文件，例如图片。
+
+需要注意的是，即便资源文件可以热更新，但这些热更新后的资源文件会以`file://`协议的形式提供访问，某些读取资源文件的第三方可能并不支持`file://`协议。
+
+***
+
+#### 热更新成功完成，但是重启后又回滚了是怎么回事？
+
+可以正常更新，但是重启后回滚，一般有两种可能的情况：
+
+- 没有正确[配置 bundleUrl](/docs/getting-started.md#配置-bundle-url)
+- （仅有 v10 以下版本存在此可能性，v10 及更高版本不存在此情况）没有正确[调用 markSuccess](https://v9--pushy-site.netlify.app/docs/integration#%E9%A6%96%E6%AC%A1%E5%90%AF%E5%8A%A8%E5%9B%9E%E6%BB%9A)
+
+如果你确定上述两个步骤都正确无误，请在[issues 区](https://github.com/reactnativecn/react-native-update/issues)给我们留言反馈。
+
+***
+
+#### 热更新报错：“热更新已暂停，原因：编译时间戳与服务器记录不一致。”
+
+当您每次编译产生一个原生包时，其中都会记录一个编译时间戳`buildTime`(可以使用`pushy parseIpa a.ipa`或是`pushy parseApk a.apk`命令来查看)。如果您需要把这个包发给客户并希望使用热更新功能，那么就需要使用 upload 命令来上传到我们的服务器，而服务器端会记录这个包的版本号和编译时间戳以便后续比对记录。
+
+举例来说，假如我已经上传了一个 1.0 版本原生包（`1A包`），但后来由于种种原因我又重新打包了（`1B包`）但没有上传，这两个包有相同的版本号，但会有不同的编译时间戳。此时有几种可能的情况：
+
+1. 我忘记上传过`1A包`，`1B包`没有实质更改且还没有客户安装。此时应当放弃`1B包`，只让客户下载安装`1A包`。
+2. 我忘记上传过`1A包`，又生成了`1B包`且已有客户安装。此时`1A包`客户可以获取热更新，`1B包`客户无法获取热更新。要使两批客户都能获取热更新，要么想办法通知`1B包`客户装回`1A包`，要么重新发布一个`高于1.0`版本的原生包且上传到 pushy 服务器，并删除`1.0`版本的记录，此时`1A包`和`1B包`的客户都会收到版本过期需要下载新版本的通知。
+3. 我知道上传过`1A包`，但我有原生方面的修改需要打了一个新的`1B包`。此时若将`1B包`上传到 pushy 服务器会提示版本验证错误，因为已经存在有相同的`1.0`版本。所以需要首先更改原生版本号再次打包，并`首先`将此新版本上传到服务器，`然后`分发给客户。这样`1.0版本`和`新版本`可以并存且都可以获得热更新。
+
+请谨记，任何时候生成原生包，请 1)先修改原生版本号，2)并上传到 pushy 服务器，才可以正常获得热更新。
+
+:::info
+如果您是`高级版`、`专业版`或`大客户VIP版`客户，也可以考虑在管理后台的应用设置中启用`忽略编译时间戳`。此选项仅对比版本号，不校验时间戳，可提供更宽容的热更策略，但可能消耗更多流量，适合需要管理多个分发渠道的客户。
+:::
+
+***
+
+### 付费问题
+
+#### 我应该选择哪个业务版本呢？
+
+其实完全无需考虑，先从最高配额的`专业版`开始体验（新用户注册验证通过后，将自动获得 7 天`专业版`试用），各个版本的使用流程完全一致！当试用时间到期后，若当前版本的配额不能满足需求，可随时补差价升级到更高配额的版本。升级自动按天数计算差价，绝无额外费用。
+
+目前仅有一项额外的付费专用功能，即`忽略编译时间戳`设置（在管理后台的应用设置中），此选项仅对比版本号，不校验时间戳，可提供更宽容的热更策略，但可能消耗更多流量，适合需要管理多个分发渠道的客户。此功能目前仅支持`高级版`、`专业版`和`大客户VIP版`。
+
+***
+
+#### 我可以试用付费版本先评估一下效果吗？
+
+新用户注册验证通过后，将自动获得 7 天`专业版`试用。如您需要更长的评估时间，可将注册用户名、邮箱、公司（或个人）名称发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，标题注明“pushy 评估试用延长”，我们会为您酌情延长评估时间。
+试用期间只能选择续费专业版或升级到更高版本，如需购买其他版本，请等待试用期过期，或者联系客服去除试用。
+
+***
+
+#### 配额具体如何计算？
+
+配额主要分为 4 种：
+
+1. 可创建的应用数量，注意 iOS 和 Android 版本记做不同的应用。
+2. 原生包数量及大小，不同应用分开计算。原生包指通过`pushy uploadIpa/uploadApk`命令上传到 Pushy 服务器上作为热更新起始版本的完整 apk/ipa 安装包。
+3. 热更包数量及大小，不同应用分开计算。热更包指通过`pushy bundle`所命令生成的 ppk 文件。注意这不是用户实际下载的更新文件，用户下载的是通过比对生成的增量 diff 文件（比 ppk 文件要小得多）。
+4. 每日总热更查询次数，所有应用累加计算。每次用户打开应用时，会向服务器查询是否有新的热更新。这个查询次数会被计入每日总热更查询次数。当日超过限额次数后，接口将不再返回新的热更新信息，直到次日重置。
+
+> 这里有一些对[包大小的优化建议](/docs/bestpractice.md#优化原生和热更包体积)可供参考。
+
+以上 2、3 条为账户下每个应用单独计算，第 4 条为账户下所有应用累加计算。具体配额和费用由于运营成本可能会有调整，请以[价格表](/pricing.md)页面为准。已购买的用户在续费前不受调整影响。
+
+***
+
+#### 达到配额后还可以正常使用吗？
+
+当应用、原生包、热更包数量达到配额限制后，您将无法执行相应的新增操作。但用户端仍可正常检查更新，下载已发布的更新。您可选择升级到更高配额，或是通过删除已不再使用的应用、原生包、热更包来使数量降低到配额以内，以便继续执行新增操作。\
+若原生包、热更包大小超过限额，则会导致上传失败。您可以选择升级到更高配额，或是想办法进行[精简优化](/docs/bestpractice.md#优化原生和热更包体积)。
+若当日热更检查次数超过限额，则会导致接口返回空数据。您可以选择升级到更高配额，或是优化热更策略，减少用户端检查更新的频率。
+
+***
+
+#### 我可以单独升级某项配额吗？
+
+如果您需要单独升级某些配额（需要达到高级版以上），请通过邮件 [hi@charmlot.com](mailto:hi@charmlot.com) 或 QQ 34731408 与我们联系，我们将根据您的个性化需求为您定制方案和报价。
+
+***
+
+#### 付费业务到期后不续费，现有应用还能否正常使用？
+
+到期后按免费版额度执行。如您现有应用已超出配额，则必须通过删除操作降低到配额以内，方可执行新的操作（如创建应用，上传热更等），但不影响用户获取之前已发布的热更。
+
+***
+
+#### 如何获取付费的专人技术支持？
+
+请将您的用户名和订单截图发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，同时提供您希望的技术联系方式（QQ、微信等），核实后会有技术专员添加您为好友。
+
+***
+
+#### 如何开具发票？
+
+请将具体开票需求发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，并附上注册邮箱和订单截图。我们默认会回复普通电子发票到`注册邮箱`，类目为软件服务。如需指定接受邮箱或手机，请在`邮件正文`中注明。如需要邮寄纸质发票请注明邮寄地址，邮费为到付。
+如邮件发送后三个工作日内未收到回复，请联系 QQ 客服 34731408。
+
+***
+
+#### 可以使用银行转账付款吗？
+
+可以的。请对照[价格表](/pricing.md)，将对应版本的款项转账至：
+
+| 公司名称  | 武汉青罗网络科技有限公司     |
+| ----- | ---------------- |
+| 账号    | 8888888048825564 |
+| 开户行名称 | 浙江网商银行           |
+| 开户地区  | 浙江省杭州市           |
+| 支行名称  | 浙江网商银行股份有限公司     |
+| 联行号   | 323331000001     |
+
+转账完成后请截图发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，并写明注册邮箱，我们将在一个工作日内开通对应服务。
+
+***
+
+#### 可以按月付款吗？
+
+需要月付的客户请联系 QQ 客服 34731408，月付价格为年付价格 / 8。如标准版当前价格为 800 元每年，则月付价格为 100 元每月。
+月付客户需累计支付满 500 元后才能开具发票。`大客户VIP版`不支持月付。
+
+***
+
+#### 大客户方案
+
+如果您的应用有大规模的活跃用户，日均所有应用累计总查询次数超过 100 万次，则建议选择我们专门针对大规模应用优化的`大客户VIP版`。
+`大客户VIP版`在应用数量、原生包数量、热更包数量等方面配额与`专业版`相同。
+
+当前价格如下表：
+
+| 服务版本 | 日均总热更查询次数 | 价格（元/年） |
+| ---- | --------- | ------- |
+| VIP1 | 1000 万次   | 30000   |
+| VIP2 | 5000 万次   | 60000   |
+| VIP3 | 1 亿次      | 120000  |
+| VIP4 | 1 亿次以上    | 请联系客服   |
+
+具体试用和对接请联系 QQ 客服 34731408
 
 
 
