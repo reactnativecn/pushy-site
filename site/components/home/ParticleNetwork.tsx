@@ -195,6 +195,9 @@ function drawRocket(ctx: CanvasRenderingContext2D, s: number) {
 const drawFns = { phone: drawPhone, app: drawApp, cloud: drawCloud, signal: drawSignal, code: drawCode, rocket: drawRocket };
 const iconTypes: FloatingIcon["type"][] = ["phone", "app", "cloud", "signal", "code", "rocket"];
 
+const OPACITY_BINS = 10;
+const opacityStyleCache = Array.from({ length: OPACITY_BINS }, (_, k) => `rgba(${COLORS.BLUE}, ${((k + 0.5) / OPACITY_BINS) * 0.15})`);
+
 // ---------- component ----------
 
 function ParticleNetwork() {
@@ -275,21 +278,36 @@ function ParticleNetwork() {
       const my = mouse.current.y;
 
       // --- connections between particles ---
+      const bins = Array.from({ length: OPACITY_BINS }, () => [] as number[]);
       for (let i = 0; i < pts.length; i++) {
+        const p1 = pts[i];
         for (let j = i + 1; j < pts.length; j++) {
-          const dx = pts[i].x - pts[j].x;
-          const dy = pts[i].y - pts[j].y;
+          const p2 = pts[j];
+          const dx = p1.x - p2.x;
+          const dy = p1.y - p2.y;
           const distSq = dx * dx + dy * dy;
           if (distSq < CONNECTION_DIST_SQ) {
             const dist = Math.sqrt(distSq);
-            const alph = (1 - dist / CONNECTION_DIST) * 0.15;
-            ctx.beginPath();
-            ctx.moveTo(pts[i].x, pts[i].y);
-            ctx.lineTo(pts[j].x, pts[j].y);
-            ctx.strokeStyle = `rgba(${COLORS.BLUE}, ${alph})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
+            let binIdx = ((1 - dist / CONNECTION_DIST) * OPACITY_BINS) | 0;
+            if (binIdx >= OPACITY_BINS) binIdx = OPACITY_BINS - 1;
+
+            bins[binIdx].push(p1.x, p1.y, p2.x, p2.y);
           }
+        }
+      }
+
+      ctx.lineWidth = 0.5;
+      for (let k = 0; k < OPACITY_BINS; k++) {
+        const lines = bins[k];
+        const linesLen = lines.length;
+        if (linesLen > 0) {
+          ctx.beginPath();
+          for (let m = 0; m < linesLen; m += 4) {
+            ctx.moveTo(lines[m], lines[m+1]);
+            ctx.lineTo(lines[m+2], lines[m+3]);
+          }
+          ctx.strokeStyle = opacityStyleCache[k];
+          ctx.stroke();
         }
       }
 
