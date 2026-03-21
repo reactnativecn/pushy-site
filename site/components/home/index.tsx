@@ -4,7 +4,11 @@ import Page2 from "./Page2";
 import Showcase from "./Showcase";
 import Footer from "../Footer";
 
-function Home(props: any) {
+interface HomeProps {
+  isMobile?: boolean;
+}
+
+function Home(props: HomeProps) {
   return (
     <div className="home-wrapper">
       <Banner {...props} />
