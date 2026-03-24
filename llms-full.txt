@@ -403,7 +403,7 @@ std::vector<std::shared_ptr<Package>> PackageProvider::getPackages(Package::Cont
 ```json5
 {
   dependencies: {
-    pushy: "file:../../node_modules/react-native-update/harmony/pushy",
+    pushy: "file:../../node_modules/react-native-update/harmony",
   },
 }
 ```
