@@ -13,6 +13,10 @@ import { Steps, Tabs, Tab } from "@rspress/core/theme";
 
 安装配置完成后，确定应用编译顺利通过，下面我们来进行代码集成。
 
+:::tip 推荐做法
+优先使用 [安装与使用 Skill](/docs/skills) 让 AI 自动完成 `UpdateProvider` 包裹、客户端初始化与常见策略配置。本页保留为手动接入参考，也适合用来校对 AI 生成的改动。
+:::
+
 ### 获取 appKey
 
 检查更新时必须提供你的`appKey`，这个值保存在`update.json`中（使用`pushy createApp`或`pushy selectApp`命令后会自动生成），并且根据平台不同而不同。你可以用如下的代码获取`appKey`：

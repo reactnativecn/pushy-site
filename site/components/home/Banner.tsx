@@ -38,6 +38,9 @@ function Banner({ isMobile }: BannerProps) {
 
         <div className="max-w-3xl mx-auto mb-12 animate-fade-in-up animation-delay-200">
           <p className="text-lg sm:text-xl text-slate-400 leading-relaxed font-light">
+            <span className="block mb-4 text-base sm:text-lg font-medium text-blue-100">
+              官方 Skill 已支持 AI 自动完成接入、配置检查与常见问题排查。
+            </span>
             <span className="inline-block mx-4 relative font-medium text-slate-300">高速节点勤分发</span>
             <span className="inline-block mx-4 relative font-medium text-slate-300">山河浩广若比邻</span>
             <br className="hidden sm:block" />
@@ -47,9 +50,14 @@ function Banner({ isMobile }: BannerProps) {
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 animate-fade-in-up animation-delay-300">
-          <a href="/docs/intro" className="w-full sm:w-auto">
+          <a href="/docs/skills" className="w-full sm:w-auto">
             <button className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl text-lg transition-all duration-300 shadow-lg shadow-blue-600/25 hover:shadow-blue-500/40 hover:-translate-y-1">
-              立即免费体验
+              优先：安装 Skill
+            </button>
+          </a>
+          <a href="/docs/getting-started" className="w-full sm:w-auto">
+            <button className="w-full sm:w-auto px-8 py-4 border border-slate-400/40 bg-slate-900/20 hover:bg-slate-900/35 text-slate-100 font-bold rounded-2xl text-lg transition-all duration-300 hover:-translate-y-1">
+              查看手动接入
             </button>
           </a>
           <div className="scale-125 transform origin-center sm:origin-left hover:scale-150 transition-transform duration-300">

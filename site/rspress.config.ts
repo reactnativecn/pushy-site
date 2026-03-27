@@ -37,6 +37,7 @@ export default defineConfig({
           text: '快速入门',
           items: [
             { text: '产品简介', link: '/docs/intro' },
+            { text: '推荐：Skills 自动集成', link: '/docs/skills' },
             { text: '安装配置', link: '/docs/getting-started' },
             { text: '代码集成', link: '/docs/integration' },
             { text: '发布流程', link: '/docs/publish' },
@@ -50,7 +51,6 @@ export default defineConfig({
             { text: '命令行工具（内置）', link: '/docs/cli' },
             { text: '命令行工具（自定义模块）', link: '/docs/cli_module' },
             { text: '场景实践', link: '/docs/bestpractice' },
-            { text: 'Skills 安装与使用', link: '/docs/skills' },
           ],
         },
         {
