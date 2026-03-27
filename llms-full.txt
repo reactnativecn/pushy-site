@@ -12,6 +12,10 @@ Pushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-n
  [![npm version](https://badge.fury.io/js/react-native-update.svg)](https://www.npmjs.com/package/react-native-update)) 是面向 React Native 应用提供的**专业热更新服务**
 ，由 [React Native 中文网](https://reactnative.cn)
 独家研发并持续维护。我们致力于为全球 React Native 开发者提供最快速、最稳定、最经济的热更新体验。
+:::tip 推荐接入方式
+如果你正在使用支持 Skills 的 AI 编程工具，推荐优先阅读 [安装与使用 Skill](/docs/skills.md)，先安装 `react-native-update` Skill，再让 AI 根据你的项目结构自动完成大部分接入改动。手动文档更适合混编项目、monorepo 或需要逐项校对的场景。
+:::
+
 ## 🚀 为什么选择 Pushy？
 
 ### 极致的更新体验
@@ -74,17 +78,97 @@ const pushyClient = new Pushy({ appKey });
 
 ## 🚦 开始使用
 
-只需三步，即可为你的 React Native 应用添加热更新能力：
+推荐按下面的顺序完成接入：
 
-1. **[安装配置](/docs/getting-started.md)** - 5 分钟完成基础配置
-2. **[代码集成](/docs/integration.md)** - 几行代码即可接入
-3. **[发布更新](/docs/publish.md)** - 一条命令推送新版本
+1. **[安装与使用 Skill](/docs/skills.md)** - 推荐先让 AI 自动完成接入改造
+2. **[安装配置](/docs/getting-started.md)** - 补齐依赖与原生侧配置
+3. **[代码集成](/docs/integration.md)** - 校对或手动定制 `UpdateProvider` 接入
+4. **[发布更新](/docs/publish.md)** - 一条命令推送新版本
 
 :::info
 不确定是否适合你的项目？查看[常见问题](/docs/faq.md)或者可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。
 :::
 
 立即开始使用 Pushy，让你的 React Native 应用拥有极致的热更新体验！
+
+
+
+---
+url: /docs/skills.md
+---
+
+# 推荐：先安装 Skill，再让 AI 自动集成
+
+首次接入 Pushy 时，推荐先安装 `react-native-update` Skill，再让支持 Skills 的 AI 编程工具根据你的项目结构自动完成大部分集成改动。只有当工程结构特殊、需要精细控制，或者想逐项校对生成代码时，再回到后续手动文档。
+
+## Skill 信息
+
+- Skill 名称：`react-native-update`
+- 源仓库：`reactnativecn/react-native-update-skill`
+
+## 推荐工作流
+
+1. 安装 `react-native-update` Skill。
+2. 在 AI 工具中打开你的 React Native / Expo 项目根目录。
+3. 直接提出接入需求，让 AI 根据现有工程自动改造。
+4. 用 [安装配置](/docs/getting-started.md) 和 [代码集成](/docs/integration.md) 作为校对基线。
+
+## 安装（推荐优先）
+
+安装到当前环境支持的所有 Agent：
+
+```bash
+npx skills add reactnativecn/react-native-update-skill --skill react-native-update -a '*'
+```
+
+仅安装到 Claude Code：
+
+```bash
+npx skills add reactnativecn/react-native-update-skill --skill react-native-update -a claude-code
+```
+
+## 更新 Skill
+
+```bash
+npx skills check
+npx skills update
+```
+
+## 可以直接这样对 AI 说
+
+安装后，可以直接向 AI 助手提出接入需求，例如：
+
+- 在 Expo 项目中接入 `react-native-update`
+- 在 class 组件根节点中完成接入改造
+- 保留当前导航和状态管理结构，自动包裹 `UpdateProvider`
+- 配置白名单灰度发布策略
+- 排查“热更新未生效”问题
+
+## Skill 可自动协助的内容
+
+- RN CLI / Expo 接入流程
+- `update.json` 与 `appKey` 配置检查
+- iOS / Android 关键改动提示
+- 更新策略建议（`checkStrategy` / `updateStrategy`）
+- 常见冲突排查（如 `expo-updates`）
+- class 组件与白名单示例
+
+## 何时改用手动文档
+
+- 工程是混编原生项目、monorepo 或目录结构高度定制
+- 自动 link 或原生构建本身已经异常，需要逐项定位
+- 团队希望将 AI 生成结果与手动基线逐行比对
+
+## 相关链接
+
+- 仓库：
+  <a href="https://github.com/reactnativecn/react-native-update-skill" target="_blank" rel="noopener noreferrer">
+    [https://github.com/reactnativecn/react-native-update-skill](https://github.com/reactnativecn/react-native-update-skill)
+  </a>
+- ClawHub 页面（可选）：
+  <a href="https://clawhub.ai/skills/react-native-update" target="_blank" rel="noopener noreferrer">
+    [https://clawhub.ai/skills/react-native-update](https://clawhub.ai/skills/react-native-update)
+  </a>
 
 
 
@@ -102,6 +186,10 @@ url: /docs/getting-started.md
 如果你还没有初始化应用，请参阅[开始使用 React Native](https://reactnative.cn/docs/getting-started)。
 
 我们假设你已经拥有了开发 React Native 应用的一切环境，包括`Node.js`、`Xcode`、`Android SDK`等等。
+
+:::tip 推荐优先使用 Skill 自动接入
+如果你正在使用支持 Skills 的 AI 编程工具，建议先完成 [安装与使用 Skill](/docs/skills.md)，再让 AI 根据当前工程自动执行依赖安装、原生配置检查与接入改造。本页保留手动步骤，适合定制工程、混编项目或作为 AI 产出校对清单。
+:::
 
 ### 安装
 在你的项目根目录下运行以下命令（如果你使用 yarn 等其他包管理器，请自行替换命令）：
@@ -677,6 +765,10 @@ url: /docs/integration.md
 :::
 
 安装配置完成后，确定应用编译顺利通过，下面我们来进行代码集成。
+
+:::tip 推荐做法
+优先使用 [安装与使用 Skill](/docs/skills.md) 让 AI 自动完成 `UpdateProvider` 包裹、客户端初始化与常见策略配置。本页保留为手动接入参考，也适合用来校对 AI 生成的改动。
+:::
 
 ### 获取 appKey
 
@@ -2249,71 +2341,6 @@ if (metaInfo.silent) {
 
 
 ---
-url: /docs/skills.md
----
-
-# 安装与使用 Skill
-
-本文介绍如何安装并使用 `react-native-update` 的 Skill，帮助你在 AI 编程工具中更高效地完成接入、配置与排查。
-
-## Skill 信息
-
-- Skill 名称：`react-native-update`
-- 源仓库：`reactnativecn/react-native-update-skill`
-
-## 安装（推荐）
-
-安装到当前环境支持的所有 Agent：
-
-```bash
-npx skills add reactnativecn/react-native-update-skill --skill react-native-update -a '*'
-```
-
-仅安装到 Claude Code：
-
-```bash
-npx skills add reactnativecn/react-native-update-skill --skill react-native-update -a claude-code
-```
-
-## 更新 Skill
-
-```bash
-npx skills check
-npx skills update
-```
-
-## 使用方式
-
-安装后，可以直接向 AI 助手提出接入需求，例如：
-
-- 在 Expo 项目中接入 `react-native-update`
-- 在 class 组件根节点中完成接入改造
-- 配置白名单灰度发布策略
-- 排查“热更新未生效”问题
-
-## Skill 覆盖内容
-
-- RN CLI / Expo 接入流程
-- `update.json` 与 `appKey` 配置检查
-- iOS / Android 关键改动提示
-- 更新策略建议（`checkStrategy` / `updateStrategy`）
-- 常见冲突排查（如 `expo-updates`）
-- class 组件与白名单示例
-
-## 相关链接
-
-- 仓库：
-  <a href="https://github.com/reactnativecn/react-native-update-skill" target="_blank" rel="noopener noreferrer">
-    [https://github.com/reactnativecn/react-native-update-skill](https://github.com/reactnativecn/react-native-update-skill)
-  </a>
-- ClawHub 页面（可选）：
-  <a href="https://clawhub.ai/skills/react-native-update" target="_blank" rel="noopener noreferrer">
-    [https://clawhub.ai/skills/react-native-update](https://clawhub.ai/skills/react-native-update)
-  </a>
-
-
-
----
 url: /docs/faq.md
 ---
 
@@ -2585,10 +2612,10 @@ url: /index.md
 
 极速热更新框架 for React Native
 
-高速节点勤分发山河浩广若比邻
+官方 Skill 已支持 AI 自动完成接入、配置检查与常见问题排查。高速节点勤分发山河浩广若比邻
 增量算法尽优化字节四两拨千斤
 
-[立即免费体验](/docs/intro)[Star](https://github.com/reactnativecn/react-native-update/)[](https://github.com/reactnativecn/react-native-update/stargazers/)## 他们选择了 Pushy
+[优先：安装 Skill](/docs/skills)[查看手动接入](/docs/getting-started)[Star](https://github.com/reactnativecn/react-native-update/)[](https://github.com/reactnativecn/react-native-update/stargazers/)## 他们选择了 Pushy
 
 ![中国联通](/static/image/zglt.a8272b3a12.png)![网易游戏](/static/image/wyyx.e81ec9afd2.png)![华中师范大学](/static/image/hzsfdx.bff67934ac.jpg)![蓝月亮](/static/image/lyl.5ba41a257d.png)![欧普照明](data:image/png;base64,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)![平安不动产](/static/image/pabdc.b5d61c85a7.png)![天津公交](/static/image/tjgj.43712fe8de.png)![锐捷网络](/static/svg/rjwl.c16bdaa1ff.svg)![环球时报](/static/image/hqsb.ed1da880b1.png)![航天信息](/static/image/htxx.4755a497ad.png)## 为什么选择 Pushy
 

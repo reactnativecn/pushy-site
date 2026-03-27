@@ -8,6 +8,10 @@ Pushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-n
  [![npm version](https://badge.fury.io/js/react-native-update.svg)](https://www.npmjs.com/package/react-native-update)) 是面向 React Native 应用提供的**专业热更新服务**
 ，由 [React Native 中文网](https://reactnative.cn)
 独家研发并持续维护。我们致力于为全球 React Native 开发者提供最快速、最稳定、最经济的热更新体验。
+:::tip 推荐接入方式
+如果你正在使用支持 Skills 的 AI 编程工具，推荐优先阅读 [安装与使用 Skill](/docs/skills.md)，先安装 `react-native-update` Skill，再让 AI 根据你的项目结构自动完成大部分接入改动。手动文档更适合混编项目、monorepo 或需要逐项校对的场景。
+:::
+
 ## 🚀 为什么选择 Pushy？
 
 ### 极致的更新体验
@@ -70,11 +74,12 @@ const pushyClient = new Pushy({ appKey });
 
 ## 🚦 开始使用
 
-只需三步，即可为你的 React Native 应用添加热更新能力：
+推荐按下面的顺序完成接入：
 
-1. **[安装配置](/docs/getting-started.md)** - 5 分钟完成基础配置
-2. **[代码集成](/docs/integration.md)** - 几行代码即可接入
-3. **[发布更新](/docs/publish.md)** - 一条命令推送新版本
+1. **[安装与使用 Skill](/docs/skills.md)** - 推荐先让 AI 自动完成接入改造
+2. **[安装配置](/docs/getting-started.md)** - 补齐依赖与原生侧配置
+3. **[代码集成](/docs/integration.md)** - 校对或手动定制 `UpdateProvider` 接入
+4. **[发布更新](/docs/publish.md)** - 一条命令推送新版本
 
 :::info
 不确定是否适合你的项目？查看[常见问题](/docs/faq.md)或者可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。
