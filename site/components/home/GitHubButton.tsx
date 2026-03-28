@@ -15,6 +15,8 @@ const typeToPath: Partial<Record<GitHubButtonType, string>> = {
 
 type CountResponse = Partial<Record<`${GitHubButtonType}_count`, number>>;
 
+const CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hours
+
 export interface GitHubButtonProps extends Omit<HTMLAttributes<HTMLSpanElement>, "type"> {
   type: GitHubButtonType;
   namespace: string;
@@ -34,9 +36,30 @@ function GitHubButton({
 
   useEffect(() => {
     const controller = new AbortController();
+    const cacheKey = `gh-count-${namespace}-${repo}`;
 
     const fetchCount = async () => {
       try {
+        // Try local cache first
+        try {
+          const cached = localStorage.getItem(cacheKey);
+          if (cached) {
+            const { data, timestamp } = JSON.parse(cached) as {
+              data: CountResponse;
+              timestamp: number;
+            };
+            if (Date.now() - timestamp < CACHE_DURATION) {
+              const nextCount = data[`${type}_count`];
+              if (typeof nextCount === "number") {
+                setCount(nextCount);
+                return;
+              }
+            }
+          }
+        } catch {
+          // Ignore localStorage errors
+        }
+
         const response = await fetch(`https://api.github.com/repos/${namespace}/${repo}`, {
           signal: controller.signal,
           headers: {
@@ -49,6 +72,14 @@ function GitHubButton({
         }
 
         const data = (await response.json()) as CountResponse;
+
+        // Save to cache
+        try {
+          localStorage.setItem(cacheKey, JSON.stringify({ data, timestamp: Date.now() }));
+        } catch {
+          // Ignore localStorage errors
+        }
+
         const nextCount = data[`${type}_count`];
 
         if (typeof nextCount === "number") {
