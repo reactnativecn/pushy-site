@@ -150,13 +150,7 @@
               scale +
               ", user-scalable=no"
           );
-          if (docEl.firstElementChild) {
-            docEl.firstElementChild.appendChild(metaEl);
-          } else {
-            var wrap = doc.createElement("div");
-            wrap.appendChild(metaEl);
-            doc.write(wrap.innerHTML);
-          }
+          (doc.head || docEl).appendChild(metaEl);
         }
 
         function refreshRem() {
