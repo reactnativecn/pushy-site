@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<body>
+<canvas id="canvas" width="800" height="800"></canvas>
+<script>
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  const COLORS = {
+    BLUE: "68,131,237",
+    INDIGO: "99,102,241",
+    VIOLET: "139,92,246",
+    BLUE_500: "59,130,246",
+    INDIGO_600: "79,70,229",
+  };
+
+  function testNativeGradients() {
+    ctx.clearRect(0,0,800,800);
+    const start = performance.now();
+    for (let i = 0; i < 2000; i++) {
+      const p = { x: Math.random()*800, y: Math.random()*800, radius: 2 };
+      const glow = Math.random();
+      const r = p.radius + glow * 2;
+
+      const gr = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 4);
+      gr.addColorStop(0, `rgba(${COLORS.BLUE}, ${glow * 0.2})`);
+      gr.addColorStop(1, `rgba(${COLORS.BLUE}, 0)`);
+      ctx.fillStyle = gr;
+      ctx.fillRect(p.x - r * 4, p.y - r * 4, r * 8, r * 8);
+    }
+    return performance.now() - start;
+  }
+
+  const glowCache = new Map();
+  function getGlowCanvas(color) {
+    if (glowCache.has(color)) return glowCache.get(color);
+    const c = document.createElement('canvas');
+    c.width = 128; // higher res for better quality
+    c.height = 128;
+    const cctx = c.getContext('2d', { willReadFrequently: true });
+    const gr = cctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+    gr.addColorStop(0, `rgba(${color}, 1)`);
+    gr.addColorStop(1, `rgba(${color}, 0)`);
+    cctx.fillStyle = gr;
+    cctx.fillRect(0, 0, 128, 128);
+    glowCache.set(color, c);
+    return c;
+  }
+
+  // pre-fill cache
+  getGlowCanvas(COLORS.BLUE);
+
+  function testCachedImages() {
+    ctx.clearRect(0,0,800,800);
+    const start = performance.now();
+    const glowImg = getGlowCanvas(COLORS.BLUE);
+
+    // Save state once
+    ctx.save();
+    for (let i = 0; i < 2000; i++) {
+      const p = { x: Math.random()*800, y: Math.random()*800, radius: 2 };
+      const glow = Math.random();
+      const r = p.radius + glow * 2;
+      const size = r * 8;
+
+      ctx.globalAlpha = glow * 0.2;
+      ctx.drawImage(glowImg, p.x - size / 2, p.y - size / 2, size, size);
+    }
+    ctx.restore();
+    return performance.now() - start;
+  }
+
+  // Warmup
+  testNativeGradients();
+  testCachedImages();
+
+  let totalNative = 0;
+  let totalCached = 0;
+  for(let i=0; i<10; i++) {
+    totalNative += testNativeGradients();
+    totalCached += testCachedImages();
+  }
+
+  console.log(`Native Gradients (avg): ${(totalNative/10).toFixed(2)}ms`);
+  console.log(`Cached Images (avg): ${(totalCached/10).toFixed(2)}ms`);
+  console.log(`Speedup: ${(totalNative / totalCached).toFixed(2)}x`);
+</script>
+</body>
+</html>
