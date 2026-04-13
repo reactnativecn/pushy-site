@@ -1,0 +1,43 @@
+name: CI Failure Issue
+
+on:
+  workflow_run:
+    workflows:
+      - github pages
+    types: [completed]
+
+jobs:
+  notify:
+    if: contains(fromJSON('["failure","timed_out","action_required"]'), github.event.workflow_run.conclusion)
+    permissions:
+      issues: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create failure issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          ACTOR: ${{ github.event.workflow_run.actor.login }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+        run: |
+          body_file="$(mktemp)"
+          cat > "$body_file" <<EOF
+          @sunnylqm CI run failed.
+
+          Repository: $REPOSITORY
+          Workflow: $WORKFLOW_NAME
+          Conclusion: $CONCLUSION
+          Branch: $HEAD_BRANCH
+          Commit: $HEAD_SHA
+          Actor: $ACTOR
+          Run: $RUN_URL
+          EOF
+
+          gh issue create \
+            --repo "$REPOSITORY" \
+            --title "[CI failed] $REPOSITORY / $WORKFLOW_NAME" \
+            --body-file "$body_file"
