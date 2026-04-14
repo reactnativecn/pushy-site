@@ -74,9 +74,9 @@ function Page1() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-10">
-          {features.map((feature, index) => (
+          {features.map((feature) => (
             <div 
-              key={index}
+              key={feature.title}
               className="group relative bg-white rounded-3xl p-8 shadow-sm border border-slate-100 hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-2 transition-all duration-300"
             >
               {/* Top Gradient Border Line on Hover */}
