@@ -13,16 +13,16 @@
     "@ant-design/icons": "^6.1.1",
     "@rsbuild/plugin-sass": "^1.5.1",
     "@rspress/core": "^2.0.9",
-    "@tailwindcss/postcss": "^4.2.2",
+    "@tailwindcss/postcss": "^4.2.4",
     "@types/react-dom": "^19.2.3",
-    "antd": "^6.3.5",
+    "antd": "^6.3.6",
     "autoprefixer": "10.5.0",
     "postcss": "^8.5.10",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "rspress-plugin-mermaid": "^1.0.1",
     "sass": "^1.99.0",
-    "tailwindcss": "^4.2.2",
-    "typescript": "^6.0.2"
+    "tailwindcss": "^4.2.4",
+    "typescript": "^6.0.3"
   }
 }
