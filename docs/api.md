@@ -55,6 +55,10 @@ interface PushyOptions {
   // 此选项需 v10.12.0+ 版本
   beforeCheckUpdate?: () => Promise<boolean>;
 
+  // 在每次检查更新结束后执行，可用于上报检查结果；不影响原有检查流程
+  // 此选项需 v10.38.3+ 版本
+  afterCheckUpdate?: (state: UpdateCheckState) => Promise<void> | void;
+
   // 在下载更新前执行，返回 false 则取消下载更新，可以配合自定义的 metaInfo 做一些条件控制
   // 此选项需 v10.12.0+ 版本
   beforeDownloadUpdate?: (info: UpdateInfo) => Promise<boolean>;
@@ -67,6 +71,16 @@ interface PushyOptions {
   // 此选项需 v10.28.2+ 版本
   onPackageExpired?: (info: UpdateInfo) => Promise<boolean>;
 }
+
+// 检查更新结束后的状态
+type UpdateCheckState = {
+  // completed: 检查完成；skipped: 因 debug、web 环境或 beforeCheckUpdate 返回 false 等原因跳过；error: 检查出错
+  status: "completed" | "skipped" | "error";
+  // status 为 completed 时的检查结果
+  result?: UpdateInfo;
+  // status 为 error 时的错误对象
+  error?: Error;
+};
 
 // 日志事件类型
 type EventType =
@@ -288,6 +302,30 @@ interface UpdateContext {
 #### function markSuccess()
 
 **一般情况下请勿手动调用此函数**。调用此函数作为更新成功的标记（否则下次启动会默认失败自动回滚）。
+
+***
+
+#### currentVersionInfo
+
+当前已热更版本的信息（如尚未热更过则为空对象）。需 v10.31.2+ 版本。
+
+`currentVersionInfo` 是同步字段，推荐用它代替 `getCurrentVersionInfo()`：
+
+```js
+const { currentVersionInfo } = useUpdate();
+
+console.log(currentVersionInfo.name);
+```
+
+字段示例：
+
+```js
+{
+    name: '1.0.3-rc',
+    description: '添加聊天功能\n修复商城页面BUG',
+    metaInfo: '{"silent":true}',
+}
+```
 
 ***
 
