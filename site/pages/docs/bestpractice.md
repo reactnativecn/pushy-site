@@ -52,6 +52,22 @@ splits {
 
 将 react-native-update-cli 更新到 v2.6.0 以上版本，即可使用 pushy parseAab 和 pushy uploadAab 命令来支持 aab 格式的原生包。
 
+如果同一个 Android 版本既需要上架 Google Play 的 AAB，也需要给其他渠道分发 APK，建议不要分两次构建。请在项目根目录的`package.json`中配置一个 npm script，让 CI 和本地发布都通过同一个入口，在同一次 Gradle 调用中同时执行`assembleRelease`和`bundleRelease`。如果已有`scripts`字段，只需要追加其中一项：
+
+```json
+{
+  "scripts": {
+    "package:android:release": "cd android && ./gradlew clean assembleRelease bundleRelease"
+  }
+}
+```
+
+```bash
+$ npm run package:android:release
+```
+
+这样生成的`android/app/build/outputs/apk/release/app-release.apk`和`android/app/build/outputs/bundle/release/app-release.aab`来自同一次 release 构建，编译时间戳保持一致。之后按渠道分发对应格式即可：Google Play 使用 AAB，直装包或第三方渠道使用 APK。如果项目使用 flavor，请把 npm script 中的任务名改为实际 variant，例如`assembleProdRelease`和`bundleProdRelease`。
+
 #### 测试与回滚
 
 自 v10.11.2 版本开始，可以使用以下两种快捷扫码方案来测试热更，而无需提前进行绑定：
