@@ -2683,9 +2683,9 @@ React Native 中文网 © 2026 武汉青罗网络科技有限公司
 url: /index.md
 ---
 
-![Pushy Logo](/static/svg/logo.8f6d66882a.svg)# Pushy
+![](/hero-loop/pushy-hero-loop-poster.png)![Pushy Logo](/static/svg/logo.8f6d66882a.svg)# Pushy
 
-极速热更新框架 for React Native
+让应用体验持续变好，不打断用户
 
 官方 Skill 已支持 AI 自动完成接入、配置检查与常见问题排查。高速节点勤分发山河浩广若比邻
 增量算法尽优化字节四两拨千斤
