@@ -1,1 +1,24 @@
+.pushy-hero {
+  isolation: isolate;
+}
 
+.pushy-hero__poster {
+  z-index: 0;
+}
+
+.pushy-hero__video {
+  z-index: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pushy-hero__video {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .pushy-hero__poster,
+  .pushy-hero__video {
+    object-position: 64% center;
+  }
+}
