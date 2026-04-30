@@ -7,22 +7,30 @@
     "dev": "rspress dev",
     "build": "rspress build",
     "preview": "rspress preview",
-    "start": "rspress preview"
+    "start": "rspress preview",
+    "hero:studio": "remotion studio remotion/index.ts",
+    "hero:render:mp4": "remotion render remotion/index.ts ReactNativeUpdateHero public/react-native-update-hero.mp4 --codec=h264 --crf=18 --pixel-format=yuv420p --image-format=png --overwrite",
+    "hero:render:webm": "remotion render remotion/index.ts ReactNativeUpdateHero public/react-native-update-hero.webm --codec=vp9 --crf=32 --overwrite",
+    "hero:poster": "remotion still remotion/index.ts ReactNativeUpdateHeroPoster public/react-native-update-hero-poster.png --overwrite"
   },
   "dependencies": {
-    "@ant-design/icons": "^6.1.1",
-    "@rsbuild/plugin-sass": "^1.5.1",
-    "@rspress/core": "^2.0.9",
+    "@ant-design/icons": "^6.2.2",
+    "@rsbuild/plugin-sass": "^1.5.2",
+    "@rspress/core": "^2.0.10",
     "@tailwindcss/postcss": "^4.2.4",
     "@types/react-dom": "^19.2.3",
-    "antd": "^6.3.6",
+    "antd": "^6.3.7",
     "autoprefixer": "10.5.0",
-    "postcss": "^8.5.10",
+    "postcss": "^8.5.12",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "rspress-plugin-mermaid": "^1.0.1",
     "sass": "^1.99.0",
     "tailwindcss": "^4.2.4",
     "typescript": "^6.0.3"
+  },
+  "devDependencies": {
+    "@remotion/cli": "^4.0.454",
+    "remotion": "^4.0.454"
   }
 }
