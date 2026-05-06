@@ -49,8 +49,7 @@ export default defineConfig({
           items: [
             { text: 'API 文档', link: '/docs/api' },
             { text: 'API Token', link: '/docs/api-token' },
-            { text: '命令行工具（内置）', link: '/docs/cli' },
-            { text: '命令行工具（自定义模块）', link: '/docs/cli_module' },
+            { text: '命令行工具', link: '/docs/cli' },
             { text: '场景实践', link: '/docs/bestpractice' },
           ],
         },
@@ -67,6 +66,41 @@ export default defineConfig({
     plugins: [pluginSass()],
     html: {
       tags: [
+        {
+          tag: 'link',
+          attrs: {
+            rel: 'manifest',
+            href: '/manifest.webmanifest',
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            name: 'theme-color',
+            content: '#0f5fff',
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            name: 'apple-mobile-web-app-capable',
+            content: 'yes',
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            name: 'apple-mobile-web-app-title',
+            content: 'Pushy',
+          },
+        },
+        {
+          tag: 'script',
+          attrs: {
+            src: '/register-pwa.js',
+            defer: true,
+          },
+        },
         {
           tag: 'meta',
           attrs: {
