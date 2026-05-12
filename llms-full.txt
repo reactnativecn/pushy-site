@@ -101,6 +101,10 @@ url: /docs/skills.md
 
 首次接入 Pushy 时，推荐先安装 `react-native-update` Skill，再让支持 Skills 的 AI 编程工具根据你的项目结构自动完成大部分集成改动。只有当工程结构特殊、需要精细控制，或者想逐项校对生成代码时，再回到后续手动文档。
 
+:::tip AI 模型服务
+本站同时提供 [AI 模型转发服务](https://ai.cresc.dev)：提供纯正官方 GPT-5.5 和 Claude Opus 4.7 模型，价格实惠、服务稳定、绝不掺水、数据安全。
+:::
+
 ## Skill 信息
 
 - Skill 名称：`react-native-update`
