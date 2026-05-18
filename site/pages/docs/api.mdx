@@ -406,7 +406,11 @@ console.log(currentVersionInfo.name);
 
 #### UpdateContext.setCustomInstanceManager(ReactInstanceManager instanceManager)
 
-如果是集成/混编 Android 方案，则可以使用此方法传入你自行创建的 ReactInstanceManager。自`v5.5.8`版本起可用。
+如果是集成/混编 Android 方案，且你仍然自行创建 `ReactInstanceManager`，则可以使用此方法传入实例。自`v5.5.8`版本起可用。
+
+:::info
+新架构或 `@callstack/react-native-brownfield` AAR 接入应优先使用 `ReactHost` 的 `jsBundleFilePath`，并在宿主 `Application` 暴露 `getReactHost()`。完整示例见 [Brownfield 接入](/docs/brownfield)。
+:::
 
 示例：
 

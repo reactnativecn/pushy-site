@@ -50,6 +50,7 @@ export default defineConfig({
             { text: 'API 文档', link: '/docs/api' },
             { text: 'API Token', link: '/docs/api-token' },
             { text: '命令行工具', link: '/docs/cli' },
+            { text: 'Brownfield 接入', link: '/docs/brownfield' },
             { text: '场景实践', link: '/docs/bestpractice' },
           ],
         },

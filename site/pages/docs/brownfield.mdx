@@ -1,0 +1,441 @@
+---
+order: 12
+title: Brownfield 接入
+type: 高阶用法
+description: 在使用 @callstack/react-native-brownfield 将 React Native 打包成 iOS XCFramework 或 Android AAR 的项目中接入 Pushy。
+---
+
+import { Steps } from "@rspress/core/theme";
+
+本页适用于原生应用通过 [`@callstack/react-native-brownfield`](https://oss.callstack.com/react-native-brownfield/) 消费 React Native 产物的项目：
+
+- iOS 宿主 App 消费 React Native XCFramework
+- Android 宿主 App 消费 React Native AAR
+
+这类项目通常有以下特点：
+
+- 宿主 App 不直接按 React Native 模板初始化 runtime
+- React Native runtime 在 XCFramework / AAR 模块或 brownfield helper 中初始化
+- JS bundle 的默认加载路径由 brownfield 产物控制，而不是标准 RN 模板控制
+
+在这种结构下，不要为了接入 Pushy 去改宿主继承关系。正确做法是在 **brownfield 初始化 React Native runtime 的位置**接入 Pushy 的 bundle 路径。
+
+## iOS XCFramework 接入
+
+iOS 侧的核心是让 `ReactNativeBrownfield` 每次加载 JS bundle 时都调用 `RCTPushy.bundleURL()`。同时，Pushy 的 iOS 差量基线会从最终 IPA 里读取 `main.jsbundle`，所以即使 brownfield 的默认 release bundle 位于 XCFramework 内，也需要把基线 bundle 同步到宿主 App 的主 bundle 根目录。
+
+<Steps>
+### 安装依赖
+
+在 React Native 工程根目录安装：
+
+```bash
+npm i react-native-update
+npm i -g react-native-update-cli
+```
+
+然后在 iOS 目录执行：
+
+```bash
+cd ios
+pod install
+```
+
+如果你的 framework target 没有继承主 RN target 的 CocoaPods 配置，请确认 `react-native-update` 也被 framework target 链接进去。常见 Podfile 结构如下：
+
+```ruby
+target 'ReactNativeApp' do
+  config = use_native_modules!
+
+  use_react_native!(
+    path: config[:reactNativePath],
+    app_path: "#{Pod::Config.instance.installation_root}/.."
+  )
+
+  target 'ReactNativeFramework' do
+    inherit! :complete
+  end
+end
+```
+
+### 导出 framework bundle
+
+按照 `@callstack/react-native-brownfield` 的 iOS 接入方式，在 framework target 中导出 `ReactNativeBundle`：
+
+```swift
+@_exported import ReactBrownfield
+
+public let ReactNativeBundle = Bundle(for: InternalClassForBundle.self)
+
+class InternalClassForBundle {}
+```
+
+`ReactNativeBundle` 仍然需要保留，因为 brownfield 会用它定位 framework 内的资源；后续只是把 JS bundle URL 的选择交给 Pushy。
+
+### 配置 bundleURLOverride
+
+在宿主 App 初始化 React Native Brownfield 的位置引入 `react_native_update`，并设置 `bundleURLOverride`：
+
+```swift
+import UIKit
+import React
+import ReactBrownfield
+import ReactNativeFramework
+import react_native_update
+
+@main
+class AppDelegate: UIResponder, UIApplicationDelegate {
+  var window: UIWindow?
+
+  func application(
+    _ application: UIApplication,
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+  ) -> Bool {
+    ReactNativeBrownfield.shared.bundle = ReactNativeBundle
+    ReactNativeBrownfield.shared.bundleURLOverride = {
+#if DEBUG
+      RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+#else
+      RCTPushy.bundleURL()
+#endif
+    }
+
+    ReactNativeBrownfield.shared.startReactNative(
+      onBundleLoaded: {
+        print("React Native bundle loaded")
+      },
+      launchOptions: launchOptions
+    )
+
+    window = UIWindow(frame: UIScreen.main.bounds)
+    window?.rootViewController = ReactNativeViewController(
+      moduleName: "ReactNativeApp"
+    )
+    window?.makeKeyAndVisible()
+
+    return true
+  }
+}
+```
+
+如果宿主是 SwiftUI App，也在 `init()` 里做同样的初始化：
+
+```swift
+import SwiftUI
+import React
+import ReactBrownfield
+import ReactNativeFramework
+import react_native_update
+
+@main
+struct HostApp: App {
+  init() {
+    ReactNativeBrownfield.shared.bundle = ReactNativeBundle
+    ReactNativeBrownfield.shared.bundleURLOverride = {
+#if DEBUG
+      RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+#else
+      RCTPushy.bundleURL()
+#endif
+    }
+    ReactNativeBrownfield.shared.startReactNative()
+  }
+
+  var body: some Scene {
+    WindowGroup {
+      ContentView()
+    }
+  }
+}
+```
+
+:::warning
+不要再让 release 环境直接使用 `ReactNativeBundle` 中的固定 `main.jsbundle` 初始化 RN。否则冷启动会绕过已下载的热更包，`switchVersion()` 后也无法按 Pushy 选择的新 bundle 重载。
+:::
+
+### 同步基线 bundle 到宿主 App
+
+`RCTPushy.bundleURL()` 在没有热更包时会回退到宿主 App 主 bundle 里的 `main.jsbundle`。`pushy uploadIpa` 也会从最终 IPA 的 `Payload/*.app/main.jsbundle` 读取基线 bundle。
+
+如果你的 `main.jsbundle` 只存在于 `ReactNativeFramework.framework` 内，请在宿主 App target 的 `Build Phases` 中新增一个位于 `Embed Frameworks` 之后的 Run Script，把 framework 内的 bundle 复制到宿主 App 主 bundle：
+
+```bash
+set -euo pipefail
+
+RN_FRAMEWORK_NAME="ReactNativeFramework"
+APP_BUNDLE="${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}"
+RN_FRAMEWORK="${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/${RN_FRAMEWORK_NAME}.framework"
+
+if [ "${CONFIGURATION}" != "Debug" ]; then
+  if [ ! -f "${RN_FRAMEWORK}/main.jsbundle" ]; then
+    echo "error: ${RN_FRAMEWORK}/main.jsbundle not found"
+    exit 1
+  fi
+
+  cp "${RN_FRAMEWORK}/main.jsbundle" "${APP_BUNDLE}/main.jsbundle"
+
+  BUILD_TIME_SOURCE=""
+  for candidate in \
+    "${RN_FRAMEWORK}/pushy_build_time.txt" \
+    "${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_update.framework/pushy_build_time.txt" \
+    "${APP_BUNDLE}/pushy_build_time.txt"; do
+    if [ -f "${candidate}" ]; then
+      BUILD_TIME_SOURCE="${candidate}"
+      break
+    fi
+  done
+
+  if [ -n "${BUILD_TIME_SOURCE}" ]; then
+    cp "${BUILD_TIME_SOURCE}" "${APP_BUNDLE}/pushy_build_time.txt"
+  else
+    date +%s > "${APP_BUNDLE}/pushy_build_time.txt"
+  fi
+fi
+```
+
+把 `RN_FRAMEWORK_NAME` 改成你的 framework target 名称。构建 release IPA 后，可以先解包确认：
+
+```bash
+unzip -l path/to/HostApp.ipa | grep -E 'Payload/.+\.app/(main\.jsbundle|pushy_build_time\.txt)'
+```
+
+### 旧式手动 RCTBridge 接入
+
+如果你的 iOS brownfield 项目没有使用 `ReactNativeBrownfield.shared.startReactNative()`，而是自己创建 `RCTBridge` / `RCTRootView`，则把 bridge delegate 的 release bundle URL 指向 `RCTPushy.bundleURL()`：
+
+```objc
+#import "RCTPushy.h"
+#import <React/RCTBundleURLProvider.h>
+
+- (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
+{
+#if DEBUG
+  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
+#else
+  return [RCTPushy bundleURL];
+#endif
+}
+```
+
+创建 root view 时不要直接用固定 `bundleURL` 初始化；应先创建可 reload 的 `RCTBridge`，再用 `initWithBridge` 创建 `RCTRootView`。
+
+### 接入 JS 根组件
+
+JS 侧和普通 React Native 项目一致，用 `UpdateProvider` 包裹根组件：
+
+```tsx
+import { Platform } from "react-native";
+import { Pushy, UpdateProvider } from "react-native-update";
+import updateConfig from "./update.json";
+import App from "./App";
+
+const pushyClient = new Pushy({
+  appKey: updateConfig[Platform.OS].appKey,
+  checkStrategy: "both",
+  updateStrategy: "silentAndLater",
+});
+
+export default function Root() {
+  return (
+    <UpdateProvider client={pushyClient}>
+      <App />
+    </UpdateProvider>
+  );
+}
+```
+
+### 构建与发布
+
+1. 重新打包 RN XCFramework，并确认宿主 App 使用的是新的 XCFramework。
+2. 构建最终宿主 IPA。
+3. 确认最终 IPA 内包含 `Payload/*.app/main.jsbundle` 和 `pushy_build_time.txt`。
+4. 使用 `pushy uploadIpa` 上传最终宿主 IPA 作为热更新基线。
+5. 后续发布 JS 热更时，确保选择的原生版本和最终宿主 App 的 `CFBundleShortVersionString` / 构建时间匹配。
+
+:::info
+Pushy 热更新只能更新 JS bundle 和 JS assets。新增 native module、修改 Swift / Objective-C、修改 Info.plist、修改 framework 等原生变更，仍然需要重新发布 XCFramework 和宿主 App。
+:::
+</Steps>
+
+## Android AAR 接入
+
+<Steps>
+### 安装依赖
+
+在 React Native 工程根目录安装：
+
+```bash
+npm i react-native-update
+npm i -g react-native-update-cli
+```
+
+如果你的 brownfield AAR 依赖不会自动包含 RN native modules，需要确认 `react-native-update` 已经被打进 AAR。
+
+常见做法是在 AAR 模块中保留 autolink；如果 autolink 失效，可以手动添加：
+
+```groovy
+dependencies {
+    api project(":react-native-update")
+}
+```
+
+:::warning
+如果 `PackageList(application).packages` 已经包含 `UpdatePackage()`，不要重复手动添加。
+:::
+
+### 在 AAR 模块中注册 UpdatePackage
+
+`react-native-update` 的 JS API 依赖 Android native module。请在创建 RN package list 的位置确认 `UpdatePackage` 已注册：
+
+```kotlin
+import cn.reactnative.modules.update.UpdatePackage
+import com.facebook.react.PackageList
+
+val packages = PackageList(application).packages.apply {
+  // 如果 autolink 已经包含 UpdatePackage，请删除这一行
+  add(UpdatePackage())
+}
+```
+
+### 配置新架构 ReactHost
+
+如果你使用 RN 0.82 或更新版本，或 AAR 模块已经使用 `ReactHost` / `getDefaultReactHost` 初始化 RN，请把 `jsBundleFilePath` 指向 `UpdateContext.getBundleUrl(...)`：
+
+```kotlin
+package com.yourapp.reactnativeapp
+
+import android.app.Application
+import cn.reactnative.modules.update.UpdateContext
+import cn.reactnative.modules.update.UpdatePackage
+import com.callstack.reactnativebrownfield.OnJSBundleLoaded
+import com.callstack.reactnativebrownfield.ReactNativeBrownfield
+import com.facebook.react.PackageList
+import com.facebook.react.ReactHost
+import com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative
+import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
+
+object ReactNativeHostManager {
+  private var reactHost: ReactHost? = null
+
+  fun initialize(
+    application: Application,
+    onJSBundleLoaded: OnJSBundleLoaded? = null,
+  ) {
+    // RN >= 0.80 需要先加载 native libs
+    loadReactNative(application)
+
+    val packages = PackageList(application).packages.apply {
+      // 如果 autolink 已经包含 UpdatePackage，请删除这一行
+      add(UpdatePackage())
+    }
+
+    reactHost = getDefaultReactHost(
+      context = application.applicationContext,
+      packageList = packages,
+      jsBundleFilePath = UpdateContext.getBundleUrl(
+        application,
+        "assets://index.android.bundle",
+      ),
+    )
+
+    ReactNativeBrownfield.initialize(
+      application = application,
+      reactHost = reactHost,
+      onJSBundleLoaded = onJSBundleLoaded,
+    )
+  }
+
+  fun getReactHost(): ReactHost? = reactHost
+}
+```
+
+`assets://index.android.bundle` 是没有热更包时的内置 bundle 回退路径。请确认它和 AAR 中实际打包进去的 bundle 名一致。
+
+### 让宿主 Application 暴露 ReactHost
+
+在新架构下，Pushy 需要在 `switchVersion()` 或 `restartApp()` 时找到当前的 `ReactHost`，这样才能在下载完成后重载 RN runtime。
+
+如果宿主 `Activity` 不是 `ReactActivity`，且宿主 `Application` 也不是 `ReactApplication`，请在宿主 `Application` 中增加一个 public `getReactHost()` 方法：
+
+```kotlin
+import android.app.Application
+import com.facebook.react.ReactHost
+import com.yourapp.reactnativeapp.ReactNativeHostManager
+
+class MainApplication : Application() {
+  override fun onCreate() {
+    super.onCreate()
+    ReactNativeHostManager.initialize(this)
+  }
+
+  fun getReactHost(): ReactHost? {
+    return ReactNativeHostManager.getReactHost()
+  }
+}
+```
+
+Pushy 会通过反射调用 `application.getReactHost()`。这个方法不要求宿主 `Application` 继承 `ReactApplication`。
+
+:::warning
+只配置 `jsBundleFilePath` 可以保证冷启动加载正确 bundle；但如果不暴露 `getReactHost()`，`switchVersion()` / `restartApp()` 可能无法在新架构 brownfield 项目中可靠地立即重载 RN runtime。
+:::
+
+### 旧架构或自建 ReactInstanceManager
+
+如果你的 brownfield 项目仍然手动创建 `ReactInstanceManager`，则使用旧式接入：
+
+```kotlin
+import cn.reactnative.modules.update.UpdateContext
+
+val reactInstanceManager = ReactInstanceManager.builder()
+  // ...各种 setter
+  // 注意不要再调用 setBundleAssetName("index.android.bundle")
+  .setJSBundleFile(
+    UpdateContext.getBundleUrl(
+      application,
+      "assets://index.android.bundle",
+    )
+  )
+  .build()
+
+UpdateContext.setCustomInstanceManager(reactInstanceManager)
+```
+
+新架构项目优先使用上面的 `ReactHost` 方案，不要把 `ReactInstanceManager` 当作主接入点。
+
+### 接入 JS 根组件
+
+JS 侧和普通 React Native 项目一致，用 `UpdateProvider` 包裹根组件：
+
+```tsx
+import { Platform } from "react-native";
+import { Pushy, UpdateProvider } from "react-native-update";
+import updateConfig from "./update.json";
+import App from "./App";
+
+const pushyClient = new Pushy({
+  appKey: updateConfig[Platform.OS].appKey,
+  checkStrategy: "both",
+  updateStrategy: "silentAndLater",
+});
+
+export default function Root() {
+  return (
+    <UpdateProvider client={pushyClient}>
+      <App />
+    </UpdateProvider>
+  );
+}
+```
+
+### 构建与发布
+
+1. 重新打包 RN AAR，并确认宿主 App 使用的是新的 AAR。
+2. 构建最终宿主 APK / AAB。
+3. 使用 `pushy uploadApk` 或 `pushy uploadAab` 上传最终宿主包作为热更新基线。
+4. 后续发布 JS 热更时，确保选择的原生版本和最终宿主 App 的 `versionName` / 构建时间匹配。
+
+:::info
+Pushy 热更新只能更新 JS bundle 和 JS assets。新增 native module、修改 Kotlin / Java、修改 Manifest、修改 so 等原生变更，仍然需要重新发布 AAR 和宿主 App。
+:::
+</Steps>
