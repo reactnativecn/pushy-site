@@ -13,6 +13,7 @@
 如果你正在使用支持 Skills 的 AI 编程工具，建议先完成 [安装与使用 Skill](/docs/skills.md)，再让 AI 根据当前工程自动执行依赖安装、原生配置检查与接入改造。本页保留手动步骤，适合定制工程、混编项目或作为 AI 产出校对清单。
 :::
 
+
 ### 安装
 在你的项目根目录下运行以下命令（如果你使用 yarn 等其他包管理器，请自行替换命令）：
 
@@ -74,14 +75,18 @@ link 的功能可能不能正常工作。此时即便 RN 版本 >= 0.60，你可
 link 操作。
 :::
 #### iOS
+
 RN < 0.60且使用CocoaPods（推荐）
+
 1. 在 ios/Podfile 中添加
 ```
 pod 'react-native-update', path: '../node_modules/react-native-update'
 ```
 2. 在项目的 ios 目录下运行`pod install`
 3. 重新编译
+
 RN < 0.60且不使用CocoaPods
+
 1. 在 XCode 中的 Project Navigator 里,右键点击`Libraries` ➜ `Add Files to [你的工程名]`
 2. 进入`node_modules` ➜ `react-native-update` ➜ `ios 并选中`RCTPushy.xcodeproj\`
 3. 在 XCode 中的 project navigator 里,选中你的工程,在 `Build Phases` ➜ `Link Binary With Libraries` 中添加 `libRCTPushy.a`、`libz.tbd`、`libbz2.1.0.tbd`
@@ -94,8 +99,11 @@ DEST="../node_modules/react-native-update/ios/"
 date +%s > "$DEST/pushy_build_time.txt"
 ```
 7. 尝试编译一下，顺利的话就会在`../node_modules/react-native-update/ios/`文件夹下面生成一个`pushy_build_time.txt`文件。然后在`Copy Bundle Resources`里把生成的`pushy_build_time.txt`文件添加进去。
+
 #### Android
+
 RN < 0.60 或其他不能自动 link 的情况
+
 1. 在`android/settings.gradle`中添加如下代码:
 
    ```
@@ -112,6 +120,7 @@ RN < 0.60 或其他不能自动 link 的情况
 3. 打开`android/app/src/main/java/[...]/MainApplication.java`,
 - 在文件开头增加 `import cn.reactnative.modules.update.UpdatePackage;`
 - 在`getPackages()` 方法中增加 `new UpdatePackage()`(注意上一行可能要增加一个逗号)
+
 ### 配置 Bundle URL
 如果你使用 `expo` 48 或更高版本，且 `react-native-update` >= 10.28.2，则可以自动配置 bundle url，请直接去往[下一个步骤](#添加测试用的-deep-link)。
 如果你没有使用 `expo`，或 `expo` 版本低于 48，则需要按以下步骤手动配置。
