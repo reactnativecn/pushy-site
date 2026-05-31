@@ -61,6 +61,33 @@ const FeatureItem = ({ children }: { children: ReactNode }) => (
   </li>
 );
 
+function formatDiscount(value: number) {
+  return Number.isInteger(value) ? String(value) : value.toFixed(1);
+}
+
+function AnnualDiscount({
+  annualPrice,
+  monthlyPrice,
+}: {
+  annualPrice: number;
+  monthlyPrice: number;
+}) {
+  const monthlyTotal = monthlyPrice * 12;
+  const savings = monthlyTotal - annualPrice;
+  const discount = (annualPrice / monthlyTotal) * 10;
+
+  return (
+    <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+      <div className="font-extrabold">
+        年付约 {formatDiscount(discount)} 折优惠
+      </div>
+      <div className="mt-0.5 text-xs font-medium text-amber-700">
+        按月 ¥{monthlyPrice} / 月，年付节省 ¥{savings}
+      </div>
+    </div>
+  );
+}
+
 function Pricing() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
@@ -82,7 +109,7 @@ function Pricing() {
             </Tooltip>
             的<strong className="text-slate-900 mx-1">专业版</strong>试用评估。
             <br />
-            到期后转为免费版。如需按月购买或寻求大客户方案，请联系 QQ 客服 34731408。
+            到期后转为免费版。年付较按月购买享约 6.7 折优惠；如需大客户方案，请联系 QQ 客服 34731408。
           </p>
         </div>
 
@@ -98,7 +125,7 @@ function Pricing() {
               <p className="text-sm text-slate-500 h-10">适用于小型应用或个人项目，满足轻度热更新需求</p>
             </div>
             
-            <div className="mb-8 border-b border-slate-100 pb-8 h-28 flex flex-col justify-end">
+            <div className="mb-8 border-b border-slate-100 pb-8 min-h-40 flex flex-col justify-end">
               <div className="flex items-baseline text-slate-900">
                 <span className="text-3xl font-bold">¥</span>
                 <span className="text-5xl font-extrabold tracking-tight">0</span>
@@ -132,13 +159,13 @@ function Pricing() {
               <p className="text-sm text-slate-500 h-10">适用于一般应用，满足中度应用迭代与热更频率</p>
             </div>
             
-            <div className="mb-8 border-b border-slate-100 pb-8 h-28 flex flex-col justify-end">
+            <div className="mb-8 border-b border-slate-100 pb-8 min-h-40 flex flex-col justify-end">
               <div className="flex items-baseline text-slate-900">
                 <span className="text-3xl font-bold">¥</span>
                 <span className="text-5xl font-extrabold tracking-tight">800</span>
                 <span className="text-slate-500 ml-2 font-medium">/ 年</span>
               </div>
-              <div className="text-sm text-slate-400 mt-2">或 ¥100 / 月</div>
+              <AnnualDiscount annualPrice={800} monthlyPrice={100} />
             </div>
 
             <ul className="flex-1 space-y-3 mb-8">
@@ -176,13 +203,13 @@ function Pricing() {
               <p className="text-sm text-slate-500 h-10">适用于中大型商业应用，快速可靠的线上问题修复</p>
             </div>
             
-            <div className="mb-8 border-b border-slate-100 pb-8 h-28 flex flex-col justify-end">
+            <div className="mb-8 border-b border-slate-100 pb-8 min-h-40 flex flex-col justify-end">
               <div className="flex items-baseline text-indigo-600">
                 <span className="text-3xl font-bold">¥</span>
                 <span className="text-5xl font-extrabold tracking-tight">2400</span>
                 <span className="text-slate-500 ml-2 font-medium">/ 年</span>
               </div>
-              <div className="text-sm text-slate-400 mt-2">或 ¥300 / 月</div>
+              <AnnualDiscount annualPrice={2400} monthlyPrice={300} />
             </div>
 
             <ul className="flex-1 space-y-3 mb-8">
@@ -214,13 +241,13 @@ function Pricing() {
               <p className="text-sm text-slate-500 h-10">适用于企业级多业务线舰队应用，极高的资源上限</p>
             </div>
             
-            <div className="mb-8 border-b border-slate-100 pb-8 h-28 flex flex-col justify-end">
+            <div className="mb-8 border-b border-slate-100 pb-8 min-h-40 flex flex-col justify-end">
               <div className="flex items-baseline text-slate-900">
                 <span className="text-3xl font-bold">¥</span>
                 <span className="text-5xl font-extrabold tracking-tight">7200</span>
                 <span className="text-slate-500 ml-2 font-medium">/ 年</span>
               </div>
-              <div className="text-sm text-slate-400 mt-2">或 ¥900 / 月</div>
+              <AnnualDiscount annualPrice={7200} monthlyPrice={900} />
             </div>
 
             <ul className="flex-1 space-y-3 mb-8">
