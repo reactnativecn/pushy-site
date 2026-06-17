@@ -162,10 +162,10 @@ function Pricing() {
             <div className="mb-8 border-b border-slate-100 pb-8 min-h-40 flex flex-col justify-end">
               <div className="flex items-baseline text-slate-900">
                 <span className="text-3xl font-bold">¥</span>
-                <span className="text-5xl font-extrabold tracking-tight">800</span>
+                <span className="text-5xl font-extrabold tracking-tight">960</span>
                 <span className="text-slate-500 ml-2 font-medium">/ 年</span>
               </div>
-              <AnnualDiscount annualPrice={800} monthlyPrice={100} />
+              <AnnualDiscount annualPrice={960} monthlyPrice={120} />
             </div>
 
             <ul className="flex-1 space-y-3 mb-8">
@@ -269,6 +269,26 @@ function Pricing() {
             </a>
           </div>
 
+        </div>
+
+        <div className="mt-10 rounded-2xl border border-blue-200/80 bg-white p-6 shadow-sm">
+          <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+            <div>
+              <div className="text-sm font-bold text-blue-600">额外更新查询额度</div>
+              <h3 className="mt-1 text-2xl font-extrabold text-slate-900">按需加购，自动转为定制版</h3>
+              <p className="mt-2 max-w-3xl text-slate-600 leading-relaxed">
+                付费用户可单独购买更新查询额度。每购买 1 份，账户每天增加 10 万次更新查询额度；购买后自动转为定制版，并可在控制台自行续费。
+              </p>
+            </div>
+            <div className="shrink-0 rounded-xl bg-blue-50 px-6 py-4 text-center">
+              <div className="text-sm font-medium text-blue-700">每 10 万次 / 日</div>
+              <div className="mt-1 text-blue-700">
+                <span className="text-3xl font-bold">¥</span>
+                <span className="text-5xl font-extrabold tracking-tight">100</span>
+                <span className="ml-1 font-medium text-slate-500">/ 月</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Footer Notes */}
