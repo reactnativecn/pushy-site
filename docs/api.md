@@ -70,6 +70,13 @@ interface PushyOptions {
   // 在原生包过期时执行，返回 false 则取消内置策略进一步执行，可以配合自定义的 metaInfo 做一些条件控制
   // 此选项需 v10.28.2+ 版本
   onPackageExpired?: (info: UpdateInfo) => Promise<boolean>;
+
+  // 在 switchVersion 或 restartApp 触发立即重启前执行，返回 false 则取消本次重启
+  // 可用于等待 Sentry 等原生 SDK 停止采样、flush 上报队列后再销毁 RN 实例
+  // 此选项需 v10.42.2+ 版本
+  beforeReload?: (
+    context: BeforeReloadContext,
+  ) => Promise<boolean | void> | boolean | void;
 }
 
 // 检查更新结束后的状态
@@ -80,6 +87,14 @@ type UpdateCheckState = {
   result?: UpdateInfo;
   // status 为 error 时的错误对象
   error?: Error;
+};
+
+// beforeReload 接收到的重启上下文
+type BeforeReloadContext = {
+  // switchVersion: 立即应用已下载热更；restartApp: 直接重启当前应用
+  type: "switchVersion" | "restartApp";
+  // type 为 switchVersion 时，表示即将应用的热更 hash
+  hash?: string;
 };
 
 // 日志事件类型
@@ -133,6 +148,35 @@ interface EventData {
 }
 ```
 
+#### beforeReload 示例：重启前清理原生 SDK
+
+`beforeReload` 会在 `switchVersion()` 和 `restartApp()` 真正重启前执行。返回 `false` 会取消本次重启；抛出异常或 Promise reject 时也不会继续重启。`switchVersionLater()` 不会立即销毁当前 RN 实例，因此不会触发此钩子。
+
+如果应用接入了 Sentry profiling、性能采样、日志上传等可能跨线程工作的原生 SDK，可以在这里先停止采样并 flush 队列，再让 Pushy 重启：
+
+```ts
+import { NativeModules } from "react-native";
+import * as Sentry from "@sentry/react-native";
+import { Pushy } from "react-native-update";
+
+const pushyClient = new Pushy({
+  appKey,
+  beforeReload: async (_context) => {
+    try {
+      NativeModules.RNSentry?.stopProfiling?.();
+    } catch {}
+
+    const flushed = await Promise.race([
+      Sentry.flush(),
+      new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 1500)),
+    ]);
+
+    // 返回 false 会取消本次立即重启，等待下一次检查或手动触发。
+    return flushed;
+  },
+});
+```
+
 #### useUpdate()
 
 热更相关的工具函数。此方法也可使用别名 `usePushy` 引入。
@@ -171,9 +215,9 @@ interface UpdateContext {
   // 我们也仍然推荐优先从`useUpdate()`中获取`updateInfo`
   checkUpdate: () => Promise<void | UpdateInfo>;
   // 下载热更完成后调用，立即重启切换新版本
-  switchVersion: () => void;
+  switchVersion: () => Promise<void>;
   // 下载热更完成后调用，用户手动重启app后切换新版本（静默更新）
-  switchVersionLater: () => void;
+  switchVersionLater: () => Promise<void>;
   // 热更完成重启后，手动标记热更完成
   markSuccess: () => void;
   // 清除最后的报错状态
@@ -202,6 +246,8 @@ interface UpdateContext {
   packageVersion: string;
   // 当前的pushy热更服务实例
   client?: Pushy;
+  // 立即重启应用，需 v10.28.2+ 版本
+  restartApp: () => Promise<void>;
   // 下载开始后的进度数据
   progress?: {
     hash: string;
@@ -349,6 +395,8 @@ console.log(currentVersionInfo.name);
 
 立即重启应用。v10.28.2+ 版本可用。
 
+如果配置了 `beforeReload`，会等待它完成后再重启；当 `beforeReload` 返回 `false`、抛出异常或 Promise reject 时，会取消本次重启。
+
 ***
 
 #### function switchVersion()
@@ -357,6 +405,8 @@ console.log(currentVersionInfo.name);
 
 > 注意!不可依赖`progress`来判断下载完成，必须要在`await downloadUpdate()`之后再调用此方法。
 
+如果配置了 `beforeReload`，会传入 `{ type: "switchVersion", hash }` 并等待它完成后再重启；当 `beforeReload` 返回 `false`、抛出异常或 Promise reject 时，会取消本次重启。
+
 ***
 
 #### function switchVersionLater()
@@ -364,6 +414,8 @@ console.log(currentVersionInfo.name);
 在下一次启动应用的时候加载已经下载完毕的版本。
 
 > 注意!不可依赖`progress`来判断下载完成，必须要在`await downloadUpdate()`之后再调用此方法。
+
+此方法不会立即销毁当前 RN 实例，因此不会触发 `beforeReload`。
 
 ***
 

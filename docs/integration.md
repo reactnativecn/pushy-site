@@ -93,6 +93,10 @@ const pushyClient = new Pushy({
 
 检查策略和更新策略是一个完整更新流水线的上下游，两者可以独立开关，自由搭配，以便不同程度的介入检查频率的控制，或是下载相关的界面交互。
 
+:::tip
+如果应用接入了 Sentry profiling、性能采样或类似会在原生线程中持续工作的 SDK，并且使用 `"silentAndNow"`、手动调用 `switchVersion()` 或 `restartApp()` 这类立即重启路径，建议升级 `react-native-update` 到 v10.42.2+，并配置 [`beforeReload`](/docs/api.md) 在重启前完成停止采样和 flush。
+:::
+
 下面的章节提供了一个自定义更新策略和界面交互的参考实现。
 
 ### 自定义更新界面

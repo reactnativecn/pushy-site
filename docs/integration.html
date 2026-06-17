@@ -3,12 +3,12 @@
   <head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>代码集成 - Pushy 极速热更新</title>
-<link href="/static/css/styles.5daa4bd98d.css" rel="stylesheet">
+<link href="/static/css/styles.280e474f25.css" rel="stylesheet">
 <script defer src="/static/js/styles.5b6caff22b.js"></script>
 <script defer src="/static/js/lib-react.5ec3a18515.js"></script>
-<script defer src="/static/js/lib-router.85a40025c0.js"></script>
-<script defer src="/static/js/4135.02655e6629.js"></script>
-<script defer src="/static/js/index.3dbdcefb31.js"></script>
+<script defer src="/static/js/lib-router.1d6fb73c53.js"></script>
+<script defer src="/static/js/4135.92164ad6d3.js"></script>
+<script defer src="/static/js/index.2d44001527.js"></script>
 <script src="/register-pwa.js" defer></script>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="generator" content="Rspress v2.0.14">
@@ -89,6 +89,8 @@
 <span class="line"><span style="color:var(--shiki-foreground)">  updateStrategy</span><span style="color:var(--shiki-token-keyword)">:</span><span style="color:var(--shiki-token-string-expression)"> &quot;silentAndLater&quot;</span><span style="color:var(--shiki-token-punctuation)">,</span><span style="color:var(--shiki-token-comment)"> // 静默下载，下次启动时更新</span></span>
 <span class="line"><span style="color:var(--shiki-foreground)">});</span></span></code></pre></div><div class="rp-code-button-group"><button class="rp-code-button-group__button rp-code-wrap-button" title="Toggle code wrap" aria-label="Toggle code wrap"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" class="rp-code-button-group__icon rp-code-button-group__icon--wrapped"><path fill="currentColor" d="M21 5H3v2h18zM3 19h7v-2H3zm0-6h15c1 0 2 .43 2 2s-1 2-2 2h-2v-2l-4 3 4 3v-2h2c2.95 0 4-1.27 4-4 0-2.72-1-4-4-4H3z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" class="rp-code-button-group__icon rp-code-button-group__icon--wrap"><path fill="currentColor" d="M16 7H3V5h13zM3 19h13v-2H3zm19-7-4-3v2H3v2h15v2z"></path></svg></button><button class="rp-code-button-group__button rp-code-copy-button" title="Copy code"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" class="rp-code-button-group__icon rp-code-copy-button__icon rp-code-copy-button__icon--copy"><path fill="currentColor" d="M20 8v12H8V8zm0-2H8a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2"></path><path fill="currentColor" d="M4 16H2V4a2 2 0 0 1 2-2h12v2H4Z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" class="rp-code-button-group__icon rp-code-copy-button__icon rp-code-copy-button__icon--success"><path fill="currentColor" d="m9.55 18-5.7-5.7 1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"></path></svg></button></div></div></div>
 <p>检查策略和更新策略是一个完整更新流水线的上下游，两者可以独立开关，自由搭配，以便不同程度的介入检查频率的控制，或是下载相关的界面交互。</p>
+<div class="rp-callout rp-callout--tip"><div class="rp-callout__title">Tip</div><div class="rp-callout__content"><p>
+如果应用接入了 Sentry profiling、性能采样或类似会在原生线程中持续工作的 SDK，并且使用 <code>&quot;silentAndNow&quot;</code>、手动调用 <code>switchVersion()</code> 或 <code>restartApp()</code> 这类立即重启路径，建议升级 <code>react-native-update</code> 到 v10.42.2+，并配置 <a href="/docs/api.html" class="rp-link"><code>beforeReload</code></a> 在重启前完成停止采样和 flush。</p></div></div>
 <p>下面的章节提供了一个自定义更新策略和界面交互的参考实现。</p>
 <h3 class="rp-toc-include" id="自定义更新界面"><a href="#自定义更新界面" class="rp-header-anchor rp-link" aria-hidden="true">#</a>自定义更新界面</h3>
 <p>默认配置下，pushy 会以系统 alert 的形式来弹出更新提示，如需自定义更新界面，首先请关闭默认的 updateStrategy 更新策略，并打开 debug 选项以便调试：</p>
