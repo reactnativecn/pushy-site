@@ -27,7 +27,7 @@ const HotUpdateText = () => (
   </Tooltip>
 );
 const CheckLimitText = ({ children }: { children: ReactNode }) => (
-  <div className="py-2 mt-4 border-t border-slate-200/50">
+  <div className="py-2 !mt-auto border-t border-slate-200/50">
     <p className="text-slate-500 text-sm mb-1">所有应用累加</p>
     <div className="flex items-center gap-1 font-medium text-slate-700">
       每天
@@ -51,6 +51,7 @@ const CheckLimitText = ({ children }: { children: ReactNode }) => (
       </Tooltip>
       更新查询
     </div>
+    <p className="mt-1 text-sm text-slate-500 font-medium">可按需提升</p>
   </div>
 );
 
@@ -133,7 +134,7 @@ function Pricing() {
               </div>
             </div>
 
-            <ul className="flex-1 space-y-3 mb-8">
+            <ul className="flex-1 flex flex-col gap-3 mb-8">
               <FeatureItem>可创建 3 个 <AppText /></FeatureItem>
               <FeatureItem>每应用 30 个 <PackageText /> (最大 30M/个)</FeatureItem>
               <FeatureItem>每应用 30 个 <HotUpdateText /> (最大 3M/个)</FeatureItem>
@@ -168,7 +169,7 @@ function Pricing() {
               <AnnualDiscount annualPrice={960} monthlyPrice={120} />
             </div>
 
-            <ul className="flex-1 space-y-3 mb-8">
+            <ul className="flex-1 flex flex-col gap-3 mb-8">
               <FeatureItem>可创建 5 个 <AppText /></FeatureItem>
               <FeatureItem>每应用 50 个 <PackageText /> (最大 150M/个)</FeatureItem>
               <FeatureItem>每应用 50 个 <HotUpdateText /> (最大 15M/个)</FeatureItem>
@@ -212,7 +213,7 @@ function Pricing() {
               <AnnualDiscount annualPrice={2400} monthlyPrice={300} />
             </div>
 
-            <ul className="flex-1 space-y-3 mb-8">
+            <ul className="flex-1 flex flex-col gap-3 mb-8">
               <FeatureItem>可创建 10 个 <AppText /></FeatureItem>
               <FeatureItem>每应用 60 个 <PackageText /> (最大 500M/个)</FeatureItem>
               <FeatureItem>每应用 60 个 <HotUpdateText /> (最大 50M/个)</FeatureItem>
@@ -250,7 +251,7 @@ function Pricing() {
               <AnnualDiscount annualPrice={7200} monthlyPrice={900} />
             </div>
 
-            <ul className="flex-1 space-y-3 mb-8">
+            <ul className="flex-1 flex flex-col gap-3 mb-8">
               <FeatureItem>可创建 50 个 <AppText /></FeatureItem>
               <FeatureItem>每应用 100 个 <PackageText /> (最大 2000M/个)</FeatureItem>
               <FeatureItem>每应用 100 个 <HotUpdateText /> (最大 200M/个)</FeatureItem>
