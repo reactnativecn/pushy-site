@@ -17,6 +17,9 @@
 
 每天1 千次更新查询
 
+可按需提升
+
+
 [开始使用](docs/getting-started)
 
 ### 标准版
@@ -37,6 +40,9 @@
 所有应用累加
 
 每天1 万次更新查询
+
+可按需提升
+
 
 [立即升级](https://pushy-admin.reactnative.cn/#/user)
 
@@ -61,6 +67,9 @@
 
 每天10 万次更新查询
 
+可按需提升
+
+
 [立刻抢购](https://pushy-admin.reactnative.cn/#/user)
 
 ### 专业版
@@ -81,6 +90,9 @@
 所有应用累加
 
 每天100 万次更新查询
+
+可按需提升
+
 
 [联系办理](https://pushy-admin.reactnative.cn/#/user)
 
