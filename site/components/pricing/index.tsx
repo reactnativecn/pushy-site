@@ -276,9 +276,9 @@ function Pricing() {
           <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
             <div>
               <div className="text-sm font-bold text-blue-600">额外更新查询额度</div>
-              <h3 className="mt-1 text-2xl font-extrabold text-slate-900">按需加购，自动转为定制版</h3>
+              <h3 className="mt-1 text-2xl font-extrabold text-slate-900">高级版起按需加购，自动转为定制版</h3>
               <p className="mt-2 max-w-3xl text-slate-600 leading-relaxed">
-                付费用户可单独购买更新查询额度。每购买 1 份，账户每天增加 10 万次更新查询额度；购买后自动转为定制版，并可在控制台自行续费。
+                高级版及以上用户可单独购买更新查询额度。每购买 1 份，账户每天增加 10 万次更新查询额度；购买后自动转为定制版，并可在控制台自行续费。
               </p>
             </div>
             <div className="shrink-0 rounded-xl bg-blue-50 px-6 py-4 text-center">
