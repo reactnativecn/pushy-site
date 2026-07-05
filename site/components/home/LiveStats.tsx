@@ -334,11 +334,13 @@ function LiveStats() {
 	].filter((stat) => stat.value > 0);
 
 	return (
-		<section className="relative overflow-hidden">
+		// Pulled up over the hero's lower edge so the card visibly floats
+		// across the section boundary instead of butting against it.
+		<section className="relative z-10 -mt-12 sm:-mt-16">
 			<div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
 				{/* Mounts after data arrives (after the reveal observer ran), so it
 				    animates itself in instead of using data-reveal. */}
-				<div className="pushy-fade-in relative rounded-3xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-sm px-8 py-10 sm:px-12 -mt-2 mb-4 overflow-hidden">
+				<div className="pushy-fade-in relative rounded-3xl border border-white/[0.08] bg-[#070d1b]/80 backdrop-blur-md px-8 py-10 sm:px-12 mb-4 overflow-hidden">
 					<div
 						className="absolute -top-32 left-1/4 w-96 h-64 rounded-full bg-blue-500/[0.08] blur-3xl pointer-events-none"
 						aria-hidden="true"

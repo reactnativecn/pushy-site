@@ -64,9 +64,10 @@ function Banner(_props: BannerProps) {
 			</div>
 			<div className="pushy-grid-layer" aria-hidden="true" />
 			<div className="pushy-noise-layer" aria-hidden="true" />
-			{/* Horizon line */}
+			{/* Fade the aurora/grid into the page background so the section
+			    boundary doesn't read as a hard seam. */}
 			<div
-				className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-400/30 to-transparent"
+				className="absolute bottom-0 inset-x-0 h-56 bg-gradient-to-b from-transparent to-[#04070f]"
 				aria-hidden="true"
 			/>
 
