@@ -57,6 +57,21 @@ body:has(.home-wrapper) {
   transform: none;
 }
 
+.pushy-fade-in {
+  animation: pushy-fade-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes pushy-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* ---------- Shared texture layers ---------- */
 
 .pushy-grid-layer {
@@ -452,6 +467,7 @@ body:has(.home-wrapper) {
     transition: none;
   }
 
+  .pushy-fade-in,
   .pushy-aurora::before,
   .pushy-aurora::after,
   .pushy-aurora__cyan,

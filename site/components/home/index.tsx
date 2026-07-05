@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import Banner from "./Banner";
+import LiveStats from "./LiveStats";
 import Page1 from "./Page1";
 import Page2 from "./Page2";
 import Showcase from "./Showcase";
@@ -52,6 +53,7 @@ function Home(props: HomeProps) {
 	return (
 		<div className="home-wrapper">
 			<Banner {...props} />
+			<LiveStats />
 			<Showcase />
 			<Page1 />
 			<Page2 />
