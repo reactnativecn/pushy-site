@@ -2628,13 +2628,13 @@ url: /index.md
 # 让每一次发布
 秒级抵达用户
 
-Pushy 是为 React Native 打造的热更新服务。KB 级增量包、全网 CDN 分发、崩溃自动回滚——修复与新功能即刻上线，无需等待应用商店审核。
+Pushy 是为 React Native 打造的热更新服务。KB 级增量包、全球 CDN 分发、崩溃自动回滚——修复与新功能即刻上线，无需等待应用商店审核。
 
 [AI 自动接入](/docs/skills)[5 分钟手动接入](/docs/getting-started)
 
 [Star](https://github.com/reactnativecn/react-native-update/)[](https://github.com/reactnativecn/react-native-update/stargazers/)
 
-增量更新包KB 级增量更新包CDN 全网分发秒级CDN 全网分发崩溃回滚保护自动崩溃回滚保护
+增量更新包KB 级增量更新包CDN 全球分发秒级CDN 全球分发崩溃回滚保护自动崩溃回滚保护
 
 ![](/static/svg/logo.8f6d66882a.svg)
 
@@ -2650,7 +2650,7 @@ pushy bundle --platform ios
 - 计算增量差异
 
 新一代 diff 算法 · 仅 42 KB
-- 推送全网 CDN
+- 推送全球 CDN
 
 全球节点同步完成
 - 用户设备自主更新
@@ -2727,7 +2727,7 @@ Pushy 增量包42 KB
 
 ### 极速下载
 
-阿里云高速 CDN 全网分发，全国各地客户端秒级拉取，弱网环境也稳定可达。
+高速 CDN 覆盖全球节点，海内外客户端就近秒级拉取，弱网环境也稳定可达。
 
 ### 快捷发布
 
