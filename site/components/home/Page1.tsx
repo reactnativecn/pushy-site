@@ -1,4 +1,8 @@
-import type { CSSProperties, ReactNode } from "react";
+import type {
+	CSSProperties,
+	MouseEvent as ReactMouseEvent,
+	ReactNode,
+} from "react";
 
 interface FeatureIconProps {
 	children: ReactNode;
@@ -27,14 +31,30 @@ function FeatureIcon({ children, tint }: FeatureIconProps) {
 }
 
 const cardBase =
-	"group relative rounded-3xl border border-white/[0.07] bg-white/[0.025] backdrop-blur-sm p-8 overflow-hidden transition-all duration-300 hover:border-white/[0.16] hover:bg-white/[0.045] hover:-translate-y-1";
+	"pushy-spot group relative rounded-3xl border border-white/[0.07] bg-white/[0.025] backdrop-blur-sm p-8 overflow-hidden transition-all duration-300 hover:border-white/[0.16] hover:bg-white/[0.045] hover:-translate-y-1";
 
 const cardGlow = (
-	<div
-		className="absolute -top-24 -right-24 w-56 h-56 rounded-full bg-blue-500/[0.07] blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-		aria-hidden="true"
-	/>
+	<>
+		<div
+			className="absolute -top-24 -right-24 w-56 h-56 rounded-full bg-blue-500/[0.07] blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+			aria-hidden="true"
+		/>
+		<div className="pushy-spotlight" aria-hidden="true" />
+	</>
 );
+
+/** Track the cursor inside the hovered card for the spotlight gradient. */
+function trackSpotlight(event: ReactMouseEvent<HTMLDivElement>) {
+	const card = (event.target as HTMLElement).closest<HTMLElement>(
+		".pushy-spot",
+	);
+	if (!card) {
+		return;
+	}
+	const rect = card.getBoundingClientRect();
+	card.style.setProperty("--spot-x", `${event.clientX - rect.left}px`);
+	card.style.setProperty("--spot-y", `${event.clientY - rect.top}px`);
+}
 
 function Page1() {
 	return (
@@ -73,7 +93,7 @@ function Page1() {
 					</p>
 				</div>
 
-				<div className="grid gap-5 lg:grid-cols-3">
+				<div className="grid gap-5 lg:grid-cols-3" onMouseMove={trackSpotlight}>
 					{/* 1 — 增量更新（大卡，含差量对比可视化） */}
 					<div data-reveal className={`${cardBase} lg:col-span-2`}>
 						{cardGlow}

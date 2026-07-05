@@ -364,6 +364,53 @@ body:has(.home-wrapper) {
   }
 }
 
+/* ---------- Card spotlight (cursor-following glow) ---------- */
+
+.pushy-spotlight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background: radial-gradient(
+    260px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+    rgba(56, 189, 248, 0.1),
+    transparent 65%
+  );
+}
+
+.pushy-spot:hover .pushy-spotlight {
+  opacity: 1;
+}
+
+/* ---------- Odometer (rolling digits) ---------- */
+
+.pushy-odometer {
+  display: inline-flex;
+  overflow: hidden;
+  height: 1em;
+  line-height: 1;
+  vertical-align: bottom;
+}
+
+.pushy-odometer__sep,
+.pushy-odometer__digit {
+  display: block;
+  height: 1em;
+}
+
+.pushy-odometer__reel {
+  display: block;
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+
+  span {
+    display: block;
+    height: 1em;
+    line-height: 1;
+  }
+}
+
 /* ---------- Logo marquee ---------- */
 
 .pushy-marquee {
@@ -490,5 +537,10 @@ body:has(.home-wrapper) {
 
   .pushy-progress::after {
     transform: scaleX(1);
+  }
+
+  .pushy-odometer__reel,
+  .pushy-spotlight {
+    transition: none !important;
   }
 }

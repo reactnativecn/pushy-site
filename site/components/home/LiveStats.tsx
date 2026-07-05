@@ -14,7 +14,12 @@ const POLL_INTERVAL_MS = 60_000;
 
 interface Summary {
 	updatedAt: string;
-	today: { checks: number; os: Record<string, number> };
+	today: {
+		checks: number;
+		os: Record<string, number>;
+		/** Checks per hour since midnight; last entry = current partial hour. */
+		hourly?: number[];
+	};
 	lastHour: { checks: number; devices: number };
 	currentHour: { checks: number; devices: number };
 	totals: { apps: number; developers: number; hotUpdateVersions: number };
@@ -35,6 +40,11 @@ const MOCK_SUMMARY: Summary = {
 	today: {
 		checks: 8_412_530,
 		os: { ios: 3_182_400, android: 4_930_130, harmony: 300_000 },
+		hourly: [
+			180_000, 95_000, 60_000, 48_000, 52_000, 88_000, 210_000, 380_000,
+			520_000, 610_000, 660_000, 690_000, 705_000, 640_000, 600_000, 630_000,
+			655_000, 480_000,
+		],
 	},
 	lastHour: { checks: 421_800, devices: 262_140 },
 	currentHour: { checks: 208_000, devices: 152_000 },
@@ -138,6 +148,123 @@ function formatInt(value: number) {
 	return Math.floor(value).toLocaleString("zh-CN");
 }
 
+const DIGITS = "0123456789";
+
+/**
+ * Odometer-style number: each digit is a vertical reel of 0-9 rolled to the
+ * target via translateY. Columns are keyed from the units digit up, so low
+ * digits keep their identity (and animate) as the number grows.
+ */
+function RollingNumber({ value }: { value: number }) {
+	const text = formatInt(value);
+	const chars = Array.from(text);
+	return (
+		<span className="pushy-odometer" aria-label={text}>
+			{chars.map((char, index) => {
+				const key = chars.length - index;
+				if (char < "0" || char > "9") {
+					return (
+						<span key={`sep-${key}`} className="pushy-odometer__sep">
+							{char}
+						</span>
+					);
+				}
+				return (
+					<span key={`digit-${key}`} className="pushy-odometer__digit">
+						<span
+							className="pushy-odometer__reel"
+							style={{ transform: `translateY(-${Number(char)}em)` }}
+						>
+							{DIGITS.split("").map((digit) => (
+								<span key={digit}>{digit}</span>
+							))}
+						</span>
+					</span>
+				);
+			})}
+		</span>
+	);
+}
+
+const TREND_W = 100;
+const TREND_H = 32;
+
+/** Catmull-Rom spline through the points, as an SVG cubic-bezier path. */
+function smoothPath(points: Array<[number, number]>) {
+	let d = `M ${points[0][0]} ${points[0][1]}`;
+	for (let i = 0; i < points.length - 1; i++) {
+		const p0 = points[Math.max(0, i - 1)];
+		const p1 = points[i];
+		const p2 = points[i + 1];
+		const p3 = points[Math.min(points.length - 1, i + 2)];
+		const c1x = p1[0] + (p2[0] - p0[0]) / 6;
+		const c1y = p1[1] + (p2[1] - p0[1]) / 6;
+		const c2x = p2[0] - (p3[0] - p1[0]) / 6;
+		const c2y = p2[1] - (p3[1] - p1[1]) / 6;
+		d += ` C ${c1x} ${c1y}, ${c2x} ${c2y}, ${p2[0]} ${p2[1]}`;
+	}
+	return d;
+}
+
+function TrendLine({ hourly }: { hourly: number[] }) {
+	// Drop the current partial hour so the curve doesn't nosedive at the end.
+	const series = hourly.slice(0, -1);
+	if (series.length < 3) {
+		return null;
+	}
+	const max = Math.max(...series);
+	if (max <= 0) {
+		return null;
+	}
+
+	const points = series.map((count, index): [number, number] => [
+		(index / (series.length - 1)) * TREND_W,
+		TREND_H - 3 - (count / max) * (TREND_H - 8),
+	]);
+	const line = smoothPath(points);
+	const [endX, endY] = points[points.length - 1];
+
+	return (
+		<div className="relative mt-7 max-w-md">
+			<svg
+				viewBox={`0 0 ${TREND_W} ${TREND_H}`}
+				preserveAspectRatio="none"
+				className="block w-full h-14"
+				aria-hidden="true"
+			>
+				<defs>
+					<linearGradient id="pushy-trend-fill" x1="0" y1="0" x2="0" y2="1">
+						<stop offset="0%" stopColor="#38bdf8" stopOpacity="0.26" />
+						<stop offset="100%" stopColor="#38bdf8" stopOpacity="0" />
+					</linearGradient>
+				</defs>
+				<path
+					d={`${line} L ${TREND_W} ${TREND_H} L 0 ${TREND_H} Z`}
+					fill="url(#pushy-trend-fill)"
+				/>
+				<path
+					d={line}
+					fill="none"
+					stroke="#38bdf8"
+					strokeOpacity="0.85"
+					strokeWidth="1.5"
+					vectorEffect="non-scaling-stroke"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</svg>
+			<span
+				className="pushy-live-dot absolute w-1.5 h-1.5 rounded-full bg-sky-300 -translate-x-1/2 -translate-y-1/2"
+				style={{ left: `${endX}%`, top: `${(endY / TREND_H) * 100}%` }}
+				aria-hidden="true"
+			/>
+			<span className="mt-1.5 block text-xs text-slate-500">
+				今日每小时更新检查
+			</span>
+		</div>
+	);
+}
+
 const PLATFORM_META: Array<{ key: string; label: string; color: string }> = [
 	{ key: "android", label: "Android", color: "#34d399" },
 	{ key: "ios", label: "iOS", color: "#38bdf8" },
@@ -230,7 +357,7 @@ function LiveStats() {
 								</span>
 							</div>
 							<div className="font-mono text-4xl sm:text-5xl lg:text-[3.4rem] font-bold tracking-tight text-slate-50 tabular-nums">
-								{formatInt(tickingChecks)}
+								<RollingNumber value={tickingChecks} />
 								<span className="ml-3 text-base font-sans font-medium text-slate-500">
 									次
 								</span>
@@ -238,6 +365,9 @@ function LiveStats() {
 							<div className="mt-5 max-w-sm">
 								<PlatformBar os={summary.today.os} />
 							</div>
+							{Array.isArray(summary.today.hourly) && (
+								<TrendLine hourly={summary.today.hourly} />
+							)}
 						</div>
 
 						{/* Side stats */}

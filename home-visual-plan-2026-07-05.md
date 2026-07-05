@@ -1,0 +1,60 @@
+# 首页视觉增强计划（2026-07-05）
+
+目标：在现有暗色首页基础上，用低成本改动继续提升「实时感」与质感。
+本轮做 1–3，4–5 为备选。边做边更新状态。
+
+状态图例：⬜ 未开始 · 🔨 进行中 · ✅ 完成 · ⏸ 暂缓
+
+## 1. ✅ LiveStats 增加今日 24 小时流量曲线
+
+服务端 `computePublicMetricsSummary` 已逐小时读取当天全部 bucket，只需
+在返回中补 `today.hourly: number[]`（0 点起每小时的检查次数，长度 =
+当前小时 + 1）。前端在大数字下方渲染渐变填充的内联 SVG 面积曲线，
+尾端当前小时点加发光标记。
+
+- [x] pushy-server：`metricsSummary.ts` 返回 `today.hourly` + 测试（master `3e5c715`，4/4 测试、lint 通过）
+- [x] cresc-server：同步同样改动（main `416c225`）
+- [x] 前端 `LiveStats.tsx`：SVG 面积曲线组件（Catmull-Rom 平滑）
+- [x] 兼容：线上接口尚未部署新字段时曲线整体隐藏，不影响其余内容（真实页已验证 hasTrend=false 且无报错）
+
+## 2. ✅ Bento 卡片鼠标跟随光斑（spotlight hover）
+
+`Page1.tsx` 六张卡：mousemove 把相对坐标写入 `--spot-x/--spot-y`，
+卡片内加一层 `radial-gradient(240px at var(--spot-x) var(--spot-y), …)`
+的覆盖层，hover 淡入。触屏设备无 hover 自动无效，无需特判。
+
+- [x] Page1 卡片接入 spotlight（grid 容器上单个 onMouseMove 委托）
+- [x] home.scss 增加 `.pushy-spotlight` 样式
+
+## 3. ✅ LIVE 大数字改为数位滚轮（odometer)
+
+每个数字位是一列 0–9 的竖向数字带，通过 `translateY(-N em)` +
+transition 滚动到目标数字；列 key 从个位向高位编号，保证低位稳定。
+逗号原样渲染。`prefers-reduced-motion` 下关闭过渡。
+
+- [x] `LiveStats.tsx` 内实现 `RollingNumber` 组件替换纯文本
+- [x] home.scss 增加 odometer 样式 + reduced-motion 分支
+
+## 4. ⏸（备选）「极速下载」卡片补中国点阵地图 + CDN 节点脉冲
+
+点阵 SVG 中国轮廓 + 主要城市呼吸光点，为后续地理热力图做铺垫。
+等第 2 步地理数据方案启动时一起做。
+
+## 5. ⏸（备选）CTA 卡片背景复用弱化 aurora + hero 加「HarmonyOS 已支持」
+
+顺手项，本轮时间富余则做。
+
+## 验收
+
+- [x] `bun run build` 通过
+- [x] pushy-server / cresc-server 测试与 lint 通过（各 4/4）
+- [x] 无头浏览器截图核对 1–3 的实际效果（mock 曲线/滚轮/光斑 OK；真实页滚轮 OK、曲线待服务端部署后自动出现）
+
+## 进度日志
+
+- 2026-07-05 计划创建。
+- 2026-07-05 任务 1 服务端完成：两仓库均已提交（未推送/未部署），
+  曲线末位为当前小时的部分数据，前端绘制时截掉末位避免「跳水」观感。
+- 2026-07-05 任务 1–3 前端完成并验证：mock 页曲线 + 滚轮 + 光斑正常，
+  计数器 3 秒内 8,412,855 → 8,413,196 平滑滚动；真实页优雅降级。
+  待办：部署 pushy-server（3e5c715）/ cresc-server（416c225）后曲线自动出现。
