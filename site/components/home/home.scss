@@ -383,6 +383,30 @@ body:has(.home-wrapper) {
   opacity: 1;
 }
 
+/* ---------- CDN node pulses (ChinaDotMap) ---------- */
+
+.pushy-cdn-node {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 9999px;
+  background: #38bdf8;
+  animation: pushy-node-pulse 3s ease-in-out infinite;
+}
+
+@keyframes pushy-node-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.45);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 0 5px rgba(56, 189, 248, 0);
+  }
+}
+
 /* ---------- Odometer (rolling digits) ---------- */
 
 .pushy-odometer {
@@ -523,6 +547,7 @@ body:has(.home-wrapper) {
   .pushy-progress::after,
   .pushy-float,
   .pushy-live-dot,
+  .pushy-cdn-node,
   .pushy-marquee__track,
   .pushy-caret,
   .pushy-diff-bar,

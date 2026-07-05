@@ -3,6 +3,7 @@ import type {
 	MouseEvent as ReactMouseEvent,
 	ReactNode,
 } from "react";
+import ChinaDotMap from "./ChinaDotMap";
 
 interface FeatureIconProps {
 	children: ReactNode;
@@ -149,6 +150,7 @@ function Page1() {
 							<p className="mt-3 text-[15px] leading-relaxed text-slate-400">
 								阿里云高速 CDN 全网分发，全国各地客户端秒级拉取，弱网环境也稳定可达。
 							</p>
+							<ChinaDotMap />
 						</div>
 					</div>
 

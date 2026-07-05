@@ -74,19 +74,24 @@ function Banner(_props: BannerProps) {
 				<div className="grid lg:grid-cols-[1.05fr_0.95fr] items-center gap-16 lg:gap-10 pt-24 pb-24 lg:pt-32 lg:pb-32">
 					{/* ---- Left: copy ---- */}
 					<div className="max-w-2xl">
-						<a
-							href="/docs/skills"
-							data-reveal
-							className="group inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur px-4 py-1.5 text-sm text-slate-300 hover:border-blue-400/40 hover:text-white transition-colors duration-300 mb-10"
-						>
-							<span className="relative flex w-2 h-2">
-								<span className="pushy-live-dot absolute inline-flex h-full w-full rounded-full bg-emerald-400" />
+						<div data-reveal className="flex flex-wrap items-center gap-3 mb-10">
+							<a
+								href="/docs/skills"
+								className="group inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur px-4 py-1.5 text-sm text-slate-300 hover:border-blue-400/40 hover:text-white transition-colors duration-300"
+							>
+								<span className="relative flex w-2 h-2">
+									<span className="pushy-live-dot absolute inline-flex h-full w-full rounded-full bg-emerald-400" />
+								</span>
+								官方 Skill 已上线 · AI 一句话完成接入
+								<span className="text-blue-400 group-hover:translate-x-0.5 transition-transform duration-300">
+									→
+								</span>
+							</a>
+							<span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur px-4 py-1.5 text-sm text-slate-300">
+								<span className="w-2 h-2 rounded-full bg-violet-400" />
+								HarmonyOS 已支持
 							</span>
-							官方 Skill 已上线 · AI 一句话完成接入
-							<span className="text-blue-400 group-hover:translate-x-0.5 transition-transform duration-300">
-								→
-							</span>
-						</a>
+						</div>
 
 						<h1
 							data-reveal

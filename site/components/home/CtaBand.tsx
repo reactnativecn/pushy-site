@@ -11,6 +11,9 @@ function CtaBand() {
 						className="absolute inset-0 bg-[radial-gradient(ellipse_100%_120%_at_50%_120%,rgba(79,70,229,0.35),rgba(10,17,32,0.4)_55%,transparent)]"
 						aria-hidden="true"
 					/>
+					<div className="pushy-aurora opacity-50" aria-hidden="true">
+						<div className="pushy-aurora__cyan" />
+					</div>
 					<div className="pushy-noise-layer" aria-hidden="true" />
 					<div
 						className="absolute inset-x-16 top-0 h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent"
