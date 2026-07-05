@@ -19,11 +19,11 @@ const pipelineSteps = [
 	},
 	{
 		title: "推送全网 CDN",
-		detail: "全国节点同步完成",
+		detail: "全球节点同步完成",
 		done: true,
 	},
 	{
-		title: "用户设备静默更新",
+		title: "用户设备自主更新",
 		detail: "无需重新下载安装",
 		done: false,
 	},
@@ -248,10 +248,10 @@ function Banner(_props: BannerProps) {
 							</span>
 							<div>
 								<div className="text-sm font-bold text-slate-100">
-									新版本已静默送达
+									新版本已送达
 								</div>
 								<div className="text-xs text-slate-500 mt-0.5 font-mono">
-									v2.4.1 · 42 KB · 无感更新
+									v2.4.1 · 42 KB · 可无感更新
 								</div>
 							</div>
 							<StepCheck />
