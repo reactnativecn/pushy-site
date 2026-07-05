@@ -18,7 +18,7 @@ const pipelineSteps = [
 		done: true,
 	},
 	{
-		title: "推送全网 CDN",
+		title: "推送全球 CDN",
 		detail: "全球节点同步完成",
 		done: true,
 	},
@@ -31,7 +31,7 @@ const pipelineSteps = [
 
 const heroStats = [
 	{ value: "KB 级", label: "增量更新包" },
-	{ value: "秒级", label: "CDN 全网分发" },
+	{ value: "秒级", label: "CDN 全球分发" },
 	{ value: "自动", label: "崩溃回滚保护" },
 ];
 
@@ -110,7 +110,7 @@ function Banner(_props: BannerProps) {
 							style={{ "--reveal-delay": "160ms" } as CSSProperties}
 							className="text-lg sm:text-xl text-slate-400 leading-relaxed max-w-xl mb-11"
 						>
-							Pushy 是为 React Native 打造的热更新服务。KB 级增量包、全网 CDN
+							Pushy 是为 React Native 打造的热更新服务。KB 级增量包、全球 CDN
 							分发、崩溃自动回滚——修复与新功能即刻上线，
 							<span className="text-slate-200">无需等待应用商店审核</span>。
 						</p>

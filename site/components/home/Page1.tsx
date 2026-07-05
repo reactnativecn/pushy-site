@@ -3,7 +3,7 @@ import type {
 	MouseEvent as ReactMouseEvent,
 	ReactNode,
 } from "react";
-import ChinaDotMap from "./ChinaDotMap";
+import WorldDotMap from "./WorldDotMap";
 
 interface FeatureIconProps {
 	children: ReactNode;
@@ -148,9 +148,9 @@ function Page1() {
 							</FeatureIcon>
 							<h3 className="mt-6 text-xl font-bold text-slate-50">极速下载</h3>
 							<p className="mt-3 text-[15px] leading-relaxed text-slate-400">
-								阿里云高速 CDN 全网分发，全国各地客户端秒级拉取，弱网环境也稳定可达。
+								高速 CDN 覆盖全球节点，海内外客户端就近秒级拉取，弱网环境也稳定可达。
 							</p>
-							<ChinaDotMap />
+							<WorldDotMap />
 						</div>
 					</div>
 
