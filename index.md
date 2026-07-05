@@ -1,4 +1,4 @@
-[官方 Skill 已上线 · AI 一句话完成接入→](/docs/skills)
+[官方 Skill 已上线 · AI 一句话完成接入→](/docs/skills)HarmonyOS 已支持
 
 # 让每一次发布
 秒级抵达用户
