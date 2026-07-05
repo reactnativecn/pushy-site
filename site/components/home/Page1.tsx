@@ -99,12 +99,14 @@ function Page1() {
 					<div data-reveal className={`${cardBase} lg:col-span-2`}>
 						{cardGlow}
 						<div className="relative flex flex-col h-full">
-							<FeatureIcon tint="bg-blue-500/10 text-blue-400">
-								<rect x="4" y="2.5" width="12" height="19" rx="2.5" />
-								<path d="M10 18.5h.01" />
-								<path d="M20 8v4m2-2h-4" />
-							</FeatureIcon>
-							<h3 className="mt-6 text-xl font-bold text-slate-50">增量更新</h3>
+							<div className="flex items-center gap-4">
+								<FeatureIcon tint="bg-blue-500/10 text-blue-400">
+									<rect x="4" y="2.5" width="12" height="19" rx="2.5" />
+									<path d="M10 18.5h.01" />
+									<path d="M20 8v4m2-2h-4" />
+								</FeatureIcon>
+								<h3 className="text-xl font-bold text-slate-50">增量更新</h3>
+							</div>
 							<p className="mt-3 text-[15px] leading-relaxed text-slate-400 max-w-md">
 								bsdiff / hdiff 双算法计算差量，只下发真正变化的部分，
 								更新包最小可至 KB 级——用户几乎无感知。
@@ -141,12 +143,14 @@ function Page1() {
 					>
 						{cardGlow}
 						<div className="relative">
-							<FeatureIcon tint="bg-sky-500/10 text-sky-400">
-								<path d="M12 3v11" />
-								<path d="M8 10l4 4 4-4" />
-								<path d="M4 17.5c1.5 2 4.3 3.5 8 3.5s6.5-1.5 8-3.5" />
-							</FeatureIcon>
-							<h3 className="mt-6 text-xl font-bold text-slate-50">极速下载</h3>
+							<div className="flex items-center gap-4">
+								<FeatureIcon tint="bg-sky-500/10 text-sky-400">
+									<path d="M12 3v11" />
+									<path d="M8 10l4 4 4-4" />
+									<path d="M4 17.5c1.5 2 4.3 3.5 8 3.5s6.5-1.5 8-3.5" />
+								</FeatureIcon>
+								<h3 className="text-xl font-bold text-slate-50">极速下载</h3>
+							</div>
 							<p className="mt-3 text-[15px] leading-relaxed text-slate-400">
 								高速 CDN 覆盖全球节点，海内外客户端就近秒级拉取，弱网环境也稳定可达。
 							</p>
@@ -158,11 +162,13 @@ function Page1() {
 					<div data-reveal className={cardBase}>
 						{cardGlow}
 						<div className="relative">
-							<FeatureIcon tint="bg-indigo-500/10 text-indigo-400">
-								<path d="M4 17l6-5-6-5" />
-								<path d="M12 19h8" />
-							</FeatureIcon>
-							<h3 className="mt-6 text-xl font-bold text-slate-50">快捷发布</h3>
+							<div className="flex items-center gap-4">
+								<FeatureIcon tint="bg-indigo-500/10 text-indigo-400">
+									<path d="M4 17l6-5-6-5" />
+									<path d="M12 19h8" />
+								</FeatureIcon>
+								<h3 className="text-xl font-bold text-slate-50">快捷发布</h3>
+							</div>
 							<p className="mt-3 text-[15px] leading-relaxed text-slate-400">
 								命令行与网页双端管理，原生支持 CI/CD——一条命令，完成从打包到全量下发。
 							</p>
@@ -177,11 +183,13 @@ function Page1() {
 					>
 						{cardGlow}
 						<div className="relative">
-							<FeatureIcon tint="bg-emerald-500/10 text-emerald-400">
-								<path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6l7-3z" />
-								<path d="M9 12l2 2 4-4.5" />
-							</FeatureIcon>
-							<h3 className="mt-6 text-xl font-bold text-slate-50">稳定可靠</h3>
+							<div className="flex items-center gap-4">
+								<FeatureIcon tint="bg-emerald-500/10 text-emerald-400">
+									<path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6l7-3z" />
+									<path d="M9 12l2 2 4-4.5" />
+								</FeatureIcon>
+								<h3 className="text-xl font-bold text-slate-50">稳定可靠</h3>
+							</div>
 							<p className="mt-3 text-[15px] leading-relaxed text-slate-400">
 								内置崩溃捕获与自动回滚，异常更新即刻恢复上一版本，线上业务安全无忧。
 							</p>
@@ -196,12 +204,14 @@ function Page1() {
 					>
 						{cardGlow}
 						<div className="relative">
-							<FeatureIcon tint="bg-violet-500/10 text-violet-400">
-								<circle cx="6" cy="6" r="2.5" />
-								<circle cx="18" cy="18" r="2.5" />
-								<path d="M8.5 6H15a3 3 0 013 3v2m-2.5 7H9a3 3 0 01-3-3v-2" />
-							</FeatureIcon>
-							<h3 className="mt-6 text-xl font-bold text-slate-50">灵活扩展</h3>
+							<div className="flex items-center gap-4">
+								<FeatureIcon tint="bg-violet-500/10 text-violet-400">
+									<circle cx="6" cy="6" r="2.5" />
+									<circle cx="18" cy="18" r="2.5" />
+									<path d="M8.5 6H15a3 3 0 013 3v2m-2.5 7H9a3 3 0 01-3-3v-2" />
+								</FeatureIcon>
+								<h3 className="text-xl font-bold text-slate-50">灵活扩展</h3>
+							</div>
 							<p className="mt-3 text-[15px] leading-relaxed text-slate-400">
 								开放元信息接口，灰度发布、条件下发、多渠道策略随心定制。
 							</p>
