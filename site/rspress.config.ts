@@ -96,6 +96,15 @@ export default defineConfig({
           },
         },
         {
+          // Inline (not SW-interceptable) dev-only cleanup: unregister any
+          // previously installed service worker and drop its caches, so dev
+          // pages can never get stuck on a stale cached bundle.
+          tag: 'script',
+          append: false,
+          children:
+            "(function(){var h=location.hostname;if(h!=='localhost'&&h!=='127.0.0.1'&&h!=='::1'&&h!=='[::1]')return;if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})})}if('caches' in window){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})})}})();",
+        },
+        {
           tag: 'script',
           attrs: {
             src: '/register-pwa.js',
