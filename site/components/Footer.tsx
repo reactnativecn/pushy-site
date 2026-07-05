@@ -43,7 +43,7 @@ function Footer() {
   ];
 
   return (
-    <footer className="bg-slate-900 text-slate-200 mt-auto">
+    <footer className="bg-[#060b18] text-slate-200 mt-auto border-t border-white/[0.06]">
       {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-8">
@@ -79,7 +79,7 @@ function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-slate-700/60">
+      <div className="border-t border-white/[0.06]">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-6">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-slate-400">
             <p>React Native 中文网 © {new Date().getFullYear()} 武汉青罗网络科技有限公司</p>

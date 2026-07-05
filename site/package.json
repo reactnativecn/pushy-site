@@ -14,23 +14,23 @@
     "remotion:render:hero:webm": "remotion render remotion/index.ts PushyHeroLoop pages/public/hero-loop/pushy-hero-loop.webm --codec=vp9 --public-dir=pages/public"
   },
   "dependencies": {
-    "@ant-design/icons": "^6.2.5",
-    "@rsbuild/plugin-sass": "^1.5.3",
-    "@rspress/core": "^2.0.13",
-    "@tailwindcss/postcss": "^4.3.0",
+    "@ant-design/icons": "^6.3.2",
+    "@rsbuild/plugin-sass": "^2.0.1",
+    "@rspress/core": "^2.0.16",
+    "@tailwindcss/postcss": "^4.3.2",
     "@types/react-dom": "^19.2.3",
-    "antd": "^6.4.3",
-    "autoprefixer": "10.5.0",
-    "postcss": "^8.5.15",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6",
+    "antd": "^6.5.0",
+    "autoprefixer": "10.5.2",
+    "postcss": "^8.5.16",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "rspress-plugin-mermaid": "^1.0.1",
-    "sass": "^1.100.0",
-    "tailwindcss": "^4.3.0",
+    "sass": "^1.101.0",
+    "tailwindcss": "^4.3.2",
     "typescript": "^6.0.3"
   },
   "devDependencies": {
-    "@remotion/cli": "4.0.469",
-    "remotion": "4.0.469"
+    "@remotion/cli": "4.0.484",
+    "remotion": "4.0.484"
   }
 }

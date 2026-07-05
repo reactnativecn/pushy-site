@@ -8,7 +8,8 @@ export default defineConfig({
   outDir: 'out',
   root: path.join(__dirname, 'pages'),
   title: 'Pushy 极速热更新',
-  description: 'Pushy 极速热更新',
+  description:
+    'Pushy —— 为 React Native 打造的热更新服务。KB 级增量包、CDN 秒级分发、崩溃自动回滚，让每一次发布秒级抵达用户，无需等待应用商店审核。',
   icon: '/images/logo.svg',
   logo: {
     light: '/images/logo.svg',
