@@ -83,6 +83,11 @@ interface PushyOptions {
   beforeReload?: (
     context: BeforeReloadContext,
   ) => Promise<boolean | void> | boolean | void;
+
+  // 是否关闭更新生命周期事件上报（版本健康度统计），默认为 false（开启）
+  // 详见下方「版本健康度事件上报」一节
+  // 此选项需 v10.47.0+ 版本
+  disableTelemetry?: boolean;
 }
 
 // 检查更新结束后的状态
@@ -153,6 +158,28 @@ interface EventData {
   [key: string]: any;
 }
 ```
+
+#### 版本健康度事件上报
+
+自 v10.47.0 起，SDK 会在更新流程的关键节点向更新服务自动上报少量生命周期事件，用于在管理端展示每个热更版本的健康度（下载失败率、patch 失败率、回滚率等），帮助你在发版后第一时间发现有问题的版本：
+
+- `download_success` / `download_fail`：热更包下载成功 / 全部下载策略失败
+- `patch_fail`：增量 patch 应用失败（含降级为完整包成功的情形）或版本切换失败
+- `rollback`：新版本启动异常，发生自动回滚
+- `mark_success`：新版本启动并标记成功
+
+上报内容仅包含热更版本 hash、原生版本号、`cInfo`（SDK/RN/系统版本与设备标识符，与 checkUpdate 请求一致）以及失败时截断后的错误信息摘要，不涉及任何业务数据。上报为一次性异步请求，不重试、失败静默，不会影响更新流程与性能；调试环境（`__DEV__`）下不会上报。
+
+如不希望上报这些事件，可在初始化时关闭：
+
+```js
+const pushyClient = new Pushy({
+  appKey,
+  disableTelemetry: true,
+});
+```
+
+注意：关闭后管理端将无法统计该客户端的版本健康度，也无法在版本发生大面积异常时为你提供预警。
 
 #### beforeReload 示例：重启前清理原生 SDK
 
