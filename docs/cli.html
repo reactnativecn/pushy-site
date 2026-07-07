@@ -5,11 +5,11 @@
 <title>命令行工具 - Pushy 极速热更新</title>
 <script>(function(){var h=location.hostname;if(h!=='localhost'&&h!=='127.0.0.1'&&h!=='::1'&&h!=='[::1]')return;if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})})}if('caches' in window){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})})}})();</script>
 <link href="/static/css/styles.0cf34cd96d.css" rel="stylesheet">
-<script defer src="/static/js/styles.a7f4e57ceb.js"></script>
+<script defer src="/static/js/styles.2f5af7e6f7.js"></script>
 <script defer src="/static/js/lib-react.5ec3a18515.js"></script>
 <script defer src="/static/js/lib-router.4b8d52d377.js"></script>
-<script defer src="/static/js/5678.8ce6129871.js"></script>
-<script defer src="/static/js/index.b3bdc88cf1.js"></script>
+<script defer src="/static/js/5678.875c775ac4.js"></script>
+<script defer src="/static/js/index.825e998462.js"></script>
 <script src="/register-pwa.js" defer></script>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="generator" content="Rspress v2.0.16">
@@ -136,15 +136,35 @@
 <hr/>
 <h4 class="rp-toc-include" id="pushy-uploadipa-ipafile"><a href="#pushy-uploadipa-ipafile" class="rp-header-anchor rp-link" aria-hidden="true">#</a>pushy uploadIpa [ipaFile]</h4>
 <p>上传 ipa 文件到开放平台。（cli 需 1.24.0 +）</p>
+<ul>
+<li>config: 指定读取的配置文件路径（默认 <code>update.json</code>）（需 cli 2.16.1+）</li>
+<li>appId: 指定上传的目标应用 ID（会覆盖配置文件中的配置）（需 cli 2.16.1+）</li>
+<li>appKey: 指定上传的目标应用 Key（会覆盖配置文件中的配置）（需 cli 2.16.1+）</li>
+</ul>
 <hr/>
 <h4 class="rp-toc-include" id="pushy-uploadapk-apkfile"><a href="#pushy-uploadapk-apkfile" class="rp-header-anchor rp-link" aria-hidden="true">#</a>pushy uploadApk [apkFile]</h4>
 <p>上传 apk 文件到开放平台。（cli 需 1.24.0 +）</p>
+<ul>
+<li>config: 指定读取的配置文件路径（默认 <code>update.json</code>）（需 cli 2.16.1+）</li>
+<li>appId: 指定上传的目标应用 ID（会覆盖配置文件中的配置）（需 cli 2.16.1+）</li>
+<li>appKey: 指定上传的目标应用 Key（会覆盖配置文件中的配置）（需 cli 2.16.1+）</li>
+</ul>
 <hr/>
 <h4 class="rp-toc-include" id="pushy-uploadapp-appfile"><a href="#pushy-uploadapp-appfile" class="rp-header-anchor rp-link" aria-hidden="true">#</a>pushy uploadApp [appFile]</h4>
 <p>上传 app 文件到开放平台。（cli 需 1.24.0 +）</p>
+<ul>
+<li>config: 指定读取的配置文件路径（默认 <code>update.json</code>）（需 cli 2.16.1+）</li>
+<li>appId: 指定上传的目标应用 ID（会覆盖配置文件中的配置）（需 cli 2.16.1+）</li>
+<li>appKey: 指定上传的目标应用 Key（会覆盖配置文件中的配置）（需 cli 2.16.1+）</li>
+</ul>
 <hr/>
 <h4 class="rp-toc-include" id="pushy-uploadaab-aabfile"><a href="#pushy-uploadaab-aabfile" class="rp-header-anchor rp-link" aria-hidden="true">#</a>pushy uploadAab [aabFile]</h4>
 <p>上传 aab 文件到开放平台。（cli 需 2.6.0 +）</p>
+<ul>
+<li>config: 指定读取的配置文件路径（默认 <code>update.json</code>）（需 cli 2.16.1+）</li>
+<li>appId: 指定上传的目标应用 ID（会覆盖配置文件中的配置）（需 cli 2.16.1+）</li>
+<li>appKey: 指定上传的目标应用 Key（会覆盖配置文件中的配置）（需 cli 2.16.1+）</li>
+</ul>
 <hr/>
 <h4 class="rp-toc-include" id="pushy-extractapk-aabfile"><a href="#pushy-extractapk-aabfile" class="rp-header-anchor rp-link" aria-hidden="true">#</a>pushy extractApk [aabFile]</h4>
 <p>从 aab 文件中提取通用 apk 文件。（cli 需 2.6.0+）</p>

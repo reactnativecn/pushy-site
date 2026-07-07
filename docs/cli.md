@@ -164,11 +164,19 @@ pushy bundle --platform android --name "1.0.0" --description "热更新版本 1.
 
 上传 ipa 文件到开放平台。（cli 需 1.24.0 +）
 
+- config: 指定读取的配置文件路径（默认 `update.json`）（需 cli 2.16.1+）
+- appId: 指定上传的目标应用 ID（会覆盖配置文件中的配置）（需 cli 2.16.1+）
+- appKey: 指定上传的目标应用 Key（会覆盖配置文件中的配置）（需 cli 2.16.1+）
+
 ***
 
 #### pushy uploadApk \[apkFile]
 
 上传 apk 文件到开放平台。（cli 需 1.24.0 +）
+
+- config: 指定读取的配置文件路径（默认 `update.json`）（需 cli 2.16.1+）
+- appId: 指定上传的目标应用 ID（会覆盖配置文件中的配置）（需 cli 2.16.1+）
+- appKey: 指定上传的目标应用 Key（会覆盖配置文件中的配置）（需 cli 2.16.1+）
 
 ***
 
@@ -176,11 +184,19 @@ pushy bundle --platform android --name "1.0.0" --description "热更新版本 1.
 
 上传 app 文件到开放平台。（cli 需 1.24.0 +）
 
+- config: 指定读取的配置文件路径（默认 `update.json`）（需 cli 2.16.1+）
+- appId: 指定上传的目标应用 ID（会覆盖配置文件中的配置）（需 cli 2.16.1+）
+- appKey: 指定上传的目标应用 Key（会覆盖配置文件中的配置）（需 cli 2.16.1+）
+
 ***
 
 #### pushy uploadAab \[aabFile]
 
 上传 aab 文件到开放平台。（cli 需 2.6.0 +）
+
+- config: 指定读取的配置文件路径（默认 `update.json`）（需 cli 2.16.1+）
+- appId: 指定上传的目标应用 ID（会覆盖配置文件中的配置）（需 cli 2.16.1+）
+- appKey: 指定上传的目标应用 Key（会覆盖配置文件中的配置）（需 cli 2.16.1+）
 
 ***
 
