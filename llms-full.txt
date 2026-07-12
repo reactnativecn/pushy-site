@@ -1348,6 +1348,10 @@ type EventType =
   | "errorUpdate"
   // 更新成功
   | "markSuccess"
+  // 已恢复到内置包（resetToPackagedBundle 成功），需 v10.48.0+ 版本
+  | "reset"
+  // 恢复内置包失败，需 v10.48.0+ 版本
+  | "errorReset"
   // 下载apk
   | "downloadingApk"
   // 下载apk前申请存储权限被用户拒绝
@@ -1461,6 +1465,7 @@ const {
   updateInfo,
   lastError,
   restartApp,
+  resetToPackagedBundle,
 } = useUpdate();
 ```
 
@@ -1505,6 +1510,8 @@ interface UpdateContext {
   client?: Pushy;
   // 立即重启应用，需 v10.28.2+ 版本
   restartApp: () => Promise<void>;
+  // 恢复到原生包内置的 bundle，返回是否成功，需 v10.48.0+ 版本
+  resetToPackagedBundle: (options?: { restart?: boolean }) => Promise<boolean>;
   // 下载开始后的进度数据
   progress?: {
     hash: string;
@@ -1653,6 +1660,35 @@ console.log(currentVersionInfo.name);
 立即重启应用。v10.28.2+ 版本可用。
 
 如果配置了 `beforeReload`，会等待它完成后再重启；当 `beforeReload` 返回 `false`、抛出异常或 Promise reject 时，会取消本次重启。
+
+***
+
+#### async function resetToPackagedBundle(options?)
+
+恢复到原生包内置的 bundle，返回 `boolean` 表示是否成功。v10.48.0+ 版本可用。
+
+调用后会清空全部热更状态、删除所有已下载的热更版本，下次启动将直接加载打包在原生安装包内的 bundle。传入 `{ restart: true }` 则会在成功后立即重启生效（重启内部走 `restartApp`，同样受 `beforeReload` 控制）。设备标识符（uuid）会保留，不影响灰度分桶。
+
+可用于客服指令、远程开关、异常兜底等需要"恢复出厂"的场景：
+
+```js
+const { resetToPackagedBundle } = useUpdate();
+
+// 清空热更并立即重启回内置包
+const ok = await resetToPackagedBundle({ restart: true });
+```
+
+也可以通过热更服务实例直接调用：
+
+```js
+const ok = await pushyClient.resetToPackagedBundle();
+```
+
+与其他更新流程 API 一致，此方法默认不抛出错误：失败时返回 `false`，错误信息（错误码 `RESET_FAILED`）可通过 `lastError` / `onError` 获取；如初始化时配置了 `throwError: true` 则会抛出。
+
+:::warning
+请务必检查返回值：此方法需要原生模块支持（v10.48.0+），如果只是通过热更把新版 JS 下发到了旧版原生包上，调用会返回 `false`——此时应用仍在运行热更 bundle，并没有恢复到内置包。
+:::
 
 ***
 
@@ -2753,6 +2789,30 @@ Trusted by teams
 ![环球时报](/static/image/hqsb.ed1da880b1.png)
 
 ![航天信息](/static/image/htxx.4755a497ad.png)
+
+发布风险控制
+
+## 热更新出问题，及时发现，及时止损
+
+持续观察每次发布的运行情况。发现异常后及时提醒并自动暂停，避免问题继续扩大。
+
+### 看清风险
+
+每次发布是否稳定，一目了然。
+
+### 及时预警
+
+异常刚刚出现，就能尽早发现。
+
+### 自动止损
+
+风险过高时自动暂停，保护更多用户。
+
+[了解版本健康度 →](/docs/api)
+
+![Pushy 版本健康度面板，按热更版本和原生包展示下载、Patch、启动及回滚数据](/images/version-health-dashboard.png)
+
+Pushy Admin 版本健康度本地示例数据
 
 Why Pushy
 
