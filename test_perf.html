@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<body>
+<canvas id="canvas" width="800" height="800"></canvas>
+<script>
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  function testNativeGradients() {
+    const start = performance.now();
+    for (let i = 0; i < 10000; i++) {
+      const p = { x: 400, y: 400, radius: 2 };
+      const glow = 1;
+      const r = p.radius + glow * 2;
+      const gr = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 4);
+      gr.addColorStop(0, `rgba(68,131,237, ${glow * 0.2})`);
+      gr.addColorStop(1, `rgba(68,131,237, 0)`);
+      ctx.fillStyle = gr;
+      ctx.fillRect(p.x - r * 4, p.y - r * 4, r * 8, r * 8);
+    }
+    return performance.now() - start;
+  }
+
+  const glowCache = new Map();
+  function getGlowCanvas(color) {
+    if (glowCache.has(color)) return glowCache.get(color);
+    const c = document.createElement('canvas');
+    c.width = 64;
+    c.height = 64;
+    const cctx = c.getContext('2d');
+    const gr = cctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0, `rgba(${color}, 1)`);
+    gr.addColorStop(1, `rgba(${color}, 0)`);
+    cctx.fillStyle = gr;
+    cctx.fillRect(0, 0, 64, 64);
+    glowCache.set(color, c);
+    return c;
+  }
+
+  function testCachedImages() {
+    const start = performance.now();
+    for (let i = 0; i < 10000; i++) {
+      const p = { x: 400, y: 400, radius: 2 };
+      const glow = 1;
+      const r = p.radius + glow * 2;
+
+      const glowImg = getGlowCanvas('68,131,237');
+      const size = r * 8;
+
+      ctx.save();
+      ctx.globalAlpha = glow * 0.2;
+      ctx.drawImage(glowImg, p.x - size / 2, p.y - size / 2, size, size);
+      ctx.restore();
+    }
+    return performance.now() - start;
+  }
+
+  // Warmup
+  testNativeGradients();
+  testCachedImages();
+
+  const nativeTime = testNativeGradients();
+  const cachedTime = testCachedImages();
+
+  console.log(`Native Gradients: ${nativeTime.toFixed(2)}ms`);
+  console.log(`Cached Images: ${cachedTime.toFixed(2)}ms`);
+  console.log(`Speedup: ${(nativeTime / cachedTime).toFixed(2)}x`);
+</script>
+</body>
+</html>
