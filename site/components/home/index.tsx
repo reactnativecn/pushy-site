@@ -4,6 +4,7 @@ import LiveStats from "./LiveStats";
 import Page1 from "./Page1";
 import Page2 from "./Page2";
 import Showcase from "./Showcase";
+import HealthSection from "./HealthSection";
 import CtaBand from "./CtaBand";
 import Footer from "../Footer";
 
@@ -55,6 +56,7 @@ function Home(props: HomeProps) {
 			<Banner {...props} />
 			<LiveStats />
 			<Showcase />
+			<HealthSection />
 			<Page1 />
 			<Page2 />
 			<CtaBand />
