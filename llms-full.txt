@@ -20,7 +20,7 @@ Pushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-n
 
 ### 极致的更新体验
 
-- **🎯 超小更新包**：基于 bsdiff/hdiff 算法的增量更新，通常只需**几十至几百 KB**（相比其他全量更新服务的几十 MB，节省流量 99%+）
+- **🎯 超小更新包**：基于 bsdiff/hdiff 算法的增量更新，通常只需**几十至几百 KB**（相比其他全量更新服务的几十 MB，节省流量 99%+），并针对 Hermes 字节码做了**独家深度优化**（见下方实测数据）
 - **⚡️ 极速分发**：国内用户使用阿里云高速 CDN，国外用户智能分流至 Cloudflare，在各地区都使用覆盖率最好的 CDN 服务商，更新成功率高达 **99.9%+**
 - **🛡️ 安全可靠**：内置崩溃回滚机制，出现问题自动回退，确保应用稳定运行
 - **🌐 全平台覆盖**：完美支持 <span style={{whiteSpace: 'nowrap'}}><AppleOutlined style={{fontSize: '16px', color: '#555', marginRight: '6px'}} /> **iOS**</span> <span style={{whiteSpace: 'nowrap'}}><AndroidOutlined style={{fontSize: '16px', color: '#3DDC84', marginRight: '6px'}} /> **Android**</span>, 且业内独家第一方支持 <span style={{whiteSpace: 'nowrap'}}><HarmonyOSOutlined style={{fontSize: '16px', color: '#000', marginRight: '6px'}} /> **鸿蒙（HarmonyOS）**</span>
@@ -29,9 +29,26 @@ Pushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-n
   - ✅ **新架构** - 第一时间跟进支持
   - ✅ **Hermes** - 完整支持字节码格式
 - **📖 核心逻辑完全开源**：客户端、命令行工具以及管理界面代码都[完全开源](https://github.com/reactnativecn)，接受社区审计，代码透明可信，你可以随时迁移到自建服务器或其他服务
+- **📊 发布全程可控**：后台自带**版本统计、按比例灰度发布、健康度监控**，每次发布的覆盖进度和稳定性一目了然，无需自建数据链路
 - **🔒 数据安全**：可以自行插入数据埋点，完全掌控自己的数据
 - **💬 专业人工支持**：提供付费专人技术支持，有问必答，确保你的应用稳定运行
 - **🏆 多年稳定运营**：从 2016 年开始运营至今，服务众多知名企业和应用
+
+### 📊 实测数据：针对 Hermes 深度优化的增量算法
+
+Hermes 字节码中充满"偏移量表"——JS 一处小改动会让其后所有偏移整体位移，普通二进制 diff 会因此把补丁体积急剧放大。Pushy 独家引入了 **HBC（Hermes 字节码）结构感知的可逆变换**，从根源上消除这种放大。
+
+在真实 React Native 0.86 应用上的实测结果（字节码约 4.4 MB，[评测代码与数据完全公开可复现](https://github.com/sunnylqm/hbc-diff-benchmark)）：
+
+| 迭代场景            | 全量更新   | 传统增量（bsdiff） | Pushy 增量（Hermes 专项优化） |
+| --------------- | ------ | ------------ | --------------------- |
+| 修改一行文案          | 1.9 MB | 93.7 KB      | **63.5 KB**（再省 32%）   |
+| 新增小功能（约 60 行）   | 1.9 MB | 411.6 KB     | **285.5 KB**（再省 31%）  |
+| 新增中等功能（约 300 行） | 1.9 MB | 551.6 KB     | **398.4 KB**（再省 28%）  |
+
+- 相比全量更新节省 **95% 以上**的流量，相比传统 bsdiff 增量**再省约 30%**
+- **改动越小、收益越大**——恰好是热修复中最高频的场景
+- 安全兜底：变换前对字节码结构做全量校验，任何不匹配自动回退到普通增量路径；Hermes 版本升级时**客户端零改动**自动兼容
 
 ## 💰 性价比之选
 
