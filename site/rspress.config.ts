@@ -50,6 +50,7 @@ export default defineConfig({
           items: [
             { text: 'API 文档', link: '/docs/api' },
             { text: 'API Token', link: '/docs/api-token' },
+            { text: 'MCP 服务器', link: '/docs/mcp' },
             { text: '命令行工具', link: '/docs/cli' },
             { text: '场景实践', link: '/docs/bestpractice' },
           ],

@@ -1,0 +1,129 @@
+---
+order: 14
+title: MCP 服务器
+type: 开发指南
+---
+
+# MCP 服务器（Private Preview）
+
+Pushy 把发布拓扑、更新判定和产物状态发布为一个**远程、只读的 MCP 服务器**。
+你在自己的 AI 客户端（Claude Desktop、IDE、自建 Agent 等）里连接它，就能让模型
+直接读到确定性的诊断事实，再自行结合 GitHub、Sentry、CI 等工具排查问题。
+
+Pushy 不托管模型、不承担 token 费用，也不会去连接你的其他 MCP 服务器。
+
+:::info 内测阶段
+当前为受邀内测（private preview），使用专用访问令牌认证。标准 OAuth 授权会在
+公开 Beta 阶段提供。
+:::
+
+## 它能回答什么
+
+典型的排查链路：
+
+```text
+pushy.apps.list                → 确认是哪个 appKey
+pushy.app.topology             → 这个原生包现在应该发哪个版本
+pushy.check_update.diagnose    → 这台设备为什么没拿到更新
+pushy.diff.status              → 增量是没生成，还是生成失败了
+```
+
+| 工具 | 作用 |
+|------|------|
+| `pushy.apps.list` | 授权范围内的应用列表 |
+| `pushy.app.topology` | 原生包 → 绑定版本（主版本 / 灰度候选 / 灰度百分比） |
+| `pushy.check_update.diagnose` | 用一组客户端参数重放更新判定：结论分型、产物状态、已确认结论与处理建议 |
+| `pushy.diff.status` | 增量产物与生成任务的状态（错误文本已脱敏） |
+
+全部只读：不会生成任务、不计配额、不产生下载地址、不修改任何状态。
+
+## 创建访问令牌
+
+1. 登录 [Pushy 管理后台](https://pushy-admin.reactnative.cn)
+2. 打开「外部 Agent / MCP」
+3. 填写令牌名称与客户端名称（如 `claude-desktop`）
+4. **选择可访问的应用**（强烈建议只勾选需要排查的那几个）
+5. 创建后**立即复制并保存令牌**
+
+:::warning
+令牌明文只在创建时显示一次，服务端只保存哈希值，之后无法再次查看。
+:::
+
+令牌与普通 API Token 是两套体系：MCP 令牌只能访问上面这四个只读工具，
+普通 API Token 也不能用来连接 `/mcp`。团队成员创建的令牌不会超出其角色与
+应用范围；成员被移除或降权后，令牌随之失效。
+
+## 连接客户端
+
+```
+Endpoint: https://update.reactnative.cn/api/mcp
+Transport: Streamable HTTP（无状态）
+Header:    Authorization: Bearer pushy_mcp_...
+```
+
+以 Claude Desktop 为例，在配置里添加一个远程 MCP 服务器：
+
+```json
+{
+  "mcpServers": {
+    "pushy": {
+      "type": "http",
+      "url": "https://update.reactnative.cn/api/mcp",
+      "headers": {
+        "Authorization": "Bearer pushy_mcp_你的令牌"
+      }
+    }
+  }
+}
+```
+
+连通性自检：
+
+```bash
+curl -sS https://update.reactnative.cn/api/mcp \
+  -H 'content-type: application/json' \
+  -H 'accept: application/json, text/event-stream' \
+  -H "authorization: Bearer $PUSHY_MCP_TOKEN" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+```
+
+服务端同时支持 `2026-07-28`（每请求自包含、无握手）与 2025 系协议版本，
+由客户端自行协商，你通常不需要关心走的是哪一条。
+
+## 结果怎么读
+
+每次调用同时返回结构化结果（`structuredContent`，模型消费）与一句话概览
+（给人看）。诊断结果里有三处特别值得注意：
+
+- **`meta.mode` 恒为 `current_simulation`**：结论反映的是**当前**的发布状态与
+  产物状态，不是对历史某次请求的复盘。
+- **`meta.limitations`**：明确列出这次结论不能断言的部分。
+- **`clientResolution`**：灰度是否命中**由客户端本地按设备 uuid 判定**。
+  由于 SDK 10.50.0 修复了分桶算法的一处实现缺陷，同一台设备的灰度桶重排过一次，
+  所以：上报了 SDK 版本 → 只按对应算法给结论；没上报 → 两种结果都列出并标记
+  `ambiguous`，不做猜测。
+
+诊断时传入的 uuid 只用于本次分桶计算，不会出现在返回结果、审计日志或数据库里。
+
+## 安全与隐私
+
+- 没有 SQL、shell、任意 URL、文件读取类工具，也没有任何写操作工具；
+- 默认不返回邮箱、IP、设备标识、密钥、支付数据、签名下载地址与原始错误详情；
+- 你授权的 AI 客户端可能会把返回数据继续发送给你选择的模型供应商 ——
+  Pushy 无法控制该客户端与供应商的数据保留、训练与跨境策略，请按需收窄应用范围；
+- 令牌可随时在管理后台撤销，撤销即时生效；
+- 调用有频率限制（单令牌 240 次/分钟），单次结果有大小上限。
+
+## 常见问题
+
+**为什么 `tools/list` 返回的工具比文档少？**
+工具列表按令牌的授权范围裁剪，没有对应权限的工具不会出现。
+
+**为什么诊断说有新版本，客户端却显示已是最新？**
+多半是产物还没生成完（增量缺失且整包不可发）。诊断会给出
+`UPDATE_DECIDED_BUT_NOTHING_SERVABLE` 这条结论，再用 `pushy.diff.status`
+看任务是否积压或失败。
+
+**自部署可以用吗？**
+可以。自部署需要执行 `prisma/migrations/add_mcp_tokens.sql`，并设置
+`MCP_ENABLED=1` 与 `MCP_ALLOWED_HOSTS`；不设置时 `/mcp` 整条路由返回 404。
