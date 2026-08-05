@@ -1,3 +1,5 @@
+> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt, and this page is available as Markdown at /docs/skills.md.
+
 # 推荐：先安装 Skill，再让 AI 自动集成
 
 首次接入 Pushy 时，推荐先安装 `react-native-update` Skill，再让支持 Skills 的 AI 编程工具根据你的项目结构自动完成大部分集成改动。只有当工程结构特殊、需要精细控制，或者想逐项校对生成代码时，再回到后续手动文档。

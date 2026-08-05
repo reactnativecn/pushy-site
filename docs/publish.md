@@ -1,3 +1,5 @@
+> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt, and this page is available as Markdown at /docs/publish.md.
+
 # 发布热更新
 
 现在你的应用已经具备了检测更新的功能，下面我们来尝试发布并更新它。流程可参考下图：

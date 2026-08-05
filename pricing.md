@@ -1,3 +1,5 @@
+> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt, and this page is available as Markdown at /pricing.md.
+
 ## 公平透明的价格体系
 
 新注册用户将自动获得7 天的**专业版**试用评估。

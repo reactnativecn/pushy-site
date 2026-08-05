@@ -1,3 +1,5 @@
+> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt, and this page is available as Markdown at /docs/api-token.md.
+
 # API Token
 
 API Token 是一种用于在 CI/CD 流程或自动化脚本中调用 [Pushy API](https://update.reactnative.cn/api/openapi) 的认证方式。相比直接使用账号密码，API Token 更加安全且便于管理。
