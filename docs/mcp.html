@@ -5,12 +5,12 @@
 <title>MCP 服务 - Pushy 极速热更新</title>
 <script>(function(){var h=location.hostname;if(h!=='localhost'&&h!=='127.0.0.1'&&h!=='::1'&&h!=='[::1]')return;if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})})}if('caches' in window){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})})}})();</script>
 <link href="/static/css/styles.05eeb78865.css" rel="stylesheet">
-<link rel="preload" href="/static/js/async/route-ed323e1f3b99.6c6b0c8ec2.js" as="script">
+<link rel="preload" href="/static/js/async/route-ed323e1f3b99.58b499b824.js" as="script">
 <script defer src="/static/js/styles.2f5af7e6f7.js"></script>
 <script defer src="/static/js/lib-react.03976590ad.js"></script>
 <script defer src="/static/js/lib-router.e8a430f2dd.js"></script>
 <script defer src="/static/js/343.2027955fa4.js"></script>
-<script defer src="/static/js/index.91fd768be3.js"></script>
+<script defer src="/static/js/index.2ee88e40e8.js"></script>
 <script src="/register-pwa.js" defer></script>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="generator" content="Rspress v2.0.19">
@@ -30,16 +30,18 @@
 <p>把 Pushy 接进你的 AI 客户端（Claude Desktop、IDE、自建 Agent 等），让它直接查
 你的发布状态，再结合 GitHub、Sentry、CI 一起排查问题。全程只读，不会改动任何
 发布数据。</p>
+<div class="rp-callout rp-callout--tip"><div class="rp-callout__title">AI 模型服务</div><div class="rp-callout__content"><p>
+本站同时提供 <a href="https://ai.cresc.dev" target="_blank" rel="noopener noreferrer" class="rp-link">AI 模型转发服务</a>：提供纯正官方 GPT 和 Claude 最前沿模型，价格实惠、服务稳定、绝不掺水、数据安全。</p></div></div>
 <h2 class="rp-toc-include" id="典型场景"><a href="#典型场景" class="rp-header-anchor rp-link" aria-hidden="true">#</a>典型场景</h2>
 <p><strong>排查某台设备为什么没收到更新</strong></p>
 <blockquote>
-<p>我的应用（appKey xxx）1.2.0 这个原生包，有台安卓设备一直没拿到更新，帮我看看</p>
+<p>我的应用（testApp）1.2.0 这个原生包，有台安卓设备一直没拿到更新，帮我看看</p>
 </blockquote>
 <p>AI 会查出这个包当前绑定的版本、重放一次更新判定、检查增量产物是否就绪，然后
 告诉你卡在哪一步 —— 灰度没命中、包被暂停，还是补丁还没生成完。</p>
 <p><strong>发版前后确认状态</strong></p>
 <blockquote>
-<p>看下 1.2.0 现在应该发哪个版本，灰度比例是多少</p>
+<p>看下 1.2.0 现在发的哪个版本，灰度比例是多少</p>
 </blockquote>
 <p><strong>结合其他工具定位问题</strong></p>
 <blockquote>
