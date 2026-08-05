@@ -1927,7 +1927,7 @@ url: /docs/mcp.md
 
 > For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt, and this page is available as Markdown at /docs/mcp.md.
 
-# MCP 服务器
+# MCP 服务
 
 把 Pushy 接进你的 AI 客户端（Claude Desktop、IDE、自建 Agent 等），让它直接查
 你的发布状态，再结合 GitHub、Sentry、CI 一起排查问题。全程只读，不会改动任何
