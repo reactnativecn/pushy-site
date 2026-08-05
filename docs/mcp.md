@@ -1,17 +1,12 @@
 > For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt, and this page is available as Markdown at /docs/mcp.md.
 
-# MCP 服务器（Private Preview）
+# MCP 服务器
 
 Pushy 把发布拓扑、更新判定和产物状态发布为一个**远程、只读的 MCP 服务器**。
 你在自己的 AI 客户端（Claude Desktop、IDE、自建 Agent 等）里连接它，就能让模型
 直接读到确定性的诊断事实，再自行结合 GitHub、Sentry、CI 等工具排查问题。
 
 Pushy 不托管模型、不承担 token 费用，也不会去连接你的其他 MCP 服务器。
-
-:::info 内测阶段
-当前为受邀内测（private preview），使用专用访问令牌认证。标准 OAuth 授权会在
-公开 Beta 阶段提供。
-:::
 
 ## 它能回答什么
 
@@ -84,8 +79,8 @@ curl -sS https://update.reactnative.cn/api/mcp \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
 ```
 
-服务端同时支持 `2026-07-28`（每请求自包含、无握手）与 2025 系协议版本，
-由客户端自行协商，你通常不需要关心走的是哪一条。
+服务端同时支持当前协议版本 `2026-07-28`（每请求自包含、无握手）与 2025 系版本，
+只要客户端不太旧都能直接连；协商过程对你透明。
 
 ## 结果怎么读
 
@@ -110,17 +105,3 @@ curl -sS https://update.reactnative.cn/api/mcp \
   Pushy 无法控制该客户端与供应商的数据保留、训练与跨境策略，请按需收窄应用范围；
 - 令牌可随时在管理后台撤销，撤销即时生效；
 - 调用有频率限制（单令牌 240 次/分钟），单次结果有大小上限。
-
-## 常见问题
-
-**为什么 `tools/list` 返回的工具比文档少？**
-工具列表按令牌的授权范围裁剪，没有对应权限的工具不会出现。
-
-**为什么诊断说有新版本，客户端却显示已是最新？**
-多半是产物还没生成完（增量缺失且整包不可发）。诊断会给出
-`UPDATE_DECIDED_BUT_NOTHING_SERVABLE` 这条结论，再用 `pushy.diff.status`
-看任务是否积压或失败。
-
-**自部署可以用吗？**
-可以。自部署需要执行 `prisma/migrations/add_mcp_tokens.sql`，并设置
-`MCP_ENABLED=1` 与 `MCP_ALLOWED_HOSTS`；不设置时 `/mcp` 整条路由返回 404。
