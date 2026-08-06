@@ -49,7 +49,7 @@ export default defineConfig({
           text: '高阶用法',
           items: [
             { text: 'API 文档', link: '/docs/api' },
-            { text: 'API Token', link: '/docs/api-token' },
+            { text: 'API Key', link: '/docs/api-token' },
             { text: 'MCP 服务', link: '/docs/mcp' },
             { text: '命令行工具', link: '/docs/cli' },
             { text: '场景实践', link: '/docs/bestpractice' },
