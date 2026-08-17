@@ -94,9 +94,9 @@ function Page1() {
 					</p>
 				</div>
 
-				<div className="grid gap-5 lg:grid-cols-3" onMouseMove={trackSpotlight}>
+				<div className="grid gap-5 lg:grid-cols-6" onMouseMove={trackSpotlight}>
 					{/* 1 — 增量更新（大卡，含差量对比可视化） */}
-					<div data-reveal className={`${cardBase} lg:col-span-2`}>
+					<div data-reveal className={`${cardBase} lg:col-span-4`}>
 						{cardGlow}
 						<div className="relative flex flex-col h-full">
 							<div className="flex items-center gap-4">
@@ -139,7 +139,7 @@ function Page1() {
 					<div
 						data-reveal
 						style={{ "--reveal-delay": "80ms" } as CSSProperties}
-						className={cardBase}
+						className={`${cardBase} lg:col-span-2`}
 					>
 						{cardGlow}
 						<div className="relative">
@@ -159,7 +159,7 @@ function Page1() {
 					</div>
 
 					{/* 3 — 快捷发布 */}
-					<div data-reveal className={cardBase}>
+					<div data-reveal className={`${cardBase} lg:col-span-2`}>
 						{cardGlow}
 						<div className="relative">
 							<div className="flex items-center gap-4">
@@ -179,7 +179,7 @@ function Page1() {
 					<div
 						data-reveal
 						style={{ "--reveal-delay": "80ms" } as CSSProperties}
-						className={cardBase}
+						className={`${cardBase} lg:col-span-2`}
 					>
 						{cardGlow}
 						<div className="relative">
@@ -200,7 +200,7 @@ function Page1() {
 					<div
 						data-reveal
 						style={{ "--reveal-delay": "160ms" } as CSSProperties}
-						className={cardBase}
+						className={`${cardBase} lg:col-span-2`}
 					>
 						{cardGlow}
 						<div className="relative">
@@ -219,26 +219,24 @@ function Page1() {
 					</div>
 
 					{/* 6 — MCP 服务 */}
-					<div
-						data-reveal
-						style={{ "--reveal-delay": "240ms" } as CSSProperties}
-						className={cardBase}
-					>
+					<div data-reveal className={`${cardBase} lg:col-span-3`}>
 						{cardGlow}
-						<div className="relative">
-							<div className="flex items-center gap-4">
-								<FeatureIcon tint="bg-amber-500/10 text-amber-400">
-									<path d="M12 3l1.9 4.3L18 9l-4.1 1.7L12 15l-1.9-4.3L6 9l4.1-1.7L12 3z" />
-									<path d="M18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9L18 15z" />
-								</FeatureIcon>
-								<h3 className="text-xl font-bold text-slate-50">MCP 服务</h3>
+						<div className="relative flex flex-col h-full justify-between">
+							<div>
+								<div className="flex items-center gap-4">
+									<FeatureIcon tint="bg-amber-500/10 text-amber-400">
+										<path d="M12 3l1.9 4.3L18 9l-4.1 1.7L12 15l-1.9-4.3L6 9l4.1-1.7L12 3z" />
+										<path d="M18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9L18 15z" />
+									</FeatureIcon>
+									<h3 className="text-xl font-bold text-slate-50">MCP 服务</h3>
+								</div>
+								<p className="mt-3 text-[15px] leading-relaxed text-slate-400">
+									把 Pushy 接进 Claude Desktop、IDE 或自建 Agent，直接问“这台设备为什么没收到更新”，全程只读。
+								</p>
 							</div>
-							<p className="mt-3 text-[15px] leading-relaxed text-slate-400">
-								把 Pushy 接进 Claude Desktop、IDE 或自建 Agent，直接问“这台设备为什么没收到更新”，全程只读。
-							</p>
 							<a
 								href="/docs/mcp"
-								className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-amber-400 hover:text-amber-300 transition-colors"
+								className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-amber-400 hover:text-amber-300 transition-colors"
 							>
 								了解 MCP 服务
 								<span aria-hidden="true">→</span>
@@ -246,25 +244,31 @@ function Page1() {
 						</div>
 					</div>
 
-					{/* 7 — 技术支持（横向长卡） */}
-					<div data-reveal className={`${cardBase} lg:col-span-3`}>
+					{/* 7 — 技术支持 */}
+					<div
+						data-reveal
+						style={{ "--reveal-delay": "80ms" } as CSSProperties}
+						className={`${cardBase} lg:col-span-3`}
+					>
 						{cardGlow}
-						<div className="relative flex flex-col sm:flex-row sm:items-center gap-6">
-							<FeatureIcon tint="bg-rose-500/10 text-rose-400">
-								<path d="M21 12a8.5 8.5 0 01-8.5 8.5c-1.5 0-3-.4-4.2-1L3 21l1.5-5.3c-.6-1.2-1-2.6-1-4.2A8.5 8.5 0 0112 3a8.5 8.5 0 019 9z" />
-								<path d="M8.5 12h.01M12 12h.01M15.5 12h.01" />
-							</FeatureIcon>
-							<div className="flex-1">
-								<h3 className="text-xl font-bold text-slate-50">
-									专业技术支持
-								</h3>
-								<p className="mt-2 text-[15px] leading-relaxed text-slate-400 max-w-2xl">
+						<div className="relative flex flex-col h-full justify-between">
+							<div>
+								<div className="flex items-center gap-4">
+									<FeatureIcon tint="bg-rose-500/10 text-rose-400">
+										<path d="M21 12a8.5 8.5 0 01-8.5 8.5c-1.5 0-3-.4-4.2-1L3 21l1.5-5.3c-.6-1.2-1-2.6-1-4.2A8.5 8.5 0 0112 3a8.5 8.5 0 019 9z" />
+										<path d="M8.5 12h.01M12 12h.01M15.5 12h.01" />
+									</FeatureIcon>
+									<h3 className="text-xl font-bold text-slate-50">
+										专业技术支持
+									</h3>
+								</div>
+								<p className="mt-3 text-[15px] leading-relaxed text-slate-400">
 									官方技术支持群随时在线，工作时间内小时级响应，陪你解决接入与发布路上的每一个问题。
 								</p>
 							</div>
 							<a
 								href="/docs/faq"
-								className="inline-flex items-center gap-2 text-sm font-semibold text-blue-400 hover:text-blue-300 transition-colors shrink-0"
+								className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-rose-400 hover:text-rose-300 transition-colors"
 							>
 								查看常见问题
 								<span aria-hidden="true">→</span>
