@@ -52,7 +52,7 @@ export default function Root() {
 }
 ```
 
-如没有特别的自定义需求，那么到此热更新已经可以开始正常运作（如需在应用内执行 apk 更新，还需配置[安装权限](/docs/api.md#async-function-downloadandinstallapkurl)）。在默认的配置下，在 App 启动，以及从后台切换到前台时会触发更新检查，弹出提示的内容也固定。
+如没有特别的自定义需求，那么到此热更新已经可以开始正常运作（如需在应用内执行 apk 更新，还需配置[安装权限与系统确认流程](/docs/api.md#async-function-downloadandinstallapkurl)）。在默认的配置下，在 App 启动，以及从后台切换到前台时会触发更新检查，弹出提示的内容也固定。
 
 如需简单调整检查和更新策略，可参考以下内置的策略参数：
 
@@ -203,7 +203,7 @@ function App() {
 
 `updateInfo` 有三种情况：
 
-1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），开发者应该在 pushy 的管理后台添加一个更新下载链接，并自行提示用户下载。如需在应用内执行 apk 更新，还需配置[安装权限](/docs/api.md#async-function-downloadandinstallapkurl)。
+1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），开发者应该在 pushy 的管理后台添加一个更新下载链接，并自行提示用户下载。如需在应用内执行 apk 更新，还需配置[安装权限与系统确认流程](/docs/api.md#async-function-downloadandinstallapkurl)。
 
 2. `{upToDate: true}`：当前已经更新到最新，无需进行更新。
 

@@ -848,7 +848,7 @@ export default function Root() {
 }
 ```
 
-如没有特别的自定义需求，那么到此热更新已经可以开始正常运作（如需在应用内执行 apk 更新，还需配置[安装权限](/docs/api.md#async-function-downloadandinstallapkurl)）。在默认的配置下，在 App 启动，以及从后台切换到前台时会触发更新检查，弹出提示的内容也固定。
+如没有特别的自定义需求，那么到此热更新已经可以开始正常运作（如需在应用内执行 apk 更新，还需配置[安装权限与系统确认流程](/docs/api.md#async-function-downloadandinstallapkurl)）。在默认的配置下，在 App 启动，以及从后台切换到前台时会触发更新检查，弹出提示的内容也固定。
 
 如需简单调整检查和更新策略，可参考以下内置的策略参数：
 
@@ -999,7 +999,7 @@ function App() {
 
 `updateInfo` 有三种情况：
 
-1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），开发者应该在 pushy 的管理后台添加一个更新下载链接，并自行提示用户下载。如需在应用内执行 apk 更新，还需配置[安装权限](/docs/api.md#async-function-downloadandinstallapkurl)。
+1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），开发者应该在 pushy 的管理后台添加一个更新下载链接，并自行提示用户下载。如需在应用内执行 apk 更新，还需配置[安装权限与系统确认流程](/docs/api.md#async-function-downloadandinstallapkurl)。
 
 2. `{upToDate: true}`：当前已经更新到最新，无需进行更新。
 
@@ -1640,7 +1640,7 @@ interface UpdateContext {
 
 触发更新检查，返回`updateInfo`（注意在 v10.26.0 版本之前，`checkUpdate`方法本身没有返回值，只能从`useUpdate()`返回的`updateInfo`中获取，且我们仍然推荐优先使用`useUpdate()`来获取），返回值有三种情形：
 
-1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），需要引导用户下载或跳转到应用市场(需要在网页管理端设置中填写`downloadUrl`)。如需在应用内执行 apk 更新，还需配置[安装权限](/docs/api.md#async-function-downloadandinstallapkurl)。
+1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），需要引导用户下载或跳转到应用市场(需要在网页管理端设置中填写`downloadUrl`)。如需在应用内执行 apk 更新，还需配置[安装权限与系统确认流程](/docs/api.md#async-function-downloadandinstallapkurl)。
 
 ```js
 {
@@ -1675,20 +1675,23 @@ interface UpdateContext {
 
 #### async function downloadAndInstallApk(url)
 
-下载更新的 apk 包并直接安装。`url`必须为可直接下载到 apk 文件的地址。
+下载更新的 apk 包，并通过 Android 系统的 `PackageInstaller` 发起安装。`url` 必须为可直接下载到 apk 文件的地址。此功能仅支持 Android 5.0（API 21）及以上版本。
 
-由于系统安全限制等各种外部因素，此功能并不能保证一定正常调用。在应用当前运行周期内，如果下载或者安装失败，则再次调用时不会重试，只会静默失败。
+安装必须由用户主动触发并在系统安装界面中确认，普通应用无法使用此 API 静默安装。方法在系统确认界面成功打开后返回，并不表示用户已经完成安装。
 
-注意要使用这个功能还需要在`AndroidManifest.xml`中手动添加安装权限，如果需要考虑 Android 7.0 以下的客户，则还需要添加外部存储权限。
+要使用此功能，需要在最终应用的 `AndroidManifest.xml` 中手动声明安装权限：
 
 ```xml
 <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-
-<!-- 如果需要考虑Android 7.0以下的客户，则还需要添加外部存储权限 -->
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 ```
 
-注意某些应用市场可能会因为上述权限拒绝应用上架。去掉上述两个权限并不影响热更新功能。
+APK 下载到应用私有目录后会直接写入 `PackageInstaller.Session`，不需要申请外部存储权限。
+
+在 Android 8.0（API 26）及以上版本中，用户还必须允许当前应用“安装未知应用”。首次调用时如果尚未授权，SDK 会打开当前应用对应的系统设置页，并以 `APK_INSTALL_PERMISSION_REQUIRED` 错误结束本次调用。用户完成授权后，需要再次调用此方法。提交安装 Session 后，SDK 会处理 `STATUS_PENDING_USER_ACTION` 并打开 Android 系统提供的安装确认界面；用户拒绝确认时不会安装。
+
+:::warning
+`REQUEST_INSTALL_PACKAGES` 属于敏感权限，不应添加到不需要应用内 APK 安装的渠道包。Google Play 不允许使用该权限实现应用自更新；Google Play 渠道应移除此权限，并改为跳转应用商店或使用 Google Play 的应用内更新机制。移除该权限只会禁用 APK 整包安装，不影响 Pushy 的热更新功能。
+:::
 
 ***
 

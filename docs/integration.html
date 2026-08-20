@@ -5,12 +5,12 @@
 <title>代码集成 - Pushy 极速热更新</title>
 <script>(function(){var h=location.hostname;if(h!=='localhost'&&h!=='127.0.0.1'&&h!=='::1'&&h!=='[::1]')return;if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})})}if('caches' in window){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})})}})();</script>
 <link href="/static/css/styles.72b3eed2bd.css" rel="stylesheet">
-<link rel="preload" href="/static/js/async/route-3d00bbce5c09.0fcb01c2ff.js" as="script">
+<link rel="preload" href="/static/js/async/route-3d00bbce5c09.d510c97b75.js" as="script">
 <script defer src="/static/js/styles.2f5af7e6f7.js"></script>
 <script defer src="/static/js/lib-react.03976590ad.js"></script>
 <script defer src="/static/js/lib-router.e8a430f2dd.js"></script>
 <script defer src="/static/js/343.98aa607a17.js"></script>
-<script defer src="/static/js/index.dd7c555938.js"></script>
+<script defer src="/static/js/index.af14ddbe5d.js"></script>
 <script src="/register-pwa.js" defer></script>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="generator" content="Rspress v2.0.19">
@@ -61,7 +61,7 @@
 <span class="line"><span style="color:var(--shiki-foreground)">    &lt;/</span><span style="color:var(--shiki-token-constant)">UpdateProvider</span><span style="color:var(--shiki-foreground)">&gt;</span></span>
 <span class="line"><span style="color:var(--shiki-foreground)">  );</span></span>
 <span class="line"><span style="color:var(--shiki-foreground)">}</span></span></code></pre></div><div class="rp-code-button-group"><button class="rp-code-button-group__button rp-code-wrap-button" title="Toggle code wrap" aria-label="Toggle code wrap"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" class="rp-code-button-group__icon rp-code-button-group__icon--wrapped"><path fill="currentColor" d="M21 5H3v2h18zM3 19h7v-2H3zm0-6h15c1 0 2 .43 2 2s-1 2-2 2h-2v-2l-4 3 4 3v-2h2c2.95 0 4-1.27 4-4 0-2.72-1-4-4-4H3z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" class="rp-code-button-group__icon rp-code-button-group__icon--wrap"><path fill="currentColor" d="M16 7H3V5h13zM3 19h13v-2H3zm19-7-4-3v2H3v2h15v2z"></path></svg></button><button class="rp-code-button-group__button rp-code-copy-button" title="Copy code"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" class="rp-code-button-group__icon rp-code-copy-button__icon rp-code-copy-button__icon--copy"><path fill="currentColor" d="M20 8v12H8V8zm0-2H8a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2"></path><path fill="currentColor" d="M4 16H2V4a2 2 0 0 1 2-2h12v2H4Z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" class="rp-code-button-group__icon rp-code-copy-button__icon rp-code-copy-button__icon--success"><path fill="currentColor" d="m9.55 18-5.7-5.7 1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"></path></svg></button></div></div></div>
-<p>如没有特别的自定义需求，那么到此热更新已经可以开始正常运作（如需在应用内执行 apk 更新，还需配置<a href="/docs/api.html#async-function-downloadandinstallapkurl" class="rp-link">安装权限</a>）。在默认的配置下，在 App 启动，以及从后台切换到前台时会触发更新检查，弹出提示的内容也固定。</p>
+<p>如没有特别的自定义需求，那么到此热更新已经可以开始正常运作（如需在应用内执行 apk 更新，还需配置<a href="/docs/api.html#async-function-downloadandinstallapkurl" class="rp-link">安装权限与系统确认流程</a>）。在默认的配置下，在 App 启动，以及从后台切换到前台时会触发更新检查，弹出提示的内容也固定。</p>
 <p>如需简单调整检查和更新策略，可参考以下内置的策略参数：</p>
 <h4 class="rp-toc-include" id="checkstrategy检查更新策略"><a href="#checkstrategy检查更新策略" class="rp-header-anchor rp-link" aria-hidden="true">#</a>checkStrategy（检查更新策略）</h4>
 <p>用于控制自动检查更新的触发时机：</p>
@@ -185,7 +185,7 @@
 <p><code>updateInfo</code> 有三种情况：</p>
 <ol>
 <li>
-<p><code>{expired: true}</code>：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），开发者应该在 pushy 的管理后台添加一个更新下载链接，并自行提示用户下载。如需在应用内执行 apk 更新，还需配置<a href="/docs/api.html#async-function-downloadandinstallapkurl" class="rp-link">安装权限</a>。</p>
+<p><code>{expired: true}</code>：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），开发者应该在 pushy 的管理后台添加一个更新下载链接，并自行提示用户下载。如需在应用内执行 apk 更新，还需配置<a href="/docs/api.html#async-function-downloadandinstallapkurl" class="rp-link">安装权限与系统确认流程</a>。</p>
 </li>
 <li>
 <p><code>{upToDate: true}</code>：当前已经更新到最新，无需进行更新。</p>
