@@ -5,12 +5,12 @@
 <title>API参考 - Pushy 极速热更新</title>
 <script>(function(){var h=location.hostname;if(h!=='localhost'&&h!=='127.0.0.1'&&h!=='::1'&&h!=='[::1]')return;if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})})}if('caches' in window){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})})}})();</script>
 <link href="/static/css/styles.72b3eed2bd.css" rel="stylesheet">
-<link rel="preload" href="/static/js/async/route-0b5d05c912a1.debcd5467b.js" as="script">
+<link rel="preload" href="/static/js/async/route-0b5d05c912a1.717ecf870a.js" as="script">
 <script defer src="/static/js/styles.2f5af7e6f7.js"></script>
 <script defer src="/static/js/lib-react.03976590ad.js"></script>
 <script defer src="/static/js/lib-router.e8a430f2dd.js"></script>
 <script defer src="/static/js/343.98aa607a17.js"></script>
-<script defer src="/static/js/index.af14ddbe5d.js"></script>
+<script defer src="/static/js/index.8aaa22ff89.js"></script>
 <script src="/register-pwa.js" defer></script>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="generator" content="Rspress v2.0.19">
@@ -376,7 +376,7 @@
 <p>APK 下载到应用私有目录后会直接写入 <code>PackageInstaller.Session</code>，不需要申请外部存储权限。</p>
 <p>在 Android 8.0（API 26）及以上版本中，用户还必须允许当前应用“安装未知应用”。首次调用时如果尚未授权，SDK 会打开当前应用对应的系统设置页，并以 <code>APK_INSTALL_PERMISSION_REQUIRED</code> 错误结束本次调用。用户完成授权后，需要再次调用此方法。提交安装 Session 后，SDK 会处理 <code>STATUS_PENDING_USER_ACTION</code> 并打开 Android 系统提供的安装确认界面；用户拒绝确认时不会安装。</p>
 <div class="rp-callout rp-callout--warning"><div class="rp-callout__title">Warning</div><div class="rp-callout__content"><p>
-<code>REQUEST_INSTALL_PACKAGES</code> 属于敏感权限，不应添加到不需要应用内 APK 安装的渠道包。Google Play 不允许使用该权限实现应用自更新；Google Play 渠道应移除此权限，并改为跳转应用商店或使用 Google Play 的应用内更新机制。移除该权限只会禁用 APK 整包安装，不影响 Pushy 的热更新功能。</p></div></div>
+注意某些应用市场可能会因为上述权限拒绝应用上架。如被明确拒绝，建议去掉上述权限重新提交，不会影响热更新功能。</p></div></div>
 <hr/>
 <h4 class="rp-toc-include" id="function-marksuccess"><a href="#function-marksuccess" class="rp-header-anchor rp-link" aria-hidden="true">#</a>function markSuccess()</h4>
 <p><strong>一般情况下请勿手动调用此函数</strong>。调用此函数作为更新成功的标记（否则下次启动会默认失败自动回滚）。</p>

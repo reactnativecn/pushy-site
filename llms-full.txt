@@ -1690,7 +1690,7 @@ APK 下载到应用私有目录后会直接写入 `PackageInstaller.Session`，�
 在 Android 8.0（API 26）及以上版本中，用户还必须允许当前应用“安装未知应用”。首次调用时如果尚未授权，SDK 会打开当前应用对应的系统设置页，并以 `APK_INSTALL_PERMISSION_REQUIRED` 错误结束本次调用。用户完成授权后，需要再次调用此方法。提交安装 Session 后，SDK 会处理 `STATUS_PENDING_USER_ACTION` 并打开 Android 系统提供的安装确认界面；用户拒绝确认时不会安装。
 
 :::warning
-`REQUEST_INSTALL_PACKAGES` 属于敏感权限，不应添加到不需要应用内 APK 安装的渠道包。Google Play 不允许使用该权限实现应用自更新；Google Play 渠道应移除此权限，并改为跳转应用商店或使用 Google Play 的应用内更新机制。移除该权限只会禁用 APK 整包安装，不影响 Pushy 的热更新功能。
+注意某些应用市场可能会因为上述权限拒绝应用上架。如被明确拒绝，建议去掉上述权限重新提交，不会影响热更新功能。
 :::
 
 ***
