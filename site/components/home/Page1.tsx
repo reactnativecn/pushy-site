@@ -108,8 +108,9 @@ function Page1() {
 								<h3 className="text-xl font-bold text-slate-50">增量更新</h3>
 							</div>
 							<p className="mt-3 text-[15px] leading-relaxed text-slate-400 max-w-md">
-								bsdiff / hdiff 双算法计算差量，只下发真正变化的部分，
-								更新包最小可至 KB 级——用户几乎无感知。
+								bsdiff / hdiff 双算法计算差量，只下发真正变化的部分；
+								针对 Hermes 字节码的专项优化更可把一行文案的修复压到
+								几 KB——用户几乎无感知。
 							</p>
 
 							<div className="mt-8 space-y-4 max-w-md">

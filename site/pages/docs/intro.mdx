@@ -23,7 +23,7 @@ Pushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-n
 
 ### 极致的更新体验
 
-- **🎯 超小更新包**：基于 bsdiff/hdiff 算法的增量更新，通常只需**几十至几百 KB**（相比其他全量更新服务的几十 MB，节省流量 99%+），并针对 Hermes 字节码做了**独家深度优化**（见下方实测数据）
+- **🎯 超小更新包**：基于 bsdiff/hdiff 算法的增量更新，通常只需**几十至几百 KB**（相比其他全量更新服务的几十 MB）；针对 Hermes 字节码的**独家深度优化**更可把一行文案的热修复压到 **3.4 KB**——比全量更新省 99.8% 的流量（见下方实测数据）
 - **⚡️ 极速分发**：国内用户使用阿里云高速 CDN，国外用户智能分流至 Cloudflare，在各地区都使用覆盖率最好的 CDN 服务商，更新成功率高达 **99.9%+**
 - **🛡️ 安全可靠**：内置崩溃回滚机制，出现问题自动回退，确保应用稳定运行
 - **🌐 全平台覆盖**：完美支持 <span style={{whiteSpace: 'nowrap'}}><AppleOutlined style={{fontSize: '16px', color: '#555', marginRight: '6px'}} /> **iOS**</span> <span style={{whiteSpace: 'nowrap'}}><AndroidOutlined style={{fontSize: '16px', color: '#3DDC84', marginRight: '6px'}} /> **Android**</span>, 且业内独家第一方支持 <span style={{whiteSpace: 'nowrap'}}><HarmonyOSOutlined style={{fontSize: '16px', color: '#000', marginRight: '6px'}} /> **鸿蒙（HarmonyOS）**</span>
@@ -40,19 +40,23 @@ Pushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-n
 
 ### 📊 实测数据：针对 Hermes 深度优化的增量算法
 
-Hermes 字节码中充满"偏移量表"——JS 一处小改动会让其后所有偏移整体位移，普通二进制 diff 会因此把补丁体积急剧放大。Pushy 独家引入了 **HBC（Hermes 字节码）结构感知的可逆变换**，从根源上消除这种放大。
+Hermes 字节码在两个层面上都对通用二进制 diff 极不友好，Pushy 把两者一并消除，收益叠加：
+
+- Hermes **每次编译都会重排字符串表**，JS 改一行就会让大部分字符串 ID 重新编号，两份几乎相同的字节码于是处处不同。Pushy 会以同一应用更早的一份字节码为基准编译，把这些 ID 钉死在原位，只有真正的改动才会进入 diff。
+- Hermes 字节码中还充满**"偏移量表"**，中间插入几个字节就会让其后所有偏移整体位移。Pushy 独家引入 **HBC（Hermes 字节码）结构感知的可逆变换**，从根源上消除这种放大。
 
 在真实 React Native 0.86 应用上的实测结果（字节码约 4.4 MB，[评测代码与数据完全公开可复现](https://github.com/sunnylqm/hbc-diff-benchmark)）：
 
 | 迭代场景 | 全量更新 | 传统增量（bsdiff） | Pushy 增量（Hermes 专项优化） |
 |---|---|---|---|
-| 修改一行文案 | 1.9 MB | 93.7 KB | **63.5 KB**（再省 32%） |
-| 新增小功能（约 60 行） | 1.9 MB | 411.6 KB | **285.5 KB**（再省 31%） |
-| 新增中等功能（约 300 行） | 1.9 MB | 551.6 KB | **398.4 KB**（再省 28%） |
+| 修改一行文案 | 1.9 MB | 93.7 KB | **3.4 KB**（小 28 倍） |
+| 新增小功能（约 60 行） | 1.9 MB | 411.6 KB | **50.2 KB**（小 8.2 倍） |
+| 新增中等功能（约 300 行） | 1.9 MB | 551.6 KB | **97.8 KB**（小 5.6 倍） |
 
-- 相比全量更新节省 **95% 以上**的流量，相比传统 bsdiff 增量**再省约 30%**
+- 一行文案的热修复只需下发 **3.4 KB**——比全量更新少 **99.8%**，比传统 bsdiff 增量**小 28 倍**
 - **改动越小、收益越大**——恰好是热修复中最高频的场景
-- 安全兜底：变换前对字节码结构做全量校验，任何不匹配自动回退到普通增量路径；Hermes 版本升级时**客户端零改动**自动兼容
+- **应用侧无需任何改动**：两项优化都发生在构建期，已上架的应用从下一次发版起自动受益
+- 安全兜底：每次构建都会与未优化的产物比对校验，任何不匹配自动回退；Hermes 版本升级时**客户端零改动**自动兼容
 
 ## 💰 性价比之选
 
