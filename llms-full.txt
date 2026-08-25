@@ -2022,7 +2022,41 @@ AI 会查出这个包当前绑定的版本、重放一次更新判定、检查�
 
 在 [Pushy 管理后台](https://pushy-admin.reactnative.cn) 打开「MCP 服务」，填写名称与客户端名称，**勾选允许访问的应用**，创建后立即复制令牌（只显示一次）。
 
-### 2. 配置客户端
+### 2. 让 AI 自己装（推荐）
+
+把下面这段整段复制给你的 AI 助手（Claude Code、Cursor、Codex、Gemini CLI 等都可以），**先把里面的令牌换成你自己的**，它会自己找到配置位置并完成安装与验证：
+
+```text
+请帮我在当前客户端里安装 Pushy 热更新的 MCP 服务。
+
+服务信息（固定，不要改动）：
+- 名称：pushy
+- 传输方式：HTTP（Streamable HTTP，不是 stdio、不是 SSE）
+- 地址：https://update.reactnative.cn/api/mcp
+- 鉴权：请求头 Authorization: Bearer <令牌>
+- 我的令牌：pushy_mcp_xxxxxxxx   ← 复制后把这里换成后台生成的令牌
+
+请按下面的步骤执行：
+
+1. 先确认我正在用哪个客户端（Claude Code / Claude Desktop / Cursor / VS Code /
+   Codex / Cline / Gemini CLI 等），找到它对应的 MCP 配置文件或命令行。
+   判断不出来就先问我，不要随便猜一个写进去。
+2. 用该客户端的官方方式添加。有官方 CLI（如 claude mcp add、codex mcp add、
+   gemini mcp add）就优先用 CLI；否则手改配置文件：改之前先备份，保留文件里
+   已有的其他 MCP 服务，不要整个覆盖。
+3. 如果这个客户端只支持 stdio，不支持远程 HTTP，就改用代理方式：
+   npx -y mcp-remote https://update.reactnative.cn/api/mcp --header "Authorization: Bearer <令牌>"
+4. 令牌等同密钥：优先写进用户级（全局）配置，不要写进会被 git 提交的项目文件。
+   如果只能写在项目里，先确认该文件已在 .gitignore 中，并提醒我。
+5. 装完做一次验证：列出 pushy 提供的工具，并调用一个只读查询（例如列出我有
+   权限的应用），把结果贴给我。如果返回 401/403，说明令牌无效或没有勾选应用
+   权限，告诉我去后台重新创建令牌，不要反复重试。
+6. 最后一句话总结：改了哪个文件 / 执行了什么命令，以及需不需要重启客户端。
+
+补充：这个 MCP 是只读的，只会查询发布状态，不会发版、不会改配置。
+```
+
+### 3. 或者手动配置
 
 以 Claude Desktop 为例：
 
@@ -2040,7 +2074,7 @@ AI 会查出这个包当前绑定的版本、重放一次更新判定、检查�
 }
 ```
 
-### 3. 直接提问
+### 4. 直接提问
 
 连上之后按上面的场景提问即可，不需要记工具名。
 
