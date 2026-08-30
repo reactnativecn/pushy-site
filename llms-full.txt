@@ -2,7 +2,7 @@
 url: /docs/intro.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt, and this page is available as Markdown at /docs/intro.md.
+> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
 
 # Pushy - 专业的热更新解决方案
 
@@ -120,7 +120,7 @@ const pushyClient = new Pushy({ appKey });
 url: /docs/skills.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt, and this page is available as Markdown at /docs/skills.md.
+> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
 
 # 推荐：先安装 Skill，再让 AI 自动集成
 
@@ -205,7 +205,7 @@ npx skills update
 url: /docs/getting-started.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt, and this page is available as Markdown at /docs/getting-started.md.
+> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
 
 # 安装配置
 
@@ -798,7 +798,7 @@ Enter appId: <输入应用前面的编号>
 url: /docs/integration.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt, and this page is available as Markdown at /docs/integration.md.
+> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
 
 # 代码集成
 
@@ -1037,7 +1037,7 @@ const pushyClient = new Pushy({
 url: /docs/publish.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt, and this page is available as Markdown at /docs/publish.md.
+> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
 
 # 发布热更新
 
@@ -1286,7 +1286,7 @@ Would you like to bind packages to this version?(Y/N)
 url: /docs/api.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt, and this page is available as Markdown at /docs/api.md.
+> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
 
 # API参考
 
@@ -1853,7 +1853,7 @@ UpdateContext.setCustomInstanceManager(mReactInstanceManager);
 url: /docs/api-token.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt, and this page is available as Markdown at /docs/api-token.md.
+> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
 
 # API Key
 
@@ -1990,7 +1990,7 @@ API Key 撤销后立即生效，使用该 API Key 的所有请求将被拒绝。
 url: /docs/mcp.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt, and this page is available as Markdown at /docs/mcp.md.
+> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
 
 # MCP 服务
 
@@ -2101,7 +2101,7 @@ AI 会查出这个包当前绑定的版本、重放一次更新判定、检查�
 url: /docs/cli.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt, and this page is available as Markdown at /docs/cli.md.
+> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
 
 # 命令行工具
 
@@ -2434,7 +2434,7 @@ react-native-update: 10.28.11 （最新：10.28.11）
 url: /docs/bestpractice.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt, and this page is available as Markdown at /docs/bestpractice.md.
+> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
 
 # 场景实践
 
@@ -2587,7 +2587,7 @@ if (metaInfo.silent) {
 url: /docs/faq.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt, and this page is available as Markdown at /docs/faq.md.
+> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
 
 # 常见问题
 
@@ -2784,7 +2784,7 @@ url: /docs/faq.md
 url: /pricing.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt, and this page is available as Markdown at /pricing.md.
+> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
 
 ## 公平透明的价格体系
 
@@ -2934,7 +2934,7 @@ React Native 中文网 © 2026 武汉青罗网络科技有限公司
 url: /index.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt, and this page is available as Markdown at /index.md.
+> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
 
 [官方 Skill 已上线 · AI 一句话完成接入→](/docs/skills)HarmonyOS 已支持
 
