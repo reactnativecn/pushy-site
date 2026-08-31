@@ -52,6 +52,7 @@ export default defineConfig({
             { text: 'API Key', link: '/docs/api-token' },
             { text: 'MCP 服务', link: '/docs/mcp' },
             { text: '命令行工具', link: '/docs/cli' },
+            { text: 'JS 报错监控', link: '/docs/errors' },
             { text: '场景实践', link: '/docs/bestpractice' },
           ],
         },
