@@ -3170,7 +3170,7 @@ Trusted by teams
 
 ## 热更新出问题，及时发现，及时止损
 
-持续观察每次发布的运行情况。发现异常后及时提醒并自动暂停，避免问题继续扩大。
+持续观察每次发布的运行情况。发现异常后及时提醒并自动暂停，避免问题继续扩大；线上 JS 报错也会自动收集并还原到源码，出了问题不用靠复现来猜。
 
 ### 看清风险
 
@@ -3184,11 +3184,15 @@ Trusted by teams
 
 风险过高时自动暂停，保护更多用户。
 
-[了解版本健康度 →](/docs/api)
+### 定位到行
 
-![Pushy 版本健康度面板，按热更版本和原生包展示下载、Patch、启动及回滚数据](/images/version-health-dashboard.png)
+JS 报错自动还原堆栈，直接指到出错的源码行。
 
-Pushy Admin 版本健康度本地示例数据
+[了解版本健康度 →](/docs/api)[了解 JS 报错监控 →](/docs/errors)
+
+![Pushy 版本健康度面板，按热更版本和原生包展示下载、Patch、启动及回滚数据](/images/version-health-dashboard.png)![Pushy 报错详情，堆栈已用 sourcemap 还原到源码行，并展示出错行前后的源码上下文](/images/error-detail-symbolicate.png)
+
+版本健康度：每个热更版本的下载、启动、回滚一屏看完
 
 Why Pushy
 
