@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "rspress dev",
-    "build": "rspress build",
+    "build": "rspress build && node scripts/build-mcp-docs-index.mjs",
     "preview": "rspress preview",
     "start": "rspress preview",
     "remotion:studio": "remotion studio remotion/index.ts --public-dir=pages/public",
