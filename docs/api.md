@@ -85,6 +85,11 @@ interface PushyOptions {
   // 此选项需 v10.47.0+ 版本
   disableTelemetry?: boolean;
 
+  // 是否关闭 JS 报错上报，默认为 false（开启）
+  // 详见「JS 报错监控」一节：https://pushy.reactnative.cn/docs/errors
+  // 此选项需 v10.55.0+ 版本
+  disableErrorReporting?: boolean;
+
   // 是否关闭原生冷启动检测（每次冷启动后由原生代码独立发起的后台检查），
   // 默认为 false（开启）。关闭后将失去「强制启动」救砖通道，
   // 详见下方「原生冷启动检测」一节
@@ -186,6 +191,18 @@ const pushyClient = new Pushy({
 ```
 
 注意：关闭后管理端将无法统计该客户端的版本健康度，也无法在版本发生大面积异常时为你提供预警。
+
+#### JS 报错上报
+
+自 v10.55.0 起，SDK 会把热更版本中发生的 JavaScript 异常上报给更新服务，管理后台用发布时归档的 sourcemap 把堆栈还原回原始源码位置。未捕获异常会自动上报（在 React Native 现有的全局 `ErrorUtils` 处理器之上追加一层，不影响 Sentry 等已有集成），也可以在 `catch` 中手动调用 `captureException`：
+
+```js
+pushyClient.captureException(error, {
+  extra: { screen: "checkout" },
+});
+```
+
+如不希望上报，可在初始化时设置 `disableErrorReporting: true`。完整说明（包括后台界面、sourcemap 归档要求与手动上报用法）见 [JS 报错监控](/docs/errors.md)。
 
 #### 原生冷启动检测
 
@@ -436,6 +453,22 @@ console.log(currentVersionInfo.name);
     name: '1.0.3-rc',
     description: '添加聊天功能\n修复商城页面BUG',
     metaInfo: '{"silent":true}',
+}
+```
+
+***
+
+#### function captureException(error, context?)
+
+手动上报一个 JavaScript 异常，需 v10.55.0+ 版本。`context` 可选 `fatal`（是否致命，默认 false）、`componentStack`（React 组件堆栈）与 `extra`（自定义上下文，仅接受字符串、数字、布尔与 null，最多 32 个字段）。
+
+调用是同步返回、永不抛错的：传输在后台进行，失败静默，同一个 error 对象只会上报一次。仅在运行于热更版本时上报，调试环境（`__DEV__`）下不上报。详见 [JS 报错监控](/docs/errors.md)。
+
+```js
+try {
+  await submitOrder(order);
+} catch (e) {
+  pushyClient.captureException(e, { extra: { orderId: order.id } });
 }
 ```
 
