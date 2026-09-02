@@ -1,19 +1,81 @@
-import type { CSSProperties } from "react";
+import { type CSSProperties, useEffect, useState } from "react";
 import GitHubButton from "./GitHubButton";
 
 interface BannerProps {
 	isMobile?: boolean;
 }
 
-const heroStats = [
-	{ value: "KB 级", label: "增量更新包" },
-	{ value: "秒级", label: "CDN 全球分发" },
-	{ value: "自动", label: "崩溃回滚保护" },
+const heroSlides = [
+	{
+		id: "speed",
+		tag: "极速交付",
+		highlight: "秒级抵达用户",
+		description:
+			"Pushy 是为 React Native 打造的热更新服务。修复与新功能即刻上线，无需等待应用商店漫长审核。",
+		stats: [
+			{ value: "0 秒", label: "免应用商店审核" },
+			{ value: "秒级", label: "CDN 全球分发" },
+			{ value: "自动", label: "崩溃回滚保护" },
+		],
+	},
+	{
+		id: "patch",
+		tag: "增量差分",
+		highlight: "省去 90% 流量",
+		description:
+			"基于智能 HDiff 差分算法生成微小更新包，几十 KB 即可完成更新，弱网与移动网络下也能丝滑升级。",
+		stats: [
+			{ value: "42 KB", label: "平均增量体积" },
+			{ value: "90%+", label: "节省下行流量" },
+			{ value: "静默", label: "后台无感就绪" },
+		],
+	},
+	{
+		id: "safety",
+		tag: "稳定保障",
+		highlight: "自带安全熔断",
+		description:
+			"遇到未知异常自动检测并秒级回滚到上一稳定版本，杜绝线上崩溃风险，保障核心业务永不中断。",
+		stats: [
+			{ value: "100%", label: "崩溃自动回滚" },
+			{ value: "可灰度", label: "按人群/版本发布" },
+			{ value: "秒级", label: "一键暂停撤回" },
+		],
+	},
+	{
+		id: "ai",
+		tag: "AI 原生",
+		highlight: "一句话完成接入",
+		description:
+			"官方 Skill 与 MCP 工具赋能，AI Agent 自动分析项目架构、安装依赖并完成热更新集成与发布。",
+		stats: [
+			{ value: "1 句话", label: "AI 自动接入" },
+			{ value: "12+ 工具", label: "官方 MCP 赋能" },
+			{ value: "三端", label: "iOS / Android / 鸿蒙" },
+		],
+	},
 ];
 
 function Banner(_props: BannerProps) {
+	const [activeSlide, setActiveSlide] = useState(0);
+	const [isPaused, setIsPaused] = useState(false);
+
+	useEffect(() => {
+		if (isPaused) return;
+		const timer = setInterval(() => {
+			setActiveSlide((prev) => (prev + 1) % heroSlides.length);
+		}, 4500);
+		return () => clearInterval(timer);
+	}, [isPaused]);
+
+	const current = heroSlides[activeSlide];
+
 	return (
-		<section className="relative overflow-hidden min-h-[90vh] lg:min-h-[96vh] flex items-center">
+		<section
+			className="relative overflow-hidden min-h-[90vh] lg:min-h-[96vh] flex items-center"
+			onMouseEnter={() => setIsPaused(true)}
+			onMouseLeave={() => setIsPaused(false)}
+		>
 			{/* 1. Fullscreen Immersive Background Video */}
 			<div className="absolute inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
 				<video
@@ -54,7 +116,7 @@ function Banner(_props: BannerProps) {
 				<div className="grid lg:grid-cols-[1.1fr_0.9fr] items-center gap-12 lg:gap-10">
 					{/* ---- Left: copy & CTAs ---- */}
 					<div className="max-w-2xl">
-						<div className="flex flex-wrap items-center gap-3 mb-8 sm:mb-10">
+						<div className="flex flex-wrap items-center gap-3 mb-6 sm:mb-8">
 							<a
 								href="/docs/skills"
 								className="group inline-flex items-center gap-2.5 rounded-full border border-white/20 bg-black/45 backdrop-blur-md px-4 py-1.5 text-sm text-slate-100 hover:border-blue-400/60 hover:text-white transition-all duration-300 shadow-xl"
@@ -73,20 +135,48 @@ function Banner(_props: BannerProps) {
 							</span>
 						</div>
 
-						<h1 className="text-[2.75rem] leading-[1.12] sm:text-6xl lg:text-[4.25rem] font-extrabold tracking-tight text-white mb-7 drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)]">
+						{/* Headline with dynamic highlight replacement */}
+						<h1 className="text-[2.75rem] leading-[1.12] sm:text-6xl lg:text-[4.25rem] font-extrabold tracking-tight text-white mb-6 drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)]">
 							让每一次发布
 							<br />
-							<span className="bg-clip-text text-transparent bg-[linear-gradient(100deg,#38bdf8_0%,#818cf8_50%,#c084fc_100%)]">
-								秒级抵达用户
+							<span
+								key={activeSlide}
+								className="pushy-slide-text bg-clip-text text-transparent bg-[linear-gradient(100deg,#38bdf8_0%,#818cf8_50%,#c084fc_100%)]"
+							>
+								{current.highlight}
 							</span>
 						</h1>
 
-						<p className="text-lg sm:text-xl text-slate-100 leading-relaxed max-w-xl mb-11 drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)] font-normal">
-							Pushy 是为 React Native 打造的热更新服务。KB 级增量包、全球 CDN
-							分发、崩溃自动回滚——修复与新功能即刻上线，
-							<span className="text-white font-semibold">无需等待应用商店审核</span>。
+						{/* Description dynamic replacement */}
+						<p
+							key={`desc-${activeSlide}`}
+							className="pushy-slide-text text-lg sm:text-xl text-slate-100 leading-relaxed max-w-xl mb-6 drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)] font-normal min-h-[3.8rem]"
+						>
+							{current.description}
 						</p>
 
+						{/* Interactive Highlight Slide Tabs (No progress bar, clean pills) */}
+						<div className="flex flex-wrap items-center gap-2 sm:gap-2.5 mb-10">
+							{heroSlides.map((slide, idx) => {
+								const isActive = idx === activeSlide;
+								return (
+									<button
+										key={slide.id}
+										type="button"
+										onClick={() => setActiveSlide(idx)}
+										className={`group relative flex items-center px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-300 ${
+											isActive
+												? "bg-white/20 text-white border border-white/40 shadow-lg backdrop-blur-md"
+												: "bg-black/35 text-slate-300 border border-white/10 hover:bg-white/10 hover:text-white backdrop-blur-sm"
+										}`}
+									>
+										{slide.tag}
+									</button>
+								);
+							})}
+						</div>
+
+						{/* CTA Action Buttons */}
 						<div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-12">
 							<a href="/docs/skills" className="w-full sm:w-auto">
 								<button
@@ -113,14 +203,18 @@ function Banner(_props: BannerProps) {
 							</div>
 						</div>
 
-						<dl className="grid grid-cols-3 gap-6 border-t border-white/15 pt-8 max-w-xl">
-							{heroStats.map((stat) => (
-								<div key={stat.label}>
+						{/* Stats Row linked to current slide (strictly horizontal 3 columns) */}
+						<dl
+							key={`stats-${activeSlide}`}
+							className="pushy-slide-grid grid grid-cols-3 gap-6 border-t border-white/15 pt-8 max-w-xl w-full"
+						>
+							{current.stats.map((stat) => (
+								<div key={stat.label} className="min-w-0">
 									<dt className="sr-only">{stat.label}</dt>
-									<dd className="text-2xl sm:text-[1.7rem] font-extrabold tracking-tight text-white drop-shadow">
+									<dd className="text-2xl sm:text-[1.7rem] font-extrabold tracking-tight text-white drop-shadow truncate">
 										{stat.value}
 									</dd>
-									<dd className="mt-1 text-sm text-slate-300">{stat.label}</dd>
+									<dd className="mt-1 text-sm text-slate-300 truncate">{stat.label}</dd>
 								</div>
 							))}
 						</dl>

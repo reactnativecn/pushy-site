@@ -282,6 +282,30 @@ body:has(.home-wrapper) {
   display: block;
 }
 
+/* ---------- Highlight Slideshow Transitions ---------- */
+
+.pushy-slide-text {
+  animation: pushy-slide-up 0.52s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.pushy-slide-grid {
+  display: grid !important;
+  animation: pushy-slide-up 0.52s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes pushy-slide-up {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
 .pushy-progress {
   position: relative;
   height: 6px;
