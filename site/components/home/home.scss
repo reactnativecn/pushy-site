@@ -256,41 +256,30 @@ body:has(.home-wrapper) {
   }
 }
 
-/* ---------- Hero pipeline card ---------- */
+/* ---------- Hero video showcase ---------- */
 
-.pushy-pipeline__rail {
+.pushy-hero-stage-glow {
   position: absolute;
-  left: 17px;
-  top: 34px;
-  bottom: 34px;
-  width: 2px;
-  background: rgba(148, 163, 184, 0.16);
-  overflow: hidden;
-
-  &::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    width: 100%;
-    height: 42%;
-    background: linear-gradient(
-      180deg,
-      transparent,
-      #38bdf8 40%,
-      #818cf8 70%,
-      transparent
-    );
-    animation: pushy-beam 3.6s linear infinite;
-  }
+  inset: -1rem;
+  pointer-events: none;
+  border-radius: 9999px;
+  background: radial-gradient(
+    ellipse 80% 60% at 50% 50%,
+    rgba(56, 189, 248, 0.22) 0%,
+    rgba(99, 102, 241, 0.16) 45%,
+    transparent 72%
+  );
+  filter: blur(48px);
 }
 
-@keyframes pushy-beam {
-  from {
-    top: -45%;
-  }
-  to {
-    top: 105%;
-  }
+.pushy-hero-bg-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  display: block;
 }
 
 .pushy-progress {
@@ -543,8 +532,6 @@ body:has(.home-wrapper) {
   .pushy-aurora::after,
   .pushy-aurora__cyan,
   .pushy-btn-primary::after,
-  .pushy-pipeline__rail::after,
-  .pushy-progress::after,
   .pushy-float,
   .pushy-live-dot,
   .pushy-cdn-node,
@@ -558,10 +545,6 @@ body:has(.home-wrapper) {
   .pushy-terminal__line {
     opacity: 1;
     transform: none;
-  }
-
-  .pushy-progress::after {
-    transform: scaleX(1);
   }
 
   .pushy-odometer__reel,
