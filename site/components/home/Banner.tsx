@@ -44,12 +44,12 @@ const heroSlides = [
 	},
 	{
 		id: "ai",
-		tag: "AI 原生",
-		highlight: "一句话完成接入",
+		tag: "AI 协同",
+		highlight: "AI 全自动托管",
 		description:
-			"官方 Skill 与 MCP 工具赋能，AI Agent 自动分析项目架构、安装依赖并完成热更新集成与发布。",
+			"官方 Skill 与 MCP 工具赋能，AI Agent 自动分析项目、生成差分包并执行多端灰度发布。",
 		stats: [
-			{ value: "1 句话", label: "AI 自动接入" },
+			{ value: "一句话", label: "AI 自动发布" },
 			{ value: "12+ 工具", label: "官方 MCP 赋能" },
 			{ value: "三端", label: "iOS / Android / 鸿蒙" },
 		],
