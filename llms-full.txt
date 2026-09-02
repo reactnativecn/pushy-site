@@ -3085,7 +3085,7 @@ url: /index.md
 
 Pushy 是为 React Native 打造的热更新服务。修复与新功能即刻上线，无需等待应用商店漫长审核。
 
-极速交付增量差分稳定保障AI 原生
+极速交付增量差分稳定保障AI 协同
 
 [AI 自动接入](/docs/skills)[5 分钟手动接入](/docs/getting-started)
 
