@@ -3091,34 +3091,7 @@ Pushy 是为 React Native 打造的热更新服务。KB 级增量包、全球 CD
 
 增量更新包KB 级增量更新包CDN 全球分发秒级CDN 全球分发崩溃回滚保护自动崩溃回滚保护
 
-![](/static/svg/logo.8f6d66882a.svg)
-
-release · v2.4.1
-
-生产环境 · iOS + Android
-
-发布中
-
-- 打包 JS Bundle
-
-pushy bundle --platform ios
-- 计算增量差异
-
-新一代 diff 算法 · 仅 42 KB
-- 推送全球 CDN
-
-全球节点同步完成
-- 用户设备自主更新
-
-无需重新下载安装
-
-全量用户覆盖98%
-
-新版本已送达
-
-v2.4.1 · 42 KB · 可无感更新
-
-🚀 可灰度，可全量，可回滚
+生产环境实时生效 · iOS / Android / HarmonyOS
 
 Trusted by teams
 
