@@ -3,7 +3,7 @@
   "product": "Pushy",
   "baseUrl": "https://pushy.react-native.cn",
   "resourceScheme": "pushy-docs",
-  "sourceCommit": "f90f109493c1dd811028b853fbff0976ef55022b",
+  "sourceCommit": "497594f22e58fe30afce19d10ca3fc4eb6fbd3c8",
   "documents": [
     {
       "slug": "api",
@@ -342,7 +342,7 @@
       "path": "pages/docs/cli.md",
       "url": "https://pushy.react-native.cn/docs/cli",
       "resourceUri": "pushy-docs://docs/cli",
-      "content": "# 命令行工具\n\n### 安装\n\n```\n$ npm install -g react-native-update-cli\n```\n\n### 命令\n\n#### pushy bundle\n\n生成热更资源包。会自动探测项目中是否使用了 expo、taro 等框架并自动调用对应的命令行打包。如果探测不准确或使用对应命令行打包时报错，可尝试使用 `--rncli` 参数来指定官方命令行打包。\n\n- platform: ios|android|harmony 对应的平台\n- entryFile: 入口脚本文件\n- intermediaDir: 临时文件输出目录\n- output: 最终 ppk 文件输出路径\n- dev: 是否打包开发版本\n- sourcemap: 是否生成 sourcemap(需 cli 版本 1.11.0+)\n- no-interactive: 不进行交互式提示\n- rncli: 指定使用官方命令行打包 (需 cli 版本 1.40.0+)\n- expo: 指定使用 expo 的命令行打包 (需 cli 版本 1.40.0+)\n- taro: 指定使用 taro 的命令行打包 (需 cli 版本 1.40.0+)\n\n从 v2.22.0 版本开始，Hermes 工程默认启用 **delta 模式**（`hermesc -base-bytecode`）：打包时以同一应用上一版热更的 HBC 为 base 编译，让 Hermes 字符串表跨版本保持稳定，热更 patch 体积通常缩小 5～30 倍。整个过程对客户端透明，产物仍是标准 HBC；任何一步失败都会自动退回普通编译，不会阻塞发版。相关参数：\n\n- hermesBase: `auto`（默认，向服务端查询本应用的 base 并按 sha256 校验）| `none`（关闭）| 本地文件路径（`.hbc` / `.ppk` / `.apk` / `.ipa`，例如用商店包的 bundle 作为 base）\n- verifyHermesBase: 默认 `true`，base 编译后再做一次普通编译并比对两份反汇编，不等价则放弃 base；大 bundle 可传 `false` 换时间\n- cacheMaxMb: 本地 bundle 缓存上限（默认 500 MB / 20 个文件），缓存位于 `.pushy/cache/<sha256>`，也可用环境变量 `PUSHY_CACHE_DIR` / `PUSHY_CACHE_MAX_MB` 调整\n\n注意：只有包含上游 delta 模式修复的 hermesc 才会启用（React Native 自带的经典 hermesc，或 `hermes-compiler` ≥ 250829098）；升级 React Native 导致 HBC 版本变化时会自动开始新的链，首个版本不带 base。另外从 v2.22.0 起 hermesc 总是以 `-output-source-map` 调用，字节码不再包含 debug info（与 RN release 构建一致，体积减少 15%～40%），Hermes 自己的 `.map` 保留在 `.pushy/intermedia/<platform>/` 下以便事后符号化崩溃堆栈。\n\n从 v1.44.2 版本开始，新增了以下直接上传发布的参数（等同于打包完成后连续调用 `pushy publish` 命令）：\n\n- name: 指定热更新版本的名字(热更自身的版本号)\n- description: 指定热更新版本的描述信息，可以对用户进行展示\n- metaInfo: 指定热更新版本的元信息，可以用来保存一些额外信息，具体用法可参考[场景实践](/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。\n\n从 v1.46.1 版本开始，在传入 `name`， `description`， `metaInfo` 参数的同时，可继续叠加以下参数（等同于在调用`pushy publish` 命令后，再连续调用 `pushy update` 命令）：\n\n- packageId: 要绑定的原生包 ID （多选一）\n- packageVersion: 要绑定的原生包版本名（多选一）\n- minPackageVersion: 要绑定的最低原生包版本，大于等于此版本的将逐个绑定（多选一）\n- maxPackageVersion: 要绑定的最高原生包版本，小于等于此版本的将逐个绑定（多选一）\n- packageVersionRange: 要绑定的原生包版本范围（多选一），范围格式遵循 semver 的语法，可参考 [https://quickref.cnxiaobai.com/docs/semver.html](https://quickref.cnxiaobai.com/docs/semver.html) 或 [https://devhints.io/semver](https://devhints.io/semver)\n\n示例：\n\n```bash\n\npushy bundle --platform android --name \"1.0.0\" --description \"热更新版本 1.0.0\" --metaInfo '{\"key\": \"value\"}' --packageVersionRange \">=1.0 <3.0\"\n```\n\n***\n\n#### pushy cache \\[clean]\n\n查看本地 bundle 缓存（Hermes delta 模式的 base 与上传过的 bundle，按 sha256 命名）的占用；`pushy cache clean` 清空缓存。\n\n#### pushy parseIpa \\[ipaFile]\n\n解析 ipa 文件并输出一些相关信息，如版本号，编译时间戳等。\n\n***\n\n#### pushy parseApk \\[apkFile]\n\n解析 apk 文件并输出一些相关信息，如版本号，编译时间戳等。\n\n***\n\n#### pushy parseApp \\[appFile]\n\n解析 app 文件并输出一些相关信息，如版本号，编译时间戳等。\n\n***\n\n#### pushy parseAab \\[aabFile]\n\n解析 aab 文件并输出一些相关信息，如版本号，编译时间戳等。\n\n***\n\n#### pushy diff \\[origin]\\[next]\n\n提供两个 ppk 文件，生成从 origin 到 next 版本的差异更新包。\n\n- output: diff 文件输出路径\n\n***\n\n#### pushy diffFromApk \\[apkFile]\\[next]\n\n提供一个 apk 文件和一个 ppk 文件，生成从 apk 文件到 next 版本的差异更新包。\n\n如果使用热更新开放平台，你不需要自己执行此命令。\n\n- output: diff 文件输出路径\n\n***\n\n#### pushy diffFromApp \\[appFile]\\[next]\n\n提供一个 app 文件和一个 ppk 文件，生成从 app 文件到 next 版本的差异更新包。\n\n如果使用热更新开放平台，你不需要自己执行此命令。\n\n- output: diff 文件输出路径\n\n***\n\n#### pushy diffFromIpa \\[ipaFile]\\[next]\n\n提供一个 ipa 文件和一个 ppk 文件，生成从 ipa 文件到 next 版本的差异更新包。\n\n如果使用热更新开放平台，你不需要自己执行此命令。\n\n- output: diff 文件输出路径\n\n***\n\n#### pushy login \\[email]\\[pwd]\n\n登录热更新开放平台。你需要先登录才能使用下面的命令。\n\n***\n\n#### pushy logout\n\n登出并清除本地的登录信息\n\n***\n\n#### pushy me\n\n查看自己是否已经登录，以及昵称等信息。\n\n***\n\n#### pushy createApp\n\n创建应用并立刻绑定到当前工程。这项操作也可以在网页管理端进行。\n\n- platform: ios|android|harmony 对应的平台\n- name: 应用名称\n- downloadUrl: 应用安装包的下载地址\n\n***\n\n#### pushy deleteApp \\[appId]\n\n删除已有应用。所有已创建的应用包、热更新版本都会被同时删除。这项操作也可以在网页管理端进行。\n\n- appId: 要删除的应用 ID\n\n***\n\n#### pushy apps\n\n查看当前已创建的全部应用。这项操作也可以在网页管理端进行。\n\n- platform: ios|android|harmony 对应的平台\n\n***\n\n#### pushy selectApp \\[appId]\n\n绑定应用到当前工程。\n\n- platform: ios|android|harmony 对应的平台\n\n***\n\n#### pushy uploadIpa \\[ipaFile]\n\n上传 ipa 文件到开放平台。（cli 需 1.24.0 +）\n\n- config: 指定读取的配置文件路径（默认 `update.json`）（需 cli 2.16.1+）\n- appId: 指定上传的目标应用 ID（会覆盖配置文件中的配置）（需 cli 2.16.1+）\n- appKey: 指定上传的目标应用 Key（会覆盖配置文件中的配置）（需 cli 2.16.1+）\n\n***\n\n#### pushy uploadApk \\[apkFile]\n\n上传 apk 文件到开放平台。（cli 需 1.24.0 +）\n\n- config: 指定读取的配置文件路径（默认 `update.json`）（需 cli 2.16.1+）\n- appId: 指定上传的目标应用 ID（会覆盖配置文件中的配置）（需 cli 2.16.1+）\n- appKey: 指定上传的目标应用 Key（会覆盖配置文件中的配置）（需 cli 2.16.1+）\n\n***\n\n#### pushy uploadApp \\[appFile]\n\n上传 app 文件到开放平台。（cli 需 1.24.0 +）\n\n- config: 指定读取的配置文件路径（默认 `update.json`）（需 cli 2.16.1+）\n- appId: 指定上传的目标应用 ID（会覆盖配置文件中的配置）（需 cli 2.16.1+）\n- appKey: 指定上传的目标应用 Key（会覆盖配置文件中的配置）（需 cli 2.16.1+）\n\n***\n\n#### pushy uploadAab \\[aabFile]\n\n上传 aab 文件到开放平台。（cli 需 2.6.0 +）\n\n- config: 指定读取的配置文件路径（默认 `update.json`）（需 cli 2.16.1+）\n- appId: 指定上传的目标应用 ID（会覆盖配置文件中的配置）（需 cli 2.16.1+）\n- appKey: 指定上传的目标应用 Key（会覆盖配置文件中的配置）（需 cli 2.16.1+）\n\n***\n\n#### pushy extractApk \\[aabFile]\n\n从 aab 文件中提取通用 apk 文件。（cli 需 2.6.0+）\n\n用法：`pushy extractApk aab后缀文件 [--output apk文件] [--includeAllSplits] [--splits 分包名列表]`\n\n- output: 指定导出的 apk 文件路径（默认与 aab 同目录同名 `.apk`）\n- includeAllSplits: 提取时包含全部 split（默认仅包含 `base`）\n- splits: 指定额外包含的 split 名称，多个值用英文逗号分隔\n\n示例：\n\n```bash\npushy extractApk android/app/build/outputs/bundle/release/app-release.aab --output app-release.apk\npushy extractApk android/app/build/outputs/bundle/release/app-release.aab --splits config.zh,arm64_v8a\npushy extractApk android/app/build/outputs/bundle/release/app-release.aab --includeAllSplits\n```\n\n***\n\n#### pushy packages\n\n查看已经上传的原生包。这项操作也可以在网页管理端进行。\n\n- platform: ios|android|harmony 对应的平台\n\n***\n\n#### pushy deletePackage\n\n删除已经上传的原生包。\n\n- appId: 要删除的原生包所属的应用 ID\n- packageId: 要删除的原生包 ID\n\n***\n\n#### pushy publish \\[ppkFile]\n\n发布新的热更新版本（ppk 文件）。\n\n- platform: ios|android|harmony 对应的平台\n- name: 当前热更新版本的名字(版本号)\n- description: 当前热更新版本的描述信息，可以对用户进行展示\n- metaInfo: 当前热更新版本的元信息，可以用来保存一些额外信息，具体用法可参考[场景实践](/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。\n\n从 v1.46.1 版本开始，支持以下参数（等同于在 调用`pushy publish` 命令后，再连续调用 `pushy update` 命令）：\n\n- packageId: 要绑定的原生包 ID （多选一）\n- packageVersion: 要绑定的原生包版本名（多选一）\n- minPackageVersion: 要绑定的最低原生包版本，大于等于此版本的将逐个绑定（多选一）\n- maxPackageVersion: 要绑定的最高原生包版本，小于等于此版本的将逐个绑定（多选一）\n- packageVersionRange: 要绑定的原生包版本范围（多选一），范围格式遵循 semver 的语法，可参考 [https://quickref.cnxiaobai.com/docs/semver.html](https://quickref.cnxiaobai.com/docs/semver.html) 或 [https://devhints.io/semver](https://devhints.io/semver)\n\n示例：\n\n```bash\n\npushy publish .pushy/output/android.1750423283653.ppk --platform android --name \"1.0.0\" --description \"热更新版本 1.0.0\" --metaInfo '{\"key\": \"value\"}' --packageVersionRange \">=1.0 <3.0\"\n```\n\n***\n\n#### pushy versions\n\n分页列举可用的版本。这项操作也可以在网页管理端进行。\n\n- platform: ios|android|harmony 对应的平台\n\n***\n\n#### pushy deleteVersion\n\n删除已经发布的热更新版本。\n\n- appId: 要删除的热更新版本所属的应用 ID\n- versionId: 要删除的热更新版本 ID\n\n***\n\n#### pushy update\n\n为一个原生包版本绑定发布一个热更新版本。这项操作也可以在网页管理端进行。以下参数中`packageId`，`packageVersion`，`minPackageVersion`，`maxPackageVersion`和`packageVersionRange`中多选一即可。\n\ncli 2.4.0 版本开始可以同时绑定一个全量和一个灰度版本。2.4.0 之前全量和灰度版本会互相覆盖，后设置的生效。\n\n- platform: ios|android|harmony 对应的平台\n- versionId: 要绑定的热更新版本 ID\n- rollout: 灰度发布范围（整数取值 1 - 100，对应 1% - 100% 终端设备覆盖率），默认为 100（需 cli 版本 1.31.0+）\n- dryRun: 是否只进行预览，不进行实际绑定（需 cli 版本 1.45.4+）\n- packageId: 要绑定的原生包 ID （多选一）\n- packageVersion: 要绑定的原生包版本名（多选一，需 cli 版本 1.7.2+）\n- minPackageVersion: 要绑定的最低原生包版本，大于等于此版本的将逐个绑定（多选一，需 cli 版本 1.27.0+）\n- maxPackageVersion: 要绑定的最高原生包版本，小于等于此版本的将逐个绑定（多选一，需 cli 版本 1.27.0+）\n- packageVersionRange: 要绑定的原生包版本范围（多选一，需 cli 版本 1.45.4+），范围格式遵循 semver 的语法，可参考 [https://quickref.cnxiaobai.com/docs/semver.html](https://quickref.cnxiaobai.com/docs/semver.html) 或 [https://devhints.io/semver](https://devhints.io/semver)\n\n示例：\n\n```bash\n❯ pushy update --versionId 211343 --platform android --packageVersionRange \">=1.0 <3.0\" --dryRun\nreact-native-update-cli: 1.45.4 （最新：1.45.4）\nreact-native-update: 10.28.11 （最新：10.28.11）\n以下是 dry-run 模拟运行结果，不会实际执行任何操作：\n已将热更包 211343 绑定到原生版本 1.28.1 (id: 75219)\n已将热更包 211343 绑定到原生版本 1.28 (id: 75184)\n已将热更包 211343 绑定到原生版本 1.5 (id: 73396)\n已将热更包 211343 绑定到原生版本 2.0 (id: 68219)\n已将热更包 211343 绑定到原生版本 1.0 (id: 68158)\n操作完成，共已绑定 5 个原生版本\n```\n",
+      "content": "# 命令行工具\n\n### 安装\n\n```\n$ npm install -g react-native-update-cli\n```\n\n### 命令\n\n#### pushy bundle\n\n生成热更资源包。会自动探测项目中是否使用了 expo、taro 等框架并自动调用对应的命令行打包。如果探测不准确或使用对应命令行打包时报错，可尝试使用 `--rncli` 参数来指定官方命令行打包。\n\n- platform: ios|android|harmony 对应的平台\n- entryFile: 入口脚本文件\n- intermediaDir: 临时文件输出目录\n- output: 最终 ppk 文件输出路径\n- dev: 是否打包开发版本\n- sourcemap: 是否生成 sourcemap(需 cli 版本 1.11.0+)\n- no-interactive: 不进行交互式提示\n- rncli: 指定使用官方命令行打包 (需 cli 版本 1.40.0+)\n- expo: 指定使用 expo 的命令行打包 (需 cli 版本 1.40.0+)\n- taro: 指定使用 taro 的命令行打包 (需 cli 版本 1.40.0+)\n\n从 v1.44.2 版本开始，新增了以下直接上传发布的参数（等同于打包完成后连续调用 `pushy publish` 命令）：\n\n- name: 指定热更新版本的名字(热更自身的版本号)\n- description: 指定热更新版本的描述信息，可以对用户进行展示\n- metaInfo: 指定热更新版本的元信息，可以用来保存一些额外信息，具体用法可参考[场景实践](/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。\n\n从 v1.46.1 版本开始，在传入 `name`， `description`， `metaInfo` 参数的同时，可继续叠加以下参数（等同于在调用`pushy publish` 命令后，再连续调用 `pushy update` 命令）：\n\n- packageId: 要绑定的原生包 ID （多选一）\n- packageVersion: 要绑定的原生包版本名（多选一）\n- minPackageVersion: 要绑定的最低原生包版本，大于等于此版本的将逐个绑定（多选一）\n- maxPackageVersion: 要绑定的最高原生包版本，小于等于此版本的将逐个绑定（多选一）\n- packageVersionRange: 要绑定的原生包版本范围（多选一），范围格式遵循 semver 的语法，可参考 [https://quickref.cnxiaobai.com/docs/semver.html](https://quickref.cnxiaobai.com/docs/semver.html) 或 [https://devhints.io/semver](https://devhints.io/semver)\n\n示例：\n\n```bash\n\npushy bundle --platform android --name \"1.0.0\" --description \"热更新版本 1.0.0\" --metaInfo '{\"key\": \"value\"}' --packageVersionRange \">=1.0 <3.0\"\n```\n\n***\n\n#### pushy cache \\[clean]\n\n查看本地 bundle 缓存（Hermes delta 模式的 base 与上传过的 bundle，按 sha256 命名）的占用；`pushy cache clean` 清空缓存。\n\n#### pushy parseIpa \\[ipaFile]\n\n解析 ipa 文件并输出一些相关信息，如版本号，编译时间戳等。\n\n***\n\n#### pushy parseApk \\[apkFile]\n\n解析 apk 文件并输出一些相关信息，如版本号，编译时间戳等。\n\n***\n\n#### pushy parseApp \\[appFile]\n\n解析 app 文件并输出一些相关信息，如版本号，编译时间戳等。\n\n***\n\n#### pushy parseAab \\[aabFile]\n\n解析 aab 文件并输出一些相关信息，如版本号，编译时间戳等。\n\n***\n\n#### pushy diff \\[origin]\\[next]\n\n提供两个 ppk 文件，生成从 origin 到 next 版本的差异更新包。\n\n- output: diff 文件输出路径\n\n***\n\n#### pushy diffFromApk \\[apkFile]\\[next]\n\n提供一个 apk 文件和一个 ppk 文件，生成从 apk 文件到 next 版本的差异更新包。\n\n如果使用热更新开放平台，你不需要自己执行此命令。\n\n- output: diff 文件输出路径\n\n***\n\n#### pushy diffFromApp \\[appFile]\\[next]\n\n提供一个 app 文件和一个 ppk 文件，生成从 app 文件到 next 版本的差异更新包。\n\n如果使用热更新开放平台，你不需要自己执行此命令。\n\n- output: diff 文件输出路径\n\n***\n\n#### pushy diffFromIpa \\[ipaFile]\\[next]\n\n提供一个 ipa 文件和一个 ppk 文件，生成从 ipa 文件到 next 版本的差异更新包。\n\n如果使用热更新开放平台，你不需要自己执行此命令。\n\n- output: diff 文件输出路径\n\n***\n\n#### pushy login \\[email]\\[pwd]\n\n登录热更新开放平台。你需要先登录才能使用下面的命令。\n\n***\n\n#### pushy logout\n\n登出并清除本地的登录信息\n\n***\n\n#### pushy me\n\n查看自己是否已经登录，以及昵称等信息。\n\n***\n\n#### pushy createApp\n\n创建应用并立刻绑定到当前工程。这项操作也可以在网页管理端进行。\n\n- platform: ios|android|harmony 对应的平台\n- name: 应用名称\n- downloadUrl: 应用安装包的下载地址\n\n***\n\n#### pushy deleteApp \\[appId]\n\n删除已有应用。所有已创建的应用包、热更新版本都会被同时删除。这项操作也可以在网页管理端进行。\n\n- appId: 要删除的应用 ID\n\n***\n\n#### pushy apps\n\n查看当前已创建的全部应用。这项操作也可以在网页管理端进行。\n\n- platform: ios|android|harmony 对应的平台\n\n***\n\n#### pushy selectApp \\[appId]\n\n绑定应用到当前工程。\n\n- platform: ios|android|harmony 对应的平台\n\n***\n\n#### pushy uploadIpa \\[ipaFile]\n\n上传 ipa 文件到开放平台。（cli 需 1.24.0 +）\n\n- config: 指定读取的配置文件路径（默认 `update.json`）（需 cli 2.16.1+）\n- appId: 指定上传的目标应用 ID（会覆盖配置文件中的配置）（需 cli 2.16.1+）\n- appKey: 指定上传的目标应用 Key（会覆盖配置文件中的配置）（需 cli 2.16.1+）\n\n***\n\n#### pushy uploadApk \\[apkFile]\n\n上传 apk 文件到开放平台。（cli 需 1.24.0 +）\n\n- config: 指定读取的配置文件路径（默认 `update.json`）（需 cli 2.16.1+）\n- appId: 指定上传的目标应用 ID（会覆盖配置文件中的配置）（需 cli 2.16.1+）\n- appKey: 指定上传的目标应用 Key（会覆盖配置文件中的配置）（需 cli 2.16.1+）\n\n***\n\n#### pushy uploadApp \\[appFile]\n\n上传 app 文件到开放平台。（cli 需 1.24.0 +）\n\n- config: 指定读取的配置文件路径（默认 `update.json`）（需 cli 2.16.1+）\n- appId: 指定上传的目标应用 ID（会覆盖配置文件中的配置）（需 cli 2.16.1+）\n- appKey: 指定上传的目标应用 Key（会覆盖配置文件中的配置）（需 cli 2.16.1+）\n\n***\n\n#### pushy uploadAab \\[aabFile]\n\n上传 aab 文件到开放平台。（cli 需 2.6.0 +）\n\n- config: 指定读取的配置文件路径（默认 `update.json`）（需 cli 2.16.1+）\n- appId: 指定上传的目标应用 ID（会覆盖配置文件中的配置）（需 cli 2.16.1+）\n- appKey: 指定上传的目标应用 Key（会覆盖配置文件中的配置）（需 cli 2.16.1+）\n\n***\n\n#### pushy extractApk \\[aabFile]\n\n从 aab 文件中提取通用 apk 文件。（cli 需 2.6.0+）\n\n用法：`pushy extractApk aab后缀文件 [--output apk文件] [--includeAllSplits] [--splits 分包名列表]`\n\n- output: 指定导出的 apk 文件路径（默认与 aab 同目录同名 `.apk`）\n- includeAllSplits: 提取时包含全部 split（默认仅包含 `base`）\n- splits: 指定额外包含的 split 名称，多个值用英文逗号分隔\n\n示例：\n\n```bash\npushy extractApk android/app/build/outputs/bundle/release/app-release.aab --output app-release.apk\npushy extractApk android/app/build/outputs/bundle/release/app-release.aab --splits config.zh,arm64_v8a\npushy extractApk android/app/build/outputs/bundle/release/app-release.aab --includeAllSplits\n```\n\n***\n\n#### pushy packages\n\n查看已经上传的原生包。这项操作也可以在网页管理端进行。\n\n- platform: ios|android|harmony 对应的平台\n\n***\n\n#### pushy deletePackage\n\n删除已经上传的原生包。\n\n- appId: 要删除的原生包所属的应用 ID\n- packageId: 要删除的原生包 ID\n\n***\n\n#### pushy publish \\[ppkFile]\n\n发布新的热更新版本（ppk 文件）。\n\n- platform: ios|android|harmony 对应的平台\n- name: 当前热更新版本的名字(版本号)\n- description: 当前热更新版本的描述信息，可以对用户进行展示\n- metaInfo: 当前热更新版本的元信息，可以用来保存一些额外信息，具体用法可参考[场景实践](/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。\n\n从 v1.46.1 版本开始，支持以下参数（等同于在 调用`pushy publish` 命令后，再连续调用 `pushy update` 命令）：\n\n- packageId: 要绑定的原生包 ID （多选一）\n- packageVersion: 要绑定的原生包版本名（多选一）\n- minPackageVersion: 要绑定的最低原生包版本，大于等于此版本的将逐个绑定（多选一）\n- maxPackageVersion: 要绑定的最高原生包版本，小于等于此版本的将逐个绑定（多选一）\n- packageVersionRange: 要绑定的原生包版本范围（多选一），范围格式遵循 semver 的语法，可参考 [https://quickref.cnxiaobai.com/docs/semver.html](https://quickref.cnxiaobai.com/docs/semver.html) 或 [https://devhints.io/semver](https://devhints.io/semver)\n\n示例：\n\n```bash\n\npushy publish .pushy/output/android.1750423283653.ppk --platform android --name \"1.0.0\" --description \"热更新版本 1.0.0\" --metaInfo '{\"key\": \"value\"}' --packageVersionRange \">=1.0 <3.0\"\n```\n\n***\n\n#### pushy versions\n\n分页列举可用的版本。这项操作也可以在网页管理端进行。\n\n- platform: ios|android|harmony 对应的平台\n\n***\n\n#### pushy deleteVersion\n\n删除已经发布的热更新版本。\n\n- appId: 要删除的热更新版本所属的应用 ID\n- versionId: 要删除的热更新版本 ID\n\n***\n\n#### pushy update\n\n为一个原生包版本绑定发布一个热更新版本。这项操作也可以在网页管理端进行。以下参数中`packageId`，`packageVersion`，`minPackageVersion`，`maxPackageVersion`和`packageVersionRange`中多选一即可。\n\ncli 2.4.0 版本开始可以同时绑定一个全量和一个灰度版本。2.4.0 之前全量和灰度版本会互相覆盖，后设置的生效。\n\n- platform: ios|android|harmony 对应的平台\n- versionId: 要绑定的热更新版本 ID\n- rollout: 灰度发布范围（整数取值 1 - 100，对应 1% - 100% 终端设备覆盖率），默认为 100（需 cli 版本 1.31.0+）\n- dryRun: 是否只进行预览，不进行实际绑定（需 cli 版本 1.45.4+）\n- packageId: 要绑定的原生包 ID （多选一）\n- packageVersion: 要绑定的原生包版本名（多选一，需 cli 版本 1.7.2+）\n- minPackageVersion: 要绑定的最低原生包版本，大于等于此版本的将逐个绑定（多选一，需 cli 版本 1.27.0+）\n- maxPackageVersion: 要绑定的最高原生包版本，小于等于此版本的将逐个绑定（多选一，需 cli 版本 1.27.0+）\n- packageVersionRange: 要绑定的原生包版本范围（多选一，需 cli 版本 1.45.4+），范围格式遵循 semver 的语法，可参考 [https://quickref.cnxiaobai.com/docs/semver.html](https://quickref.cnxiaobai.com/docs/semver.html) 或 [https://devhints.io/semver](https://devhints.io/semver)\n\n示例：\n\n```bash\n❯ pushy update --versionId 211343 --platform android --packageVersionRange \">=1.0 <3.0\" --dryRun\nreact-native-update-cli: 1.45.4 （最新：1.45.4）\nreact-native-update: 10.28.11 （最新：10.28.11）\n以下是 dry-run 模拟运行结果，不会实际执行任何操作：\n已将热更包 211343 绑定到原生版本 1.28.1 (id: 75219)\n已将热更包 211343 绑定到原生版本 1.28 (id: 75184)\n已将热更包 211343 绑定到原生版本 1.5 (id: 73396)\n已将热更包 211343 绑定到原生版本 2.0 (id: 68219)\n已将热更包 211343 绑定到原生版本 1.0 (id: 68158)\n操作完成，共已绑定 5 个原生版本\n```\n",
       "sections": [
         {
           "heading": "命令行工具",
@@ -370,195 +370,195 @@
           "level": 4,
           "anchor": "pushy-bundle",
           "offset": 75,
-          "length": 2255
+          "length": 1393
         },
         {
           "heading": "pushy cache \\[clean]",
           "level": 4,
           "anchor": "pushy-cache-clean",
-          "offset": 2330,
+          "offset": 1468,
           "length": 120
         },
         {
           "heading": "pushy parseIpa \\[ipaFile]",
           "level": 4,
           "anchor": "pushy-parseipa-ipafile",
-          "offset": 2450,
+          "offset": 1588,
           "length": 70
         },
         {
           "heading": "pushy parseApk \\[apkFile]",
           "level": 4,
           "anchor": "pushy-parseapk-apkfile",
-          "offset": 2520,
+          "offset": 1658,
           "length": 70
         },
         {
           "heading": "pushy parseApp \\[appFile]",
           "level": 4,
           "anchor": "pushy-parseapp-appfile",
-          "offset": 2590,
+          "offset": 1728,
           "length": 70
         },
         {
           "heading": "pushy parseAab \\[aabFile]",
           "level": 4,
           "anchor": "pushy-parseaab-aabfile",
-          "offset": 2660,
+          "offset": 1798,
           "length": 70
         },
         {
           "heading": "pushy diff \\[origin]\\[next]",
           "level": 4,
           "anchor": "pushy-diff-originnext",
-          "offset": 2730,
+          "offset": 1868,
           "length": 103
         },
         {
           "heading": "pushy diffFromApk \\[apkFile]\\[next]",
           "level": 4,
           "anchor": "pushy-difffromapk-apkfilenext",
-          "offset": 2833,
+          "offset": 1971,
           "length": 146
         },
         {
           "heading": "pushy diffFromApp \\[appFile]\\[next]",
           "level": 4,
           "anchor": "pushy-difffromapp-appfilenext",
-          "offset": 2979,
+          "offset": 2117,
           "length": 146
         },
         {
           "heading": "pushy diffFromIpa \\[ipaFile]\\[next]",
           "level": 4,
           "anchor": "pushy-difffromipa-ipafilenext",
-          "offset": 3125,
+          "offset": 2263,
           "length": 146
         },
         {
           "heading": "pushy login \\[email]\\[pwd]",
           "level": 4,
           "anchor": "pushy-login-emailpwd",
-          "offset": 3271,
+          "offset": 2409,
           "length": 66
         },
         {
           "heading": "pushy logout",
           "level": 4,
           "anchor": "pushy-logout",
-          "offset": 3337,
+          "offset": 2475,
           "length": 38
         },
         {
           "heading": "pushy me",
           "level": 4,
           "anchor": "pushy-me",
-          "offset": 3375,
+          "offset": 2513,
           "length": 41
         },
         {
           "heading": "pushy createApp",
           "level": 4,
           "anchor": "pushy-createapp",
-          "offset": 3416,
+          "offset": 2554,
           "length": 138
         },
         {
           "heading": "pushy deleteApp \\[appId]",
           "level": 4,
           "anchor": "pushy-deleteapp-appid",
-          "offset": 3554,
+          "offset": 2692,
           "length": 104
         },
         {
           "heading": "pushy apps",
           "level": 4,
           "anchor": "pushy-apps",
-          "offset": 3658,
+          "offset": 2796,
           "length": 92
         },
         {
           "heading": "pushy selectApp \\[appId]",
           "level": 4,
           "anchor": "pushy-selectapp-appid",
-          "offset": 3750,
+          "offset": 2888,
           "length": 87
         },
         {
           "heading": "pushy uploadIpa \\[ipaFile]",
           "level": 4,
           "anchor": "pushy-uploadipa-ipafile",
-          "offset": 3837,
+          "offset": 2975,
           "length": 229
         },
         {
           "heading": "pushy uploadApk \\[apkFile]",
           "level": 4,
           "anchor": "pushy-uploadapk-apkfile",
-          "offset": 4066,
+          "offset": 3204,
           "length": 229
         },
         {
           "heading": "pushy uploadApp \\[appFile]",
           "level": 4,
           "anchor": "pushy-uploadapp-appfile",
-          "offset": 4295,
+          "offset": 3433,
           "length": 229
         },
         {
           "heading": "pushy uploadAab \\[aabFile]",
           "level": 4,
           "anchor": "pushy-uploadaab-aabfile",
-          "offset": 4524,
+          "offset": 3662,
           "length": 228
         },
         {
           "heading": "pushy extractApk \\[aabFile]",
           "level": 4,
           "anchor": "pushy-extractapk-aabfile",
-          "offset": 4752,
+          "offset": 3890,
           "length": 609
         },
         {
           "heading": "pushy packages",
           "level": 4,
           "anchor": "pushy-packages",
-          "offset": 5361,
+          "offset": 4499,
           "length": 94
         },
         {
           "heading": "pushy deletePackage",
           "level": 4,
           "anchor": "pushy-deletepackage",
-          "offset": 5455,
+          "offset": 4593,
           "length": 94
         },
         {
           "heading": "pushy publish \\[ppkFile]",
           "level": 4,
           "anchor": "pushy-publish-ppkfile",
-          "offset": 5549,
+          "offset": 4687,
           "length": 961
         },
         {
           "heading": "pushy versions",
           "level": 4,
           "anchor": "pushy-versions",
-          "offset": 6510,
+          "offset": 5648,
           "length": 93
         },
         {
           "heading": "pushy deleteVersion",
           "level": 4,
           "anchor": "pushy-deleteversion",
-          "offset": 6603,
+          "offset": 5741,
           "length": 100
         },
         {
           "heading": "pushy update",
           "level": 4,
           "anchor": "pushy-update",
-          "offset": 6703,
+          "offset": 5841,
           "length": 1304
         }
       ]

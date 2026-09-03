@@ -5,12 +5,12 @@
 <title>命令行工具 - Pushy 极速热更新</title>
 <script>(function(){var h=location.hostname;if(h!=='localhost'&&h!=='127.0.0.1'&&h!=='::1'&&h!=='[::1]')return;if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})})}if('caches' in window){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})})}})();</script>
 <link href="/static/css/styles.82da08402b.css" rel="stylesheet">
-<link rel="preload" href="/static/js/async/route-27c8c22b4560.546e8af811.js" as="script">
+<link rel="preload" href="/static/js/async/route-27c8c22b4560.8313baa04f.js" as="script">
 <script defer src="/static/js/styles.2f5af7e6f7.js"></script>
 <script defer src="/static/js/lib-react.03976590ad.js"></script>
 <script defer src="/static/js/lib-router.f84347d92b.js"></script>
 <script defer src="/static/js/3648.dafe3f8fe9.js"></script>
-<script defer src="/static/js/index.61c4b22ac9.js"></script>
+<script defer src="/static/js/index.ef94a23b3e.js"></script>
 <script src="/register-pwa.js" defer></script>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="generator" content="Rspress v2.0.21">
@@ -43,13 +43,6 @@
 <li>expo: 指定使用 expo 的命令行打包 (需 cli 版本 1.40.0+)</li>
 <li>taro: 指定使用 taro 的命令行打包 (需 cli 版本 1.40.0+)</li>
 </ul>
-<p>从 v2.22.0 版本开始，Hermes 工程默认启用 <strong>delta 模式</strong>（<code>hermesc -base-bytecode</code>）：打包时以同一应用上一版热更的 HBC 为 base 编译，让 Hermes 字符串表跨版本保持稳定，热更 patch 体积通常缩小 5～30 倍。整个过程对客户端透明，产物仍是标准 HBC；任何一步失败都会自动退回普通编译，不会阻塞发版。相关参数：</p>
-<ul>
-<li>hermesBase: <code>auto</code>（默认，向服务端查询本应用的 base 并按 sha256 校验）| <code>none</code>（关闭）| 本地文件路径（<code>.hbc</code> / <code>.ppk</code> / <code>.apk</code> / <code>.ipa</code>，例如用商店包的 bundle 作为 base）</li>
-<li>verifyHermesBase: 默认 <code>true</code>，base 编译后再做一次普通编译并比对两份反汇编，不等价则放弃 base；大 bundle 可传 <code>false</code> 换时间</li>
-<li>cacheMaxMb: 本地 bundle 缓存上限（默认 500 MB / 20 个文件），缓存位于 <code>.pushy/cache/&lt;sha256&gt;</code>，也可用环境变量 <code>PUSHY_CACHE_DIR</code> / <code>PUSHY_CACHE_MAX_MB</code> 调整</li>
-</ul>
-<p>注意：只有包含上游 delta 模式修复的 hermesc 才会启用（React Native 自带的经典 hermesc，或 <code>hermes-compiler</code> ≥ 250829098）；升级 React Native 导致 HBC 版本变化时会自动开始新的链，首个版本不带 base。另外从 v2.22.0 起 hermesc 总是以 <code>-output-source-map</code> 调用，字节码不再包含 debug info（与 RN release 构建一致，体积减少 15%～40%），Hermes 自己的 <code>.map</code> 保留在 <code>.pushy/intermedia/&lt;platform&gt;/</code> 下以便事后符号化崩溃堆栈。</p>
 <p>从 v1.44.2 版本开始，新增了以下直接上传发布的参数（等同于打包完成后连续调用 <code>pushy publish</code> 命令）：</p>
 <ul>
 <li>name: 指定热更新版本的名字(热更自身的版本号)</li>
