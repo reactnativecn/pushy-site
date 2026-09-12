@@ -3,8 +3,67 @@
   "product": "Pushy",
   "baseUrl": "https://pushy.react-native.cn",
   "resourceScheme": "pushy-docs",
-  "sourceCommit": "497594f22e58fe30afce19d10ca3fc4eb6fbd3c8",
+  "sourceCommit": "9c2f305f2fa26f61a48be184ee3528cef67ba36f",
   "documents": [
+    {
+      "slug": "analytics",
+      "title": "数据分析",
+      "path": "pages/docs/analytics.mdx",
+      "url": "https://pushy.react-native.cn/docs/analytics",
+      "resourceUri": "pushy-docs://docs/analytics",
+      "content": "# 数据分析\n\n更新已经发布，接下来要知道：多少设备下载了、多少已经生效、哪些原生包还在旧版本上，以及失败集中在哪里。Pushy 把这些信息放在同一应用的**概览、版本漏斗、流量画像、失败诊断**四个视图中，让放量和排查都有数据依据。\n\n在[控制台](https://pushy-admin.reactnative.cn/#/realtime-metrics)进入「数据分析」，选择应用。也可以在应用页面切换到「数据分析」标签。上方支持近 **7 / 14 / 35 天**，应用、视图和天数会保存在页面 URL 中，方便团队分享同一分析范围。\n\n> 本页为本地真实控制台截图。「拾光商城」及其版本、流量和设备数据均为模拟数据，用于展示功能，不代表客户案例或效果承诺。点击截图可查看原图。\n\n## 概览：先看规模，再看请求结果\n\n[![拾光商城分析概览：今日请求、活跃设备和按请求结果堆叠的每日趋势](/images/analytics/overview.webp)](/images/analytics/overview.webp)\n今日请求量、今日活跃设备、窗口内请求总量和峰值活跃设备，帮助你判断应用最近的更新活跃程度。每日趋势可以在**请求结果**与**活跃设备**之间切换。\n\n往下还能看到请求结果构成与版本速览：\n\n- **已是最新**：客户端已经在运行绑定的最新热更。\n- **hdiff / pdiff 增量与整包**：看清实际下发方式和各自占比。\n- **暂停、过期、blocked、未登记原生包**：区分正常发布状态和需要检查的配置问题。\n- **版本速览**：并列查看各版本的下发、激活、累计激活率、覆盖参照与健康标签，再进入完整版本漏斗。\n\n这里的活跃设备按发起更新检查的设备 uuid 去重，属于更新服务的设备活跃指标。请求次数与去重设备数含义不同，不能将请求量当作用户数。\n\n## 版本漏斗：从下发追到实际生效\n\n[![展开 3.6.2 的版本漏斗，查看原生包明细、累计激活设备以及下载和激活时延](/images/analytics/versions.webp)](/images/analytics/versions.webp)\n每个热更版本独立展示**下发 → 下载成功 → 激活 → 回滚**的数据，并列显示失败次数、累计激活率和回滚率。可筛选热更版本或原生包；展开一行，就能继续查看：\n\n- **原生包明细**：比较同一个热更在不同原生包上的下发、下载、激活、失败与回滚。\n- **累计激活与下载设备**：用去重设备口径了解这个版本的累计生效情况。\n- **发布时间到下载 / 激活的时延**：按 1 小时内、1–6 小时、6–24 小时、1–3 天、3–7 天和 7 天以上分组，看到更新到达及生效的节奏。\n- **健康标签**：启动样本达到 10 次后，回滚率达到 1% 标为「关注」，达到 5% 标为「异常」。标签为排查提供线索，仍需结合样本量判断。\n\n例如，模拟版本 3.6.1 的回滚率高于 3.6.2，就可以先筛选 3.6.1，检查是否集中在某个原生包，再转到失败诊断分析原因。\n\n### 正确理解几个比率\n\n| 指标    | 计算口径                    | 如何解读                                        |\n| ----- | ----------------------- | ------------------------------------------- |\n| 累计激活率 | 累计激活设备 ÷ 累计下载设备         | 两者均为该版本跨日去重的累计值，不随上方天数变化                    |\n| 覆盖率   | 累计激活该版本的设备 ÷ 今日活跃设备     | 是累计设备与今日活跃规模的对比，不是「今日设备中有多少运行此版本」，可能超过 100% |\n| 下载成功率 | 下载成功事件 ÷（下载成功 + 下载失败事件） | 按所选窗口的事件次数计算                                |\n| 回滚率   | 回滚事件 ÷（激活成功 + 回滚事件）     | 看启动结果中回滚的比例，结合样本量判断                         |\n\n窗口内的下载与激活事件可能不属于同一批设备，不宜直接相除作为转化率。累计激活率使用一致的累计去重口径。\n\n## 流量画像：从访问节奏到网络与地区\n\n[![请求域名、IPv4 与 IPv6 占比，以及按省份和国家汇总的请求分布](/images/analytics/traffic.webp)](/images/analytics/traffic.webp)\n流量画像保留实时版本曲线，并增加多个互补维度：\n\n| 维度     | 可以回答的问题                              |\n| ------ | ------------------------------------ |\n| 实时版本曲线 | 哪些热更包和原生包正在发起请求？可选择时间范围并查看曲线与 Top 分类 |\n| 小时分布   | 所选天数内，一天的哪些时段更新检查最密集？                |\n| 原生包    | 哪些安装版本仍有流量，各占多少，单日峰值设备数是多少？          |\n| 运营商    | 请求来自哪些网络类别？中国大陆以外统一归为「其他地区」          |\n| 请求域名   | 客户端通过哪些 Host 访问服务？                   |\n| IP 版本  | IPv4 与 IPv6 的请求各占多少？                 |\n| 地区分布   | 请求来自哪些省份或国家，各自的数量与占比是多少？             |\n\n[![小时分布与原生包、运营商构成](/images/analytics/traffic-hours.webp)](/images/analytics/traffic-hours.webp)\n地区面板单独支持**今日 / 近 7 天 / 近 30 天**。中国大陆按省级展示，其他地区按国家级展示；它统计的是完成的更新检查请求，不是设备定位。地区名称会随界面语言展示。\n\n原生包设备数采用所选窗口内的**单日峰值**，因为每日去重计数不能直接相加得到跨日去重设备数。\n\n## 失败诊断：把异常收敛到可排查的范围\n\n[![按版本筛选失败原因，显示原因次数、占比及相关事件类型](/images/analytics/failures.webp)](/images/analytics/failures.webp)\n页面汇总失败事件、最常见原因和失败率最高的系统版本。原因表同时展示**次数、占比、事件类型和受影响的热更版本**，可按热更版本筛选。\n\n已知原因包括超时、网络错误、磁盘空间不足、校验不一致、补丁应用失败、HTTP 错误、文件读写和解压失败等。未上报具体原因的事件会单独归类，避免把未知原因解释成某种故障。\n\n[![按系统版本和运营商比较下载成功、下载失败、补丁失败、激活、回滚及相应比率](/images/analytics/failure-dimensions.webp)](/images/analytics/failure-dimensions.webp)\n继续往下可按**操作系统版本**和**运营商**对比成功、失败与回滚，判断异常是否集中在某类环境。运营商事件当前没有热更版本维度，筛选单个版本时该表会说明限制，不会展示未经筛选的数据来代替。\n\n需要进一步检查 JavaScript 异常时，可进入「健康度」中的 [JS 报错监控](/docs/errors.md)，查看聚合错误、运行环境和还原后的源码堆栈。\n\n## 数据范围与排查顺序\n\n- 概览、流量与失败诊断按**北京时间自然日**统计；版本漏斗的事件窗口按 **UTC 日**统计。\n- 今日数据实时累计，页面会定期刷新；当天尚未结束，不宜直接与完整一天比较。\n- 分析日数据最多保留 **35 天**；地区数据最多保留 **30 天**。实时曲线的时间范围独立于页面天数，地区面板也有独立时间窗。\n- 累计下载、激活设备与发布后时延属于版本累计数据，不受天数切换影响。原生包筛选不改变版本整体的累计设备和时延口径。\n- 设备指标依赖 uuid，客户端事件依赖 SDK 上报；没有采集到的指标不能当作零故障。去重设备数采用近似统计。\n\n一次常见排查可以从概览开始：检查流量和命中结果，再在版本漏斗确认受影响版本与原生包，最后用失败原因和系统分布缩小范围。把同一个应用的这些视图连起来，才能区分「没命中更新」「下载失败」和「已下载但尚未激活」。\n",
+      "sections": [
+        {
+          "heading": "数据分析",
+          "level": 1,
+          "anchor": "数据分析",
+          "offset": 0,
+          "length": 346
+        },
+        {
+          "heading": "概览：先看规模，再看请求结果",
+          "level": 2,
+          "anchor": "概览先看规模再看请求结果",
+          "offset": 346,
+          "length": 456
+        },
+        {
+          "heading": "版本漏斗：从下发追到实际生效",
+          "level": 2,
+          "anchor": "版本漏斗从下发追到实际生效",
+          "offset": 802,
+          "length": 514
+        },
+        {
+          "heading": "正确理解几个比率",
+          "level": 3,
+          "anchor": "正确理解几个比率",
+          "offset": 1316,
+          "length": 560
+        },
+        {
+          "heading": "流量画像：从访问节奏到网络与地区",
+          "level": 2,
+          "anchor": "流量画像从访问节奏到网络与地区",
+          "offset": 1876,
+          "length": 837
+        },
+        {
+          "heading": "失败诊断：把异常收敛到可排查的范围",
+          "level": 2,
+          "anchor": "失败诊断把异常收敛到可排查的范围",
+          "offset": 2713,
+          "length": 583
+        },
+        {
+          "heading": "数据范围与排查顺序",
+          "level": 2,
+          "anchor": "数据范围与排查顺序",
+          "offset": 3296,
+          "length": 395
+        }
+      ]
+    },
     {
       "slug": "api",
       "title": "API参考",
@@ -945,7 +1004,7 @@
       "path": "pages/docs/intro.mdx",
       "url": "https://pushy.react-native.cn/docs/intro",
       "resourceUri": "pushy-docs://docs/intro",
-      "content": "# Pushy - 专业的热更新解决方案\n\n:::info\n**现已全面支持鸿蒙系统以及 React Native 新架构！**\n:::\n\nPushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-native-update)\n [![npm version](https://badge.fury.io/js/react-native-update.svg)](https://www.npmjs.com/package/react-native-update)) 是面向 React Native 应用提供的**专业热更新服务**\n，由 [React Native 中文网](https://reactnative.cn)\n独家研发并持续维护。我们致力于为全球 React Native 开发者提供最快速、最稳定、最经济的热更新体验。\n:::tip 推荐接入方式\n如果你正在使用支持 Skills 的 AI 编程工具，推荐优先阅读 [安装与使用 Skill](/docs/skills.md)，先安装 `react-native-update` Skill，再让 AI 根据你的项目结构自动完成大部分接入改动。手动文档更适合混编项目、monorepo 或需要逐项校对的场景。\n:::\n\n## 🚀 为什么选择 Pushy？\n\n### 极致的更新体验\n\n- **🎯 超小更新包**：基于 bsdiff/hdiff 算法的增量更新，通常只需**几十至几百 KB**（相比其他全量更新服务的几十 MB）；针对 Hermes 字节码的**独家深度优化**更可把一行文案的热修复压到 **3.4 KB**——比全量更新省 99.8% 的流量（见下方实测数据）\n- **⚡️ 极速分发**：国内用户使用阿里云高速 CDN，国外用户智能分流至 Cloudflare，在各地区都使用覆盖率最好的 CDN 服务商，更新成功率高达 **99.9%+**\n- **🛡️ 安全可靠**：内置崩溃回滚机制，出现问题自动回退，确保应用稳定运行\n- **🌐 全平台覆盖**：完美支持 <span style={{whiteSpace: 'nowrap'}}><AppleOutlined style={{fontSize: '16px', color: '#555', marginRight: '6px'}} /> **iOS**</span> <span style={{whiteSpace: 'nowrap'}}><AndroidOutlined style={{fontSize: '16px', color: '#3DDC84', marginRight: '6px'}} /> **Android**</span>, 且业内独家第一方支持 <span style={{whiteSpace: 'nowrap'}}><HarmonyOSOutlined style={{fontSize: '16px', color: '#000', marginRight: '6px'}} /> **鸿蒙（HarmonyOS）**</span>\n- **🔍 深耕 React Native 生态**：\n  - ✅ **Expo** - 无缝集成\n  - ✅ **新架构** - 第一时间跟进支持\n  - ✅ **Hermes** - 完整支持字节码格式\n- **📖 核心逻辑完全开源**：客户端、命令行工具以及管理界面代码都[完全开源](https://github.com/reactnativecn)，接受社区审计，代码透明可信，你可以随时迁移到自建服务器或其他服务\n- **📊 发布全程可控**：后台自带**版本统计、按比例灰度发布、健康度监控**，每次发布的覆盖进度和稳定性一目了然，无需自建数据链路\n- **🔒 数据安全**：可以自行插入数据埋点，完全掌控自己的数据\n- **💬 专业人工支持**：提供付费专人技术支持，有问必答，确保你的应用稳定运行\n- **🏆 多年稳定运营**：从 2016 年开始运营至今，服务众多知名企业和应用\n\n### 📊 实测数据：针对 Hermes 深度优化的增量算法\n\nHermes 字节码在两个层面上都对通用二进制 diff 极不友好，Pushy 把两者一并消除，收益叠加：\n\n- Hermes **每次编译都会重排字符串表**，JS 改一行就会让大部分字符串 ID 重新编号，两份几乎相同的字节码于是处处不同。Pushy 会以同一应用更早的一份字节码为基准编译，把这些 ID 钉死在原位，只有真正的改动才会进入 diff。\n- Hermes 字节码中还充&#x6EE1;**\"偏移量表\"**，中间插入几个字节就会让其后所有偏移整体位移。Pushy 独家引入 **HBC（Hermes 字节码）结构感知的可逆变换**，从根源上消除这种放大。\n\n在真实 React Native 0.86 应用上的实测结果（字节码约 4.4 MB，[评测代码与数据完全公开可复现](https://github.com/sunnylqm/hbc-diff-benchmark)）：\n\n| 迭代场景            | 全量更新   | 传统增量（bsdiff） | Pushy 增量（Hermes 专项优化） |\n| --------------- | ------ | ------------ | --------------------- |\n| 修改一行文案          | 1.9 MB | 93.7 KB      | **3.4 KB**（小 28 倍）    |\n| 新增小功能（约 60 行）   | 1.9 MB | 411.6 KB     | **50.2 KB**（小 8.2 倍）  |\n| 新增中等功能（约 300 行） | 1.9 MB | 551.6 KB     | **97.8 KB**（小 5.6 倍）  |\n\n- 一行文案的热修复只需下发 **3.4 KB**——比全量更新少 **99.8%**，比传统 bsdiff 增量**小 28 倍**\n- **改动越小、收益越大**——恰好是热修复中最高频的场景\n- **应用侧无需任何改动**：两项优化都发生在构建期，已上架的应用从下一次发版起自动受益\n- 安全兜底：每次构建都会与未优化的产物比对校验，任何不匹配自动回退；Hermes 版本升级时**客户端零改动**自动兼容\n\n## 💰 性价比之选\n\n相比同类服务，Pushy 不仅功能更强大，价格也更亲民：\n\n| 对比项       | Pushy        | Expo Update |\n| --------- | ------------ | ----------- |\n| **起步价**   | ¥66/月        | \\~¥136/月    |\n| **流量计费**  | 不单独计费        | 超出需额外付费     |\n| **更新包大小** | 几十至几百 KB（增量） | 几十 MB（全量）   |\n| **国内速度**  | ⭐⭐⭐⭐⭐ 极快     | ⭐⭐ 较慢       |\n| **鸿蒙支持**  | ✅ 支持         | ❌ 不支持       |\n\n:::warning\n**注意**：Microsoft App Center（Code Push）已于 2025 年 3 月 31 日正式停止服务。如果你正在使用 Code Push，现在正是迁移到 Pushy 的最佳时机！\n:::\n\n使用 Pushy 后，你的团队将获得：\n\n- ✅ **节省 90% 以上的流量成本**\n- ✅ **发版速度提升 10 倍以上**（无需等待应用商店审核）\n- ✅ **Bug 修复时间缩短至分钟级**\n- ✅ **用户更新率提升至 99%+**（相比应用商店的自然更新率）\n- ✅ **开发迭代更加灵活自由**\n\n### 简单易用\n\n```js\n// 三行代码即可集成\nimport { UpdateProvider, Pushy } from \"react-native-update\";\n\nconst pushyClient = new Pushy({ appKey });\n\n<UpdateProvider client={pushyClient}>\n  <App />\n</UpdateProvider>\n```\n\n内置多种更新策略，开箱即用：\n\n- 🔕 **静默更新** - 后台自动下载，用户无感知\n- 💬 **提示更新** - 友好的系统弹窗提醒\n- ⚙️ **自定义策略** - 完全可控的更新流程\n\n## 🚦 开始使用\n\n推荐按下面的顺序完成接入：\n\n1. **[安装与使用 Skill](/docs/skills.md)** - 推荐先让 AI 自动完成接入改造\n2. **[安装配置](/docs/getting-started.md)** - 补齐依赖与原生侧配置\n3. **[代码集成](/docs/integration.md)** - 校对或手动定制 `UpdateProvider` 接入\n4. **[发布更新](/docs/publish.md)** - 一条命令推送新版本\n\n:::info\n不确定是否适合你的项目？查看[常见问题](/docs/faq.md)或者可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。\n:::\n\n立即开始使用 Pushy，让你的 React Native 应用拥有极致的热更新体验！\n",
+      "content": "# Pushy - 专业的热更新解决方案\n\n:::info\n**现已全面支持鸿蒙系统以及 React Native 新架构！**\n:::\n\nPushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-native-update)\n [![npm version](https://badge.fury.io/js/react-native-update.svg)](https://www.npmjs.com/package/react-native-update)) 是面向 React Native 应用提供的**专业热更新服务**\n，由 [React Native 中文网](https://reactnative.cn)\n独家研发并持续维护。我们致力于为全球 React Native 开发者提供最快速、最稳定、最经济的热更新体验。\n:::tip 推荐接入方式\n如果你正在使用支持 Skills 的 AI 编程工具，推荐优先阅读 [安装与使用 Skill](/docs/skills.md)，先安装 `react-native-update` Skill，再让 AI 根据你的项目结构自动完成大部分接入改动。手动文档更适合混编项目、monorepo 或需要逐项校对的场景。\n:::\n\n## 🚀 为什么选择 Pushy？\n\n### 极致的更新体验\n\n- **🎯 超小更新包**：基于 bsdiff/hdiff 算法的增量更新，通常只需**几十至几百 KB**（相比其他全量更新服务的几十 MB）；针对 Hermes 字节码的**独家深度优化**更可把一行文案的热修复压到 **3.4 KB**——比全量更新省 99.8% 的流量（见下方实测数据）\n- **⚡️ 极速分发**：国内用户使用阿里云高速 CDN，国外用户智能分流至 Cloudflare，在各地区都使用覆盖率最好的 CDN 服务商，更新成功率高达 **99.9%+**\n- **🛡️ 安全可靠**：内置崩溃回滚机制，出现问题自动回退，确保应用稳定运行\n- **🌐 全平台覆盖**：完美支持 <span style={{whiteSpace: 'nowrap'}}><AppleOutlined style={{fontSize: '16px', color: '#555', marginRight: '6px'}} /> **iOS**</span> <span style={{whiteSpace: 'nowrap'}}><AndroidOutlined style={{fontSize: '16px', color: '#3DDC84', marginRight: '6px'}} /> **Android**</span>, 且业内独家第一方支持 <span style={{whiteSpace: 'nowrap'}}><HarmonyOSOutlined style={{fontSize: '16px', color: '#000', marginRight: '6px'}} /> **鸿蒙（HarmonyOS）**</span>\n- **🔍 深耕 React Native 生态**：\n  - ✅ **Expo** - 无缝集成\n  - ✅ **新架构** - 第一时间跟进支持\n  - ✅ **Hermes** - 完整支持字节码格式\n- **📖 核心逻辑完全开源**：客户端、命令行工具以及管理界面代码都[完全开源](https://github.com/reactnativecn)，接受社区审计，代码透明可信，你可以随时迁移到自建服务器或其他服务\n- **📊 发布全程可控**：后台自带**版本统计、按比例灰度发布、健康度监控**，每次发布的覆盖进度和稳定性一目了然，无需自建数据链路\n- **🔒 数据安全**：可以自行插入数据埋点，完全掌控自己的数据\n- **💬 专业人工支持**：提供付费专人技术支持，有问必答，确保你的应用稳定运行\n- **🏆 多年稳定运营**：从 2016 年开始运营至今，服务众多知名企业和应用\n\n### 📊 实测数据：针对 Hermes 深度优化的增量算法\n\nHermes 字节码在两个层面上都对通用二进制 diff 极不友好，Pushy 把两者一并消除，收益叠加：\n\n- Hermes **每次编译都会重排字符串表**，JS 改一行就会让大部分字符串 ID 重新编号，两份几乎相同的字节码于是处处不同。Pushy 会以同一应用更早的一份字节码为基准编译，把这些 ID 钉死在原位，只有真正的改动才会进入 diff。\n- Hermes 字节码中还充&#x6EE1;**\"偏移量表\"**，中间插入几个字节就会让其后所有偏移整体位移。Pushy 独家引入 **HBC（Hermes 字节码）结构感知的可逆变换**，从根源上消除这种放大。\n\n在真实 React Native 0.86 应用上的实测结果（字节码约 4.4 MB，[评测代码与数据完全公开可复现](https://github.com/sunnylqm/hbc-diff-benchmark)）：\n\n| 迭代场景            | 全量更新   | 传统增量（bsdiff） | Pushy 增量（Hermes 专项优化） |\n| --------------- | ------ | ------------ | --------------------- |\n| 修改一行文案          | 1.9 MB | 93.7 KB      | **3.4 KB**（小 28 倍）    |\n| 新增小功能（约 60 行）   | 1.9 MB | 411.6 KB     | **50.2 KB**（小 8.2 倍）  |\n| 新增中等功能（约 300 行） | 1.9 MB | 551.6 KB     | **97.8 KB**（小 5.6 倍）  |\n\n- 一行文案的热修复只需下发 **3.4 KB**——比全量更新少 **99.8%**，比传统 bsdiff 增量**小 28 倍**\n- **改动越小、收益越大**——恰好是热修复中最高频的场景\n- **应用侧无需任何改动**：两项优化都发生在构建期，已上架的应用从下一次发版起自动受益\n- 安全兜底：每次构建都会与未优化的产物比对校验，任何不匹配自动回退；Hermes 版本升级时**客户端零改动**自动兼容\n\n## 💰 性价比之选\n\n相比同类服务，Pushy 不仅功能更强大，价格也更亲民：\n\n| 对比项       | Pushy        | Expo Update |\n| --------- | ------------ | ----------- |\n| **起步价**   | ¥66/月        | \\~¥136/月    |\n| **流量计费**  | 不单独计费        | 超出需额外付费     |\n| **更新包大小** | 几十至几百 KB（增量） | 几十 MB（全量）   |\n| **国内速度**  | ⭐⭐⭐⭐⭐ 极快     | ⭐⭐ 较慢       |\n| **鸿蒙支持**  | ✅ 支持         | ❌ 不支持       |\n\n:::warning\n**注意**：Microsoft App Center（Code Push）已于 2025 年 3 月 31 日正式停止服务。如果你正在使用 Code Push，现在正是迁移到 Pushy 的最佳时机！\n:::\n\n使用 Pushy 后，你的团队将获得：\n\n- ✅ **节省 90% 以上的流量成本**\n- ✅ **发版速度提升 10 倍以上**（无需等待应用商店审核）\n- ✅ **Bug 修复时间缩短至分钟级**\n- ✅ **用户更新率提升至 99%+**（相比应用商店的自然更新率）\n- ✅ **开发迭代更加灵活自由**\n\n### 简单易用\n\n```js\n// 三行代码即可集成\nimport { UpdateProvider, Pushy } from \"react-native-update\";\n\nconst pushyClient = new Pushy({ appKey });\n\n<UpdateProvider client={pushyClient}>\n  <App />\n</UpdateProvider>\n```\n\n内置多种更新策略，开箱即用：\n\n- 🔕 **静默更新** - 后台自动下载，用户无感知\n- 💬 **提示更新** - 友好的系统弹窗提醒\n- ⚙️ **自定义策略** - 完全可控的更新流程\n\n## 🚦 开始使用\n\n推荐按下面的顺序完成接入：\n\n1. **[安装与使用 Skill](/docs/skills.md)** - 推荐先让 AI 自动完成接入改造\n2. **[安装配置](/docs/getting-started.md)** - 补齐依赖与原生侧配置\n3. **[代码集成](/docs/integration.md)** - 校对或手动定制 `UpdateProvider` 接入\n4. **[发布更新](/docs/publish.md)** - 一条命令推送新版本\n\n:::info\n不确定是否适合你的项目？查看[常见问题](/docs/faq.md)或者可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。\n:::\n\n立即开始使用 Pushy，让你的 React Native 应用拥有极致的热更新体验！\n\n## 发布之后，继续用数据判断\n\n在[数据分析](/docs/analytics.md)中查看请求趋势、版本漏斗、生效时延、网络与地区分布以及失败原因。让每次发布从下发到激活都有迹可循。\n",
       "sections": [
         {
           "heading": "Pushy - 专业的热更新解决方案",
@@ -994,7 +1053,14 @@
           "level": 2,
           "anchor": "开始使用",
           "offset": 3671,
-          "length": 470
+          "length": 471
+        },
+        {
+          "heading": "发布之后，继续用数据判断",
+          "level": 2,
+          "anchor": "发布之后继续用数据判断",
+          "offset": 4142,
+          "length": 94
         }
       ]
     },

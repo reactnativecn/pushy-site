@@ -109,3 +109,7 @@ const pushyClient = new Pushy({ appKey });
 :::
 
 立即开始使用 Pushy，让你的 React Native 应用拥有极致的热更新体验！
+
+## 发布之后，继续用数据判断
+
+在[数据分析](/docs/analytics.md)中查看请求趋势、版本漏斗、生效时延、网络与地区分布以及失败原因。让每次发布从下发到激活都有迹可循。

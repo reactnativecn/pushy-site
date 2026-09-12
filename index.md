@@ -63,6 +63,33 @@ Trusted by teams
 
 ![航天信息](/static/image/htxx.4755a497ad.png)
 
+每次发布，都有数据可循
+
+## 从发布到生效，
+每一步都看得清。
+
+更新发出去了，用户真的用上了吗？把请求趋势、版本覆盖、网络分布和失败原因放在一起，让每次放量与排查都有依据。
+
+[探索完整数据分析指南 ↗](/docs/analytics)
+
+01全局概览↗02版本漏斗↗03流量画像↗04失败诊断↗
+
+01 / 04
+
+### 先看全貌，再看变化。
+
+今日请求、活跃设备与每日趋势，一屏掌握应用运行情况。区分已是最新、增量更新、整包、暂停和过期，知道每次查询得到了什么结果。
+
+- ＋请求趋势与活跃设备
+- ＋7 / 14 / 35 天切换
+- ＋更新命中与拒绝原因
+
+Pushy / 拾光商城 · Android · 分析概览[查看原始截图 ↗](/images/analytics/overview.webp)
+
+[![拾光商城 · Android · 分析概览](/images/analytics/overview.webp)](/images/analytics/overview.webp)
+
+真实控制台截图 · 应用与数值均为模拟数据[打开控制台 →](https://pushy-admin.reactnative.cn/#/realtime-metrics)
+
 发布风险控制
 
 ## 热更新出问题，及时发现，及时止损
