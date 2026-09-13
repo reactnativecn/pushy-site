@@ -5,12 +5,12 @@
 <title>MCP 服务 - Pushy 极速热更新</title>
 <script>(function(){var h=location.hostname;if(h!=='localhost'&&h!=='127.0.0.1'&&h!=='::1'&&h!=='[::1]')return;if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})})}if('caches' in window){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})})}})();</script>
 <link href="/static/css/styles.82cf6fb3e9.css" rel="stylesheet">
-<link rel="preload" href="/static/js/async/route-ed323e1f3b99.3836c7b454.js" as="script">
+<link rel="preload" href="/static/js/async/route-ed323e1f3b99.57965ce076.js" as="script">
 <script defer src="/static/js/styles.c99d5550c5.js"></script>
 <script defer src="/static/js/lib-react.5d72a0a212.js"></script>
 <script defer src="/static/js/lib-router.f84347d92b.js"></script>
 <script defer src="/static/js/3648.dafe3f8fe9.js"></script>
-<script defer src="/static/js/index.f54283c0b0.js"></script>
+<script defer src="/static/js/index.5814cc10c6.js"></script>
 <script src="/register-pwa.js" defer></script>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="generator" content="Rspress v2.0.21">
@@ -40,6 +40,11 @@
 <blockquote>
 <p>看下 1.2.0 现在发的哪个版本，灰度比例是多少</p>
 </blockquote>
+<p><strong>发版后看新版本稳不稳</strong></p>
+<blockquote>
+<p>昨天发的 1.2.4 有没有回滚？看下这个版本的 JS 报错，最多的那个还原到源码是哪一行</p>
+</blockquote>
+<p>AI 会汇总这个版本的下发、下载失败、patch 失败、激活与回滚次数，列出该版本上报的 JS 报错，并用发布时归档的 sourcemap 把堆栈还原到源码位置（需开启 <code>pushy:health:read</code>，见下文）。</p>
 <p><strong>结合其他工具定位问题</strong></p>
 <blockquote>
 <p>这个版本昨天开始报错变多，对比一下 Sentry 上的异常和 Pushy 上的发布记录</p>
@@ -47,6 +52,7 @@
 <h2 class="rp-toc-include" id="快速开始"><a href="#快速开始" class="rp-header-anchor rp-link" aria-hidden="true">#</a>快速开始</h2>
 <h3 class="rp-toc-include" id="1-创建令牌"><a href="#1-创建令牌" class="rp-header-anchor rp-link" aria-hidden="true">#</a>1. 创建令牌</h3>
 <p>在 <a href="https://pushy-admin.reactnative.cn" target="_blank" rel="noopener noreferrer" class="rp-link">Pushy 管理后台</a> 打开「MCP 服务」，填写名称与客户端名称，<strong>勾选允许访问的应用</strong>，创建后立即复制令牌（只显示一次）。</p>
+<p>授权范围默认包含 <code>pushy:apps:read</code> 与 <code>pushy:diagnose</code>，足够排查更新下发问题。如果还想让 AI 查看版本健康度与 JS 报错，需要额外勾选 <code>pushy:health:read</code>；已创建的令牌不会自动获得这项权限，需要重新创建。</p>
 <h3 class="rp-toc-include" id="2-让-ai-自己装推荐"><a href="#2-让-ai-自己装推荐" class="rp-header-anchor rp-link" aria-hidden="true">#</a>2. 让 AI 自己装（推荐）</h3>
 <p>把下面这段整段复制给你的 AI 助手（Claude Code、Cursor、Codex、Gemini CLI 等都可以），<strong>先把里面的令牌换成你自己的</strong>，它会自己找到配置位置并完成安装与验证：</p>
 <div class="rp-codeblock language-text"><div class="rp-codeblock__content"><div class="rp-codeblock__content__scroll-container rp-scrollbar rp-scrollbar--always"><pre class="shiki css-variables" style="background-color:var(--shiki-background);color:var(--shiki-foreground)" tabindex="0" data-lang="text"><code><span class="line"><span>请帮我在当前客户端里安装 Pushy 热更新的 MCP 服务。</span></span>
@@ -92,13 +98,15 @@
 <h3 class="rp-toc-include" id="4-直接提问"><a href="#4-直接提问" class="rp-header-anchor rp-link" aria-hidden="true">#</a>4. 直接提问</h3>
 <p>连上之后按上面的场景提问即可，不需要记工具名。</p>
 <h2 class="rp-toc-include" id="能查到什么"><a href="#能查到什么" class="rp-header-anchor rp-link" aria-hidden="true">#</a>能查到什么</h2>
-<div class="rp-table-scroll-container rp-scrollbar"><table><thead><tr><th>能力</th><th>说明</th></tr></thead><tbody><tr><td>应用列表</td><td>令牌授权范围内的应用</td></tr><tr><td>发布拓扑</td><td>每个原生包当前绑定的版本、灰度版本与灰度比例</td></tr><tr><td>更新判定</td><td>用一组客户端参数重放判定，给出结论与原因</td></tr><tr><td>产物状态</td><td>增量补丁是否生成、生成任务是否失败</td></tr><tr><td>请求观测</td><td>近期真实请求按原生包版本汇总：上报的编译时间戳 / 内容指纹、客户端 SDK 版本，并与已登记的原生包逐一对照</td></tr></tbody></table></div>
+<div class="rp-table-scroll-container rp-scrollbar"><table><thead><tr><th>能力</th><th>说明</th></tr></thead><tbody><tr><td>应用列表</td><td>令牌授权范围内的应用</td></tr><tr><td>发布拓扑</td><td>每个原生包当前绑定的版本、灰度版本与灰度比例</td></tr><tr><td>更新判定</td><td>用一组客户端参数重放判定，给出结论与原因</td></tr><tr><td>产物状态</td><td>增量补丁是否生成、生成任务是否失败</td></tr><tr><td>请求观测</td><td>近期真实请求按原生包版本汇总：上报的编译时间戳 / 内容指纹、客户端 SDK 版本，并与已登记的原生包逐一对照</td></tr><tr><td>版本健康度</td><td>每个热更版本的下发方式，客户端上报的下载失败、patch 失败、激活与回滚次数，以及累计观测到的设备数（需 <code>pushy:health:read</code>，客户端 v10.47.0+）</td></tr><tr><td>JS 报错</td><td>按指纹聚合的报错列表与详情，有归档 sourcemap 时把堆栈还原到源码位置（需 <code>pushy:health:read</code>，客户端 v10.55.0+，见 <a href="/docs/errors.html" class="rp-link">JS 报错监控</a>）</td></tr></tbody></table></div>
 <h2 class="rp-toc-include" id="注意事项"><a href="#注意事项" class="rp-header-anchor rp-link" aria-hidden="true">#</a>注意事项</h2>
 <ul>
 <li><strong>只读</strong>：不会发布版本、不会暂停应用、不会修改任何配置；</li>
 <li><strong>按应用授权</strong>：建议只勾选需要排查的应用；令牌可随时在后台撤销，立即生效；</li>
 <li><strong>数据去向</strong>：查询结果会返回给你授权的 AI 客户端，它可能继续发送给你选择的模型供应商 —— Pushy 不控制该客户端与供应商的数据处理策略；</li>
-<li>返回内容不含邮箱、IP、设备标识、密钥与支付信息。</li>
+<li>返回内容不含邮箱、IP、设备标识、密钥与支付信息；</li>
+<li><strong>报错数据</strong>：报错消息、堆栈与源码片段来自你自己的应用代码，已去除 URL 参数、邮箱、IP 与形如 <code>token=</code> 的密钥，但仍可能包含业务上下文；<code>captureException</code> 传入的自定义上下文只返回字段名，不返回值；</li>
+<li><strong>限流</strong>：首次把某个报错还原到源码需要下载 sourcemap，按账号限制为每 10 分钟 30 次，超出时返回原始堆栈，已还原过的报错不受影响。</li>
 </ul><!--/$--></div><footer class="rp-doc-footer"><div class="rp-doc-footer__edit"></div><div class="rp-doc-footer__divider"></div><div class="rp-prev-next-page"><a href="/docs/api-token.html" class="rp-prev-next-page__item rp-prev-next-page__prev rp-link"><span class="rp-prev-next-page__item__desc">Previous page</span><span class="rp-prev-next-page__item__title"><svg width="1em" height="1em" viewBox="0 0 32 32" class="rp-prev-next-page__icon rp-prev-next-page__rotate_180"><path fill="currentColor" d="M22 16 12 26l-1.4-1.4 8.6-8.6-8.6-8.6L12 6z"></path></svg><span>API Key</span></span></a><a href="/docs/cli.html" class="rp-prev-next-page__item rp-prev-next-page__next rp-link"><span class="rp-prev-next-page__item__desc">Next page</span><span class="rp-prev-next-page__item__title"><span>命令行工具</span><svg width="1em" height="1em" viewBox="0 0 32 32" class="rp-prev-next-page__icon"><path fill="currentColor" d="M22 16 12 26l-1.4-1.4 8.6-8.6-8.6-8.6L12 6z"></path></svg></span></a></div></footer></main></div><aside class="rp-doc-layout__outline rp-scrollbar"><div class="rp-outline"><div class="rp-outline__title">ON THIS PAGE<svg width="14" height="14" class="rp-progress-circle"><circle cx="7" cy="7" r="6" stroke-linecap="round" fill="none" stroke="var(--rp-c-divider-light)" stroke-width="2"></circle><circle cx="7" cy="7" r="6" stroke-linecap="round" fill="none" stroke="var(--rp-c-brand)" stroke-width="2" stroke-dasharray="37.69911184307752" stroke-dashoffset="37.69911184307752" transform="rotate(-90 7 7)" style="transition:stroke-dashoffset 0.3s"></circle></svg></div><nav class="rp-outline__toc rp-scrollbar"><a href="#典型场景" class="rp-toc-item rp-link" title="典型场景" style="padding-left:0" data-depth="0"><span class="rp-toc-item__text rp-doc">典型场景</span></a><a href="#快速开始" class="rp-toc-item rp-link" title="快速开始" style="padding-left:0" data-depth="0"><span class="rp-toc-item__text rp-doc">快速开始</span></a><a href="#1-创建令牌" class="rp-toc-item rp-link" title="1. 创建令牌" style="padding-left:12px" data-depth="1"><span class="rp-toc-item__text rp-doc">1. 创建令牌</span></a><a href="#2-让-ai-自己装推荐" class="rp-toc-item rp-link" title="2. 让 AI 自己装（推荐）" style="padding-left:12px" data-depth="1"><span class="rp-toc-item__text rp-doc">2. 让 AI 自己装（推荐）</span></a><a href="#3-或者手动配置" class="rp-toc-item rp-link" title="3. 或者手动配置" style="padding-left:12px" data-depth="1"><span class="rp-toc-item__text rp-doc">3. 或者手动配置</span></a><a href="#4-直接提问" class="rp-toc-item rp-link" title="4. 直接提问" style="padding-left:12px" data-depth="1"><span class="rp-toc-item__text rp-doc">4. 直接提问</span></a><a href="#能查到什么" class="rp-toc-item rp-link" title="能查到什么" style="padding-left:0" data-depth="0"><span class="rp-toc-item__text rp-doc">能查到什么</span></a><a href="#注意事项" class="rp-toc-item rp-link" title="注意事项" style="padding-left:0" data-depth="0"><span class="rp-toc-item__text rp-doc">注意事项</span></a></nav><div class="rp-outline__divider"></div><div class="rp-outline__bottom"><button class="rp-outline__action-row"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M20 8v12H8V8zm0-2H8a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2"></path><path fill="currentColor" d="M4 16H2V4a2 2 0 0 1 2-2h12v2H4Z"></path></svg><span>Copy Markdown</span></button><div class="rp-outline__open-in-wrapper"><button class="rp-outline__action-row"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"></path></svg><span>Open in chat</span></button></div></div></div></aside></div></div>
     <div id="__rspress_modal_container"></div>
   </body>

@@ -3,7 +3,7 @@
   "product": "Pushy",
   "baseUrl": "https://pushy.react-native.cn",
   "resourceScheme": "pushy-docs",
-  "sourceCommit": "9c2f305f2fa26f61a48be184ee3528cef67ba36f",
+  "sourceCommit": "160d84a0c1ccd6815b303fb8f6fb2006fa6182d0",
   "documents": [
     {
       "slug": "analytics",
@@ -1070,7 +1070,7 @@
       "path": "pages/docs/mcp.mdx",
       "url": "https://pushy.react-native.cn/docs/mcp",
       "resourceUri": "pushy-docs://docs/mcp",
-      "content": "# MCP 服务\n\n把 Pushy 接进你的 AI 客户端（Claude Desktop、IDE、自建 Agent 等），让它直接查你的发布状态，再结合 GitHub、Sentry、CI 一起排查问题。全程只读，不会改动任何发布数据。\n\n:::tip AI 模型服务\n本站同时提供 [AI 模型转发服务](https://ai.cresc.dev/model-plaza)：提供纯正官方 GPT 和 Claude 最前沿模型，价格实惠、服务稳定、绝不掺水、数据安全。\n:::\n\n## 典型场景\n\n**排查某台设备为什么没收到更新**\n\n> 我的应用（testApp）1.2.0 这个原生包，有台安卓设备一直没拿到更新，帮我看看\n\nAI 会查出这个包当前绑定的版本、重放一次更新判定、检查增量产物是否就绪，然后告诉你卡在哪一步 —— 灰度没命中、包被暂停，还是补丁还没生成完。\n\n**发版前后确认状态**\n\n> 看下 1.2.0 现在发的哪个版本，灰度比例是多少\n\n**结合其他工具定位问题**\n\n> 这个版本昨天开始报错变多，对比一下 Sentry 上的异常和 Pushy 上的发布记录\n\n## 快速开始\n\n### 1. 创建令牌\n\n在 [Pushy 管理后台](https://pushy-admin.reactnative.cn) 打开「MCP 服务」，填写名称与客户端名称，**勾选允许访问的应用**，创建后立即复制令牌（只显示一次）。\n\n### 2. 让 AI 自己装（推荐）\n\n把下面这段整段复制给你的 AI 助手（Claude Code、Cursor、Codex、Gemini CLI 等都可以），**先把里面的令牌换成你自己的**，它会自己找到配置位置并完成安装与验证：\n\n```text\n请帮我在当前客户端里安装 Pushy 热更新的 MCP 服务。\n\n服务信息（固定，不要改动）：\n- 名称：pushy\n- 传输方式：HTTP（Streamable HTTP，不是 stdio、不是 SSE）\n- 地址：https://update.reactnative.cn/api/mcp\n- 鉴权：请求头 Authorization: Bearer <令牌>\n- 我的令牌：pushy_mcp_xxxxxxxx   ← 复制后把这里换成后台生成的令牌\n\n请按下面的步骤执行：\n\n1. 先确认我正在用哪个客户端（Claude Code / Claude Desktop / Cursor / VS Code /\n   Codex / Cline / Gemini CLI 等），找到它对应的 MCP 配置文件或命令行。\n   判断不出来就先问我，不要随便猜一个写进去。\n2. 用该客户端的官方方式添加。有官方 CLI（如 claude mcp add、codex mcp add、\n   gemini mcp add）就优先用 CLI；否则手改配置文件：改之前先备份，保留文件里\n   已有的其他 MCP 服务，不要整个覆盖。\n3. 如果这个客户端只支持 stdio，不支持远程 HTTP，就改用代理方式：\n   npx -y mcp-remote https://update.reactnative.cn/api/mcp --header \"Authorization: Bearer <令牌>\"\n4. 令牌等同密钥：优先写进用户级（全局）配置，不要写进会被 git 提交的项目文件。\n   如果只能写在项目里，先确认该文件已在 .gitignore 中，并提醒我。\n5. 装完做一次验证：列出 pushy 提供的工具，并调用一个只读查询（例如列出我有\n   权限的应用），把结果贴给我。如果返回 401/403，说明令牌无效或没有勾选应用\n   权限，告诉我去后台重新创建令牌，不要反复重试。\n6. 最后一句话总结：改了哪个文件 / 执行了什么命令，以及需不需要重启客户端。\n\n补充：这个 MCP 是只读的，只会查询发布状态，不会发版、不会改配置。\n```\n\n### 3. 或者手动配置\n\n以 Claude Desktop 为例：\n\n```json\n{\n  \"mcpServers\": {\n    \"pushy\": {\n      \"type\": \"http\",\n      \"url\": \"https://update.reactnative.cn/api/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer pushy_mcp_你的令牌\"\n      }\n    }\n  }\n}\n```\n\n### 4. 直接提问\n\n连上之后按上面的场景提问即可，不需要记工具名。\n\n## 能查到什么\n\n| 能力   | 说明                                                      |\n| ---- | ------------------------------------------------------- |\n| 应用列表 | 令牌授权范围内的应用                                              |\n| 发布拓扑 | 每个原生包当前绑定的版本、灰度版本与灰度比例                                  |\n| 更新判定 | 用一组客户端参数重放判定，给出结论与原因                                    |\n| 产物状态 | 增量补丁是否生成、生成任务是否失败                                       |\n| 请求观测 | 近期真实请求按原生包版本汇总：上报的编译时间戳 / 内容指纹、客户端 SDK 版本，并与已登记的原生包逐一对照 |\n\n## 注意事项\n\n- **只读**：不会发布版本、不会暂停应用、不会修改任何配置；\n- **按应用授权**：建议只勾选需要排查的应用；令牌可随时在后台撤销，立即生效；\n- **数据去向**：查询结果会返回给你授权的 AI 客户端，它可能继续发送给你选择的模型供应商 —— Pushy 不控制该客户端与供应商的数据处理策略；\n- 返回内容不含邮箱、IP、设备标识、密钥与支付信息。\n",
+      "content": "# MCP 服务\n\n把 Pushy 接进你的 AI 客户端（Claude Desktop、IDE、自建 Agent 等），让它直接查你的发布状态，再结合 GitHub、Sentry、CI 一起排查问题。全程只读，不会改动任何发布数据。\n\n:::tip AI 模型服务\n本站同时提供 [AI 模型转发服务](https://ai.cresc.dev/model-plaza)：提供纯正官方 GPT 和 Claude 最前沿模型，价格实惠、服务稳定、绝不掺水、数据安全。\n:::\n\n## 典型场景\n\n**排查某台设备为什么没收到更新**\n\n> 我的应用（testApp）1.2.0 这个原生包，有台安卓设备一直没拿到更新，帮我看看\n\nAI 会查出这个包当前绑定的版本、重放一次更新判定、检查增量产物是否就绪，然后告诉你卡在哪一步 —— 灰度没命中、包被暂停，还是补丁还没生成完。\n\n**发版前后确认状态**\n\n> 看下 1.2.0 现在发的哪个版本，灰度比例是多少\n\n**发版后看新版本稳不稳**\n\n> 昨天发的 1.2.4 有没有回滚？看下这个版本的 JS 报错，最多的那个还原到源码是哪一行\n\nAI 会汇总这个版本的下发、下载失败、patch 失败、激活与回滚次数，列出该版本上报的 JS 报错，并用发布时归档的 sourcemap 把堆栈还原到源码位置（需开启 `pushy:health:read`，见下文）。\n\n**结合其他工具定位问题**\n\n> 这个版本昨天开始报错变多，对比一下 Sentry 上的异常和 Pushy 上的发布记录\n\n## 快速开始\n\n### 1. 创建令牌\n\n在 [Pushy 管理后台](https://pushy-admin.reactnative.cn) 打开「MCP 服务」，填写名称与客户端名称，**勾选允许访问的应用**，创建后立即复制令牌（只显示一次）。\n\n授权范围默认包含 `pushy:apps:read` 与 `pushy:diagnose`，足够排查更新下发问题。如果还想让 AI 查看版本健康度与 JS 报错，需要额外勾选 `pushy:health:read`；已创建的令牌不会自动获得这项权限，需要重新创建。\n\n### 2. 让 AI 自己装（推荐）\n\n把下面这段整段复制给你的 AI 助手（Claude Code、Cursor、Codex、Gemini CLI 等都可以），**先把里面的令牌换成你自己的**，它会自己找到配置位置并完成安装与验证：\n\n```text\n请帮我在当前客户端里安装 Pushy 热更新的 MCP 服务。\n\n服务信息（固定，不要改动）：\n- 名称：pushy\n- 传输方式：HTTP（Streamable HTTP，不是 stdio、不是 SSE）\n- 地址：https://update.reactnative.cn/api/mcp\n- 鉴权：请求头 Authorization: Bearer <令牌>\n- 我的令牌：pushy_mcp_xxxxxxxx   ← 复制后把这里换成后台生成的令牌\n\n请按下面的步骤执行：\n\n1. 先确认我正在用哪个客户端（Claude Code / Claude Desktop / Cursor / VS Code /\n   Codex / Cline / Gemini CLI 等），找到它对应的 MCP 配置文件或命令行。\n   判断不出来就先问我，不要随便猜一个写进去。\n2. 用该客户端的官方方式添加。有官方 CLI（如 claude mcp add、codex mcp add、\n   gemini mcp add）就优先用 CLI；否则手改配置文件：改之前先备份，保留文件里\n   已有的其他 MCP 服务，不要整个覆盖。\n3. 如果这个客户端只支持 stdio，不支持远程 HTTP，就改用代理方式：\n   npx -y mcp-remote https://update.reactnative.cn/api/mcp --header \"Authorization: Bearer <令牌>\"\n4. 令牌等同密钥：优先写进用户级（全局）配置，不要写进会被 git 提交的项目文件。\n   如果只能写在项目里，先确认该文件已在 .gitignore 中，并提醒我。\n5. 装完做一次验证：列出 pushy 提供的工具，并调用一个只读查询（例如列出我有\n   权限的应用），把结果贴给我。如果返回 401/403，说明令牌无效或没有勾选应用\n   权限，告诉我去后台重新创建令牌，不要反复重试。\n6. 最后一句话总结：改了哪个文件 / 执行了什么命令，以及需不需要重启客户端。\n\n补充：这个 MCP 是只读的，只会查询发布状态，不会发版、不会改配置。\n```\n\n### 3. 或者手动配置\n\n以 Claude Desktop 为例：\n\n```json\n{\n  \"mcpServers\": {\n    \"pushy\": {\n      \"type\": \"http\",\n      \"url\": \"https://update.reactnative.cn/api/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer pushy_mcp_你的令牌\"\n      }\n    }\n  }\n}\n```\n\n### 4. 直接提问\n\n连上之后按上面的场景提问即可，不需要记工具名。\n\n## 能查到什么\n\n| 能力    | 说明                                                                                                        |\n| ----- | --------------------------------------------------------------------------------------------------------- |\n| 应用列表  | 令牌授权范围内的应用                                                                                                |\n| 发布拓扑  | 每个原生包当前绑定的版本、灰度版本与灰度比例                                                                                    |\n| 更新判定  | 用一组客户端参数重放判定，给出结论与原因                                                                                      |\n| 产物状态  | 增量补丁是否生成、生成任务是否失败                                                                                         |\n| 请求观测  | 近期真实请求按原生包版本汇总：上报的编译时间戳 / 内容指纹、客户端 SDK 版本，并与已登记的原生包逐一对照                                                   |\n| 版本健康度 | 每个热更版本的下发方式，客户端上报的下载失败、patch 失败、激活与回滚次数，以及累计观测到的设备数（需 `pushy:health:read`，客户端 v10.47.0+）                  |\n| JS 报错 | 按指纹聚合的报错列表与详情，有归档 sourcemap 时把堆栈还原到源码位置（需 `pushy:health:read`，客户端 v10.55.0+，见 [JS 报错监控](/docs/errors.md)） |\n\n## 注意事项\n\n- **只读**：不会发布版本、不会暂停应用、不会修改任何配置；\n- **按应用授权**：建议只勾选需要排查的应用；令牌可随时在后台撤销，立即生效；\n- **数据去向**：查询结果会返回给你授权的 AI 客户端，它可能继续发送给你选择的模型供应商 —— Pushy 不控制该客户端与供应商的数据处理策略；\n- 返回内容不含邮箱、IP、设备标识、密钥与支付信息；\n- **报错数据**：报错消息、堆栈与源码片段来自你自己的应用代码，已去除 URL 参数、邮箱、IP 与形如 `token=` 的密钥，但仍可能包含业务上下文；`captureException` 传入的自定义上下文只返回字段名，不返回值；\n- **限流**：首次把某个报错还原到源码需要下载 sourcemap，按账号限制为每 10 分钟 30 次，超出时返回原始堆栈，已还原过的报错不受影响。\n",
       "sections": [
         {
           "heading": "MCP 服务",
@@ -1084,56 +1084,56 @@
           "level": 2,
           "anchor": "典型场景",
           "offset": 239,
-          "length": 256
+          "length": 433
         },
         {
           "heading": "快速开始",
           "level": 2,
           "anchor": "快速开始",
-          "offset": 495,
+          "offset": 672,
           "length": 9
         },
         {
           "heading": "1. 创建令牌",
           "level": 3,
           "anchor": "1-创建令牌",
-          "offset": 504,
-          "length": 119
+          "offset": 681,
+          "length": 253
         },
         {
           "heading": "2. 让 AI 自己装（推荐）",
           "level": 3,
           "anchor": "2-让-ai-自己装推荐",
-          "offset": 623,
+          "offset": 934,
           "length": 1064
         },
         {
           "heading": "3. 或者手动配置",
           "level": 3,
           "anchor": "3-或者手动配置",
-          "offset": 1687,
+          "offset": 1998,
           "length": 249
         },
         {
           "heading": "4. 直接提问",
           "level": 3,
           "anchor": "4-直接提问",
-          "offset": 1936,
+          "offset": 2247,
           "length": 38
         },
         {
           "heading": "能查到什么",
           "level": 2,
           "anchor": "能查到什么",
-          "offset": 1974,
-          "length": 480
+          "offset": 2285,
+          "length": 1073
         },
         {
           "heading": "注意事项",
           "level": 2,
           "anchor": "注意事项",
-          "offset": 2454,
-          "length": 190
+          "offset": 3358,
+          "length": 389
         }
       ]
     },
