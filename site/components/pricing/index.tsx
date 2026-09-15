@@ -112,24 +112,32 @@ function AIBonusTag({ amount }: { amount: number }) {
 function AIBonusBanner() {
   return (
     <div className="relative mb-14 overflow-hidden rounded-3xl bg-slate-900 px-6 py-8 text-white shadow-2xl shadow-indigo-500/20 sm:px-10">
-      <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-        <div className="max-w-2xl">
+      <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+        <div className="min-w-0 lg:flex-1">
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-300/40 bg-amber-300/10 px-3 py-1 text-xs font-bold tracking-wider text-amber-300">
             <span aria-hidden>🎁</span>
             年付限时福利
           </div>
-          {/* rspress 主题给 h3 设了深色，这里必须显式写白色，否则在深色底上看不清 */}
-          <h3 className="mt-4 !text-white text-2xl font-extrabold leading-tight sm:text-3xl">
+          {/* rspress 主题会覆盖 h3 的颜色和外边距，这里用 ! 强制，否则深色底上看不清、和徽标贴在一起 */}
+          <h3 className="!mt-5 !mb-0 !text-white text-2xl font-extrabold leading-tight sm:text-3xl">
             年付即送 Token，最高 <span className="!text-amber-300">$360</span>
           </h3>
-          <p className="mt-3 text-slate-300 leading-relaxed">
-            标准版送 $30、高级版送 $100、专业版送 $360，可用于 {AI_MODELS} 等主流模型，
-            官方直连、按量计费、不掺水。适合 AI 编程、智能客服、内容生产等场景。
+          <p className="!mt-4 !mb-0 max-w-3xl text-slate-300 leading-relaxed">
+            {`标准版送 $30、高级版送 $100、专业版送 $360，可用于 ${AI_MODELS} 等主流模型，官方直连、按量计费、不掺水。适合 AI 编程、智能客服、内容生产等场景。`}
           </p>
-          <ol className="mt-4 flex flex-col gap-1.5 text-sm text-slate-200 sm:flex-row sm:flex-wrap sm:gap-x-6">
-            <li><span className="font-bold text-amber-300">1</span> 年付购买任意付费版本</li>
-            <li><span className="font-bold text-amber-300">2</span> 前往 ai.reactnative.cn 注册账号</li>
-            <li><span className="font-bold text-amber-300">3</span> 回复支付确认邮件或联系微信 <span className="font-bold text-white">sunnylqm</span> 领取</li>
+          <ol className="!mt-5 !mb-0 !pl-0 flex list-none flex-col gap-2 text-sm text-slate-200 xl:flex-row xl:flex-wrap xl:gap-x-8">
+            {[
+              <>年付购买任意付费版本</>,
+              <>前往 ai.reactnative.cn 注册账号</>,
+              <>回复支付邮件或加微信 <span className="font-bold text-white">sunnylqm</span> 领取</>,
+            ].map((step, index) => (
+              <li key={index} className="!my-0 flex items-center gap-2 xl:whitespace-nowrap">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-300 text-xs font-bold text-slate-900">
+                  {index + 1}
+                </span>
+                <span>{step}</span>
+              </li>
+            ))}
           </ol>
         </div>
         <div className="flex shrink-0 flex-col gap-3 lg:items-end">
@@ -379,7 +387,7 @@ function Pricing() {
           <p className="mb-3 leading-relaxed">
             * <strong>Token 赠送规则：</strong>仅整单年付（含续费年付）赠送，月付、升级补差价、加购更新查询额度、试用均不赠送。额度充入
             <a className="text-indigo-600 font-bold mx-1 hover:underline underline-offset-4" href={AI_SIGNUP_URL} target="_blank" rel="noopener noreferrer">ai.reactnative.cn</a>
-            账户后永久有效，仅限平台内使用，不可提现或转让；订单退款时扣回已使用部分。大客户方案请与商务另行约定。<br className="hidden sm:block" />
+            账户后永久有效，仅限平台内使用，不可提现或转让。大客户方案请与商务另行约定。<br className="hidden sm:block" />
             GPT、Claude 等模型计价参考官方美元挂牌价，但充值和消费时 1 元人民币等值 1 美元。
           </p>
           <p className="text-slate-600">
