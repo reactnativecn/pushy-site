@@ -198,7 +198,7 @@ function Pricing() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 xl:gap-10 items-stretch">
           
           {/* Card 1: 免费版 */}
-          <div className="flex flex-col bg-white rounded-3xl p-8 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+          <div className="flex flex-col md:grid md:grid-rows-subgrid md:row-span-4 md:gap-0 bg-white rounded-3xl p-8 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
             <div className="mb-6">
               <div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-500 mb-6 drop-shadow-sm">
                 <SmileOutlined className="text-3xl" />
@@ -207,7 +207,7 @@ function Pricing() {
               <p className="text-sm text-slate-500 h-10">适用于小型应用或个人项目，满足轻度热更新需求</p>
             </div>
             
-            <div className="mb-8 border-b border-slate-100 pb-8 min-h-40 flex flex-col justify-end">
+            <div className="mb-8 border-b border-slate-100 pb-8 flex flex-col justify-start">
               <div className="flex items-baseline text-slate-900">
                 <span className="text-3xl font-bold">¥</span>
                 <span className="text-5xl font-extrabold tracking-tight">0</span>
@@ -232,7 +232,7 @@ function Pricing() {
           </div>
 
           {/* Card 2: 标准版 */}
-          <div className="flex flex-col bg-white rounded-3xl p-8 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+          <div className="flex flex-col md:grid md:grid-rows-subgrid md:row-span-4 md:gap-0 bg-white rounded-3xl p-8 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
             <div className="mb-6">
               <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500 mb-6 drop-shadow-sm">
                 <CarOutlined className="text-3xl" />
@@ -241,7 +241,7 @@ function Pricing() {
               <p className="text-sm text-slate-500 h-10">适用于一般应用，满足中度应用迭代与热更频率</p>
             </div>
             
-            <div className="mb-8 border-b border-slate-100 pb-8 min-h-40 flex flex-col justify-end">
+            <div className="mb-8 border-b border-slate-100 pb-8 flex flex-col justify-start">
               <div className="flex items-baseline text-slate-900">
                 <span className="text-3xl font-bold">¥</span>
                 <span className="text-5xl font-extrabold tracking-tight">960</span>
@@ -271,14 +271,14 @@ function Pricing() {
           </div>
 
           {/* Card 3: 高级版 (Highlighted) */}
-          <div className="relative flex flex-col bg-white rounded-3xl p-8 shadow-2xl shadow-indigo-500/10 border-2 border-indigo-500 hover:-translate-y-3 transition-transform duration-300 z-10">
+          <div className="relative flex flex-col md:grid md:grid-rows-subgrid md:row-span-4 md:gap-0 bg-white rounded-3xl p-[31px] shadow-2xl shadow-indigo-500/10 border-2 border-indigo-500 hover:-translate-y-3 transition-transform duration-300 z-10">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
               <span className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm font-bold tracking-wider px-4 py-1.5 rounded-full uppercase shadow-md">
                 最受欢迎
               </span>
             </div>
             
-            <div className="mb-6 mt-2">
+            <div className="mb-6">
               <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-500 mb-6 drop-shadow-sm">
                 <SendOutlined className="text-3xl" />
               </div>
@@ -286,7 +286,7 @@ function Pricing() {
               <p className="text-sm text-slate-500 h-10">适用于中大型商业应用，快速可靠的线上问题修复</p>
             </div>
             
-            <div className="mb-8 border-b border-slate-100 pb-8 min-h-40 flex flex-col justify-end">
+            <div className="mb-8 border-b border-slate-100 pb-8 flex flex-col justify-start">
               <div className="flex items-baseline text-indigo-600">
                 <span className="text-3xl font-bold">¥</span>
                 <span className="text-5xl font-extrabold tracking-tight">2400</span>
@@ -316,7 +316,7 @@ function Pricing() {
           </div>
 
           {/* Card 4: 专业版 */}
-          <div className="flex flex-col bg-white rounded-3xl p-8 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+          <div className="flex flex-col md:grid md:grid-rows-subgrid md:row-span-4 md:gap-0 bg-white rounded-3xl p-8 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
             <div className="mb-6">
               <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-500 mb-6 drop-shadow-sm">
                 <RocketOutlined className="text-3xl" />
@@ -325,7 +325,7 @@ function Pricing() {
               <p className="text-sm text-slate-500 h-10">适用于企业级多业务线舰队应用，极高的资源上限</p>
             </div>
             
-            <div className="mb-8 border-b border-slate-100 pb-8 min-h-40 flex flex-col justify-end">
+            <div className="mb-8 border-b border-slate-100 pb-8 flex flex-col justify-start">
               <div className="flex items-baseline text-slate-900">
                 <span className="text-3xl font-bold">¥</span>
                 <span className="text-5xl font-extrabold tracking-tight">7200</span>
