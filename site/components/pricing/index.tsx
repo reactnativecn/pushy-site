@@ -89,6 +89,76 @@ function AnnualDiscount({
   );
 }
 
+const AI_SIGNUP_URL = "https://ai.reactnative.cn";
+const AI_MODEL_PLAZA_URL = "https://ai.reactnative.cn/model-plaza";
+const AI_MODELS = "GPT、Claude、DeepSeek、GLM、Kimi";
+
+// 年付赠送的 Token（美元计价额度）。只有年付送，版本越高送得越多，月付、升级和加购不送；
+// 数字要和 pushy-go internal/order/ai_bonus.go 保持一致。
+function AIBonusTag({ amount }: { amount: number }) {
+  return (
+    <div className="mt-3 rounded-xl border border-fuchsia-200 bg-gradient-to-r from-fuchsia-50 to-indigo-50 px-3 py-2 text-sm">
+      <div className="flex items-center gap-2 font-extrabold text-fuchsia-700">
+        <span aria-hidden>🎁</span>
+        年付再送 ${amount} Token
+      </div>
+      <div className="mt-0.5 text-xs font-medium text-fuchsia-600/80">
+        {AI_MODELS} 等主流模型通用
+      </div>
+    </div>
+  );
+}
+
+function AIBonusBanner() {
+  return (
+    <div className="relative mb-14 overflow-hidden rounded-3xl bg-slate-900 px-6 py-8 text-white shadow-2xl shadow-indigo-500/20 sm:px-10">
+      <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+        <div className="max-w-2xl">
+          <div className="inline-flex items-center gap-2 rounded-full border border-amber-300/40 bg-amber-300/10 px-3 py-1 text-xs font-bold tracking-wider text-amber-300">
+            <span aria-hidden>🎁</span>
+            年付限时福利
+          </div>
+          {/* rspress 主题给 h3 设了深色，这里必须显式写白色，否则在深色底上看不清 */}
+          <h3 className="mt-4 !text-white text-2xl font-extrabold leading-tight sm:text-3xl">
+            年付即送 Token，最高 <span className="!text-amber-300">$360</span>
+          </h3>
+          <p className="mt-3 text-slate-300 leading-relaxed">
+            标准版送 $30、高级版送 $100、专业版送 $360，可用于 {AI_MODELS} 等主流模型，
+            官方直连、按量计费、不掺水。适合 AI 编程、智能客服、内容生产等场景。
+          </p>
+          <ol className="mt-4 flex flex-col gap-1.5 text-sm text-slate-200 sm:flex-row sm:flex-wrap sm:gap-x-6">
+            <li><span className="font-bold text-amber-300">1</span> 年付购买任意付费版本</li>
+            <li><span className="font-bold text-amber-300">2</span> 前往 ai.reactnative.cn 注册账号</li>
+            <li><span className="font-bold text-amber-300">3</span> 回复支付确认邮件或联系微信 <span className="font-bold text-white">sunnylqm</span> 领取</li>
+          </ol>
+        </div>
+        <div className="flex shrink-0 flex-col gap-3 lg:items-end">
+          <div className="grid grid-cols-3 gap-2 text-center lg:gap-3">
+            {[
+              ["标准版", 30],
+              ["高级版", 100],
+              ["专业版", 360],
+            ].map(([tier, amount]) => (
+              <div key={tier} className="rounded-2xl border border-white/10 bg-white/5 px-3 py-3 lg:px-5">
+                <div className="text-xs font-medium text-slate-400">{tier}</div>
+                <div className="mt-1 text-xl font-extrabold text-amber-300 lg:text-2xl">${amount}</div>
+              </div>
+            ))}
+          </div>
+          <a
+            href={AI_MODEL_PLAZA_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center rounded-xl bg-amber-300 px-5 py-3 text-sm font-bold text-slate-900 transition-colors hover:bg-amber-200"
+          >
+            先去 ai.reactnative.cn 看看模型
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Pricing() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
@@ -110,9 +180,12 @@ function Pricing() {
             </Tooltip>
             的<strong className="text-slate-900 mx-1">专业版</strong>试用评估。
             <br />
-            到期后转为免费版。年付较按月购买享约 6.7 折优惠；如需大客户方案，请联系 QQ 客服 34731408。
+            到期后转为免费版。年付较按月购买享约 6.7 折优惠，
+            <strong className="text-fuchsia-700 mx-1">还可获赠最高 $360 的 Token</strong>。
           </p>
         </div>
+
+        <AIBonusBanner />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 xl:gap-10 items-stretch">
           
@@ -167,6 +240,7 @@ function Pricing() {
                 <span className="text-slate-500 ml-2 font-medium">/ 年</span>
               </div>
               <AnnualDiscount annualPrice={960} monthlyPrice={120} />
+              <AIBonusTag amount={30} />
             </div>
 
             <ul className="flex-1 flex flex-col gap-3 mb-8">
@@ -184,7 +258,7 @@ function Pricing() {
               rel="noopener noreferrer"
               className="mt-auto block w-full py-4 px-6 rounded-xl font-bold text-center bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/30 transition-all"
             >
-              立即升级
+              立即购买
             </a>
           </div>
 
@@ -211,6 +285,7 @@ function Pricing() {
                 <span className="text-slate-500 ml-2 font-medium">/ 年</span>
               </div>
               <AnnualDiscount annualPrice={2400} monthlyPrice={300} />
+              <AIBonusTag amount={100} />
             </div>
 
             <ul className="flex-1 flex flex-col gap-3 mb-8">
@@ -228,7 +303,7 @@ function Pricing() {
               rel="noopener noreferrer"
               className="mt-auto block w-full py-4 px-6 rounded-xl font-bold text-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-500 hover:to-purple-500 hover:shadow-xl hover:shadow-indigo-500/40 transition-all"
             >
-              立刻抢购
+              立即购买
             </a>
           </div>
 
@@ -249,6 +324,7 @@ function Pricing() {
                 <span className="text-slate-500 ml-2 font-medium">/ 年</span>
               </div>
               <AnnualDiscount annualPrice={7200} monthlyPrice={900} />
+              <AIBonusTag amount={360} />
             </div>
 
             <ul className="flex-1 flex flex-col gap-3 mb-8">
@@ -266,7 +342,7 @@ function Pricing() {
               rel="noopener noreferrer"
               className="mt-auto block w-full py-4 px-6 rounded-xl font-bold text-center bg-slate-900 text-white hover:bg-slate-800 hover:shadow-lg hover:shadow-slate-900/30 transition-all"
             >
-              联系办理
+              立即购买
             </a>
           </div>
 
@@ -299,6 +375,12 @@ function Pricing() {
             原生包指完整的 apk/ipa 安装包。热更包指 pushy bundle 命令生成的 ppk 文件（非用户实际下载的增量更新文件）。<br className="hidden sm:block" />
             <strong className="text-slate-700">所有版本均包含 CDN 流量费用，无需额外付费。</strong><br className="hidden sm:block" />
             为了最大化利用您的定额，您可随时在控制台删除已不再使用的应用、原生包和热更包。
+          </p>
+          <p className="mb-3 leading-relaxed">
+            * <strong>Token 赠送规则：</strong>仅整单年付（含续费年付）赠送，月付、升级补差价、加购更新查询额度、试用均不赠送。额度充入
+            <a className="text-indigo-600 font-bold mx-1 hover:underline underline-offset-4" href={AI_SIGNUP_URL} target="_blank" rel="noopener noreferrer">ai.reactnative.cn</a>
+            账户后永久有效，仅限平台内使用，不可提现或转让；订单退款时扣回已使用部分。大客户方案请与商务另行约定。<br className="hidden sm:block" />
+            GPT、Claude 等模型计价参考官方美元挂牌价，但充值和消费时 1 元人民币等值 1 美元。
           </p>
           <p className="text-slate-600">
             对于付费业务还有其他疑问？请参考我们的
