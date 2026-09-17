@@ -97,7 +97,7 @@
 
 年付购买（含续费）`标准版`、`高级版`、`专业版`，分别赠送 $30、$100、$360 的 Token，可用于 GPT、Claude、DeepSeek、GLM、Kimi 等主流模型，官方直连、按量计费。领取步骤：
 
-1. 前往 [ai.reactnative.cn](https://ai.reactnative.cn) 注册账号；
+1. 前往 [36k.ai](https://36k.ai) 注册账号；
 2. 回复支付确认邮件告知注册邮箱，或添加微信客服 `sunnylqm`；
 3. 我们核对订单后将额度充入您的 AI 账户。
 
