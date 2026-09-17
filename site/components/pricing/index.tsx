@@ -140,7 +140,7 @@ function AIBonusBanner() {
             ))}
           </ol>
         </div>
-        <div className="flex shrink-0 flex-col gap-3 lg:items-end">
+        <div className="flex shrink-0 flex-col gap-3">
           <div className="grid grid-cols-3 gap-2 text-center lg:gap-3">
             {[
               ["标准版", 30],
@@ -157,7 +157,7 @@ function AIBonusBanner() {
             href={AI_MODEL_PLAZA_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center rounded-xl bg-amber-300 px-5 py-3 text-sm font-bold text-slate-900 transition-colors hover:bg-amber-200"
+            className="flex w-full items-center justify-center rounded-xl bg-amber-300 px-5 py-3 text-sm font-bold text-slate-900 transition-colors hover:bg-amber-200"
           >
             先去 36k.ai 看看模型
           </a>
