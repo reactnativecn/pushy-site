@@ -89,8 +89,8 @@ function AnnualDiscount({
   );
 }
 
-const AI_SIGNUP_URL = "https://ai.reactnative.cn";
-const AI_MODEL_PLAZA_URL = "https://ai.reactnative.cn/model-plaza";
+const AI_SIGNUP_URL = "https://36k.ai";
+const AI_MODEL_PLAZA_URL = "https://36k.ai/model-plaza";
 const AI_MODELS = "GPT、Claude、DeepSeek、GLM、Kimi";
 
 // 年付赠送的 Token（美元计价额度）。只有年付送，版本越高送得越多，月付、升级和加购不送；
@@ -128,7 +128,7 @@ function AIBonusBanner() {
           <ol className="!mt-5 !mb-0 !pl-0 flex list-none flex-col gap-2 text-sm text-slate-200 xl:flex-row xl:flex-wrap xl:gap-x-8">
             {[
               <>年付购买任意付费版本</>,
-              <>前往 ai.reactnative.cn 注册账号</>,
+              <>前往 36k.ai 注册账号</>,
               <>回复支付邮件或加微信 <span className="font-bold text-white">sunnylqm</span> 领取</>,
             ].map((step, index) => (
               <li key={index} className="!my-0 flex items-center gap-2 xl:whitespace-nowrap">
@@ -159,7 +159,7 @@ function AIBonusBanner() {
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center rounded-xl bg-amber-300 px-5 py-3 text-sm font-bold text-slate-900 transition-colors hover:bg-amber-200"
           >
-            先去 ai.reactnative.cn 看看模型
+            先去 36k.ai 看看模型
           </a>
         </div>
       </div>
@@ -386,7 +386,7 @@ function Pricing() {
           </p>
           <p className="mb-3 leading-relaxed">
             * <strong>Token 赠送规则：</strong>仅整单年付（含续费年付）赠送，月付、升级补差价、加购更新查询额度、试用均不赠送。额度充入
-            <a className="text-indigo-600 font-bold mx-1 hover:underline underline-offset-4" href={AI_SIGNUP_URL} target="_blank" rel="noopener noreferrer">ai.reactnative.cn</a>
+            <a className="text-indigo-600 font-bold mx-1 hover:underline underline-offset-4" href={AI_SIGNUP_URL} target="_blank" rel="noopener noreferrer">36k.ai</a>
             账户后永久有效，仅限平台内使用，不可提现或转让。大客户方案请与商务另行约定。<br className="hidden sm:block" />
             GPT、Claude 等模型计价参考官方美元挂牌价，但充值和消费时 1 元人民币等值 1 美元。
           </p>
