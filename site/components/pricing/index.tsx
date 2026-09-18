@@ -111,8 +111,8 @@ function AIBonusTag({ amount }: { amount: number }) {
 
 function AIBonusBanner() {
   return (
-    <div className="relative mb-14 overflow-hidden rounded-3xl bg-slate-900 px-6 py-8 text-white shadow-2xl shadow-indigo-500/20 sm:px-10">
-      <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+    <div className="relative mb-14 overflow-hidden rounded-3xl bg-slate-900 p-6 text-white shadow-2xl shadow-indigo-500/20 sm:p-10">
+      <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between lg:gap-12">
         <div className="min-w-0 lg:flex-1">
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-300/40 bg-amber-300/10 px-3 py-1 text-xs font-bold tracking-wider text-amber-300">
             <span aria-hidden>🎁</span>
@@ -140,14 +140,14 @@ function AIBonusBanner() {
             ))}
           </ol>
         </div>
-        <div className="flex shrink-0 flex-col gap-3">
+        <div className="flex shrink-0 flex-col gap-3 lg:w-[360px]">
           <div className="grid grid-cols-3 gap-2 text-center lg:gap-3">
             {[
               ["标准版", 30],
               ["高级版", 100],
               ["专业版", 360],
             ].map(([tier, amount]) => (
-              <div key={tier} className="rounded-2xl border border-white/10 bg-white/5 px-3 py-3 lg:px-5">
+              <div key={tier} className="rounded-2xl border border-white/10 bg-white/5 px-3 py-3 lg:py-4">
                 <div className="text-xs font-medium text-slate-400">{tier}</div>
                 <div className="mt-1 text-xl font-extrabold text-amber-300 lg:text-2xl">${amount}</div>
               </div>
