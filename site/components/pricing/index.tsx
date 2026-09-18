@@ -112,7 +112,7 @@ function AIBonusTag({ amount }: { amount: number }) {
 function AIBonusBanner() {
   return (
     <div className="relative mb-14 overflow-hidden rounded-3xl bg-slate-900 p-6 text-white shadow-2xl shadow-indigo-500/20 sm:p-10">
-      <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between lg:gap-12">
+      <div className="relative flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
         <div className="min-w-0 lg:flex-1">
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-300/40 bg-amber-300/10 px-3 py-1 text-xs font-bold tracking-wider text-amber-300">
             <span aria-hidden>🎁</span>
@@ -157,7 +157,7 @@ function AIBonusBanner() {
             href={AI_MODEL_PLAZA_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex w-full items-center justify-center rounded-xl bg-amber-300 px-5 py-3 text-sm font-bold text-slate-900 transition-colors hover:bg-amber-200"
+            className="flex w-full items-center justify-center rounded-xl bg-amber-300 px-5 py-3 lg:py-4 text-sm font-bold text-slate-900 transition-colors hover:bg-amber-200"
           >
             先去 36k.ai 看看模型
           </a>
