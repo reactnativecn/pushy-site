@@ -1,0 +1,56 @@
+name: Verify native configuration docs
+on:
+  push:
+    branches: [docs/native-host-update-api]
+    paths: [.github/workflows/native-config-docs-check.yml]
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Update the JS API reference and example sequencing
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('site/pages/docs/api.mdx')
+          s = p.read_text()
+          old = '  disableNativeCheck?: boolean;\n'
+          assert s.count(old) == 1
+          s = s.replace(old, old + '\n  // 原生配置来源，默认 javascript：继续由 JS 同步配置。\n  // native：由原生 configure 管理，JS 不再覆盖原生配置；\n  // 此模式下原生是否禁用由 configure 的 disabled 控制，\n  // JS 的 disableNativeCheck 不再写入原生存储。\n  // 需包含 SDK PR #641 的原生版本，尚未标记为已发布。\n  nativeConfigSource?: "javascript" | "native";\n')
+          old = '### JavaScript 方法\n'
+          assert s.count(old) == 1
+          s = s.replace(old, old + '\n原生端主动配置、检测与下载的接口和完整首启顺序，参见[原生配置、检测与更新](/docs/native-api)。原生主导配置时，请在 JS 实例首次创建时设置 `nativeConfigSource: "native"`，避免 JS 初始化覆盖原生配置。\n')
+          p.write_text(s)
+          p = Path('site/pages/docs/native-api.mdx')
+          s = p.read_text()
+          old = '// 以下调用属于 bundle 已解析后的业务入口，不要与上面的异步配置并排立即执行。\nPushyNativeUpdate.checkAndUpdate'
+          assert s.count(old) == 1
+          s = s.replace(old, '```\n\n以下是另一个业务入口，必须在配置成功且 bundle 已正常解析后执行，不要与上面的异步配置并排立即调用：\n\n```java\nPushyNativeUpdate.checkAndUpdate')
+          old = '    guard error == nil else {\n        print("Pushy 配置失败：\\(error!.localizedDescription)")'
+          assert s.count(old) == 1
+          s = s.replace(old, '    if let error = error {\n        print("Pushy 配置失败：\\(error.localizedDescription)")')
+          p.write_text(s)
+          PY
+      - name: Build the site and documentation index
+        working-directory: site
+        run: npm install --no-audit --no-fund && npm run build
+      - name: Verify the generated guide and commit
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          pages = [p for p in Path('site/out').rglob('*.html') if 'native-api' in str(p)]
+          assert pages and any('nativeConfigSource' in p.read_text() and 'configure' in p.read_text() for p in pages)
+          print('Verified native-first configuration guide')
+          PY
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add site/pages/docs/{api,native-api}.mdx
+          git commit -m 'docs: link native configuration ownership from the JS API reference'
+          git push origin HEAD:refs/heads/docs/native-host-update-api
