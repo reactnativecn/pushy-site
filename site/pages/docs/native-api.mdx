@@ -11,7 +11,7 @@ Pushy 提供 Android、iOS 和 HarmonyOS 原生宿主接口，支持**原生配�
 `configure` 只配置，不联网、不下载、不解析 bundle；`checkAndUpdate` 则不是仅查询版本的接口，有可执行热更新时会继续下载、校验，并按配置决定是否设置为下次启动使用的版本。两个接口都不会弹窗或立即重载正在运行的 React Native 页面。
 
 :::warning 版本与原生包要求
-这些接口由 [SDK PR #641](https://github.com/reactnativecn/react-native-update/pull/641) 新增，不代表已经发布到 npm。集成前请确认所用 SDK 包含这些方法；`10.56.1` 及此前版本没有本文介绍的宿主入口。
+本文的原生 `configure`、`checkAndUpdate` 接口及 JS 选项 `nativeConfigSource` 均从 **react-native-update v10.57.0** 起提供，适用于 Android、iOS 和 HarmonyOS。请使用 **v10.57.0 或更高版本**；旧版 SDK 即使已有原生自动检测，也不包含本文的公开宿主入口。完整变更见 [v10.57.0 发布说明](https://github.com/reactnativecn/react-native-update/releases/tag/v10.57.0)。
 
 升级后必须重新编译和发布原生安装包，不能仅发布 JS 热更新。HarmonyOS 从源码集成时，还需重新构建并集成包含这些导出的 HAR。
 :::

@@ -106,7 +106,7 @@ interface PushyOptions {
   // native：由原生 configure 管理，JS 不再覆盖原生配置；
   // 此模式下原生是否禁用由 configure 的 disabled 控制，
   // JS 的 disableNativeCheck 不再写入原生存储。
-  // 需包含 SDK PR #641 的原生版本，尚未标记为已发布。
+  // 此选项需 v10.57.0+ 版本；原生 configure/checkAndUpdate 同样需要 v10.57.0+，升级后须重新构建原生包。
   nativeConfigSource?: "javascript" | "native";
 }
 
