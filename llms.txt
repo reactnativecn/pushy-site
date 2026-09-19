@@ -10,6 +10,7 @@
 - [代码集成](/docs/integration.md)
 - [发布热更新](/docs/publish.md)
 - [API参考](/docs/api.md)
+- [原生主动检测与更新](/docs/native-api.md): Pushy 提供 Android、iOS 和 HarmonyOS 原生宿主接口，支持原生配置 → 正常解析启动 bundle → 主动检查和下载更新。配置和检查均不必经过 JS Bridge：即使首次安装、JS 尚未执行，也可以由原生端准备配置，之后运行原生更新流程。 configure 只配置，不联网、不下载、不解析 bundle；checkAndUpdate 则不是仅查询版本的接口，有可执行热更新时会继续下载、校验，并按配置决定是否设置为下次启动使用的版本。两个接口都不会弹窗或立即重载正在运行的 React Native 页面。
 - [API Key](/docs/api-token.md): API Key 是一种用于在 CI/CD 流程或自动化脚本中调用 Pushy API 的认证方式。相比直接使用账号密码，API Key 更加安全且便于管理。
 - [MCP 服务](/docs/mcp.md): 把 Pushy 接进你的 AI 客户端（Claude Desktop、IDE、自建 Agent 等），让它直接查你的发布状态，再结合 GitHub、Sentry、CI 一起排查问题。全程只读，不会改动任何发布数据。
 - [命令行工具](/docs/cli.md)

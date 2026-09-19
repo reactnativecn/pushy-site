@@ -3,7 +3,7 @@
   "product": "Pushy",
   "baseUrl": "https://pushy.react-native.cn",
   "resourceScheme": "pushy-docs",
-  "sourceCommit": "fe03458063cc71ba8767359f1b4fc3c278cac0d5",
+  "sourceCommit": "908a23f5b2c942239e7adbab37e70644d742b38e",
   "documents": [
     {
       "slug": "analytics",
@@ -70,7 +70,7 @@
       "path": "pages/docs/api.mdx",
       "url": "https://pushy.react-native.cn/docs/api",
       "resourceUri": "pushy-docs://docs/api",
-      "content": "# API参考\n\n### JavaScript 方法\n\n#### new Pushy(options: PushyOptions)\n\n创建 Pushy 热更新服务实例，其构造参数如下：\n\n```ts\ninterface PushyOptions {\n  // 必填，通过pushy createApp或selectApp命令，或在网页管理端获取\n  appKey: string;\n\n  // 自定义日志输出，也可用于上报统计数据\n  logger?: ({ type, data }: { type: EventType; data: EventData }) => void;\n\n  // 触发自动检查更新的策略\n  checkStrategy?:\n    | \"onAppStart\" // 仅在app启动时\n    | \"onAppResume\" // 仅在app从后台切换到前台时\n    | \"both\"; // 默认值，同时包含前两个场景\n    | null; // 不自动检查更新，必须手动调用checkUpdate方法，此选项需 v10.4.2+ 版本\n\n  // 自动下载和应用更新的策略\n  updateStrategy?:\n    | \"alwaysAlert\" // 调试环境（__DEV__）默认值，使用系统默认的alert页面提示热更且会在有报错时弹出提示\n    | \"alertUpdateAndIgnoreError\" // 生产环境默认值，在有热更时使用系统默认的alert页面提示热更，但不弹出任何报错提示\n    | \"silentAndNow\" // 自动静默下载并立刻应用热更\n    | \"silentAndLater\"; // 自动静默下载，但仅在用户退出app后重启时应用更新\n    | null; // 不自动下载和应用更新，如需自定义热更界面请选择此项\n\n  // 是否在热更重启后自动标记为成功，默认为true\n  // 一般情况下不建议手动标记\n  autoMarkSuccess?: boolean;\n\n  // 是否在若干ms后自动清除最后的报错，默认为不清除\n  dismissErrorAfter?: number;\n\n  // 是否在开发环境中检查热更，默认为false。如需在开发环境中调试热更，请打开此选项。\n  // 但即便打开此选项，也仅能检查、下载热更，并不能实际应用热更。实际应用热更必须在release包中进行。\n  // 此选项需 v10.4.2+ 版本\n  debug?: boolean;\n\n  // 是否在调用 checkUpdate 和 downloadUpdate 时抛出错误，默认为不抛出错误，通过 lastError 获取错误信息\n  // 启用后可以使用 try catch 语句 捕获错误，同时 lastError 也仍然可用\n  // try {\n  //   await checkUpdate();\n  // } catch (e) {\n  //   console.error(e);\n  // }\n  // 此选项需 v10.15.2+ 版本\n  throwError?: boolean;\n\n  // 在检查更新前执行，返回 false 则取消检查更新\n  // 此选项需 v10.12.0+ 版本\n  beforeCheckUpdate?: () => Promise<boolean>;\n\n  // 在每次检查更新结束后执行，可用于上报检查结果；不影响原有检查流程\n  // 此选项需 v10.38.3+ 版本\n  afterCheckUpdate?: (state: UpdateCheckState) => Promise<void> | void;\n\n  // 在下载更新前执行，返回 false 则取消下载更新，可以配合自定义的 metaInfo 做一些条件控制\n  // 此选项需 v10.12.0+ 版本\n  beforeDownloadUpdate?: (info: UpdateInfo) => Promise<boolean>;\n\n  // 在下载更新后执行，返回 false 则取消内置策略进一步执行，可以配合自定义的 metaInfo 做一些条件控制\n  // 此选项需 v10.27.0+ 版本\n  afterDownloadUpdate?: (info: UpdateInfo) => Promise<boolean>;\n\n  // 在原生包过期时执行，返回 false 则取消内置策略进一步执行，可以配合自定义的 metaInfo 做一些条件控制\n  // 此选项需 v10.28.2+ 版本\n  onPackageExpired?: (info: UpdateInfo) => Promise<boolean>;\n\n  // 在 switchVersion 或 restartApp 触发立即重启前执行，返回 false 则取消本次重启\n  // 可用于等待 Sentry 等原生 SDK 停止采样、flush 上报队列后再销毁 RN 实例\n  // 此选项需 v10.42.2+ 版本\n  beforeReload?: (\n    context: BeforeReloadContext,\n  ) => Promise<boolean | void> | boolean | void;\n\n  // 是否关闭更新生命周期事件上报（版本健康度统计），默认为 false（开启）\n  // 详见下方「版本健康度事件上报」一节\n  // 此选项需 v10.47.0+ 版本\n  disableTelemetry?: boolean;\n\n  // 是否关闭 JS 报错上报，默认为 false（开启）\n  // 详见「JS 报错监控」一节：https://pushy.reactnative.cn/docs/errors\n  // 此选项需 v10.55.0+ 版本\n  disableErrorReporting?: boolean;\n\n  // 是否关闭原生冷启动检测（每次冷启动后由原生代码独立发起的后台检查），\n  // 默认为 false（开启）。关闭后将失去「强制启动」救砖通道，\n  // 详见下方「原生冷启动检测」一节\n  // 此选项需 v10.52.1+ 版本\n  disableNativeCheck?: boolean;\n}\n\n// 检查更新结束后的状态\ntype UpdateCheckState = {\n  // completed: 检查完成；skipped: 因 debug、web 环境或 beforeCheckUpdate 返回 false 等原因跳过；error: 检查出错\n  status: \"completed\" | \"skipped\" | \"error\";\n  // status 为 completed 时的检查结果\n  result?: UpdateInfo;\n  // status 为 error 时的错误对象\n  error?: Error;\n};\n\n// beforeReload 接收到的重启上下文\ntype BeforeReloadContext = {\n  // switchVersion: 立即应用已下载热更；restartApp: 直接重启当前应用\n  type: \"switchVersion\" | \"restartApp\";\n  // type 为 switchVersion 时，表示即将应用的热更 hash\n  hash?: string;\n};\n\n// 日志事件类型\ntype EventType =\n  // 更新失败，重启后发生回滚\n  | \"rollback\"\n  // 检查更新时报错\n  | \"errorChecking\"\n  // 正在发起检查\n  | \"checking\"\n  // 正在下载更新\n  | \"downloading\"\n  // 已下载更新\n  | \"downloadSuccess\"\n  // 更新失败\n  | \"errorUpdate\"\n  // 更新成功\n  | \"markSuccess\"\n  // 已恢复到内置包（resetToPackagedBundle 成功），需 v10.48.0+ 版本\n  | \"reset\"\n  // 恢复内置包失败，需 v10.48.0+ 版本\n  | \"errorReset\"\n  // 下载apk\n  | \"downloadingApk\"\n  // 下载apk前申请存储权限被用户拒绝\n  | \"rejectStoragePermission\"\n  // 下载apk前申请存储权限发生错误\n  | \"errorStoragePermission\"\n  // 下载apk时发生错误\n  | \"errorDownloadAndInstallApk\";\n\n// 日志事件数据\ninterface EventData {\n  // 当前已完成的热更hash值，如尚未热更则为空字符串\n  currentVersion: string;\n  // 客户端版本信息\n  cInfo: {\n    rnu: string; // 当前 react-native-update 版本\n    rn: string; // 当前 react-native 版本\n    os: string; // 当前操作系统及版本\n    uuid: string; // 用户标识符\n  };\n  // 客户端原生版本号\n  packageVersion: string;\n  // 编译时间戳\n  buildTime: number;\n  // 报错相关的信息\n  message?: string;\n  // 发生回滚的版本hash值\n  rolledBackVersion?: string;\n  // 更新失败的新版本hash值\n  newVersion?: string;\n  // 其他一些数据\n  [key: string]: any;\n}\n```\n\n#### 版本健康度事件上报\n\n自 v10.47.0 起，SDK 会在更新流程的关键节点向更新服务自动上报少量生命周期事件，用于在管理端展示每个热更版本的健康度（下载失败率、patch 失败率、回滚率等），帮助你在发版后第一时间发现有问题的版本：\n\n- `download_success` / `download_fail`：热更包下载成功 / 全部下载策略失败\n- `patch_fail`：增量 patch 应用失败（含降级为完整包成功的情形）或版本切换失败\n- `rollback`：新版本启动异常，发生自动回滚\n- `mark_success`：新版本启动并标记成功\n\n上报内容仅包含热更版本 hash、原生版本号、`cInfo`（SDK/RN/系统版本与设备标识符，与 checkUpdate 请求一致）以及失败时截断后的错误信息摘要，不涉及任何业务数据。上报为一次性异步请求，不重试、失败静默，不会影响更新流程与性能；调试环境（`__DEV__`）下不会上报。\n\n如不希望上报这些事件，可在初始化时关闭：\n\n```js\nconst pushyClient = new Pushy({\n  appKey,\n  disableTelemetry: true,\n});\n```\n\n注意：关闭后管理端将无法统计该客户端的版本健康度，也无法在版本发生大面积异常时为你提供预警。\n\n#### JS 报错上报\n\n自 v10.55.0 起，SDK 会把热更版本中发生的 JavaScript 异常上报给更新服务，管理后台用发布时归档的 sourcemap 把堆栈还原回原始源码位置。未捕获异常会自动上报（在 React Native 现有的全局 `ErrorUtils` 处理器之上追加一层，不影响 Sentry 等已有集成），也可以在 `catch` 中手动调用 `captureException`：\n\n```js\npushyClient.captureException(error, {\n  extra: { screen: \"checkout\" },\n});\n```\n\n如不希望上报，可在初始化时设置 `disableErrorReporting: true`。完整说明（包括后台界面、sourcemap 归档要求与手动上报用法）见 [JS 报错监控](/docs/errors.md)。\n\n#### 原生冷启动检测\n\n自 v10.52.1 起，客户端会在每次冷启动几秒后，由**原生代码**独立发起一次后台检查更新（完全不依赖 JS）。它的意义在于救砖：如果某次热更把 JS 打死，设备再也无法运行 JS 侧的检查逻辑，此时只有这条原生通道还能把修复版本拉回来（配合管理后台的[强制启动](/docs/publish.md#强制启动救砖)标记激活）。\n\n行为要点：\n\n- **不会打扰正常流程**：常规情况下它只做下载与缓存，是否激活取决于你配置的策略——`checkStrategy: null` 时原生只下载不激活；仅当服务端下发了强制启动标记时才会越过策略激活\n- **JS 会复用它的结果**：JS 侧检查更新会直接复用原生刚拿到的响应缓存，冷启动时可少一次网络请求\n- **安全护栏**：设备本地的回滚保护优先级最高；激活后若启动异常，首次启动崩溃保护依然会自动回滚\n\n如确有需要（如流量/电量预算、合规要求联网需用户同意等场景），可在初始化时关闭：\n\n```js\nconst pushyClient = new Pushy({\n  appKey,\n  disableNativeCheck: true,\n});\n```\n\n注意：关闭后该客户端将失去强制启动救砖能力——一旦被坏热更卡死只能重装应用。\n\n#### beforeReload 示例：重启前清理原生 SDK\n\n`beforeReload` 会在 `switchVersion()` 和 `restartApp()` 真正重启前执行。返回 `false` 会取消本次重启；抛出异常或 Promise reject 时也不会继续重启。`switchVersionLater()` 不会立即销毁当前 RN 实例，因此不会触发此钩子。\n\n如果应用接入了 Sentry profiling、性能采样、日志上传等可能跨线程工作的原生 SDK，可以在这里先停止采样并 flush 队列，再让 Pushy 重启：\n\n```ts\nimport { NativeModules } from \"react-native\";\nimport * as Sentry from \"@sentry/react-native\";\nimport { Pushy } from \"react-native-update\";\n\nconst pushyClient = new Pushy({\n  appKey,\n  beforeReload: async (_context) => {\n    try {\n      NativeModules.RNSentry?.stopProfiling?.();\n    } catch {}\n\n    const flushed = await Promise.race([\n      Sentry.flush(),\n      new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 1500)),\n    ]);\n\n    // 返回 false 会取消本次立即重启，等待下一次检查或手动触发。\n    return flushed;\n  },\n});\n```\n\n#### useUpdate()\n\n热更相关的工具函数。此方法也可使用别名 `usePushy` 引入。\n\n:::info\n注意，在使用 `<UpdateProvider>` 的当前组件（一般是根组件）中无法直接调用`useUpdate`，只有当前组件的子组件才能调用。\n:::\n\n```js\nconst {\n  checkUpdate,\n  switchVersion,\n  switchVersionLater,\n  markSuccess,\n  dismissError,\n  downloadUpdate,\n  downloadAndInstallApk,\n  getCurrentVersionInfo,\n  currentVersionInfo,\n  parseTestQrCode,\n  currentHash,\n  packageVersion,\n  client,\n  progress,\n  updateInfo,\n  lastError,\n  restartApp,\n  resetToPackagedBundle,\n} = useUpdate();\n```\n\n其类型定义和功能如下：\n\n```ts\ninterface UpdateContext {\n  // 检查更新（注意在 v10.26.0 版本之前，`checkUpdate`方法本身没有返回值，只能从`useUpdate()`返回的`updateInfo`中获取）\n  // 我们也仍然推荐优先从`useUpdate()`中获取`updateInfo`\n  checkUpdate: () => Promise<void | UpdateInfo>;\n  // 下载热更完成后调用，立即重启切换新版本\n  switchVersion: () => Promise<void>;\n  // 下载热更完成后调用，用户手动重启app后切换新版本（静默更新）\n  switchVersionLater: () => Promise<void>;\n  // 热更完成重启后，手动标记热更完成\n  markSuccess: () => void;\n  // 清除最后的报错状态\n  dismissError: () => void;\n  // 下载热更, v10.16.0+ 版本返回值为`boolean`，表示是否下载成功\n  downloadUpdate: () => Promise<boolean | void>;\n  // 下载并安装apk\n  downloadAndInstallApk: (url: string) => Promise<void>;\n  // 异步获取当前已热更版本的信息，v10.31.2 版本后用 `currentVersionInfo` 代替\n  getCurrentVersionInfo: () => Promise<{\n    name?: string;\n    description?: string;\n    metaInfo?: string;\n  }>;\n  // 当前已热更版本的信息，需 v10.31.2+ 版本\n  currentVersionInfo: {\n    name?: string;\n    description?: string;\n    metaInfo?: string;\n  };\n  // 解析测试二维码，此方法需 v10.11.2+ 版本\n  parseTestQrCode: (qrCode: string) => void;\n  // 当前的版本hash\n  currentHash: string;\n  // 当前的原生版本号\n  packageVersion: string;\n  // 当前的pushy热更服务实例\n  client?: Pushy;\n  // 立即重启应用，需 v10.28.2+ 版本\n  restartApp: () => Promise<void>;\n  // 恢复到原生包内置的 bundle，返回是否成功，需 v10.48.0+ 版本\n  resetToPackagedBundle: (options?: { restart?: boolean }) => Promise<boolean>;\n  // 下载开始后的进度数据\n  progress?: {\n    hash: string;\n    // 已下载的字节数\n    received: number;\n    // 待下载的总字节数\n    total: number;\n  };\n  // 热更相关信息\n  updateInfo?: {\n    // 已是最新版本，无需热更\n    upToDate?: true;\n    // 当前原生版本已过期，需要下载新的原生版本\n    expired?: true;\n    // 在pushy网页管理端设置的原生版本下载地址\n    downloadUrl?: string;\n    // 是否存在新的热更\n    update?: true;\n    // 新热更的版本名称\n    name?: string;\n    // 新热更的hash值\n    hash?: string;\n    // 新热更的更新说明\n    description?: string;\n    // 新热更携带的额外元数据\n    metaInfo?: string;\n    // 当前热更是否已暂停\n    paused?:\n      | \"app\" // 当前应用所有原生版本暂停\n      | \"package\" // 仅当前原生版本暂停\n      | \"quota\"; // 因检查次数超限而暂停\n    // 其他信息\n    message?: string;\n  };\n  // 检查、下载、应用热更等过程中的最近一次报错\n  lastError?: Error;\n}\n```\n\n***\n\n#### async function checkUpdate()\n\n触发更新检查，返回`updateInfo`（注意在 v10.26.0 版本之前，`checkUpdate`方法本身没有返回值，只能从`useUpdate()`返回的`updateInfo`中获取，且我们仍然推荐优先使用`useUpdate()`来获取），返回值有三种情形：\n\n1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），需要引导用户下载或跳转到应用市场(需要在网页管理端设置中填写`downloadUrl`)。如需在应用内执行 apk 更新，还需配置[安装权限与系统确认流程](/docs/api.md#async-function-downloadandinstallapkurl)。\n\n```js\n{\n    expired: true,\n    downloadUrl: 'http://appstore/downloadUrl',\n}\n```\n\n2. `{upToDate: true}`：当前已经更新到最新，无需进行更新。\n\n3. `{update: true}`：当前有新版本可以更新。`name`、`description`字段可以用于展示给用户版本号，更新内容等信息，而`metaInfo`字段则可以根据你的需求自定义一些标记(如是否静默更新、是否强制更新等等，自己根据标记的属性做一些条件流程控制)，具体用法可参考[场景实践](/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了热更新文件的下载地址，\n\n```js\n{\n    update: true,\n    name: '1.0.3-rc',\n    hash: 'hash',\n    description: '添加聊天功能\\n修复商城页面BUG',\n    metaInfo: '{\"silent\":true}',\n    pdiffUrl: 'http://update-packages.reactnative.cn/hash',\n    diffUrl: 'http://update-packages.reactnative.cn/hash',\n}\n```\n\n***\n\n#### async function downloadUpdate()\n\n下载热更包。仅当`update:true`时实际进行下载。会更新`progress`数据。v10.16.0+ 版本返回值为`boolean`，表示是否下载成功。\n\n***\n\n#### async function downloadAndInstallApk(url)\n\n下载更新的 apk 包，并通过 Android 系统的 `PackageInstaller` 发起安装。`url` 必须为可直接下载到 apk 文件的地址。此功能仅支持 Android 5.0（API 21）及以上版本。\n\n安装必须由用户主动触发并在系统安装界面中确认，普通应用无法使用此 API 静默安装。方法在系统确认界面成功打开后返回，并不表示用户已经完成安装。\n\n要使用此功能，需要在最终应用的 `AndroidManifest.xml` 中手动声明安装权限：\n\n```xml\n<uses-permission android:name=\"android.permission.REQUEST_INSTALL_PACKAGES\" />\n```\n\nAPK 下载到应用私有目录后会直接写入 `PackageInstaller.Session`，不需要申请外部存储权限。\n\n在 Android 8.0（API 26）及以上版本中，用户还必须允许当前应用“安装未知应用”。首次调用时如果尚未授权，SDK 会打开当前应用对应的系统设置页，并以 `APK_INSTALL_PERMISSION_REQUIRED` 错误结束本次调用。用户完成授权后，需要再次调用此方法。提交安装 Session 后，SDK 会处理 `STATUS_PENDING_USER_ACTION` 并打开 Android 系统提供的安装确认界面；用户拒绝确认时不会安装。\n\n:::warning\n注意某些应用市场可能会因为上述权限拒绝应用上架。如被明确拒绝，建议去掉上述权限重新提交，不会影响热更新功能。\n:::\n\n***\n\n#### function markSuccess()\n\n**一般情况下请勿手动调用此函数**。调用此函数作为更新成功的标记（否则下次启动会默认失败自动回滚）。\n\n***\n\n#### currentVersionInfo\n\n当前已热更版本的信息（如尚未热更过则为空对象）。需 v10.31.2+ 版本。\n\n`currentVersionInfo` 是同步字段，推荐用它代替 `getCurrentVersionInfo()`：\n\n```js\nconst { currentVersionInfo } = useUpdate();\n\nconsole.log(currentVersionInfo.name);\n```\n\n字段示例：\n\n```js\n{\n    name: '1.0.3-rc',\n    description: '添加聊天功能\\n修复商城页面BUG',\n    metaInfo: '{\"silent\":true}',\n}\n```\n\n***\n\n#### function captureException(error, context?)\n\n手动上报一个 JavaScript 异常，需 v10.55.0+ 版本。`context` 可选 `fatal`（是否致命，默认 false）、`componentStack`（React 组件堆栈）与 `extra`（自定义上下文，仅接受字符串、数字、布尔与 null，最多 32 个字段）。\n\n调用是同步返回、永不抛错的：传输在后台进行，失败静默，同一个 error 对象只会上报一次。仅在运行于热更版本时上报，调试环境（`__DEV__`）下不上报。详见 [JS 报错监控](/docs/errors.md)。\n\n```js\ntry {\n  await submitOrder(order);\n} catch (e) {\n  pushyClient.captureException(e, { extra: { orderId: order.id } });\n}\n```\n\n***\n\n#### async function getCurrentVersionInfo()\n\n获取当前已热更版本的信息（如尚未热更过则返回空对象）。v10.31.2 版本之后可以直接用 `currentVersionInfo` 代替。\n\n返回值示例：\n\n```js\n{\n    name: '1.0.3-rc',\n    description: '添加聊天功能\\n修复商城页面BUG',\n    metaInfo: '{\"silent\":true}',\n}\n```\n\n***\n\n#### function restartApp()\n\n立即重启应用。v10.28.2+ 版本可用。\n\n如果配置了 `beforeReload`，会等待它完成后再重启；当 `beforeReload` 返回 `false`、抛出异常或 Promise reject 时，会取消本次重启。\n\n***\n\n#### async function resetToPackagedBundle(options?)\n\n恢复到原生包内置的 bundle，返回 `boolean` 表示是否成功。v10.48.0+ 版本可用。\n\n调用后会清空全部热更状态、删除所有已下载的热更版本，下次启动将直接加载打包在原生安装包内的 bundle。传入 `{ restart: true }` 则会在成功后立即重启生效（重启内部走 `restartApp`，同样受 `beforeReload` 控制）。设备标识符（uuid）会保留，不影响灰度分桶。\n\n可用于客服指令、远程开关、异常兜底等需要\"恢复出厂\"的场景：\n\n```js\nconst { resetToPackagedBundle } = useUpdate();\n\n// 清空热更并立即重启回内置包\nconst ok = await resetToPackagedBundle({ restart: true });\n```\n\n也可以通过热更服务实例直接调用：\n\n```js\nconst ok = await pushyClient.resetToPackagedBundle();\n```\n\n与其他更新流程 API 一致，此方法默认不抛出错误：失败时返回 `false`，错误信息（错误码 `RESET_FAILED`）可通过 `lastError` / `onError` 获取；如初始化时配置了 `throwError: true` 则会抛出。\n\n:::warning\n请务必检查返回值：此方法需要原生模块支持（v10.48.0+），如果只是通过热更把新版 JS 下发到了旧版原生包上，调用会返回 `false`——此时应用仍在运行热更 bundle，并没有恢复到内置包。\n:::\n\n***\n\n#### function switchVersion()\n\n立即重启应用，并加载已经下载完毕的版本。\n\n> 注意!不可依赖`progress`来判断下载完成，必须要在`await downloadUpdate()`之后再调用此方法。\n\n如果配置了 `beforeReload`，会传入 `{ type: \"switchVersion\", hash }` 并等待它完成后再重启；当 `beforeReload` 返回 `false`、抛出异常或 Promise reject 时，会取消本次重启。\n\n***\n\n#### function switchVersionLater()\n\n在下一次启动应用的时候加载已经下载完毕的版本。\n\n> 注意!不可依赖`progress`来判断下载完成，必须要在`await downloadUpdate()`之后再调用此方法。\n\n此方法不会立即销毁当前 RN 实例，因此不会触发 `beforeReload`。\n\n***\n\n#### function parseTestQrCode(qrCode: string)\n\n解析测试二维码，一般用于给 QA 人员测试热更新。如果在应用中已有扫码功能，则可以在应用中扫描 pushy 后台的测试二维码来测试任意版本的热更包。\n注意如果你使用自定义的(更新策略（updateStrategy）)\\[[https://pushy.reactnative.cn/docs/integration#updatestrategy%E6%9B%B4%E6%96%B0%E5%BA%94%E7%94%A8%E7%AD%96%E7%95%A5\\]，请务必从](https://pushy.reactnative.cn/docs/integration#updatestrategy%E6%9B%B4%E6%96%B0%E5%BA%94%E7%94%A8%E7%AD%96%E7%95%A5]，请务必从) `useUpdate()` 中获取 `updateInfo` ，而不要依赖 checkUpdate 方法的返回值，否则扫码不会有后续动作。\n\n![testqrcode](/static/image/testqrcode.24c22c1ebe.png)\n注意使用此方法，上述界面中的\"使用 Deep Link\"选项 **请不要\n** 勾选。\n代码示例：\n\n```js\n<Camera\n  onReadCode={({ nativeEvent: { codeStringValue } }) => {\n    // 识别到二维码后先关闭相机\n    setShowCamera(false);\n    // 先解析是否是pushy的测试二维码\n    if (parseTestQrCode(codeStringValue)) {\n      // 如果是pushy的测试二维码，则不再做其他业务扫码逻辑\n      return;\n    }\n    // 如果不是，继续处理其他业务扫码逻辑\n  }}\n/>\n```\n\n***\n\n### Android 方法\n\n#### UpdateContext.setCustomInstanceManager(ReactInstanceManager instanceManager)\n\n如果是集成/混编 Android 方案，则可以使用此方法传入你自行创建的 ReactInstanceManager。自`v5.5.8`版本起可用。\n\n示例：\n\n```java\nimport cn.reactnative.modules.update.UpdateContext\n\nmReactInstanceManager = ReactInstanceManager.builder()\n                // ...各种setter，但注意不要调用setBundleAssetName\n                .setJSBundleFile(UpdateContext.getBundleUrl(mContext, \"assets://index.android.bundle\"))\n                .build();\nUpdateContext.setCustomInstanceManager(mReactInstanceManager);\n```\n",
+      "content": "# API参考\n\n### JavaScript 方法\n\n原生端主动配置、检测与下载的接口和完整首启顺序，参见[原生配置、检测与更新](/docs/native-api.md)。原生主导配置时，请在 JS 实例首次创建时设置 `nativeConfigSource: \"native\"`，避免 JS 初始化覆盖原生配置。\n\n#### new Pushy(options: PushyOptions)\n\n创建 Pushy 热更新服务实例，其构造参数如下：\n\n```ts\ninterface PushyOptions {\n  // 必填，通过pushy createApp或selectApp命令，或在网页管理端获取\n  appKey: string;\n\n  // 自定义日志输出，也可用于上报统计数据\n  logger?: ({ type, data }: { type: EventType; data: EventData }) => void;\n\n  // 触发自动检查更新的策略\n  checkStrategy?:\n    | \"onAppStart\" // 仅在app启动时\n    | \"onAppResume\" // 仅在app从后台切换到前台时\n    | \"both\"; // 默认值，同时包含前两个场景\n    | null; // 不自动检查更新，必须手动调用checkUpdate方法，此选项需 v10.4.2+ 版本\n\n  // 自动下载和应用更新的策略\n  updateStrategy?:\n    | \"alwaysAlert\" // 调试环境（__DEV__）默认值，使用系统默认的alert页面提示热更且会在有报错时弹出提示\n    | \"alertUpdateAndIgnoreError\" // 生产环境默认值，在有热更时使用系统默认的alert页面提示热更，但不弹出任何报错提示\n    | \"silentAndNow\" // 自动静默下载并立刻应用热更\n    | \"silentAndLater\"; // 自动静默下载，但仅在用户退出app后重启时应用更新\n    | null; // 不自动下载和应用更新，如需自定义热更界面请选择此项\n\n  // 是否在热更重启后自动标记为成功，默认为true\n  // 一般情况下不建议手动标记\n  autoMarkSuccess?: boolean;\n\n  // 是否在若干ms后自动清除最后的报错，默认为不清除\n  dismissErrorAfter?: number;\n\n  // 是否在开发环境中检查热更，默认为false。如需在开发环境中调试热更，请打开此选项。\n  // 但即便打开此选项，也仅能检查、下载热更，并不能实际应用热更。实际应用热更必须在release包中进行。\n  // 此选项需 v10.4.2+ 版本\n  debug?: boolean;\n\n  // 是否在调用 checkUpdate 和 downloadUpdate 时抛出错误，默认为不抛出错误，通过 lastError 获取错误信息\n  // 启用后可以使用 try catch 语句 捕获错误，同时 lastError 也仍然可用\n  // try {\n  //   await checkUpdate();\n  // } catch (e) {\n  //   console.error(e);\n  // }\n  // 此选项需 v10.15.2+ 版本\n  throwError?: boolean;\n\n  // 在检查更新前执行，返回 false 则取消检查更新\n  // 此选项需 v10.12.0+ 版本\n  beforeCheckUpdate?: () => Promise<boolean>;\n\n  // 在每次检查更新结束后执行，可用于上报检查结果；不影响原有检查流程\n  // 此选项需 v10.38.3+ 版本\n  afterCheckUpdate?: (state: UpdateCheckState) => Promise<void> | void;\n\n  // 在下载更新前执行，返回 false 则取消下载更新，可以配合自定义的 metaInfo 做一些条件控制\n  // 此选项需 v10.12.0+ 版本\n  beforeDownloadUpdate?: (info: UpdateInfo) => Promise<boolean>;\n\n  // 在下载更新后执行，返回 false 则取消内置策略进一步执行，可以配合自定义的 metaInfo 做一些条件控制\n  // 此选项需 v10.27.0+ 版本\n  afterDownloadUpdate?: (info: UpdateInfo) => Promise<boolean>;\n\n  // 在原生包过期时执行，返回 false 则取消内置策略进一步执行，可以配合自定义的 metaInfo 做一些条件控制\n  // 此选项需 v10.28.2+ 版本\n  onPackageExpired?: (info: UpdateInfo) => Promise<boolean>;\n\n  // 在 switchVersion 或 restartApp 触发立即重启前执行，返回 false 则取消本次重启\n  // 可用于等待 Sentry 等原生 SDK 停止采样、flush 上报队列后再销毁 RN 实例\n  // 此选项需 v10.42.2+ 版本\n  beforeReload?: (\n    context: BeforeReloadContext,\n  ) => Promise<boolean | void> | boolean | void;\n\n  // 是否关闭更新生命周期事件上报（版本健康度统计），默认为 false（开启）\n  // 详见下方「版本健康度事件上报」一节\n  // 此选项需 v10.47.0+ 版本\n  disableTelemetry?: boolean;\n\n  // 是否关闭 JS 报错上报，默认为 false（开启）\n  // 详见「JS 报错监控」一节：https://pushy.reactnative.cn/docs/errors\n  // 此选项需 v10.55.0+ 版本\n  disableErrorReporting?: boolean;\n\n  // 是否关闭原生冷启动检测（每次冷启动后由原生代码独立发起的后台检查），\n  // 默认为 false（开启）。关闭后将失去「强制启动」救砖通道，\n  // 详见下方「原生冷启动检测」一节\n  // 此选项需 v10.52.1+ 版本\n  disableNativeCheck?: boolean;\n\n  // 原生配置来源，默认 javascript：继续由 JS 同步配置。\n  // native：由原生 configure 管理，JS 不再覆盖原生配置；\n  // 此模式下原生是否禁用由 configure 的 disabled 控制，\n  // JS 的 disableNativeCheck 不再写入原生存储。\n  // 此选项需 v10.57.0+ 版本；原生 configure/checkAndUpdate 同样需要 v10.57.0+，升级后须重新构建原生包。\n  nativeConfigSource?: \"javascript\" | \"native\";\n}\n\n// 检查更新结束后的状态\ntype UpdateCheckState = {\n  // completed: 检查完成；skipped: 因 debug、web 环境或 beforeCheckUpdate 返回 false 等原因跳过；error: 检查出错\n  status: \"completed\" | \"skipped\" | \"error\";\n  // status 为 completed 时的检查结果\n  result?: UpdateInfo;\n  // status 为 error 时的错误对象\n  error?: Error;\n};\n\n// beforeReload 接收到的重启上下文\ntype BeforeReloadContext = {\n  // switchVersion: 立即应用已下载热更；restartApp: 直接重启当前应用\n  type: \"switchVersion\" | \"restartApp\";\n  // type 为 switchVersion 时，表示即将应用的热更 hash\n  hash?: string;\n};\n\n// 日志事件类型\ntype EventType =\n  // 更新失败，重启后发生回滚\n  | \"rollback\"\n  // 检查更新时报错\n  | \"errorChecking\"\n  // 正在发起检查\n  | \"checking\"\n  // 正在下载更新\n  | \"downloading\"\n  // 已下载更新\n  | \"downloadSuccess\"\n  // 更新失败\n  | \"errorUpdate\"\n  // 更新成功\n  | \"markSuccess\"\n  // 已恢复到内置包（resetToPackagedBundle 成功），需 v10.48.0+ 版本\n  | \"reset\"\n  // 恢复内置包失败，需 v10.48.0+ 版本\n  | \"errorReset\"\n  // 下载apk\n  | \"downloadingApk\"\n  // 下载apk前申请存储权限被用户拒绝\n  | \"rejectStoragePermission\"\n  // 下载apk前申请存储权限发生错误\n  | \"errorStoragePermission\"\n  // 下载apk时发生错误\n  | \"errorDownloadAndInstallApk\";\n\n// 日志事件数据\ninterface EventData {\n  // 当前已完成的热更hash值，如尚未热更则为空字符串\n  currentVersion: string;\n  // 客户端版本信息\n  cInfo: {\n    rnu: string; // 当前 react-native-update 版本\n    rn: string; // 当前 react-native 版本\n    os: string; // 当前操作系统及版本\n    uuid: string; // 用户标识符\n  };\n  // 客户端原生版本号\n  packageVersion: string;\n  // 编译时间戳\n  buildTime: number;\n  // 报错相关的信息\n  message?: string;\n  // 发生回滚的版本hash值\n  rolledBackVersion?: string;\n  // 更新失败的新版本hash值\n  newVersion?: string;\n  // 其他一些数据\n  [key: string]: any;\n}\n```\n\n#### 版本健康度事件上报\n\n自 v10.47.0 起，SDK 会在更新流程的关键节点向更新服务自动上报少量生命周期事件，用于在管理端展示每个热更版本的健康度（下载失败率、patch 失败率、回滚率等），帮助你在发版后第一时间发现有问题的版本：\n\n- `download_success` / `download_fail`：热更包下载成功 / 全部下载策略失败\n- `patch_fail`：增量 patch 应用失败（含降级为完整包成功的情形）或版本切换失败\n- `rollback`：新版本启动异常，发生自动回滚\n- `mark_success`：新版本启动并标记成功\n\n上报内容仅包含热更版本 hash、原生版本号、`cInfo`（SDK/RN/系统版本与设备标识符，与 checkUpdate 请求一致）以及失败时截断后的错误信息摘要，不涉及任何业务数据。上报为一次性异步请求，不重试、失败静默，不会影响更新流程与性能；调试环境（`__DEV__`）下不会上报。\n\n如不希望上报这些事件，可在初始化时关闭：\n\n```js\nconst pushyClient = new Pushy({\n  appKey,\n  disableTelemetry: true,\n});\n```\n\n注意：关闭后管理端将无法统计该客户端的版本健康度，也无法在版本发生大面积异常时为你提供预警。\n\n#### JS 报错上报\n\n自 v10.55.0 起，SDK 会把热更版本中发生的 JavaScript 异常上报给更新服务，管理后台用发布时归档的 sourcemap 把堆栈还原回原始源码位置。未捕获异常会自动上报（在 React Native 现有的全局 `ErrorUtils` 处理器之上追加一层，不影响 Sentry 等已有集成），也可以在 `catch` 中手动调用 `captureException`：\n\n```js\npushyClient.captureException(error, {\n  extra: { screen: \"checkout\" },\n});\n```\n\n如不希望上报，可在初始化时设置 `disableErrorReporting: true`。完整说明（包括后台界面、sourcemap 归档要求与手动上报用法）见 [JS 报错监控](/docs/errors.md)。\n\n#### 原生冷启动检测\n\n自 v10.52.1 起，客户端会在每次冷启动几秒后，由**原生代码**独立发起一次后台检查更新（完全不依赖 JS）。它的意义在于救砖：如果某次热更把 JS 打死，设备再也无法运行 JS 侧的检查逻辑，此时只有这条原生通道还能把修复版本拉回来（配合管理后台的[强制启动](/docs/publish.md#强制启动救砖)标记激活）。\n\n行为要点：\n\n- **不会打扰正常流程**：常规情况下它只做下载与缓存，是否激活取决于你配置的策略——`checkStrategy: null` 时原生只下载不激活；仅当服务端下发了强制启动标记时才会越过策略激活\n- **JS 会复用它的结果**：JS 侧检查更新会直接复用原生刚拿到的响应缓存，冷启动时可少一次网络请求\n- **安全护栏**：设备本地的回滚保护优先级最高；激活后若启动异常，首次启动崩溃保护依然会自动回滚\n\n如确有需要（如流量/电量预算、合规要求联网需用户同意等场景），可在初始化时关闭：\n\n```js\nconst pushyClient = new Pushy({\n  appKey,\n  disableNativeCheck: true,\n});\n```\n\n注意：关闭后该客户端将失去强制启动救砖能力——一旦被坏热更卡死只能重装应用。\n\n#### beforeReload 示例：重启前清理原生 SDK\n\n`beforeReload` 会在 `switchVersion()` 和 `restartApp()` 真正重启前执行。返回 `false` 会取消本次重启；抛出异常或 Promise reject 时也不会继续重启。`switchVersionLater()` 不会立即销毁当前 RN 实例，因此不会触发此钩子。\n\n如果应用接入了 Sentry profiling、性能采样、日志上传等可能跨线程工作的原生 SDK，可以在这里先停止采样并 flush 队列，再让 Pushy 重启：\n\n```ts\nimport { NativeModules } from \"react-native\";\nimport * as Sentry from \"@sentry/react-native\";\nimport { Pushy } from \"react-native-update\";\n\nconst pushyClient = new Pushy({\n  appKey,\n  beforeReload: async (_context) => {\n    try {\n      NativeModules.RNSentry?.stopProfiling?.();\n    } catch {}\n\n    const flushed = await Promise.race([\n      Sentry.flush(),\n      new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 1500)),\n    ]);\n\n    // 返回 false 会取消本次立即重启，等待下一次检查或手动触发。\n    return flushed;\n  },\n});\n```\n\n#### useUpdate()\n\n热更相关的工具函数。此方法也可使用别名 `usePushy` 引入。\n\n:::info\n注意，在使用 `<UpdateProvider>` 的当前组件（一般是根组件）中无法直接调用`useUpdate`，只有当前组件的子组件才能调用。\n:::\n\n```js\nconst {\n  checkUpdate,\n  switchVersion,\n  switchVersionLater,\n  markSuccess,\n  dismissError,\n  downloadUpdate,\n  downloadAndInstallApk,\n  getCurrentVersionInfo,\n  currentVersionInfo,\n  parseTestQrCode,\n  currentHash,\n  packageVersion,\n  client,\n  progress,\n  updateInfo,\n  lastError,\n  restartApp,\n  resetToPackagedBundle,\n} = useUpdate();\n```\n\n其类型定义和功能如下：\n\n```ts\ninterface UpdateContext {\n  // 检查更新（注意在 v10.26.0 版本之前，`checkUpdate`方法本身没有返回值，只能从`useUpdate()`返回的`updateInfo`中获取）\n  // 我们也仍然推荐优先从`useUpdate()`中获取`updateInfo`\n  checkUpdate: () => Promise<void | UpdateInfo>;\n  // 下载热更完成后调用，立即重启切换新版本\n  switchVersion: () => Promise<void>;\n  // 下载热更完成后调用，用户手动重启app后切换新版本（静默更新）\n  switchVersionLater: () => Promise<void>;\n  // 热更完成重启后，手动标记热更完成\n  markSuccess: () => void;\n  // 清除最后的报错状态\n  dismissError: () => void;\n  // 下载热更, v10.16.0+ 版本返回值为`boolean`，表示是否下载成功\n  downloadUpdate: () => Promise<boolean | void>;\n  // 下载并安装apk\n  downloadAndInstallApk: (url: string) => Promise<void>;\n  // 异步获取当前已热更版本的信息，v10.31.2 版本后用 `currentVersionInfo` 代替\n  getCurrentVersionInfo: () => Promise<{\n    name?: string;\n    description?: string;\n    metaInfo?: string;\n  }>;\n  // 当前已热更版本的信息，需 v10.31.2+ 版本\n  currentVersionInfo: {\n    name?: string;\n    description?: string;\n    metaInfo?: string;\n  };\n  // 解析测试二维码，此方法需 v10.11.2+ 版本\n  parseTestQrCode: (qrCode: string) => void;\n  // 当前的版本hash\n  currentHash: string;\n  // 当前的原生版本号\n  packageVersion: string;\n  // 当前的pushy热更服务实例\n  client?: Pushy;\n  // 立即重启应用，需 v10.28.2+ 版本\n  restartApp: () => Promise<void>;\n  // 恢复到原生包内置的 bundle，返回是否成功，需 v10.48.0+ 版本\n  resetToPackagedBundle: (options?: { restart?: boolean }) => Promise<boolean>;\n  // 下载开始后的进度数据\n  progress?: {\n    hash: string;\n    // 已下载的字节数\n    received: number;\n    // 待下载的总字节数\n    total: number;\n  };\n  // 热更相关信息\n  updateInfo?: {\n    // 已是最新版本，无需热更\n    upToDate?: true;\n    // 当前原生版本已过期，需要下载新的原生版本\n    expired?: true;\n    // 在pushy网页管理端设置的原生版本下载地址\n    downloadUrl?: string;\n    // 是否存在新的热更\n    update?: true;\n    // 新热更的版本名称\n    name?: string;\n    // 新热更的hash值\n    hash?: string;\n    // 新热更的更新说明\n    description?: string;\n    // 新热更携带的额外元数据\n    metaInfo?: string;\n    // 当前热更是否已暂停\n    paused?:\n      | \"app\" // 当前应用所有原生版本暂停\n      | \"package\" // 仅当前原生版本暂停\n      | \"quota\"; // 因检查次数超限而暂停\n    // 其他信息\n    message?: string;\n  };\n  // 检查、下载、应用热更等过程中的最近一次报错\n  lastError?: Error;\n}\n```\n\n***\n\n#### async function checkUpdate()\n\n触发更新检查，返回`updateInfo`（注意在 v10.26.0 版本之前，`checkUpdate`方法本身没有返回值，只能从`useUpdate()`返回的`updateInfo`中获取，且我们仍然推荐优先使用`useUpdate()`来获取），返回值有三种情形：\n\n1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），需要引导用户下载或跳转到应用市场(需要在网页管理端设置中填写`downloadUrl`)。如需在应用内执行 apk 更新，还需配置[安装权限与系统确认流程](/docs/api.md#async-function-downloadandinstallapkurl)。\n\n```js\n{\n    expired: true,\n    downloadUrl: 'http://appstore/downloadUrl',\n}\n```\n\n2. `{upToDate: true}`：当前已经更新到最新，无需进行更新。\n\n3. `{update: true}`：当前有新版本可以更新。`name`、`description`字段可以用于展示给用户版本号，更新内容等信息，而`metaInfo`字段则可以根据你的需求自定义一些标记(如是否静默更新、是否强制更新等等，自己根据标记的属性做一些条件流程控制)，具体用法可参考[场景实践](/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了热更新文件的下载地址，\n\n```js\n{\n    update: true,\n    name: '1.0.3-rc',\n    hash: 'hash',\n    description: '添加聊天功能\\n修复商城页面BUG',\n    metaInfo: '{\"silent\":true}',\n    pdiffUrl: 'http://update-packages.reactnative.cn/hash',\n    diffUrl: 'http://update-packages.reactnative.cn/hash',\n}\n```\n\n***\n\n#### async function downloadUpdate()\n\n下载热更包。仅当`update:true`时实际进行下载。会更新`progress`数据。v10.16.0+ 版本返回值为`boolean`，表示是否下载成功。\n\n***\n\n#### async function downloadAndInstallApk(url)\n\n下载更新的 apk 包，并通过 Android 系统的 `PackageInstaller` 发起安装。`url` 必须为可直接下载到 apk 文件的地址。此功能仅支持 Android 5.0（API 21）及以上版本。\n\n安装必须由用户主动触发并在系统安装界面中确认，普通应用无法使用此 API 静默安装。方法在系统确认界面成功打开后返回，并不表示用户已经完成安装。\n\n要使用此功能，需要在最终应用的 `AndroidManifest.xml` 中手动声明安装权限：\n\n```xml\n<uses-permission android:name=\"android.permission.REQUEST_INSTALL_PACKAGES\" />\n```\n\nAPK 下载到应用私有目录后会直接写入 `PackageInstaller.Session`，不需要申请外部存储权限。\n\n在 Android 8.0（API 26）及以上版本中，用户还必须允许当前应用“安装未知应用”。首次调用时如果尚未授权，SDK 会打开当前应用对应的系统设置页，并以 `APK_INSTALL_PERMISSION_REQUIRED` 错误结束本次调用。用户完成授权后，需要再次调用此方法。提交安装 Session 后，SDK 会处理 `STATUS_PENDING_USER_ACTION` 并打开 Android 系统提供的安装确认界面；用户拒绝确认时不会安装。\n\n:::warning\n注意某些应用市场可能会因为上述权限拒绝应用上架。如被明确拒绝，建议去掉上述权限重新提交，不会影响热更新功能。\n:::\n\n***\n\n#### function markSuccess()\n\n**一般情况下请勿手动调用此函数**。调用此函数作为更新成功的标记（否则下次启动会默认失败自动回滚）。\n\n***\n\n#### currentVersionInfo\n\n当前已热更版本的信息（如尚未热更过则为空对象）。需 v10.31.2+ 版本。\n\n`currentVersionInfo` 是同步字段，推荐用它代替 `getCurrentVersionInfo()`：\n\n```js\nconst { currentVersionInfo } = useUpdate();\n\nconsole.log(currentVersionInfo.name);\n```\n\n字段示例：\n\n```js\n{\n    name: '1.0.3-rc',\n    description: '添加聊天功能\\n修复商城页面BUG',\n    metaInfo: '{\"silent\":true}',\n}\n```\n\n***\n\n#### function captureException(error, context?)\n\n手动上报一个 JavaScript 异常，需 v10.55.0+ 版本。`context` 可选 `fatal`（是否致命，默认 false）、`componentStack`（React 组件堆栈）与 `extra`（自定义上下文，仅接受字符串、数字、布尔与 null，最多 32 个字段）。\n\n调用是同步返回、永不抛错的：传输在后台进行，失败静默，同一个 error 对象只会上报一次。仅在运行于热更版本时上报，调试环境（`__DEV__`）下不上报。详见 [JS 报错监控](/docs/errors.md)。\n\n```js\ntry {\n  await submitOrder(order);\n} catch (e) {\n  pushyClient.captureException(e, { extra: { orderId: order.id } });\n}\n```\n\n***\n\n#### async function getCurrentVersionInfo()\n\n获取当前已热更版本的信息（如尚未热更过则返回空对象）。v10.31.2 版本之后可以直接用 `currentVersionInfo` 代替。\n\n返回值示例：\n\n```js\n{\n    name: '1.0.3-rc',\n    description: '添加聊天功能\\n修复商城页面BUG',\n    metaInfo: '{\"silent\":true}',\n}\n```\n\n***\n\n#### function restartApp()\n\n立即重启应用。v10.28.2+ 版本可用。\n\n如果配置了 `beforeReload`，会等待它完成后再重启；当 `beforeReload` 返回 `false`、抛出异常或 Promise reject 时，会取消本次重启。\n\n***\n\n#### async function resetToPackagedBundle(options?)\n\n恢复到原生包内置的 bundle，返回 `boolean` 表示是否成功。v10.48.0+ 版本可用。\n\n调用后会清空全部热更状态、删除所有已下载的热更版本，下次启动将直接加载打包在原生安装包内的 bundle。传入 `{ restart: true }` 则会在成功后立即重启生效（重启内部走 `restartApp`，同样受 `beforeReload` 控制）。设备标识符（uuid）会保留，不影响灰度分桶。\n\n可用于客服指令、远程开关、异常兜底等需要\"恢复出厂\"的场景：\n\n```js\nconst { resetToPackagedBundle } = useUpdate();\n\n// 清空热更并立即重启回内置包\nconst ok = await resetToPackagedBundle({ restart: true });\n```\n\n也可以通过热更服务实例直接调用：\n\n```js\nconst ok = await pushyClient.resetToPackagedBundle();\n```\n\n与其他更新流程 API 一致，此方法默认不抛出错误：失败时返回 `false`，错误信息（错误码 `RESET_FAILED`）可通过 `lastError` / `onError` 获取；如初始化时配置了 `throwError: true` 则会抛出。\n\n:::warning\n请务必检查返回值：此方法需要原生模块支持（v10.48.0+），如果只是通过热更把新版 JS 下发到了旧版原生包上，调用会返回 `false`——此时应用仍在运行热更 bundle，并没有恢复到内置包。\n:::\n\n***\n\n#### function switchVersion()\n\n立即重启应用，并加载已经下载完毕的版本。\n\n> 注意!不可依赖`progress`来判断下载完成，必须要在`await downloadUpdate()`之后再调用此方法。\n\n如果配置了 `beforeReload`，会传入 `{ type: \"switchVersion\", hash }` 并等待它完成后再重启；当 `beforeReload` 返回 `false`、抛出异常或 Promise reject 时，会取消本次重启。\n\n***\n\n#### function switchVersionLater()\n\n在下一次启动应用的时候加载已经下载完毕的版本。\n\n> 注意!不可依赖`progress`来判断下载完成，必须要在`await downloadUpdate()`之后再调用此方法。\n\n此方法不会立即销毁当前 RN 实例，因此不会触发 `beforeReload`。\n\n***\n\n#### function parseTestQrCode(qrCode: string)\n\n解析测试二维码，一般用于给 QA 人员测试热更新。如果在应用中已有扫码功能，则可以在应用中扫描 pushy 后台的测试二维码来测试任意版本的热更包。\n注意如果你使用自定义的(更新策略（updateStrategy）)\\[[https://pushy.reactnative.cn/docs/integration#updatestrategy%E6%9B%B4%E6%96%B0%E5%BA%94%E7%94%A8%E7%AD%96%E7%95%A5\\]，请务必从](https://pushy.reactnative.cn/docs/integration#updatestrategy%E6%9B%B4%E6%96%B0%E5%BA%94%E7%94%A8%E7%AD%96%E7%95%A5]，请务必从) `useUpdate()` 中获取 `updateInfo` ，而不要依赖 checkUpdate 方法的返回值，否则扫码不会有后续动作。\n\n![testqrcode](/static/image/testqrcode.24c22c1ebe.png)\n注意使用此方法，上述界面中的\"使用 Deep Link\"选项 **请不要\n** 勾选。\n代码示例：\n\n```js\n<Camera\n  onReadCode={({ nativeEvent: { codeStringValue } }) => {\n    // 识别到二维码后先关闭相机\n    setShowCamera(false);\n    // 先解析是否是pushy的测试二维码\n    if (parseTestQrCode(codeStringValue)) {\n      // 如果是pushy的测试二维码，则不再做其他业务扫码逻辑\n      return;\n    }\n    // 如果不是，继续处理其他业务扫码逻辑\n  }}\n/>\n```\n\n***\n\n### Android 方法\n\n#### UpdateContext.setCustomInstanceManager(ReactInstanceManager instanceManager)\n\n如果是集成/混编 Android 方案，则可以使用此方法传入你自行创建的 ReactInstanceManager。自`v5.5.8`版本起可用。\n\n示例：\n\n```java\nimport cn.reactnative.modules.update.UpdateContext\n\nmReactInstanceManager = ReactInstanceManager.builder()\n                // ...各种setter，但注意不要调用setBundleAssetName\n                .setJSBundleFile(UpdateContext.getBundleUrl(mContext, \"assets://index.android.bundle\"))\n                .build();\nUpdateContext.setCustomInstanceManager(mReactInstanceManager);\n```\n",
       "sections": [
         {
           "heading": "API参考",
@@ -84,146 +84,146 @@
           "level": 3,
           "anchor": "javascript-方法",
           "offset": 9,
-          "length": 19
+          "length": 152
         },
         {
           "heading": "new Pushy(options: PushyOptions)",
           "level": 4,
           "anchor": "new-pushyoptions-pushyoptions",
-          "offset": 28,
-          "length": 4192
+          "offset": 161,
+          "length": 4482
         },
         {
           "heading": "版本健康度事件上报",
           "level": 4,
           "anchor": "版本健康度事件上报",
-          "offset": 4220,
+          "offset": 4643,
           "length": 592
         },
         {
           "heading": "JS 报错上报",
           "level": 4,
           "anchor": "js-报错上报",
-          "offset": 4812,
+          "offset": 5235,
           "length": 408
         },
         {
           "heading": "原生冷启动检测",
           "level": 4,
           "anchor": "原生冷启动检测",
-          "offset": 5220,
+          "offset": 5643,
           "length": 562
         },
         {
           "heading": "beforeReload 示例：重启前清理原生 SDK",
           "level": 4,
           "anchor": "beforereload-示例重启前清理原生-sdk",
-          "offset": 5782,
+          "offset": 6205,
           "length": 807
         },
         {
           "heading": "useUpdate()",
           "level": 4,
           "anchor": "useupdate",
-          "offset": 6589,
+          "offset": 7012,
           "length": 2507
         },
         {
           "heading": "async function checkUpdate()",
           "level": 4,
           "anchor": "async-function-checkupdate",
-          "offset": 9096,
+          "offset": 9519,
           "length": 1032
         },
         {
           "heading": "async function downloadUpdate()",
           "level": 4,
           "anchor": "async-function-downloadupdate",
-          "offset": 10128,
+          "offset": 10551,
           "length": 125
         },
         {
           "heading": "async function downloadAndInstallApk(url)",
           "level": 4,
           "anchor": "async-function-downloadandinstallapkurl",
-          "offset": 10253,
+          "offset": 10676,
           "length": 746
         },
         {
           "heading": "function markSuccess()",
           "level": 4,
           "anchor": "function-marksuccess",
-          "offset": 10999,
+          "offset": 11422,
           "length": 87
         },
         {
           "heading": "currentVersionInfo",
           "level": 4,
           "anchor": "currentversioninfo",
-          "offset": 11086,
+          "offset": 11509,
           "length": 342
         },
         {
           "heading": "function captureException(error, context?)",
           "level": 4,
           "anchor": "function-captureexceptionerror-context",
-          "offset": 11428,
+          "offset": 11851,
           "length": 444
         },
         {
           "heading": "async function getCurrentVersionInfo()",
           "level": 4,
           "anchor": "async-function-getcurrentversioninfo",
-          "offset": 11872,
+          "offset": 12295,
           "length": 238
         },
         {
           "heading": "function restartApp()",
           "level": 4,
           "anchor": "function-restartapp",
-          "offset": 12110,
+          "offset": 12533,
           "length": 150
         },
         {
           "heading": "async function resetToPackagedBundle(options?)",
           "level": 4,
           "anchor": "async-function-resettopackagedbundleoptions",
-          "offset": 12260,
+          "offset": 12683,
           "length": 766
         },
         {
           "heading": "function switchVersion()",
           "level": 4,
           "anchor": "function-switchversion",
-          "offset": 13026,
+          "offset": 13449,
           "length": 255
         },
         {
           "heading": "function switchVersionLater()",
           "level": 4,
           "anchor": "function-switchversionlater",
-          "offset": 13281,
+          "offset": 13704,
           "length": 174
         },
         {
           "heading": "function parseTestQrCode(qrCode: string)",
           "level": 4,
           "anchor": "function-parsetestqrcodeqrcode-string",
-          "offset": 13455,
+          "offset": 13878,
           "length": 867
         },
         {
           "heading": "Android 方法",
           "level": 3,
           "anchor": "android-方法",
-          "offset": 14322,
+          "offset": 14745,
           "length": 16
         },
         {
           "heading": "UpdateContext.setCustomInstanceManager(ReactInstanceManager instanceManager)",
           "level": 4,
           "anchor": "updatecontextsetcustominstancemanagerreactinstancemanager-instancemanager",
-          "offset": 14338,
+          "offset": 14761,
           "length": 532
         }
       ]
@@ -1141,6 +1141,135 @@
           "anchor": "注意事项",
           "offset": 3358,
           "length": 389
+        }
+      ]
+    },
+    {
+      "slug": "native-api",
+      "title": "原生配置、检测与更新",
+      "path": "pages/docs/native-api.mdx",
+      "url": "https://pushy.react-native.cn/docs/native-api",
+      "resourceUri": "pushy-docs://docs/native-api",
+      "content": "# 原生配置、检测与更新\n\nPushy 提供 Android、iOS 和 HarmonyOS 原生宿主接口，支持**原生配置 → 正常解析启动 bundle → 主动检查和下载更新**。配置和检查均不必经过 JS Bridge：即使首次安装、JS 尚未执行，也可以由原生端准备配置，之后运行原生更新流程。\n\n`configure` 只配置，不联网、不下载、不解析 bundle；`checkAndUpdate` 则不是仅查询版本的接口，有可执行热更新时会继续下载、校验，并按配置决定是否设置为下次启动使用的版本。两个接口都不会弹窗或立即重载正在运行的 React Native 页面。\n\n:::warning 版本与原生包要求\n本文的原生 `configure`、`checkAndUpdate` 接口及 JS 选项 `nativeConfigSource` 均从 **react-native-update v10.57.0** 起提供，适用于 Android、iOS 和 HarmonyOS。请使用 **v10.57.0 或更高版本**；旧版 SDK 即使已有原生自动检测，也不包含本文的公开宿主入口。完整变更见 [v10.57.0 发布说明](https://github.com/reactnativecn/react-native-update/releases/tag/v10.57.0)。\n\n升级后必须重新编译和发布原生安装包，不能仅发布 JS 热更新。HarmonyOS 从源码集成时，还需重新构建并集成包含这些导出的 HAR。\n:::\n\n## 首次启动的调用顺序\n\n应用仍需完成[安装配置](/docs/getting-started.md)和[代码集成](/docs/integration.md)，保留原来的 Pushy bundle 加载方式和版本成功标记、回滚接入。原生配置解决的是配置来源问题，不代替整个 RN 启动流程。\n\n1. 原生调用 `configure`，等待成功回调或 Promise 完成。此时不要求 JS 或 RN Bridge 已启动。\n2. 继续应用原有的 RN 启动流程，由 Android 的 `UpdateContext.getBundleUrl(...)`、iOS 的 `RCTPushy.bundleURL` 或 HarmonyOS 的实际 `PushyFileJSBundleProvider` 完成本次启动的 bundle 解析。\n3. 解析完成后调用 `checkAndUpdate`，或交由已有原生冷启动检查自动执行。\n\n**不要阻塞主线程等待配置完成，也不要为了触发检查而额外调用一次 bundle 解析函数。** 解析包含首次加载和回滚状态处理，并非无副作用的初始化方法。如果应用已经正常启动并完成解析，可直接配置成功后检查，无需重复解析。\n\n配置保存在设备上，后续启动可复用；每次启动重复提交相同的原生配置也是幂等的。首次原生配置时会在缺少安装标识的情况下生成并保存设备安装标识，已有标识不会被覆盖，后续 JS 可继续复用。\n\n## 配置参数\n\nAndroid 使用 `JSONObject`，iOS 使用字典，HarmonyOS 使用导出的 `NativeUpdateConfig`。三端字段相同：\n\n| 字段               | 类型／默认值     | 含义                                                                     |\n| ---------------- | ---------- | ---------------------------------------------------------------------- |\n| `appKey`         | 必填字符串      | 当前平台对应的应用 appKey，不是管理端 API Token                                       |\n| `endpoints`      | 可选字符串数组    | 检查服务的基础地址；省略时使用 Pushy 内置服务地址                                           |\n| `queryUrls`      | 可选字符串数组    | 服务地址发现列表的 URL。使用内置服务时有内置默认值；显式指定 `endpoints` 后，省略此字段意味着空列表，不会偷偷回退到公共服务 |\n| `afterDownload`  | 默认 `none`  | `none` 表示普通下载不主动激活；`setNeedUpdate` 表示下载成功后设置为下次启动使用。两者都不会立即重载 RN       |\n| `disabled`       | 默认 `false` | 同时禁用原生自动检查和主动检查，不影响 JS 自己的检查策略                                         |\n| `packageVersion` | 可选字符串      | 覆盖请求中的原生包版本；通常应省略，让 SDK 读取实际安装包版本                                      |\n| `rnu`、`rn`       | 可选字符串      | SDK／RN 版本诊断信息；不是首次原生检查的必填项                                             |\n\n最小配置只需要 `appKey`。要让正常下载的更新在下次启动生效，还应显式设置 `afterDownload: 'setNeedUpdate'`。服务端 `forceBoot` 和已有崩溃救援规则继续生效，因此 `none` 不是关闭所有救援激活的开关。\n\n`configure` 提交的是**完整配置替换，不是局部合并**。例如，只传入 `appKey` 会重新采用默认服务地址、`afterDownload: 'none'`、`disabled: false`，而不是沿用之前的自定义值。\n\nSDK 会校验必填值、字段类型、策略、未知字段，以及 HTTP(S) URL；基础地址不能含账号密码、查询参数或片段。地址会去除首尾空白，基础地址会去除末尾斜杠并去重。**校验失败不会覆盖已有配置**；存储错误同样通过失败回调或 Promise 拒绝返回，业务不要把失败当成配置成功。生产环境应使用 HTTPS。\n\n## Android：Java / Kotlin\n\n公开入口：\n\n```java\nPushyNativeUpdate.configure(Context context, JSONObject options,\n    PushyNativeUpdate.ConfigurationCallback callback);\nPushyNativeUpdate.checkAndUpdate(Context context,\n    PushyNativeUpdate.Callback callback);\n```\n\n不需要 `ReactContext` 或原生模块实例。配置与检查均异步执行，回调都在**主线程**；配置回调的 `error == null` 表示成功。`context`、配置对象和回调不能为空，否则抛出 `IllegalArgumentException`。\n\n### Kotlin：原生配置\n\n```kotlin\nimport android.util.Log\nimport cn.reactnative.modules.update.PushyNativeUpdate\nimport org.json.JSONObject\n\nval options = JSONObject()\n    .put(\"appKey\", \"你的 Android appKey\")\n    .put(\"afterDownload\", \"setNeedUpdate\")\n\nPushyNativeUpdate.configure(applicationContext, options) { error ->\n    if (error != null) {\n        Log.e(\"Pushy\", \"配置失败\", error)\n        return@configure\n    }\n    // 配置已完成。继续应用原有的 RN 启动流程，不要在这里重复解析 bundle。\n    // 正常 bundle 解析完成后，可调用下方 checkAndUpdate 示例。\n}\n```\n\n### Kotlin：主动检查\n\n```kotlin\nimport cn.reactnative.modules.update.NativeUpdateResult\n\nPushyNativeUpdate.checkAndUpdate(applicationContext) { result ->\n    when (result.status) {\n        NativeUpdateResult.DOWNLOADED -> {\n            val message = if (result.isActivated) {\n                \"更新已准备好，将在下次启动时使用\"\n            } else {\n                \"更新已下载，等待后续策略处理\"\n            }\n            Log.i(\"Pushy\", \"$message，版本：${result.hash}\")\n        }\n        NativeUpdateResult.NO_UPDATE -> Log.i(\"Pushy\", \"本轮没有可执行的热更新\")\n        else -> Log.i(\"Pushy\", \"${result.status}: ${result.reason}\")\n    }\n}\n```\n\n### Java\n\n以下代码放在可以处理 `JSONException` 的方法或 `try/catch` 中。配置回调后应继续正常启动；检查示例放在实际 bundle 解析完成之后：\n\n```java\nJSONObject options = new JSONObject()\n    .put(\"appKey\", \"你的 Android appKey\")\n    .put(\"afterDownload\", \"setNeedUpdate\");\n\nPushyNativeUpdate.configure(getApplicationContext(), options, error -> {\n    if (error != null) {\n        Log.e(\"Pushy\", \"配置失败\", error);\n        return;\n    }\n    // 继续正常 RN 启动流程。\n});\n\n```\n\n以下是另一个业务入口，必须在配置成功且 bundle 已正常解析后执行，不要与上面的异步配置并排立即调用：\n\n```java\nPushyNativeUpdate.checkAndUpdate(getApplicationContext(), result -> {\n    Log.i(\"Pushy\", \"status=\" + result.getStatus()\n        + \", reason=\" + result.getReason()\n        + \", hash=\" + result.getHash()\n        + \", activated=\" + result.isActivated());\n});\n```\n\n`NativeUpdateResult` 是不可变对象。检查可能持续一段时间，回调更新页面前仍应检查页面是否已经销毁。\n\n## iOS：Objective-C / Swift\n\n公开类方法不要求创建 `RCTPushy` 实例或获取 Bridge。配置与检查完成回调均在**主队列**执行。\n\n### Objective-C\n\n```objc\n#import \"RCTPushy.h\"\n\n[RCTPushy configure:@{\n    @\"appKey\": @\"你的 iOS appKey\",\n    @\"afterDownload\": @\"setNeedUpdate\"\n} completion:^(NSError *error) {\n    if (error != nil) {\n        NSLog(@\"Pushy 配置失败：%@\", error.localizedDescription);\n        return;\n    }\n    // 继续应用原有的 RN 启动流程。\n}];\n```\n\n本次启动的正常 bundle 解析完成后，再从业务入口主动检查：\n\n```objc\n[RCTPushy checkAndUpdateWithCompletion:^(NSDictionary<NSString *, id> *result) {\n    if ([result[@\"status\"] isEqualToString:@\"downloaded\"]\n        && [result[@\"activated\"] boolValue]) {\n        NSLog(@\"更新 %@ 将在下次启动时使用\", result[@\"hash\"]);\n    } else {\n        NSLog(@\"Pushy: %@ / %@\", result[@\"status\"], result[@\"reason\"]);\n    }\n}];\n```\n\n### Swift\n\n在已有的 Objective-C bridging header 中引入 `RCTPushy.h`。Swift 方法名固定为 `configure(_:completion:)` 和 `checkAndUpdate(completion:)`：\n\n```swift\nRCTPushy.configure([\n    \"appKey\": \"你的 iOS appKey\",\n    \"afterDownload\": \"setNeedUpdate\"\n], completion: { error in\n    if let error = error {\n        print(\"Pushy 配置失败：\\(error.localizedDescription)\")\n        return\n    }\n    // 继续正常 RN 启动流程，在 bundle 解析完成后使用下方检查入口。\n})\n```\n\n```swift\nRCTPushy.checkAndUpdate(completion: { result in\n    let status = result[\"status\"] as? String ?? \"failed\"\n    let activated = result[\"activated\"] as? Bool ?? false\n    let reason = result[\"reason\"] as? String ?? \"\"\n    print(\"Pushy: \\(status), activated=\\(activated), reason=\\(reason)\")\n})\n```\n\ncompletion 可以传 `nil`，但启动需要等待配置完成时应提供回调，不要依赖延迟几秒来猜测是否成功。页面相关的回调按生命周期使用弱引用。\n\n## HarmonyOS：ArkTS\n\n使用应用实际加载 bundle 的 `PushyFileJSBundleProvider` 实例。不要额外创建一个只用于检查的 provider，也不要为了初始化检查而调用一次多余的 `getURL()` 或 `getBundle()`。\n\n```ts\nimport {\n  PushyFileJSBundleProvider,\n  NativeUpdateConfig,\n  NativeUpdateResult,\n} from 'pushy';\n\n// 在原有 provider 接入位置，先配置，再继续正常 bundle 加载。\nasync function configurePushy(provider: PushyFileJSBundleProvider): Promise<void> {\n  const options: NativeUpdateConfig = {\n    appKey: '你的 HarmonyOS appKey',\n    afterDownload: 'setNeedUpdate',\n  };\n  await provider.configure(options);\n}\n\n// 在该 provider 已经参与正常启动解析之后调用。\nasync function checkFromNative(provider: PushyFileJSBundleProvider): Promise<void> {\n  const result: NativeUpdateResult = await provider.checkAndUpdate();\n  console.info(`Pushy: ${result.status} / ${result.reason}`);\n}\n```\n\n`configure` 校验或存储失败时 Promise 会拒绝，应在你的启动逻辑中捕获错误；不要在错误后继续假定配置可用。请以项目实际配置的 HAR 依赖名称为准。开发环境使用 Metro、没有经过 Pushy bundle 解析时，检查返回 `not_initialized`。\n\n## JS 和原生谁管理配置？\n\n### 由原生管理：推荐用于完整原生更新入口\n\n从 JS Pushy 实例**首次创建时**设置 `nativeConfigSource: 'native'`：\n\n```ts\nimport { Pushy } from 'react-native-update';\n\nexport const pushyClient = new Pushy({\n  appKey: '与原生配置一致的当前平台 appKey',\n  nativeConfigSource: 'native',\n  checkStrategy: null, // 可选：关闭 JS 自动检查，由原生决定检查时机\n});\n```\n\n这样 JS 初始化及后续 `setOptions` 不会把原生配置覆盖掉。`nativeConfigSource` 只决定**是否由 JS 写入原生配置**，不会把原生配置自动同步到 JS，也不会自行关闭 JS 检查；若两端都检查，应保持 `appKey`、服务地址、版本覆盖等设置一致。\n\n该模式下原生是否禁用、下载后是否激活，都由 `configure` 的 `disabled` 和 `afterDownload` 控制。JS 的 `disableNativeCheck`、`updateStrategy` 等设置不再写入原生配置；仍要保留既有的版本成功标记和回滚接入。\n\n### 由 JS 管理：默认兼容方式\n\n省略 `nativeConfigSource` 或设置为 `'javascript'` 时，JS 继续按原有行为同步原生配置。可以先由原生 `configure` 提供首启配置，待 JS 正常运行后接管；**同一个配置存储以最后实际完成的写入为准**，不做跨来源字段合并。\n\n不要在两个来源之间反复切换。已经发出的异步 JS 配置写入不会因为随后切换选项就自动撤销；原生主导的应用应一开始就设置 `'native'`。既有 JS 写入未完成时，不应并行发起预期长期保留的原生配置。\n\n## 返回结果和生效时机\n\n三端检查结果字段一致：`status`、`reason`、`hash`、`activated`。`hash` 在本轮没有准备好更新时为空字符串；`activated: true` 表示本轮已选定下次启动版本，**不表示当前 RN 页面已更新**。\n\n| `status`     | 含义                                      |\n| ------------ | --------------------------------------- |\n| `skipped`    | 未完成启动解析、未配置、被禁用或调试构建等原因使检查跳过            |\n| `noUpdate`   | 获得有效响应，但原生规则判定没有可执行热更新；不等于服务器完全没有其他版本   |\n| `downloaded` | 更新已在本地准备好，也可能复用了已有完整下载；继续查看 `activated` |\n| `failed`     | 检查、下载、配置读取或提交失败；不要提示“已是最新版本”            |\n| `cancelled`  | 配置已变更或恢复内置包使这轮结果失效                      |\n\n常见 `reason` 包括 `not_initialized`、`not_configured`、`disabled`、`debug`、`invalid_config`、`check_failed`、`download_failed`、`commit_failed`、`internal_error`、`reset` 和 `config_changed`。Android 等待被中断时还可能返回 `interrupted`。业务先按 `status` 分支，再用 `reason` 提示或诊断。\n\n`configure` 不会设置热更版本或重载页面；`checkAndUpdate` 的普通激活受 `afterDownload` 控制，服务端 `forceBoot` 和已有救援规则继续生效。`activated: false` 时，下载并不意味着下次启动就一定加载这个版本，仍需后续激活处理。**不要在下载完成回调中提前调用 `markSuccess`**。\n\n## 重复调用和配置变更\n\n原生主动调用、自动冷启动检查及 Android/iOS 已有崩溃救援共用**每进程至多一轮实际检查**。尚未开始时主动调用立即发起；正在执行时共享任务；已经结束时复用该轮结果，包括失败结果。反复点击不会重新请求服务器，重建 RN 实例也不等于重启进程。\n\n自动检查若因缺少或禁用配置而在开始前跳过，不会消耗实际轮次；之后原生配置成功，仍可在同一进程检查。配置更新本身不会启动新轮次，也不会把已完成的轮次重置为可再次执行。\n\n配置替换会使旧响应缓存和进行中的原生决策失效，旧轮次不能再用旧 appKey 或旧策略提交激活；已下载文件仍可能留作后续复用。正在进行的网络传输不保证立即中断，但不会把失效结果当成更新成功。此时结果通常为 `cancelled / config_changed`，下一次进程启动使用新配置。\n\n原生与 JS 检查不是同一个网络任务，原有响应缓存和“JS 已完成则跳过延迟原生检查”的规则继续保留，但不承诺把主动原生请求与进行中的 JS 请求合并。\n\n## 边界与验证\n\n原生轮次不会执行 JS 函数，包括 `beforeCheckUpdate`、`beforeDownloadUpdate`、`afterDownloadUpdate`、`afterCheckUpdate` 和 `beforeReload`。需要用户同意、网络条件或页面状态判断时，应在原生业务发起调用前完成。\n\nAndroid/iOS 调试构建的检查返回 `skipped / debug`；JS 的 `debug: true` 不会开启原生检查。使用发布构建验证完整流程。这些接口只处理适配当前原生包的热更新，不能代替 APK、App Store 或原生模块升级。\n\n重点验证首次安装且 JS 未执行时的配置、正常启动后的检查和下载；重复调用仅一轮；错误配置不覆盖原配置；断网返回失败；配置变更或恢复内置包使旧轮次失效；下载已激活时在下一次真实进程启动加载新版本。还应确认 JS 使用 `'native'` 模式时不会覆盖原生配置。\n",
+      "sections": [
+        {
+          "heading": "原生配置、检测与更新",
+          "level": 1,
+          "anchor": "原生配置检测与更新",
+          "offset": 0,
+          "length": 678
+        },
+        {
+          "heading": "首次启动的调用顺序",
+          "level": 2,
+          "anchor": "首次启动的调用顺序",
+          "offset": 678,
+          "length": 622
+        },
+        {
+          "heading": "配置参数",
+          "level": 2,
+          "anchor": "配置参数",
+          "offset": 1300,
+          "length": 1459
+        },
+        {
+          "heading": "Android：Java / Kotlin",
+          "level": 2,
+          "anchor": "androidjava-kotlin",
+          "offset": 2759,
+          "length": 391
+        },
+        {
+          "heading": "Kotlin：原生配置",
+          "level": 3,
+          "anchor": "kotlin原生配置",
+          "offset": 3150,
+          "length": 509
+        },
+        {
+          "heading": "Kotlin：主动检查",
+          "level": 3,
+          "anchor": "kotlin主动检查",
+          "offset": 3659,
+          "length": 593
+        },
+        {
+          "heading": "Java",
+          "level": 3,
+          "anchor": "java",
+          "offset": 4252,
+          "length": 800
+        },
+        {
+          "heading": "iOS：Objective-C / Swift",
+          "level": 2,
+          "anchor": "iosobjective-c-swift",
+          "offset": 5052,
+          "length": 86
+        },
+        {
+          "heading": "Objective-C",
+          "level": 3,
+          "anchor": "objective-c",
+          "offset": 5138,
+          "length": 695
+        },
+        {
+          "heading": "Swift",
+          "level": 3,
+          "anchor": "swift",
+          "offset": 5833,
+          "length": 795
+        },
+        {
+          "heading": "HarmonyOS：ArkTS",
+          "level": 2,
+          "anchor": "harmonyosarkts",
+          "offset": 6628,
+          "length": 926
+        },
+        {
+          "heading": "JS 和原生谁管理配置？",
+          "level": 2,
+          "anchor": "js-和原生谁管理配置",
+          "offset": 7554,
+          "length": 17
+        },
+        {
+          "heading": "由原生管理：推荐用于完整原生更新入口",
+          "level": 3,
+          "anchor": "由原生管理推荐用于完整原生更新入口",
+          "offset": 7571,
+          "length": 587
+        },
+        {
+          "heading": "由 JS 管理：默认兼容方式",
+          "level": 3,
+          "anchor": "由-js-管理默认兼容方式",
+          "offset": 8158,
+          "length": 262
+        },
+        {
+          "heading": "返回结果和生效时机",
+          "level": 2,
+          "anchor": "返回结果和生效时机",
+          "offset": 8420,
+          "length": 986
+        },
+        {
+          "heading": "重复调用和配置变更",
+          "level": 2,
+          "anchor": "重复调用和配置变更",
+          "offset": 9406,
+          "length": 451
+        },
+        {
+          "heading": "边界与验证",
+          "level": 2,
+          "anchor": "边界与验证",
+          "offset": 9857,
+          "length": 427
         }
       ]
     },

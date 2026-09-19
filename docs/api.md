@@ -4,6 +4,8 @@
 
 ### JavaScript 方法
 
+原生端主动配置、检测与下载的接口和完整首启顺序，参见[原生配置、检测与更新](/docs/native-api.md)。原生主导配置时，请在 JS 实例首次创建时设置 `nativeConfigSource: "native"`，避免 JS 初始化覆盖原生配置。
+
 #### new Pushy(options: PushyOptions)
 
 创建 Pushy 热更新服务实例，其构造参数如下：
@@ -95,6 +97,13 @@ interface PushyOptions {
   // 详见下方「原生冷启动检测」一节
   // 此选项需 v10.52.1+ 版本
   disableNativeCheck?: boolean;
+
+  // 原生配置来源，默认 javascript：继续由 JS 同步配置。
+  // native：由原生 configure 管理，JS 不再覆盖原生配置；
+  // 此模式下原生是否禁用由 configure 的 disabled 控制，
+  // JS 的 disableNativeCheck 不再写入原生存储。
+  // 此选项需 v10.57.0+ 版本；原生 configure/checkAndUpdate 同样需要 v10.57.0+，升级后须重新构建原生包。
+  nativeConfigSource?: "javascript" | "native";
 }
 
 // 检查更新结束后的状态
