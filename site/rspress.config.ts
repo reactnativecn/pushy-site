@@ -49,6 +49,7 @@ export default defineConfig({
           text: '高阶用法',
           items: [
             { text: 'API 文档', link: '/docs/api' },
+            { text: '原生主动检测与更新', link: '/docs/native-api' },
             { text: 'API Key', link: '/docs/api-token' },
             { text: 'MCP 服务', link: '/docs/mcp' },
             { text: '命令行工具', link: '/docs/cli' },
