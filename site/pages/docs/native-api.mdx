@@ -4,67 +4,96 @@ title: 原生主动检测与更新
 type: 开发指南
 ---
 
-# 原生主动检测与更新
+# 原生配置、检测与更新
 
-已经接入 Pushy 的应用，可以从 Android、iOS 或 HarmonyOS 原生代码主动触发一轮热更新检查和下载，不必通过 JS Bridge 调用 `pushyClient.checkUpdate()`。适合原生启动协调逻辑、原生设置页，以及 JS 暂时无法执行时的更新入口。
+Pushy 提供 Android、iOS 和 HarmonyOS 原生宿主接口，支持**原生配置 → 正常解析启动 bundle → 主动检查和下载更新**。配置和检查均不必经过 JS Bridge：即使首次安装、JS 尚未执行，也可以由原生端准备配置，之后运行原生更新流程。
 
-这个接口复用 SDK 已有的原生更新流程，**不是仅查询版本的接口**：存在可执行的热更新时，会继续下载、校验，并按已有策略决定是否设置为下次启动使用的版本。它不会弹出更新提示，也不会立即重载正在运行的 React Native 页面。
+`configure` 只配置，不联网、不下载、不解析 bundle；`checkAndUpdate` 则不是仅查询版本的接口，有可执行热更新时会继续下载、校验，并按配置决定是否设置为下次启动使用的版本。两个接口都不会弹窗或立即重载正在运行的 React Native 页面。
 
 :::warning 版本与原生包要求
-本文介绍的是 [SDK PR #641](https://github.com/reactnativecn/react-native-update/pull/641) 新增的原生接口，不代表已经发布到 npm。集成前请确认使用的 SDK 包含这些方法；`10.56.1` 及此前版本没有本文介绍的宿主入口。
+这些接口由 [SDK PR #641](https://github.com/reactnativecn/react-native-update/pull/641) 新增，不代表已经发布到 npm。集成前请确认所用 SDK 包含这些方法；`10.56.1` 及此前版本没有本文介绍的宿主入口。
 
-升级后必须重新编译和发布原生安装包，不能只发布一次 JS 热更新。HarmonyOS 从源码集成时，还需重新构建并集成包含这些导出的 HAR。
+升级后必须重新编译和发布原生安装包，不能仅发布 JS 热更新。HarmonyOS 从源码集成时，还需重新构建并集成包含这些导出的 HAR。
 :::
 
-## 调用前需要满足什么条件？
+## 首次启动的调用顺序
 
-应用仍须完成[安装配置](/docs/getting-started)和[代码集成](/docs/integration)。原生入口不会代替原有 bundle 加载接入，也不会替你初始化 JS 侧的 Pushy 实例。
+应用仍需完成[安装配置](/docs/getting-started)和[代码集成](/docs/integration)，保留原来的 Pushy bundle 加载方式和版本成功标记、回滚接入。原生配置解决的是配置来源问题，不代替整个 RN 启动流程。
 
-**配置仍由 JS SDK 统一管理。** SDK 会把原生检测所需的 `appKey`、服务端地址、下载后策略及禁用开关持久化；原生入口读取这些配置，不需要在 Java、Swift 或 ArkTS 中再维护另一份 `appKey`。例如，已有的 JS 初始化可以采用：
+1. 原生调用 `configure`，等待成功回调或 Promise 完成。此时不要求 JS 或 RN Bridge 已启动。
+2. 继续应用原有的 RN 启动流程，由 Android 的 `UpdateContext.getBundleUrl(...)`、iOS 的 `RCTPushy.bundleURL` 或 HarmonyOS 的实际 `PushyFileJSBundleProvider` 完成本次启动的 bundle 解析。
+3. 解析完成后调用 `checkAndUpdate`，或交由已有原生冷启动检查自动执行。
 
-```ts
-import { Pushy } from 'react-native-update';
+**不要阻塞主线程等待配置完成，也不要为了触发检查而额外调用一次 bundle 解析函数。** 解析包含首次加载和回滚状态处理，并非无副作用的初始化方法。如果应用已经正常启动并完成解析，可直接配置成功后检查，无需重复解析。
 
-export const pushyClient = new Pushy({
-  appKey: '当前平台对应的 appKey',
-  updateStrategy: 'silentAndLater',
-  disableNativeCheck: false,
-});
-```
+配置保存在设备上，后续启动可复用；每次启动重复提交相同的原生配置也是幂等的。首次原生配置时会在缺少安装标识的情况下生成并保存设备安装标识，已有标识不会被覆盖，后续 JS 可继续复用。
 
-上例是在你现有的初始化位置修改配置，**不要为了原生检查另外创建第二个 Pushy 实例**。配置同步是异步的：刚执行完构造函数，不等于原生已经能读到配置。首次安装后、JS 从未成功完成配置持久化时，接口返回 `skipped / not_configured`；有了落盘配置，后续调用和后续启动的原生检查才具备运行条件。这不是一个“首次安装、完全没有运行过 JS 也能自行配置”的独立原生 SDK。
+## 配置参数
 
-**调用应发生在本次启动真正的 bundle 解析之后。** Android 应已通过现有接入调用 `UpdateContext.getBundleUrl(...)`；iOS 应已通过现有接入调用 `RCTPushy.bundleURL`；HarmonyOS 应已使用实际的 `PushyFileJSBundleProvider` 解析加载路径。尚未完成时返回 `skipped / not_initialized`。
+Android 使用 `JSONObject`，iOS 使用字典，HarmonyOS 使用导出的 `NativeUpdateConfig`。三端字段相同：
 
-不要为了触发检查，再调用一次 `getBundleUrl`、`bundleURL`、`getURL` 或 `getBundle`。bundle 解析包含首次加载与回滚状态处理，不能拿来充当无副作用的初始化方法。
+| 字段 | 类型／默认值 | 含义 |
+| --- | --- | --- |
+| `appKey` | 必填字符串 | 当前平台对应的应用 appKey，不是管理端 API Token |
+| `endpoints` | 可选字符串数组 | 检查服务的基础地址；省略时使用 Pushy 内置服务地址 |
+| `queryUrls` | 可选字符串数组 | 服务地址发现列表的 URL。使用内置服务时有内置默认值；显式指定 `endpoints` 后，省略此字段意味着空列表，不会偷偷回退到公共服务 |
+| `afterDownload` | 默认 `none` | `none` 表示普通下载不主动激活；`setNeedUpdate` 表示下载成功后设置为下次启动使用。两者都不会立即重载 RN |
+| `disabled` | 默认 `false` | 同时禁用原生自动检查和主动检查，不影响 JS 自己的检查策略 |
+| `packageVersion` | 可选字符串 | 覆盖请求中的原生包版本；通常应省略，让 SDK 读取实际安装包版本 |
+| `rnu`、`rn` | 可选字符串 | SDK／RN 版本诊断信息；不是首次原生检查的必填项 |
+
+最小配置只需要 `appKey`。要让正常下载的更新在下次启动生效，还应显式设置 `afterDownload: 'setNeedUpdate'`。服务端 `forceBoot` 和已有崩溃救援规则继续生效，因此 `none` 不是关闭所有救援激活的开关。
+
+`configure` 提交的是**完整配置替换，不是局部合并**。例如，只传入 `appKey` 会重新采用默认服务地址、`afterDownload: 'none'`、`disabled: false`，而不是沿用之前的自定义值。
+
+SDK 会校验必填值、字段类型、策略、未知字段，以及 HTTP(S) URL；基础地址不能含账号密码、查询参数或片段。地址会去除首尾空白，基础地址会去除末尾斜杠并去重。**校验失败不会覆盖已有配置**；存储错误同样通过失败回调或 Promise 拒绝返回，业务不要把失败当成配置成功。生产环境应使用 HTTPS。
 
 ## Android：Java / Kotlin
 
-公开入口为：
+公开入口：
 
 ```java
-PushyNativeUpdate.checkAndUpdate(Context context, PushyNativeUpdate.Callback callback);
+PushyNativeUpdate.configure(Context context, JSONObject options,
+    PushyNativeUpdate.ConfigurationCallback callback);
+PushyNativeUpdate.checkAndUpdate(Context context,
+    PushyNativeUpdate.Callback callback);
 ```
 
-不需要 `ReactContext` 或原生模块实例，可以从原生页面传入 `applicationContext`。方法异步执行，所有正常结果都通过**主线程**回调返回；网络失败等运行结果不会要求调用方处理 Promise。`context` 和 `callback` 不能为空，否则会抛出 `IllegalArgumentException`。
+不需要 `ReactContext` 或原生模块实例。配置与检查均异步执行，回调都在**主线程**；配置回调的 `error == null` 表示成功。`context`、配置对象和回调不能为空，否则抛出 `IllegalArgumentException`。
 
-### Kotlin 示例
-
-在已完成上述启动接入的 Activity 或其他原生业务入口中调用：
+### Kotlin：原生配置
 
 ```kotlin
 import android.util.Log
-import cn.reactnative.modules.update.NativeUpdateResult
 import cn.reactnative.modules.update.PushyNativeUpdate
+import org.json.JSONObject
+
+val options = JSONObject()
+    .put("appKey", "你的 Android appKey")
+    .put("afterDownload", "setNeedUpdate")
+
+PushyNativeUpdate.configure(applicationContext, options) { error ->
+    if (error != null) {
+        Log.e("Pushy", "配置失败", error)
+        return@configure
+    }
+    // 配置已完成。继续应用原有的 RN 启动流程，不要在这里重复解析 bundle。
+    // 正常 bundle 解析完成后，可调用下方 checkAndUpdate 示例。
+}
+```
+
+### Kotlin：主动检查
+
+```kotlin
+import cn.reactnative.modules.update.NativeUpdateResult
 
 PushyNativeUpdate.checkAndUpdate(applicationContext) { result ->
-    // 此回调运行在主线程。更新页面前仍应确认页面没有销毁。
     when (result.status) {
         NativeUpdateResult.DOWNLOADED -> {
             val message = if (result.isActivated) {
                 "更新已准备好，将在下次启动时使用"
             } else {
-                "更新已下载，等待应用现有策略处理"
+                "更新已下载，等待后续策略处理"
             }
             Log.i("Pushy", "$message，版本：${result.hash}")
         }
@@ -74,12 +103,24 @@ PushyNativeUpdate.checkAndUpdate(applicationContext) { result ->
 }
 ```
 
-### Java 示例
+### Java
+
+以下代码放在可以处理 `JSONException` 的方法或 `try/catch` 中。配置回调后应继续正常启动；检查示例放在实际 bundle 解析完成之后：
 
 ```java
-import android.util.Log;
-import cn.reactnative.modules.update.PushyNativeUpdate;
+JSONObject options = new JSONObject()
+    .put("appKey", "你的 Android appKey")
+    .put("afterDownload", "setNeedUpdate");
 
+PushyNativeUpdate.configure(getApplicationContext(), options, error -> {
+    if (error != null) {
+        Log.e("Pushy", "配置失败", error);
+        return;
+    }
+    // 继续正常 RN 启动流程。
+});
+
+// 以下调用属于 bundle 已解析后的业务入口，不要与上面的异步配置并排立即执行。
 PushyNativeUpdate.checkAndUpdate(getApplicationContext(), result -> {
     Log.i("Pushy", "status=" + result.getStatus()
         + ", reason=" + result.getReason()
@@ -88,129 +129,155 @@ PushyNativeUpdate.checkAndUpdate(getApplicationContext(), result -> {
 });
 ```
 
-`NativeUpdateResult` 是不可变结果对象，提供 `getStatus()`、`getReason()`、`getHash()`、`isActivated()`。
+`NativeUpdateResult` 是不可变对象。检查可能持续一段时间，回调更新页面前仍应检查页面是否已经销毁。
 
 ## iOS：Objective-C / Swift
 
-公开入口为类方法，不必创建 `RCTPushy` 实例或获取 Bridge。检查在后台队列执行，completion 在**主队列**调用。
+公开类方法不要求创建 `RCTPushy` 实例或获取 Bridge。配置与检查完成回调均在**主队列**执行。
 
-### Objective-C 示例
+### Objective-C
 
 ```objc
 #import "RCTPushy.h"
 
-[RCTPushy checkAndUpdateWithCompletion:^(NSDictionary<NSString *, id> *result) {
-    NSString *status = result[@"status"];
-    BOOL activated = [result[@"activated"] boolValue];
+[RCTPushy configure:@{
+    @"appKey": @"你的 iOS appKey",
+    @"afterDownload": @"setNeedUpdate"
+} completion:^(NSError *error) {
+    if (error != nil) {
+        NSLog(@"Pushy 配置失败：%@", error.localizedDescription);
+        return;
+    }
+    // 继续应用原有的 RN 启动流程。
+}];
+```
 
-    if ([status isEqualToString:@"downloaded"] && activated) {
-        NSLog(@"更新 %@ 已准备好，将在下次启动时使用", result[@"hash"]);
+本次启动的正常 bundle 解析完成后，再从业务入口主动检查：
+
+```objc
+[RCTPushy checkAndUpdateWithCompletion:^(NSDictionary<NSString *, id> *result) {
+    if ([result[@"status"] isEqualToString:@"downloaded"]
+        && [result[@"activated"] boolValue]) {
+        NSLog(@"更新 %@ 将在下次启动时使用", result[@"hash"]);
     } else {
-        NSLog(@"Pushy: %@ / %@", status, result[@"reason"]);
+        NSLog(@"Pushy: %@ / %@", result[@"status"], result[@"reason"]);
     }
 }];
 ```
 
-不需要结果时可以传入 `nil`，检查仍会执行，但原生应用将无法获知本轮结果。
+### Swift
 
-### Swift 示例
+在已有的 Objective-C bridging header 中引入 `RCTPushy.h`。Swift 方法名固定为 `configure(_:completion:)` 和 `checkAndUpdate(completion:)`：
 
-在项目已有的 Objective-C bridging header 中引入 `RCTPushy.h`，然后调用：
+```swift
+RCTPushy.configure([
+    "appKey": "你的 iOS appKey",
+    "afterDownload": "setNeedUpdate"
+], completion: { error in
+    guard error == nil else {
+        print("Pushy 配置失败：\(error!.localizedDescription)")
+        return
+    }
+    // 继续正常 RN 启动流程，在 bundle 解析完成后使用下方检查入口。
+})
+```
 
 ```swift
 RCTPushy.checkAndUpdate(completion: { result in
     let status = result["status"] as? String ?? "failed"
-    let reason = result["reason"] as? String ?? ""
-    let hash = result["hash"] as? String ?? ""
     let activated = result["activated"] as? Bool ?? false
-
-    if status == "downloaded" && activated {
-        print("更新 \(hash) 已准备好，将在下次启动时使用")
-    } else {
-        print("Pushy: \(status) / \(reason)")
-    }
+    let reason = result["reason"] as? String ?? ""
+    print("Pushy: \(status), activated=\(activated), reason=\(reason)")
 })
 ```
 
-Swift 方法名固定为 `checkAndUpdate(completion:)`。如需在 completion 中操作页面，按你的页面生命周期使用弱引用；该接口不负责持有或恢复已经销毁的 UI。
+completion 可以传 `nil`，但启动需要等待配置完成时应提供回调，不要依赖延迟几秒来猜测是否成功。页面相关的回调按生命周期使用弱引用。
 
 ## HarmonyOS：ArkTS
 
-调用应用实际使用的 `PushyFileJSBundleProvider` 实例上的方法；结果类型从 `pushy` 导出。下面的函数接收你已有的 provider，而不是创建一个仅用于检查的 provider：
+使用应用实际加载 bundle 的 `PushyFileJSBundleProvider` 实例。不要额外创建一个只用于检查的 provider，也不要为了初始化检查而调用一次多余的 `getURL()` 或 `getBundle()`。
 
 ```ts
 import {
   PushyFileJSBundleProvider,
+  NativeUpdateConfig,
   NativeUpdateResult,
 } from 'pushy';
 
+// 在原有 provider 接入位置，先配置，再继续正常 bundle 加载。
+async function configurePushy(provider: PushyFileJSBundleProvider): Promise<void> {
+  const options: NativeUpdateConfig = {
+    appKey: '你的 HarmonyOS appKey',
+    afterDownload: 'setNeedUpdate',
+  };
+  await provider.configure(options);
+}
+
+// 在该 provider 已经参与正常启动解析之后调用。
 async function checkFromNative(provider: PushyFileJSBundleProvider): Promise<void> {
   const result: NativeUpdateResult = await provider.checkAndUpdate();
-  if (result.status === 'downloaded' && result.activated) {
-    console.info(`更新 ${result.hash} 已准备好，将在下次启动时使用`);
-  } else {
-    console.info(`Pushy: ${result.status} / ${result.reason}`);
-  }
+  console.info(`Pushy: ${result.status} / ${result.reason}`);
 }
 ```
 
-请以项目实际配置的 HAR 依赖名称为准；如果本地依赖名称不同，调整 import 路径。方法通过 Promise 返回结果，不需要调用 JS TurboModule。开发环境使用 Metro provider、没有经过 Pushy bundle 解析时，返回 `not_initialized`；请使用实际加载 Pushy bundle 的发布构建验证完整流程。
+`configure` 校验或存储失败时 Promise 会拒绝，应在你的启动逻辑中捕获错误；不要在错误后继续假定配置可用。请以项目实际配置的 HAR 依赖名称为准。开发环境使用 Metro、没有经过 Pushy bundle 解析时，检查返回 `not_initialized`。
 
-## 如何理解返回结果？
+## JS 和原生谁管理配置？
 
-三端使用相同的字段含义：
+### 由原生管理：推荐用于完整原生更新入口
 
-| 字段 | 含义 |
+从 JS Pushy 实例**首次创建时**设置 `nativeConfigSource: 'native'`：
+
+```ts
+import { Pushy } from 'react-native-update';
+
+export const pushyClient = new Pushy({
+  appKey: '与原生配置一致的当前平台 appKey',
+  nativeConfigSource: 'native',
+  checkStrategy: null, // 可选：关闭 JS 自动检查，由原生决定检查时机
+});
+```
+
+这样 JS 初始化及后续 `setOptions` 不会把原生配置覆盖掉。`nativeConfigSource` 只决定**是否由 JS 写入原生配置**，不会把原生配置自动同步到 JS，也不会自行关闭 JS 检查；若两端都检查，应保持 `appKey`、服务地址、版本覆盖等设置一致。
+
+该模式下原生是否禁用、下载后是否激活，都由 `configure` 的 `disabled` 和 `afterDownload` 控制。JS 的 `disableNativeCheck`、`updateStrategy` 等设置不再写入原生配置；仍要保留既有的版本成功标记和回滚接入。
+
+### 由 JS 管理：默认兼容方式
+
+省略 `nativeConfigSource` 或设置为 `'javascript'` 时，JS 继续按原有行为同步原生配置。可以先由原生 `configure` 提供首启配置，待 JS 正常运行后接管；**同一个配置存储以最后实际完成的写入为准**，不做跨来源字段合并。
+
+不要在两个来源之间反复切换。已经发出的异步 JS 配置写入不会因为随后切换选项就自动撤销；原生主导的应用应一开始就设置 `'native'`。既有 JS 写入未完成时，不应并行发起预期长期保留的原生配置。
+
+## 返回结果和生效时机
+
+三端检查结果字段一致：`status`、`reason`、`hash`、`activated`。`hash` 在本轮没有准备好更新时为空字符串；`activated: true` 表示本轮已选定下次启动版本，**不表示当前 RN 页面已更新**。
+
+| `status` | 含义 |
 | --- | --- |
-| `status` | 本轮状态，见下表 |
-| `reason` | 跳过、失败、取消或没有可执行更新的原因；正常下载完成时为空字符串 |
-| `hash` | 本轮准备好的热更新版本；没有准备好更新时为空字符串 |
-| `activated` | 本轮是否已将这个版本选为下次启动使用的版本，不表示当前页面已更新 |
+| `skipped` | 未完成启动解析、未配置、被禁用或调试构建等原因使检查跳过 |
+| `noUpdate` | 获得有效响应，但原生规则判定没有可执行热更新；不等于服务器完全没有其他版本 |
+| `downloaded` | 更新已在本地准备好，也可能复用了已有完整下载；继续查看 `activated` |
+| `failed` | 检查、下载、配置读取或提交失败；不要提示“已是最新版本” |
+| `cancelled` | 配置已变更或恢复内置包使这轮结果失效 |
 
-| `status` | 含义与处理建议 |
-| --- | --- |
-| `skipped` | 当前条件不允许执行，例如未初始化、没有配置、已禁用或调试构建；查看 `reason` |
-| `noUpdate` | 检查获得了有效响应，但现有原生更新规则判定本轮没有可执行的热更新；不一定表示服务器完全没有其他版本 |
-| `downloaded` | 更新已在本地准备好，也可能复用了此前已完整下载的版本；继续检查 `activated` |
-| `failed` | 配置、检查、下载或状态提交失败；不要显示“已是最新版本” |
-| `cancelled` | 结果被恢复内置包等操作作废；不要继续依据旧的 `hash` 提示应用更新 |
+常见 `reason` 包括 `not_initialized`、`not_configured`、`disabled`、`debug`、`invalid_config`、`check_failed`、`download_failed`、`commit_failed`、`internal_error`、`reset` 和 `config_changed`。Android 等待被中断时还可能返回 `interrupted`。业务先按 `status` 分支，再用 `reason` 提示或诊断。
 
-常见 `reason` 包括 `not_initialized`、`not_configured`、`disabled`、`debug`、`invalid_config`、`check_failed`、`download_failed`、`commit_failed`、`internal_error`、`reset` 和 `config_changed`。Android 等待被中断时还可能返回 `interrupted`。建议先按 `status` 处理业务，再把 `reason` 用于提示或诊断，不要要求所有失败都具有相同平台细节。
+`configure` 不会设置热更版本或重载页面；`checkAndUpdate` 的普通激活受 `afterDownload` 控制，服务端 `forceBoot` 和已有救援规则继续生效。`activated: false` 时，下载并不意味着下次启动就一定加载这个版本，仍需后续激活处理。**不要在下载完成回调中提前调用 `markSuccess`**。
 
-结果是**这轮操作的快照**，不是实时查询当前运行 bundle 的接口。SDK 会在返回复用结果前检查配置变化及恢复内置包的代次，避免把已失效的结果作为本轮成功继续返回。
+## 重复调用和配置变更
 
-## 重复调用会怎样？
+原生主动调用、自动冷启动检查及 Android/iOS 已有崩溃救援共用**每进程至多一轮实际检查**。尚未开始时主动调用立即发起；正在执行时共享任务；已经结束时复用该轮结果，包括失败结果。反复点击不会重新请求服务器，重建 RN 实例也不等于重启进程。
 
-原生主动调用、原生冷启动检查，以及 Android / iOS 的已有崩溃救援检查，共用原生更新轮次：
+自动检查若因缺少或禁用配置而在开始前跳过，不会消耗实际轮次；之后原生配置成功，仍可在同一进程检查。配置更新本身不会启动新轮次，也不会把已完成的轮次重置为可再次执行。
 
-- 本进程尚未开始原生轮次：主动调用会立即开始，不必再等待冷启动检查的延迟。
-- 原生轮次正在执行：等待同一轮结果，不并发创建第二轮下载。
-- 原生轮次已经结束：返回该轮快照，**不会再次请求服务器**；失败轮次同样不会无限重试。
+配置替换会使旧响应缓存和进行中的原生决策失效，旧轮次不能再用旧 appKey 或旧策略提交激活；已下载文件仍可能留作后续复用。正在进行的网络传输不保证立即中断，但不会把失效结果当成更新成功。此时结果通常为 `cancelled / config_changed`，下一次进程启动使用新配置。
 
-这里的边界是**每进程一次**，不是每个页面或每次进入前台一次。不要把它当作每次点击都会刷新服务器结果的轮询接口，也不要用定时器反复调用。应用进程重新启动后，才会有新的原生轮次；只重建 React Native 实例不等于重新启动进程。
+原生与 JS 检查不是同一个网络任务，原有响应缓存和“JS 已完成则跳过延迟原生检查”的规则继续保留，但不承诺把主动原生请求与进行中的 JS 请求合并。
 
-主动调用在未初始化、缺少配置或被禁用等前置检查中跳过，不会自行消耗新轮次；但原有自动检查如果已经执行并结束，主动调用仍会复用它，不能借此绕过每进程一次的限制。
+## 边界与验证
 
-JS 检查与原生检查不是同一个网络任务。原有“JS 已成功检查则跳过延迟原生轮次”及原生响应缓存规则继续生效；主动原生调用不承诺与正在进行的 JS 请求合并。需要严格控制请求时机时，由业务统一安排触发入口。
+原生轮次不会执行 JS 函数，包括 `beforeCheckUpdate`、`beforeDownloadUpdate`、`afterDownloadUpdate`、`afterCheckUpdate` 和 `beforeReload`。需要用户同意、网络条件或页面状态判断时，应在原生业务发起调用前完成。
 
-## 下载后何时生效？
+Android/iOS 调试构建的检查返回 `skipped / debug`；JS 的 `debug: true` 不会开启原生检查。使用发布构建验证完整流程。这些接口只处理适配当前原生包的热更新，不能代替 APK、App Store 或原生模块升级。
 
-此接口不提供原生“立即重载”操作。`downloaded` 只表示热更新已准备好，`activated: true` 才表示本轮已经把它选为下次启动使用的版本。
-
-是否激活继续由已有原生决策规则决定，包括 JS 持久化的下载后策略、服务端下发的 `forceBoot` 指令，以及已有崩溃救援逻辑。原生入口不会自行展示 JS 的更新确认弹窗；`activated: false` 时，仍需由应用现有的 JS 更新策略或用户交互完成后续处理。
-
-即使 JS 侧使用了立即应用类策略，也不要从这个原生接口的回调推断当前 RN 页面已经被重载。版本标记成功、异常回滚等生命周期仍由原来的 SDK 接入处理，**不要在下载完成回调中提前调用 `markSuccess`**。
-
-## 与 JS 配置和回调的关系
-
-`disableNativeCheck: true` 持久化后会同时阻止原生自动检查与本文的主动入口，不是“只关闭自动检查、保留原生手动检查”的开关。重新启用也应修改 JS 侧配置，不要直接修改原生存储键。
-
-原生轮次不会执行 JS 函数，例如 `beforeCheckUpdate`、`beforeDownloadUpdate`、`afterDownloadUpdate`、`afterCheckUpdate` 或 `beforeReload`。需要用户同意、网络条件或业务页面状态等前置判断时，应在调用原生入口之前由原生业务完成；调用结果通过本文的 callback / completion / Promise 获取。
-
-Android / iOS 调试构建返回 `skipped / debug`。JS 配置中的 `debug: true` 不会打开原生宿主接口的调试更新能力。该接口只处理适配当前原生安装包的热更新，不能代替 APK、App Store 或原生模块升级。
-
-## 接入验证
-
-先用发布构建运行应用并让现有 JS 初始化完成配置持久化，再通过正常冷启动路径加载应用，调用原生入口。发布一个匹配当前原生包的测试热更新，确认结果、日志与后续启动加载的版本一致。
-
-重点验证：重复调用只复用一轮；断网或下载失败返回 `failed`；缺少配置返回 `not_configured`；禁用原生检查后返回 `disabled`；恢复内置包时旧轮次不再被当作成功；`activated` 为真时，下一次实际进程启动才加载新版本。测试中不要通过再次调用 bundle 解析函数来模拟重启。
+重点验证首次安装且 JS 未执行时的配置、正常启动后的检查和下载；重复调用仅一轮；错误配置不覆盖原配置；断网返回失败；配置变更或恢复内置包使旧轮次失效；下载已激活时在下一次真实进程启动加载新版本。还应确认 JS 使用 `'native'` 模式时不会覆盖原生配置。
