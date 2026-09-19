@@ -136,13 +136,13 @@ Swift 方法名固定为 `checkAndUpdate(completion:)`。如需在 completion �
 
 ## HarmonyOS：ArkTS
 
-调用应用实际使用的 `PushyFileJSBundleProvider` 实例上的方法；结果类型从 `@react-native-oh-tpl/react-native-update` 导出。下面的函数接收你已有的 provider，而不是创建一个仅用于检查的 provider：
+调用应用实际使用的 `PushyFileJSBundleProvider` 实例上的方法；结果类型从 `pushy` 导出。下面的函数接收你已有的 provider，而不是创建一个仅用于检查的 provider：
 
 ```ts
 import {
   PushyFileJSBundleProvider,
   NativeUpdateResult,
-} from '@react-native-oh-tpl/react-native-update';
+} from 'pushy';
 
 async function checkFromNative(provider: PushyFileJSBundleProvider): Promise<void> {
   const result: NativeUpdateResult = await provider.checkAndUpdate();
