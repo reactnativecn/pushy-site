@@ -1,0 +1,46 @@
+name: Verify native API guide
+on:
+  push:
+    branches: [docs/native-host-update-api]
+    paths: [.github/workflows/native-api-docs-verify.yml]
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Align the example with the SDK HAR package name
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('site/pages/docs/native-api.mdx')
+          source = path.read_text()
+          old = '@react-native-oh-tpl/react-native-update'
+          assert source.count(old) == 2
+          path.write_text(source.replace(old, 'pushy'))
+          PY
+      - name: Production build and documentation index
+        working-directory: site
+        run: |
+          npm install --no-audit --no-fund
+          npm run build
+      - name: Verify generated page and commit the corrected import
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          pages = [p for p in Path('site/out').rglob('*.html') if 'native-api' in str(p)]
+          assert pages, 'native API page was not generated'
+          assert any('checkAndUpdate' in p.read_text() for p in pages)
+          print('Verified native API HTML page:', ', '.join(str(p) for p in pages))
+          PY
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add site/pages/docs/native-api.mdx
+          git commit -m 'docs: use the actual pushy HAR dependency name'
+          git push origin HEAD:refs/heads/docs/native-host-update-api
