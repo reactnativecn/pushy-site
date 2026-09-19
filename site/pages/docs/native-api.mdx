@@ -120,7 +120,11 @@ PushyNativeUpdate.configure(getApplicationContext(), options, error -> {
     // 继续正常 RN 启动流程。
 });
 
-// 以下调用属于 bundle 已解析后的业务入口，不要与上面的异步配置并排立即执行。
+```
+
+以下是另一个业务入口，必须在配置成功且 bundle 已正常解析后执行，不要与上面的异步配置并排立即调用：
+
+```java
 PushyNativeUpdate.checkAndUpdate(getApplicationContext(), result -> {
     Log.i("Pushy", "status=" + result.getStatus()
         + ", reason=" + result.getReason()
@@ -174,8 +178,8 @@ RCTPushy.configure([
     "appKey": "你的 iOS appKey",
     "afterDownload": "setNeedUpdate"
 ], completion: { error in
-    guard error == nil else {
-        print("Pushy 配置失败：\(error!.localizedDescription)")
+    if let error = error {
+        print("Pushy 配置失败：\(error.localizedDescription)")
         return
     }
     // 继续正常 RN 启动流程，在 bundle 解析完成后使用下方检查入口。
