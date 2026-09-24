@@ -10,6 +10,10 @@ Pushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-n
  [![npm version](https://badge.fury.io/js/react-native-update.svg)](https://www.npmjs.com/package/react-native-update)) 是面向 React Native 应用提供的**专业热更新服务**
 ，由 [React Native 中文网](https://reactnative.cn)
 独家研发并持续维护。我们致力于为全球 React Native 开发者提供最快速、最稳定、最经济的热更新体验。
+
+[reactnativecn/react-native-updatePushy 的核心代码在 GitHub 上完全开源。如果它帮到了你，欢迎点个 Star，这是对我们持续维护最好的鼓励。
+](https://github.com/reactnativecn/react-native-update)[Star](https://github.com/reactnativecn/react-native-update)
+
 :::tip 推荐接入方式
 如果你正在使用支持 Skills 的 AI 编程工具，推荐优先阅读 [安装与使用 Skill](/docs/skills.md)，先安装 `react-native-update` Skill，再让 AI 根据你的项目结构自动完成大部分接入改动。手动文档更适合混编项目、monorepo 或需要逐项校对的场景。
 :::
@@ -31,10 +35,6 @@ Pushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-n
 - **🔒 数据安全**：可以自行插入数据埋点，完全掌控自己的数据
 - **💬 专业人工支持**：提供付费专人技术支持，有问必答，确保你的应用稳定运行
 - **🏆 多年稳定运营**：从 2016 年开始运营至今，服务众多知名企业和应用
-
-
-[reactnativecn/react-native-updatePushy 的核心代码在 GitHub 上完全开源。如果它帮到了你，欢迎点个 Star，这是对我们持续维护最好的鼓励。
-](https://github.com/reactnativecn/react-native-update)[Star](https://github.com/reactnativecn/react-native-update)
 
 ### 📊 实测数据：针对 Hermes 深度优化的增量算法
 
