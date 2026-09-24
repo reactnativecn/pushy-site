@@ -32,6 +32,10 @@ Pushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-n
 - **💬 专业人工支持**：提供付费专人技术支持，有问必答，确保你的应用稳定运行
 - **🏆 多年稳定运营**：从 2016 年开始运营至今，服务众多知名企业和应用
 
+
+[reactnativecn/react-native-updatePushy 的核心代码在 GitHub 上完全开源。如果它帮到了你，欢迎点个 Star，这是对我们持续维护最好的鼓励。
+](https://github.com/reactnativecn/react-native-update)[Star](https://github.com/reactnativecn/react-native-update)
+
 ### 📊 实测数据：针对 Hermes 深度优化的增量算法
 
 Hermes 字节码在两个层面上都对通用二进制 diff 极不友好，Pushy 把两者一并消除，收益叠加：

@@ -68,11 +68,11 @@ npx skills update
 
 ## 相关链接
 
-- 仓库：
-  <a href="https://github.com/reactnativecn/react-native-update-skill" target="_blank" rel="noopener noreferrer">
-    [https://github.com/reactnativecn/react-native-update-skill](https://github.com/reactnativecn/react-native-update-skill)
-  </a>
 - ClawHub 页面（可选）：
   <a href="https://clawhub.ai/skills/react-native-update" target="_blank" rel="noopener noreferrer">
     [https://clawhub.ai/skills/react-native-update](https://clawhub.ai/skills/react-native-update)
   </a>
+
+
+[reactnativecn/react-native-update-skillSkill 已在 GitHub 开源，欢迎提 Issue 或 PR 一起完善；用得顺手的话，也请点个 Star 支持一下。
+](https://github.com/reactnativecn/react-native-update-skill)[Star](https://github.com/reactnativecn/react-native-update-skill)
