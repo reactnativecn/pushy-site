@@ -46,7 +46,7 @@ function ChapterRail({ player }: { player: LaunchPlayer | null }) {
 	}, [player]);
 
 	return (
-		<ol className="mt-6 sm:mt-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-5 gap-y-5">
+		<ol className="mt-5 sm:mt-6 grid grid-cols-2 sm:grid-cols-3 gap-x-5 gap-y-4">
 			{chapters.map((c, i) => (
 				<li key={c.id}>
 					<button
@@ -118,13 +118,13 @@ function LaunchFilm() {
 	}, [player]);
 
 	return (
-		<div className="relative mt-14 sm:mt-16 lg:mt-20 mx-auto max-w-[1180px]">
+		<div className="relative w-full max-w-[1180px] mx-auto">
 			<div className="pushy-launch-glow" aria-hidden="true" />
 			<div className="pushy-launch-frame relative rounded-[18px] sm:rounded-[28px] p-[5px] sm:p-[7px]">
 				<div className="relative overflow-hidden rounded-[13px] sm:rounded-[21px] bg-[#05060a] aspect-video">
 					<iframe
 						ref={frameRef}
-						src="/launch/index.html"
+						src="/launch/"
 						title="Pushy 发布动画：一条命令发布、3.4 KB 增量更新、灰度与崩溃回滚、原生冷启动自愈、MCP 排查"
 						className="absolute inset-0 h-full w-full border-0"
 					/>
@@ -137,16 +137,16 @@ function LaunchFilm() {
 
 function Banner(_props: BannerProps) {
 	return (
-		<section className="relative overflow-hidden pt-28 sm:pt-32 lg:pt-36 pb-24 sm:pb-32">
+		<section className="relative overflow-hidden pt-24 sm:pt-32 lg:pt-20 pb-24 sm:pb-32 lg:pb-20 lg:min-h-[100svh] lg:flex lg:items-center">
 			<div className="pushy-aurora" aria-hidden="true">
 				<div className="pushy-aurora__cyan" />
 			</div>
 			<div className="pushy-grid-layer" aria-hidden="true" />
 			<div className="pushy-noise-layer" aria-hidden="true" />
 
-			<div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-				<div className="max-w-4xl mx-auto text-center">
-					<div className="flex flex-wrap items-center justify-center gap-3 mb-7 sm:mb-9">
+			<div className="relative z-10 w-full max-w-[1600px] mx-auto px-5 sm:px-6 lg:px-10 grid lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] gap-y-8 lg:gap-y-5 lg:gap-x-12 xl:gap-x-16">
+				<div className="max-w-2xl mx-auto lg:mx-0 text-center lg:text-left lg:col-start-1 lg:row-start-1 lg:self-end">
+					<div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mb-7 sm:mb-9 lg:mb-7">
 						<a
 							href="/docs/skills"
 							className="group inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-white/[0.04] backdrop-blur-md px-4 py-1.5 text-sm text-slate-200 hover:border-blue-400/60 hover:text-white transition-all duration-300"
@@ -165,20 +165,27 @@ function Banner(_props: BannerProps) {
 						</span>
 					</div>
 
-					<h1 className="text-[2.6rem] leading-[1.1] sm:text-6xl lg:text-[5.25rem] font-extrabold tracking-tight text-white">
+					<h1 className="text-[2.6rem] leading-[1.1] sm:text-6xl lg:text-[3.25rem] xl:text-[4rem] 2xl:text-[4.5rem] font-extrabold tracking-tight text-white">
 						发布，
-						<br className="sm:hidden" />
+						<br className="sm:hidden lg:inline" />
 						<span className="bg-clip-text text-transparent bg-[linear-gradient(100deg,#38bdf8_0%,#818cf8_50%,#c084fc_100%)]">
 							就该这么快。
 						</span>
 					</h1>
 
-					<p className="mt-6 sm:mt-7 text-lg sm:text-xl text-slate-300 leading-relaxed max-w-2xl mx-auto">
+				</div>
+
+				<div className="lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:self-center">
+					<LaunchFilm />
+				</div>
+
+				<div className="max-w-2xl mx-auto lg:mx-0 text-center lg:text-left lg:col-start-1 lg:row-start-2 lg:self-start">
+					<p className="text-lg sm:text-xl lg:text-lg xl:text-xl text-slate-300 leading-relaxed max-w-2xl mx-auto lg:mx-0">
 						Pushy 是为 React Native 打造的热更新服务。改完代码，几秒钟触达每一台设备——无需等待应用商店审核，单行修改只需下发
 						3.4 KB。
 					</p>
 
-					<div className="mt-9 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+					<div className="mt-9 sm:mt-10 lg:mt-8 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
 						<a href="/docs/skills" className="w-full sm:w-auto">
 							<button
 								type="button"
@@ -195,7 +202,7 @@ function Banner(_props: BannerProps) {
 								5 分钟手动接入
 							</button>
 						</a>
-						<div className="pushy-gh-dark scale-125 sm:ml-3 mt-2 sm:mt-0">
+						<div className="pushy-gh-dark scale-125 lg:origin-left sm:ml-3 mt-2 sm:mt-0">
 							<GitHubButton
 								type="stargazers"
 								namespace="reactnativecn"
@@ -205,7 +212,6 @@ function Banner(_props: BannerProps) {
 					</div>
 				</div>
 
-				<LaunchFilm />
 			</div>
 		</section>
 	);
