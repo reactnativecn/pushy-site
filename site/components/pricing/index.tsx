@@ -129,7 +129,7 @@ function AIBonusBanner() {
             {[
               <>年付购买任意付费版本</>,
               <>前往 36k.ai 注册账号</>,
-              <>回复支付邮件或加微信 <span className="font-bold text-white">sunnylqm</span> 领取</>,
+              <>发邮件至 hi@charmlot.com 或加微信 <span className="font-bold text-white">sunnylqm</span> 领取</>,
             ].map((step, index) => (
               <li key={index} className="!my-0 flex items-center gap-2 xl:whitespace-nowrap">
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-300 text-xs font-bold text-slate-900">
