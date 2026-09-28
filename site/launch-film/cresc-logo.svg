@@ -1,0 +1,29 @@
+<svg width="108" height="108" viewBox="0 0 108 108" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="cresc_stroke" x1="16" y1="18" x2="90" y2="90" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D7B57C"/>
+      <stop offset="0.55" stop-color="#A86A42"/>
+      <stop offset="1" stop-color="#6E3428"/>
+    </linearGradient>
+    <radialGradient id="cresc_pearl" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(84 50) rotate(56.31) scale(18.6011)">
+      <stop stop-color="#FFFDF9"/>
+      <stop offset="0.56" stop-color="#F0E1CA"/>
+      <stop offset="1" stop-color="#C7A072"/>
+    </radialGradient>
+  </defs>
+  <path
+    d="M 88 25 A 40 40 0 1 0 88 83"
+    stroke="url(#cresc_stroke)"
+    stroke-width="18"
+    stroke-linecap="round"
+  />
+  <path
+    d="M 86 31 A 32 32 0 1 0 86 77"
+    stroke="#F4E6CD"
+    stroke-opacity="0.28"
+    stroke-width="4"
+    stroke-linecap="round"
+  />
+  <circle cx="88" cy="54" r="10" fill="url(#cresc_pearl)" stroke="#B68657" stroke-width="1.6" />
+  <circle cx="84.2" cy="49.3" r="2.8" fill="#FFFFFF" fill-opacity="0.88" />
+</svg>

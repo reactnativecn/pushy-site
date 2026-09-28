@@ -1,0 +1,7 @@
+node_modules/
+index.html
+index-en.html
+dist/
+stills/
+music.wav
+*.mp4
