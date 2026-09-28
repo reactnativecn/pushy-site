@@ -7,11 +7,7 @@
     "dev": "rspress dev",
     "build": "rspress build && node scripts/build-mcp-docs-index.mjs",
     "preview": "rspress preview",
-    "start": "rspress preview",
-    "remotion:studio": "remotion studio remotion/index.ts --public-dir=pages/public",
-    "remotion:poster:hero": "remotion still remotion/index.ts PushyHeroLoop pages/public/hero-loop/pushy-hero-loop-poster.png --frame=126 --public-dir=pages/public",
-    "remotion:render:hero:mp4": "remotion render remotion/index.ts PushyHeroLoop pages/public/hero-loop/pushy-hero-loop.mp4 --codec=h264 --public-dir=pages/public",
-    "remotion:render:hero:webm": "remotion render remotion/index.ts PushyHeroLoop pages/public/hero-loop/pushy-hero-loop.webm --codec=vp9 --public-dir=pages/public"
+    "start": "rspress preview"
   },
   "dependencies": {
     "@ant-design/icons": "^6.3.4",
@@ -28,9 +24,5 @@
     "sass": "^1.105.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2"
-  },
-  "devDependencies": {
-    "@remotion/cli": "4.0.527",
-    "remotion": "4.0.527"
   }
 }
