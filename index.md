@@ -85,11 +85,11 @@ Trusted by teams
 - ＋7 / 14 / 35 天切换
 - ＋更新命中与拒绝原因
 
-Pushy / 拾光商城 · Android · 分析概览[查看原始截图 ↗](/images/analytics/overview.webp)
+Pushy / 拾光商城 · Android · 分析概览
 
 [![拾光商城 · Android · 分析概览](/images/analytics/overview.webp)](/images/analytics/overview.webp)
 
-真实控制台截图 · 应用与数值均为模拟数据[打开控制台 →](https://pushy-admin.reactnative.cn/#/realtime-metrics)
+[打开控制台 →](https://pushy-admin.reactnative.cn/#/realtime-metrics)
 
 发布风险控制
 
