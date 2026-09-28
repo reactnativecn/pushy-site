@@ -4,14 +4,16 @@ title: 原生主动检测与更新
 type: 开发指南
 ---
 
+import { Tabs, Tab } from "@rspress/core/theme";
+
 # 原生配置、检测与更新
 
 Pushy 提供 Android、iOS 和 HarmonyOS 原生宿主接口，支持**原生配置 → 正常解析启动 bundle → 主动检查和下载更新**。配置和检查均不必经过 JS Bridge：即使首次安装、JS 尚未执行，也可以由原生端准备配置，之后运行原生更新流程。
 
-`configure` 只配置，不联网、不下载、不解析 bundle；`checkAndUpdate` 则不是仅查询版本的接口，有可执行热更新时会继续下载、校验，并按配置决定是否设置为下次启动使用的版本。两个接口都不会弹窗或立即重载正在运行的 React Native 页面。
+`configure` 只配置，不联网、不下载、不解析 bundle；`prepareBundle` 则不是仅查询版本的接口，有可执行热更新时会继续下载、校验，并按配置决定是否设置为下次启动使用的版本。两个接口都不会弹窗或立即重载正在运行的 React Native 页面。
 
 :::warning 版本与原生包要求
-本文的原生 `configure`、`checkAndUpdate` 接口及 JS 选项 `nativeConfigSource` 均从 **react-native-update v10.57.0** 起提供，适用于 Android、iOS 和 HarmonyOS。请使用 **v10.57.0 或更高版本**；旧版 SDK 即使已有原生自动检测，也不包含本文的公开宿主入口。完整变更见 [v10.57.0 发布说明](https://github.com/reactnativecn/react-native-update/releases/tag/v10.57.0)。
+本文的原生 `configure`、`prepareBundle` 接口及 JS 选项 `nativeConfigSource` 需要 **react-native-update v10.59.0 或更高版本**，适用于 Android、iOS 和 HarmonyOS。完整变更见 [v10.59.0 发布说明](https://github.com/reactnativecn/react-native-update/releases/tag/v10.59.0)。
 
 升级后必须重新编译和发布原生安装包，不能仅发布 JS 热更新。HarmonyOS 从源码集成时，还需重新构建并集成包含这些导出的 HAR。
 :::
@@ -22,7 +24,7 @@ Pushy 提供 Android、iOS 和 HarmonyOS 原生宿主接口，支持**原生配�
 
 1. 原生调用 `configure`，等待成功回调或 Promise 完成。此时不要求 JS 或 RN Bridge 已启动。
 2. 继续应用原有的 RN 启动流程，由 Android 的 `UpdateContext.getBundleUrl(...)`、iOS 的 `RCTPushy.bundleURL` 或 HarmonyOS 的实际 `PushyFileJSBundleProvider` 完成本次启动的 bundle 解析。
-3. 解析完成后调用 `checkAndUpdate`，或交由已有原生冷启动检查自动执行。
+3. 解析完成后调用 `prepareBundle`，或交由已有原生冷启动检查自动执行。
 
 **不要阻塞主线程等待配置完成，也不要为了触发检查而额外调用一次 bundle 解析函数。** 解析包含首次加载和回滚状态处理，并非无副作用的初始化方法。如果应用已经正常启动并完成解析，可直接配置成功后检查，无需重复解析。
 
@@ -30,7 +32,7 @@ Pushy 提供 Android、iOS 和 HarmonyOS 原生宿主接口，支持**原生配�
 
 ## 配置参数
 
-Android 使用 `JSONObject`，iOS 使用字典，HarmonyOS 使用导出的 `NativeUpdateConfig`。三端字段相同：
+Android 使用 `JSONObject`，iOS 使用字典，HarmonyOS 使用导出的 `PushyConfiguration`。三端字段相同：
 
 | 字段 | 类型／默认值 | 含义 |
 | --- | --- | --- |
@@ -48,48 +50,86 @@ Android 使用 `JSONObject`，iOS 使用字典，HarmonyOS 使用导出的 `Nati
 
 SDK 会校验必填值、字段类型、策略、未知字段，以及 HTTP(S) URL；基础地址不能含账号密码、查询参数或片段。地址会去除首尾空白，基础地址会去除末尾斜杠并去重。**校验失败不会覆盖已有配置**；存储错误同样通过失败回调或 Promise 拒绝返回，业务不要把失败当成配置成功。生产环境应使用 HTTPS。
 
-## Android：Java / Kotlin
+## Android
 
 公开入口：
 
 ```java
-PushyNativeUpdate.configure(Context context, JSONObject options,
-    PushyNativeUpdate.ConfigurationCallback callback);
-PushyNativeUpdate.checkAndUpdate(Context context,
-    PushyNativeUpdate.Callback callback);
+PushyRuntime.configure(Context context, JSONObject options,
+    PushyRuntime.ConfigurationCallback callback);
+PushyRuntime.prepareBundle(Context context,
+    PushyRuntime.Callback callback);
 ```
 
 不需要 `ReactContext` 或原生模块实例。配置与检查均异步执行，回调都在**主线程**；配置回调的 `error == null` 表示成功。`context`、配置对象和回调不能为空，否则抛出 `IllegalArgumentException`。
 
-### Kotlin：原生配置
+### 原生配置
+
+<Tabs>
+<Tab label="Kotlin">
 
 ```kotlin
 import android.util.Log
-import cn.reactnative.modules.update.PushyNativeUpdate
+import cn.reactnative.modules.update.PushyRuntime
 import org.json.JSONObject
 
 val options = JSONObject()
     .put("appKey", "你的 Android appKey")
     .put("afterDownload", "setNeedUpdate")
 
-PushyNativeUpdate.configure(applicationContext, options) { error ->
+PushyRuntime.configure(applicationContext, options) { error ->
     if (error != null) {
         Log.e("Pushy", "配置失败", error)
         return@configure
     }
     // 配置已完成。继续应用原有的 RN 启动流程，不要在这里重复解析 bundle。
-    // 正常 bundle 解析完成后，可调用下方 checkAndUpdate 示例。
 }
 ```
 
-### Kotlin：主动检查
+</Tab>
+<Tab label="Java">
+
+```java
+import android.util.Log;
+import cn.reactnative.modules.update.PushyRuntime;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+try {
+    JSONObject options = new JSONObject()
+        .put("appKey", "你的 Android appKey")
+        .put("afterDownload", "setNeedUpdate");
+
+    PushyRuntime.configure(getApplicationContext(), options, error -> {
+        if (error != null) {
+            Log.e("Pushy", "配置失败", error);
+            return;
+        }
+        // 配置已完成。继续应用原有的 RN 启动流程，不要在这里重复解析 bundle。
+    });
+} catch (JSONException error) {
+    Log.e("Pushy", "配置 JSON 无效", error);
+}
+```
+
+</Tab>
+</Tabs>
+
+### 主动检查
+
+以下代码放在另一个业务入口，必须在配置成功且 bundle 已正常解析后执行，不要与上面的异步配置并排立即调用：
+
+<Tabs>
+<Tab label="Kotlin">
 
 ```kotlin
-import cn.reactnative.modules.update.NativeUpdateResult
+import android.util.Log
+import cn.reactnative.modules.update.BundlePreparationResult
+import cn.reactnative.modules.update.PushyRuntime
 
-PushyNativeUpdate.checkAndUpdate(applicationContext) { result ->
+PushyRuntime.prepareBundle(applicationContext) { result ->
     when (result.status) {
-        NativeUpdateResult.DOWNLOADED -> {
+        BundlePreparationResult.DOWNLOADED -> {
             val message = if (result.isActivated) {
                 "更新已准备好，将在下次启动时使用"
             } else {
@@ -97,35 +137,20 @@ PushyNativeUpdate.checkAndUpdate(applicationContext) { result ->
             }
             Log.i("Pushy", "$message，版本：${result.hash}")
         }
-        NativeUpdateResult.NO_UPDATE -> Log.i("Pushy", "本轮没有可执行的热更新")
+        BundlePreparationResult.NO_UPDATE -> Log.i("Pushy", "本轮没有可执行的热更新")
         else -> Log.i("Pushy", "${result.status}: ${result.reason}")
     }
 }
 ```
 
-### Java
-
-以下代码放在可以处理 `JSONException` 的方法或 `try/catch` 中。配置回调后应继续正常启动；检查示例放在实际 bundle 解析完成之后：
-
-```java
-JSONObject options = new JSONObject()
-    .put("appKey", "你的 Android appKey")
-    .put("afterDownload", "setNeedUpdate");
-
-PushyNativeUpdate.configure(getApplicationContext(), options, error -> {
-    if (error != null) {
-        Log.e("Pushy", "配置失败", error);
-        return;
-    }
-    // 继续正常 RN 启动流程。
-});
-
-```
-
-以下是另一个业务入口，必须在配置成功且 bundle 已正常解析后执行，不要与上面的异步配置并排立即调用：
+</Tab>
+<Tab label="Java">
 
 ```java
-PushyNativeUpdate.checkAndUpdate(getApplicationContext(), result -> {
+import android.util.Log;
+import cn.reactnative.modules.update.PushyRuntime;
+
+PushyRuntime.prepareBundle(getApplicationContext(), result -> {
     Log.i("Pushy", "status=" + result.getStatus()
         + ", reason=" + result.getReason()
         + ", hash=" + result.getHash()
@@ -133,13 +158,19 @@ PushyNativeUpdate.checkAndUpdate(getApplicationContext(), result -> {
 });
 ```
 
-`NativeUpdateResult` 是不可变对象。检查可能持续一段时间，回调更新页面前仍应检查页面是否已经销毁。
+</Tab>
+</Tabs>
 
-## iOS：Objective-C / Swift
+`BundlePreparationResult` 是不可变对象。检查可能持续一段时间，回调更新页面前仍应检查页面是否已经销毁。
 
-公开类方法不要求创建 `RCTPushy` 实例或获取 Bridge。配置与检查完成回调均在**主队列**执行。
+## iOS
 
-### Objective-C
+公开类方法不要求创建 `RCTPushy` 实例或获取 Bridge。配置与检查完成回调均在**主队列**执行。使用 Swift 时，在已有的 Objective-C bridging header 中引入 `RCTPushy.h`，Swift 方法名为 `configure(_:completion:)` 和 `prepareBundle(completion:)`。
+
+### 原生配置
+
+<Tabs>
+<Tab label="Objective-C">
 
 ```objc
 #import "RCTPushy.h"
@@ -156,22 +187,8 @@ PushyNativeUpdate.checkAndUpdate(getApplicationContext(), result -> {
 }];
 ```
 
-本次启动的正常 bundle 解析完成后，再从业务入口主动检查：
-
-```objc
-[RCTPushy checkAndUpdateWithCompletion:^(NSDictionary<NSString *, id> *result) {
-    if ([result[@"status"] isEqualToString:@"downloaded"]
-        && [result[@"activated"] boolValue]) {
-        NSLog(@"更新 %@ 将在下次启动时使用", result[@"hash"]);
-    } else {
-        NSLog(@"Pushy: %@ / %@", result[@"status"], result[@"reason"]);
-    }
-}];
-```
-
-### Swift
-
-在已有的 Objective-C bridging header 中引入 `RCTPushy.h`。Swift 方法名固定为 `configure(_:completion:)` 和 `checkAndUpdate(completion:)`：
+</Tab>
+<Tab label="Swift">
 
 ```swift
 RCTPushy.configure([
@@ -182,18 +199,45 @@ RCTPushy.configure([
         print("Pushy 配置失败：\(error.localizedDescription)")
         return
     }
-    // 继续正常 RN 启动流程，在 bundle 解析完成后使用下方检查入口。
+    // 继续应用原有的 RN 启动流程。
 })
 ```
 
+</Tab>
+</Tabs>
+
+### 主动检查
+
+本次启动的正常 bundle 解析完成后，再从业务入口主动检查：
+
+<Tabs>
+<Tab label="Objective-C">
+
+```objc
+[RCTPushy prepareBundleWithCompletion:^(NSDictionary<NSString *, id> *result) {
+    if ([result[@"status"] isEqualToString:@"downloaded"]
+        && [result[@"activated"] boolValue]) {
+        NSLog(@"更新 %@ 将在下次启动时使用", result[@"hash"]);
+    } else {
+        NSLog(@"Pushy: %@ / %@", result[@"status"], result[@"reason"]);
+    }
+}];
+```
+
+</Tab>
+<Tab label="Swift">
+
 ```swift
-RCTPushy.checkAndUpdate(completion: { result in
+RCTPushy.prepareBundle(completion: { result in
     let status = result["status"] as? String ?? "failed"
     let activated = result["activated"] as? Bool ?? false
     let reason = result["reason"] as? String ?? ""
     print("Pushy: \(status), activated=\(activated), reason=\(reason)")
 })
 ```
+
+</Tab>
+</Tabs>
 
 completion 可以传 `nil`，但启动需要等待配置完成时应提供回调，不要依赖延迟几秒来猜测是否成功。页面相关的回调按生命周期使用弱引用。
 
@@ -204,13 +248,13 @@ completion 可以传 `nil`，但启动需要等待配置完成时应提供回调
 ```ts
 import {
   PushyFileJSBundleProvider,
-  NativeUpdateConfig,
-  NativeUpdateResult,
+  PushyConfiguration,
+  BundlePreparationResult,
 } from 'pushy';
 
 // 在原有 provider 接入位置，先配置，再继续正常 bundle 加载。
 async function configurePushy(provider: PushyFileJSBundleProvider): Promise<void> {
-  const options: NativeUpdateConfig = {
+  const options: PushyConfiguration = {
     appKey: '你的 HarmonyOS appKey',
     afterDownload: 'setNeedUpdate',
   };
@@ -219,7 +263,7 @@ async function configurePushy(provider: PushyFileJSBundleProvider): Promise<void
 
 // 在该 provider 已经参与正常启动解析之后调用。
 async function checkFromNative(provider: PushyFileJSBundleProvider): Promise<void> {
-  const result: NativeUpdateResult = await provider.checkAndUpdate();
+  const result: BundlePreparationResult = await provider.prepareBundle();
   console.info(`Pushy: ${result.status} / ${result.reason}`);
 }
 ```
@@ -266,7 +310,7 @@ export const pushyClient = new Pushy({
 
 常见 `reason` 包括 `not_initialized`、`not_configured`、`disabled`、`debug`、`invalid_config`、`check_failed`、`download_failed`、`commit_failed`、`internal_error`、`reset` 和 `config_changed`。Android 等待被中断时还可能返回 `interrupted`。业务先按 `status` 分支，再用 `reason` 提示或诊断。
 
-`configure` 不会设置热更版本或重载页面；`checkAndUpdate` 的普通激活受 `afterDownload` 控制，服务端 `forceBoot` 和已有救援规则继续生效。`activated: false` 时，下载并不意味着下次启动就一定加载这个版本，仍需后续激活处理。**不要在下载完成回调中提前调用 `markSuccess`**。
+`configure` 不会设置热更版本或重载页面；`prepareBundle` 的普通激活受 `afterDownload` 控制，服务端 `forceBoot` 和已有救援规则继续生效。`activated: false` 时，下载并不意味着下次启动就一定加载这个版本，仍需后续激活处理。**不要在下载完成回调中提前调用 `markSuccess`**。
 
 ## 重复调用和配置变更
 
