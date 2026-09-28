@@ -107,14 +107,6 @@ export default function AnalyticsSection() {
 						<div className="analytics-frame-bar">
 							<span className="analytics-dot" aria-hidden="true" />
 							<span>Pushy / {view.caption}</span>
-							<a
-								href={`/images/analytics/${view.id}.webp`}
-								target="_blank"
-								rel="noreferrer"
-								aria-label={`查看原始截图: ${view.caption}`}
-							>
-								查看原始截图 <span aria-hidden="true">↗</span>
-							</a>
 						</div>
 						<a
 							className="analytics-image-link"
@@ -134,7 +126,6 @@ export default function AnalyticsSection() {
 							/>
 						</a>
 						<figcaption>
-							<span>真实控制台截图 · 应用与数值均为模拟数据</span>
 							<a href="https://pushy-admin.reactnative.cn/#/realtime-metrics">
 								打开控制台 <span aria-hidden="true">→</span>
 							</a>
