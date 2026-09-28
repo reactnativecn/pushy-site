@@ -5,18 +5,18 @@
 # 发布，
 就该这么快。
 
-Pushy 是为 React Native 打造的热更新服务。改完代码，几秒钟触达每一台设备——无需等待应用商店审核，单行修改只需下发 3.4 KB。
-
-[AI 自动接入](/docs/skills)[5 分钟手动接入](/docs/getting-started)
-
-[Star](https://github.com/reactnativecn/react-native-update/)[](https://github.com/reactnativecn/react-native-update/stargazers/)
-
 1. 01一条命令发布
 1. 02增量更新 3.4 KB
 1. 03为 Hermes 而生
 1. 04灰度与崩溃回滚
 1. 05原生冷启动自愈
 1. 06MCP · AI 排查
+
+Pushy 是为 React Native 打造的热更新服务。改完代码，几秒钟触达每一台设备——无需等待应用商店审核，单行修改只需下发 3.4 KB。
+
+[AI 自动接入](/docs/skills)[5 分钟手动接入](/docs/getting-started)
+
+[Star](https://github.com/reactnativecn/react-native-update/)[](https://github.com/reactnativecn/react-native-update/stargazers/)
 
 Trusted by teams
 
