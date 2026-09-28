@@ -78,7 +78,7 @@ link 操作。
 :::
 #### iOS
 
-RN < 0.60且使用CocoaPods（推荐）
+RN \< 0.60且使用CocoaPods（推荐）
 
 1. 在 ios/Podfile 中添加
 ```
@@ -87,7 +87,7 @@ pod 'react-native-update', path: '../node_modules/react-native-update'
 2. 在项目的 ios 目录下运行`pod install`
 3. 重新编译
 
-RN < 0.60且不使用CocoaPods
+RN \< 0.60且不使用CocoaPods
 
 1. 在 XCode 中的 Project Navigator 里,右键点击`Libraries` ➜ `Add Files to [你的工程名]`
 2. 进入`node_modules` ➜ `react-native-update` ➜ `ios 并选中`RCTPushy.xcodeproj\`
@@ -104,7 +104,7 @@ date +%s > "$DEST/pushy_build_time.txt"
 
 #### Android
 
-RN < 0.60 或其他不能自动 link 的情况
+RN \< 0.60 或其他不能自动 link 的情况
 
 1. 在`android/settings.gradle`中添加如下代码:
 

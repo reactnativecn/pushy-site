@@ -292,7 +292,7 @@ link 操作。
 :::
 #### iOS
 
-RN < 0.60且使用CocoaPods（推荐）
+RN \< 0.60且使用CocoaPods（推荐）
 
 1. 在 ios/Podfile 中添加
 ```
@@ -301,7 +301,7 @@ pod 'react-native-update', path: '../node_modules/react-native-update'
 2. 在项目的 ios 目录下运行`pod install`
 3. 重新编译
 
-RN < 0.60且不使用CocoaPods
+RN \< 0.60且不使用CocoaPods
 
 1. 在 XCode 中的 Project Navigator 里,右键点击`Libraries` ➜ `Add Files to [你的工程名]`
 2. 进入`node_modules` ➜ `react-native-update` ➜ `ios 并选中`RCTPushy.xcodeproj\`
@@ -318,7 +318,7 @@ date +%s > "$DEST/pushy_build_time.txt"
 
 #### Android
 
-RN < 0.60 或其他不能自动 link 的情况
+RN \< 0.60 或其他不能自动 link 的情况
 
 1. 在`android/settings.gradle`中添加如下代码:
 
@@ -1284,7 +1284,7 @@ Would you like to bind packages to this version?(Y/N)
 
 - **客户端版本要求**：原生包中的 `react-native-update` >= 10.52.1（低于此版本没有完整的原生冷启动检测能力，管理后台也不会显示该选项）
 - **仅作用于原生检测**：JS 侧的交互式检查更新流程不受此标记影响
-- **安全护栏依然生效**：设备本地的回滚保护（rolledBack 记录）优先于强制启动；首次启动崩溃保护（first\_time）也依然生效，激活后如果再次崩溃仍会自动回滚
+- **安全护栏依然生效**：设备本地的回滚保护（rolledBack 记录）优先于强制启动；首次启动崩溃保护（first_time）也依然生效，激活后如果再次崩溃仍会自动回滚
 - **标记随绑定存在**：重新发布（重新绑定）会替换绑定并清除强制启动标记；也可在包名菜单中选择「取消强制启动」
 
 
@@ -3538,20 +3538,21 @@ url: /index.md
 
 [官方 Skill 已上线 · AI 一句话完成接入→](/docs/skills)HarmonyOS 已支持
 
-# 让每一次发布
-秒级抵达用户
+# 发布，
+就该这么快。
 
-Pushy 是为 React Native 打造的热更新服务。修复与新功能即刻上线，无需等待应用商店漫长审核。
-
-极速交付增量差分稳定保障AI 协同
+Pushy 是为 React Native 打造的热更新服务。改完代码，几秒钟触达每一台设备——无需等待应用商店审核，单行修改只需下发 3.4 KB。
 
 [AI 自动接入](/docs/skills)[5 分钟手动接入](/docs/getting-started)
 
 [Star](https://github.com/reactnativecn/react-native-update/)[](https://github.com/reactnativecn/react-native-update/stargazers/)
 
-免应用商店审核0 秒免应用商店审核CDN 全球分发秒级CDN 全球分发崩溃回滚保护自动崩溃回滚保护
-
-生产环境实时生效 · iOS / Android / HarmonyOS
+1. 01一条命令发布
+1. 02增量更新 3.4 KB
+1. 03为 Hermes 而生
+1. 04灰度与崩溃回滚
+1. 05原生冷启动自愈
+1. 06MCP · AI 排查
 
 Trusted by teams
 

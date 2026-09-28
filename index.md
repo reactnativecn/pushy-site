@@ -2,20 +2,21 @@
 
 [官方 Skill 已上线 · AI 一句话完成接入→](/docs/skills)HarmonyOS 已支持
 
-# 让每一次发布
-秒级抵达用户
+# 发布，
+就该这么快。
 
-Pushy 是为 React Native 打造的热更新服务。修复与新功能即刻上线，无需等待应用商店漫长审核。
-
-极速交付增量差分稳定保障AI 协同
+Pushy 是为 React Native 打造的热更新服务。改完代码，几秒钟触达每一台设备——无需等待应用商店审核，单行修改只需下发 3.4 KB。
 
 [AI 自动接入](/docs/skills)[5 分钟手动接入](/docs/getting-started)
 
 [Star](https://github.com/reactnativecn/react-native-update/)[](https://github.com/reactnativecn/react-native-update/stargazers/)
 
-免应用商店审核0 秒免应用商店审核CDN 全球分发秒级CDN 全球分发崩溃回滚保护自动崩溃回滚保护
-
-生产环境实时生效 · iOS / Android / HarmonyOS
+1. 01一条命令发布
+1. 02增量更新 3.4 KB
+1. 03为 Hermes 而生
+1. 04灰度与崩溃回滚
+1. 05原生冷启动自愈
+1. 06MCP · AI 排查
 
 Trusted by teams
 
