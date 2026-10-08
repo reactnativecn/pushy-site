@@ -1,21 +1,22 @@
-> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.reactnative.cn/llms.txt, the full documentation bundle is available at https://pushy.reactnative.cn/llms-full.txt.
 
 # Pushy - 专业的热更新解决方案
 
+Pushy（npm 包名 `react-native-update`）是专为 React Native 应用打造的热更新服务，由 React Native 中文网自 2016 年起研发并持续运营。它让 JS 代码和图片等资源的修改无需重新提交应用商店审核即可下发到用户手机：增量包通常只有几十 KB，国内走阿里云 CDN、海外走 Cloudflare 分发，新版本启动崩溃会自动回滚。Pushy 支持 iOS、Android 和鸿蒙（HarmonyOS），兼容 Expo、Hermes 与 React Native 新架构，客户端和命令行工具完全开源，提供免费版，可直接替代已于 2025 年 3 月 31 日停服的 Microsoft CodePush（App Center）。
+
+[![npm version](https://badge.fury.io/js/react-native-update.svg)](https://www.npmjs.com/package/react-native-update)
 :::info
 **现已全面支持鸿蒙系统以及 React Native 新架构！**
 :::
 
-Pushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-native-update)
- [![npm version](https://badge.fury.io/js/react-native-update.svg)](https://www.npmjs.com/package/react-native-update)) 是面向 React Native 应用提供的**专业热更新服务**
-，由 [React Native 中文网](https://reactnative.cn)
-独家研发并持续维护。我们致力于为全球 React Native 开发者提供最快速、最稳定、最经济的热更新体验。
+我们致力于为全球 React Native 开发者提供最快速、最稳定、最经济的热更新体验。
+
 
 [reactnativecn/react-native-updatePushy 的核心代码在 GitHub 上完全开源。如果它帮到了你，欢迎点个 Star，这是对我们持续维护最好的鼓励。
 ](https://github.com/reactnativecn/react-native-update)[Star](https://github.com/reactnativecn/react-native-update)
 
 :::tip 推荐接入方式
-如果你正在使用支持 Skills 的 AI 编程工具，推荐优先阅读 [安装与使用 Skill](https://pushy.react-native.cn/docs/skills.md)，先安装 `react-native-update` Skill，再让 AI 根据你的项目结构自动完成大部分接入改动。手动文档更适合混编项目、monorepo 或需要逐项校对的场景。
+如果你正在使用支持 Skills 的 AI 编程工具，推荐优先阅读 [安装与使用 Skill](https://pushy.reactnative.cn/docs/skills.md)，先安装 `react-native-update` Skill，再让 AI 根据你的项目结构自动完成大部分接入改动。手动文档更适合混编项目、monorepo 或需要逐项校对的场景。
 :::
 
 ## 🚀 为什么选择 Pushy？
@@ -103,17 +104,17 @@ const pushyClient = new Pushy({ appKey });
 
 推荐按下面的顺序完成接入：
 
-1. **[安装与使用 Skill](https://pushy.react-native.cn/docs/skills.md)** - 推荐先让 AI 自动完成接入改造
-2. **[安装配置](https://pushy.react-native.cn/docs/getting-started.md)** - 补齐依赖与原生侧配置
-3. **[代码集成](https://pushy.react-native.cn/docs/integration.md)** - 校对或手动定制 `UpdateProvider` 接入
-4. **[发布更新](https://pushy.react-native.cn/docs/publish.md)** - 一条命令推送新版本
+1. **[安装与使用 Skill](https://pushy.reactnative.cn/docs/skills.md)** - 推荐先让 AI 自动完成接入改造
+2. **[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)** - 补齐依赖与原生侧配置
+3. **[代码集成](https://pushy.reactnative.cn/docs/integration.md)** - 校对或手动定制 `UpdateProvider` 接入
+4. **[发布更新](https://pushy.reactnative.cn/docs/publish.md)** - 一条命令推送新版本
 
 :::info
-不确定是否适合你的项目？查看[常见问题](https://pushy.react-native.cn/docs/faq.md)或者可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。
+不确定是否适合你的项目？查看[常见问题](https://pushy.reactnative.cn/docs/faq.md)或者可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。
 :::
 
 立即开始使用 Pushy，让你的 React Native 应用拥有极致的热更新体验！
 
 ## 发布之后，继续用数据判断
 
-在[数据分析](https://pushy.react-native.cn/docs/analytics.md)中查看请求趋势、版本漏斗、生效时延、网络与地区分布以及失败原因。让每次发布从下发到激活都有迹可循。
+在[数据分析](https://pushy.reactnative.cn/docs/analytics.md)中查看请求趋势、版本漏斗、生效时延、网络与地区分布以及失败原因。让每次发布从下发到激活都有迹可循。

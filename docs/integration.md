@@ -1,4 +1,4 @@
-> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.reactnative.cn/llms.txt, the full documentation bundle is available at https://pushy.reactnative.cn/llms-full.txt.
 
 # 代码集成
 
@@ -9,7 +9,7 @@
 安装配置完成后，确定应用编译顺利通过，下面我们来进行代码集成。
 
 :::tip 推荐做法
-优先使用 [安装与使用 Skill](https://pushy.react-native.cn/docs/skills.md) 让 AI 自动完成 `UpdateProvider` 包裹、客户端初始化与常见策略配置。本页保留为手动接入参考，也适合用来校对 AI 生成的改动。
+优先使用 [安装与使用 Skill](https://pushy.reactnative.cn/docs/skills.md) 让 AI 自动完成 `UpdateProvider` 包裹、客户端初始化与常见策略配置。本页保留为手动接入参考，也适合用来校对 AI 生成的改动。
 :::
 
 ### 获取 appKey
@@ -52,7 +52,7 @@ export default function Root() {
 }
 ```
 
-如没有特别的自定义需求，那么到此热更新已经可以开始正常运作（如需在应用内执行 apk 更新，还需配置[安装权限与系统确认流程](https://pushy.react-native.cn/docs/api.md#async-function-downloadandinstallapkurl)）。在默认的配置下，在 App 启动，以及从后台切换到前台时会触发更新检查，弹出提示的内容也固定。
+如没有特别的自定义需求，那么到此热更新已经可以开始正常运作（如需在应用内执行 apk 更新，还需配置[安装权限与系统确认流程](https://pushy.reactnative.cn/docs/api.md#async-function-downloadandinstallapkurl)）。在默认的配置下，在 App 启动，以及从后台切换到前台时会触发更新检查，弹出提示的内容也固定。
 
 如需简单调整检查和更新策略，可参考以下内置的策略参数：
 
@@ -109,7 +109,7 @@ const pushyClient = new Pushy({
 });
 ```
 
-所有更新相关的数据可以通过一个单一的[`useUpdate()`](https://pushy.react-native.cn/docs/api.md#useupdate)hook 函数来获取，然后可以根据其提供的数据来自行渲染自定义的界面，如下面的例子：
+所有更新相关的数据可以通过一个单一的[`useUpdate()`](https://pushy.reactnative.cn/docs/api.md#useupdate)hook 函数来获取，然后可以根据其提供的数据来自行渲染自定义的界面，如下面的例子：
 
 ```js
 import { Text, View, TouchableOpacity } from 'react-native';
@@ -189,7 +189,7 @@ function App() {
 }
 ```
 
-其中`checkUpdate`方法可以用来手动触发更新检查。虽然这个方法会返回[`updateInfo`](https://pushy.react-native.cn/docs/api.md#async-function-checkupdate)（仅限 v10.26.0+ 版本），但我们仍然推荐优先使用`useUpdate()`来获取`updateInfo`。
+其中`checkUpdate`方法可以用来手动触发更新检查。虽然这个方法会返回[`updateInfo`](https://pushy.reactnative.cn/docs/api.md#async-function-checkupdate)（仅限 v10.26.0+ 版本），但我们仍然推荐优先使用`useUpdate()`来获取`updateInfo`。
 
 :::info
 依赖`useUpdate()`而不是`checkUpdate`来获取`updateInfo`，这样做虽然一开始可能觉得不太直观，但可以将**检查逻辑**和**更新逻辑**完全解耦，使更新流程上的各个组件不需要互相依赖和影响。
@@ -199,11 +199,11 @@ function App() {
 
 `updateInfo` 有三种情况：
 
-1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），开发者应该在 pushy 的管理后台添加一个更新下载链接，并自行提示用户下载。如需在应用内执行 apk 更新，还需配置[安装权限与系统确认流程](https://pushy.react-native.cn/docs/api.md#async-function-downloadandinstallapkurl)。
+1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），开发者应该在 pushy 的管理后台添加一个更新下载链接，并自行提示用户下载。如需在应用内执行 apk 更新，还需配置[安装权限与系统确认流程](https://pushy.reactnative.cn/docs/api.md#async-function-downloadandinstallapkurl)。
 
 2. `{upToDate: true}`：当前已经更新到最新，无需进行更新。
 
-3. `{update: true}`：当前有新版本可以更新。info 的`name`、`description`字段可以用于提示用户，而`metaInfo`字段则可以根据你的需求自定义其它属性(如是否静默更新、是否强制更新等等)，具体用法可参考[场景实践](https://pushy.react-native.cn/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了补丁包的下载地址等。 pushy 会首先尝试耗费流量更少的更新方式。
+3. `{update: true}`：当前有新版本可以更新。info 的`name`、`description`字段可以用于提示用户，而`metaInfo`字段则可以根据你的需求自定义其它属性(如是否静默更新、是否强制更新等等)，具体用法可参考[场景实践](https://pushy.reactnative.cn/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了补丁包的下载地址等。 pushy 会首先尝试耗费流量更少的更新方式。
 
 当返回的`updateInfo`中`update`字段为 true 时，即可调用`downloadUpdate`方法来下载更新，此时可以获取到下载的进度数据`progress`。下载完成后（注意!不可依赖`progress`来判断下载完成，必须要`await downloadUpdate()`之后）可以调用`switchVersion`来立即重启更新，也可以使用`switchVersionLater`来标记下次启动时更新。
 
@@ -223,6 +223,6 @@ const pushyClient = new Pushy({
 });
 ```
 
-以上提及的所有 api 的说明文档可在[这里](https://pushy.react-native.cn/docs/api.md)查看。还有一些其他常见的场景可以参考[场景实践](https://pushy.react-native.cn/docs/bestpractice.md)。
+以上提及的所有 api 的说明文档可在[这里](https://pushy.reactnative.cn/docs/api.md)查看。还有一些其他常见的场景可以参考[场景实践](https://pushy.reactnative.cn/docs/bestpractice.md)。
 
-现在，你的应用已经可以通过 pushy 服务检查版本并进行更新了。下一步，你可以开始尝试发布应用包和版本，请参阅[发布热更新](https://pushy.react-native.cn/docs/publish.md)。
+现在，你的应用已经可以通过 pushy 服务检查版本并进行更新了。下一步，你可以开始尝试发布应用包和版本，请参阅[发布热更新](https://pushy.reactnative.cn/docs/publish.md)。

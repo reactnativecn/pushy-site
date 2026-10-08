@@ -1,4 +1,4 @@
-> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.reactnative.cn/llms.txt, the full documentation bundle is available at https://pushy.reactnative.cn/llms-full.txt.
 
 # 安装配置
 
@@ -12,7 +12,7 @@
 我们假设你已经拥有了开发 React Native 应用的一切环境，包括`Node.js`、`Xcode`、`Android SDK`等等。
 
 :::tip 推荐优先使用 Skill 自动接入
-如果你正在使用支持 Skills 的 AI 编程工具，建议先完成 [安装与使用 Skill](https://pushy.react-native.cn/docs/skills.md)，再让 AI 根据当前工程自动执行依赖安装、原生配置检查与接入改造。本页保留手动步骤，适合定制工程、混编项目或作为 AI 产出校对清单。
+如果你正在使用支持 Skills 的 AI 编程工具，建议先完成 [安装与使用 Skill](https://pushy.reactnative.cn/docs/skills.md)，再让 AI 根据当前工程自动执行依赖安装、原生配置检查与接入改造。本页保留手动步骤，适合定制工程、混编项目或作为 AI 产出校对清单。
 :::
 
 
@@ -203,7 +203,7 @@ class AppDelegate: RCTAppDelegate {
 ```
 
 #### Android
-在 MainApplication 中增加如下代码（如果是混编原生的项目或其他原因没有使用 ReactApplication，请[使用此 api 集成](https://pushy.react-native.cn/docs/api.md#updatecontextsetcustominstancemanagerreactinstancemanager-instancemanager))：
+在 MainApplication 中增加如下代码（如果是混编原生的项目或其他原因没有使用 ReactApplication，请[使用此 api 集成](https://pushy.reactnative.cn/docs/api.md#updatecontextsetcustominstancemanagerreactinstancemanager-instancemanager))：
 
 **Kotlin（RN 0.82 或以上）**
 
@@ -583,4 +583,4 @@ Enter appId: <输入应用前面的编号>
 }
 ```
 你可以安全的把`update.json`上传到 Git 等 CVS 系统上，与你的团队共享这个文件，它不包含任何敏感信息。当然，他们在使用任何功能之前，都必须首先输入`pushy login`进行登录。
-至此应用的创建/选择就已经成功了。下一步，你需要给代码添加相应的功能，请参阅[代码集成](https://pushy.react-native.cn/docs/integration.md)。
+至此应用的创建/选择就已经成功了。下一步，你需要给代码添加相应的功能，请参阅[代码集成](https://pushy.reactnative.cn/docs/integration.md)。

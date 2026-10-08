@@ -1,4 +1,4 @@
-> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.reactnative.cn/llms.txt, the full documentation bundle is available at https://pushy.reactnative.cn/llms-full.txt.
 
 # JS 报错监控
 
@@ -89,7 +89,7 @@ const pushyClient = new Pushy({
 });
 ```
 
-关闭后管理后台将不再收到该客户端的 JS 报错。它与[版本健康度事件上报](https://pushy.react-native.cn/docs/api.md#%E7%89%88%E6%9C%AC%E5%81%A5%E5%BA%B7%E5%BA%A6%E4%BA%8B%E4%BB%B6%E4%B8%8A%E6%8A%A5)的开关 `disableTelemetry` 相互独立：关闭 `disableTelemetry` 会同时停掉两者，只关 `disableErrorReporting` 则仅停掉 JS 报错。
+关闭后管理后台将不再收到该客户端的 JS 报错。它与[版本健康度事件上报](https://pushy.reactnative.cn/docs/api.md#%E7%89%88%E6%9C%AC%E5%81%A5%E5%BA%B7%E5%BA%A6%E4%BA%8B%E4%BB%B6%E4%B8%8A%E6%8A%A5)的开关 `disableTelemetry` 相互独立：关闭 `disableTelemetry` 会同时停掉两者，只关 `disableErrorReporting` 则仅停掉 JS 报错。
 
 ## 常见情况
 

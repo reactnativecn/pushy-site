@@ -1,4 +1,4 @@
-> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.reactnative.cn/llms.txt, the full documentation bundle is available at https://pushy.reactnative.cn/llms-full.txt.
 
 # MCP 服务
 
@@ -96,15 +96,15 @@ AI 会汇总这个版本的下发、下载失败、patch 失败、激活与回�
 
 ## 能查到什么
 
-| 能力    | 说明                                                                                                                                     |
-| ----- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| 应用列表  | 令牌授权范围内的应用                                                                                                                             |
-| 发布拓扑  | 每个原生包当前绑定的版本、灰度版本与灰度比例                                                                                                                 |
-| 更新判定  | 用一组客户端参数重放判定，给出结论与原因                                                                                                                   |
-| 产物状态  | 增量补丁是否生成、生成任务是否失败                                                                                                                      |
-| 请求观测  | 近期真实请求按原生包版本汇总：上报的编译时间戳 / 内容指纹、客户端 SDK 版本，并与已登记的原生包逐一对照                                                                                |
-| 版本健康度 | 每个热更版本的下发方式，客户端上报的下载失败、patch 失败、激活与回滚次数，以及累计观测到的设备数（需 `pushy:health:read`，客户端 v10.47.0+）                                               |
-| JS 报错 | 按指纹聚合的报错列表与详情，有归档 sourcemap 时把堆栈还原到源码位置（需 `pushy:health:read`，客户端 v10.55.0+，见 [JS 报错监控](https://pushy.react-native.cn/docs/errors.md)） |
+| 能力    | 说明                                                                                                                                    |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| 应用列表  | 令牌授权范围内的应用                                                                                                                            |
+| 发布拓扑  | 每个原生包当前绑定的版本、灰度版本与灰度比例                                                                                                                |
+| 更新判定  | 用一组客户端参数重放判定，给出结论与原因                                                                                                                  |
+| 产物状态  | 增量补丁是否生成、生成任务是否失败                                                                                                                     |
+| 请求观测  | 近期真实请求按原生包版本汇总：上报的编译时间戳 / 内容指纹、客户端 SDK 版本，并与已登记的原生包逐一对照                                                                               |
+| 版本健康度 | 每个热更版本的下发方式，客户端上报的下载失败、patch 失败、激活与回滚次数，以及累计观测到的设备数（需 `pushy:health:read`，客户端 v10.47.0+）                                              |
+| JS 报错 | 按指纹聚合的报错列表与详情，有归档 sourcemap 时把堆栈还原到源码位置（需 `pushy:health:read`，客户端 v10.55.0+，见 [JS 报错监控](https://pushy.reactnative.cn/docs/errors.md)） |
 
 ## 注意事项
 

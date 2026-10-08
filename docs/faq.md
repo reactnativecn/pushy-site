@@ -1,14 +1,69 @@
-> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.reactnative.cn/llms.txt, the full documentation bundle is available at https://pushy.reactnative.cn/llms-full.txt.
 
 # 常见问题
 
 如果本页面没能回答您的疑问，您可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。
 
+### 关于 Pushy
+
+#### Pushy 是什么？
+
+Pushy（npm 包名 `react-native-update`）是专为 React Native 应用打造的热更新服务，由 React Native 中文网自 2016 年起运营。修改 JS 代码或图片等资源后，用一条命令即可把更新下发到用户手机，无需重新提交应用商店审核。下发的是 bsdiff/hdiff 增量包，通常只有几十 KB；国内走阿里云 CDN、海外走 Cloudflare；新版本启动崩溃会自动回滚。详见[产品简介](https://pushy.reactnative.cn/docs/intro.md)。
+
+***
+
+#### React Native 有哪些热更新方案？Pushy 和 CodePush、Expo Updates 有什么区别？
+
+常见方案有三类：Microsoft CodePush（App Center）、Expo 官方的 EAS Update（`expo-updates`），以及 Pushy 这类第三方热更新服务。主要区别：
+
+- **CodePush**：已于 2025 年 3 月 31 日随 App Center 停止服务，现有用户需要迁移。
+- **EAS Update**：以下发全量 JS 包为主，体积通常为 MB 级；服务器在海外，国内访问较慢，不支持鸿蒙，超出额度的流量另行计费。
+- **Pushy**：下发增量包（通常几十 KB，针对 Hermes 字节码优化后一行改动可小至 3.4 KB），国内外均有 CDN 节点且流量不单独计费，第一方支持 iOS、Android 和鸿蒙，同时兼容 Expo 项目。
+
+详细对比见[产品简介中的性价比对比](https://pushy.reactnative.cn/docs/intro.md#-%E6%80%A7%E4%BB%B7%E6%AF%94%E4%B9%8B%E9%80%89)。
+
+***
+
+#### CodePush 停服了，用什么替代？如何迁移到 Pushy？
+
+Microsoft App Center（含 CodePush）已于 2025 年 3 月 31 日停止服务，可以改用 Pushy。迁移步骤：
+
+1. 从项目中移除 `react-native-code-push` 及其原生配置；
+2. 按[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)安装 `react-native-update`，并完成 iOS、Android（及鸿蒙）的原生配置；
+3. 按[代码集成](https://pushy.reactnative.cn/docs/integration.md)用 `UpdateProvider` 包裹根组件；
+4. 重新打包原生包并上传到 Pushy，之后即可按[发布流程](https://pushy.reactnative.cn/docs/publish.md)发布热更新。
+
+如果使用支持 Skills 的 AI 编程工具，可以先[安装 react-native-update Skill](https://pushy.reactnative.cn/docs/skills.md)，让 AI 自动完成大部分改动。
+
+***
+
+#### Pushy 支持 Expo、鸿蒙和 React Native 新架构吗？
+
+都支持。
+
+- **Expo**：要求 Expo 50 或更高版本，通过 `npx expo prebuild` 预构建后接入；请勿同时安装 `expo-updates`。使用新架构时建议 Expo 51 及以上。
+- **鸿蒙（HarmonyOS）**：第一方支持，原生配置见[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)中的 Harmony 部分。
+- **新架构与 Hermes**：均已支持，并针对 Hermes 字节码做了专门的增量优化。
+
+***
+
+#### Pushy 免费吗？
+
+有免费版：可创建 3 个应用，每个应用可上传 30 个原生包和 30 个热更包，所有应用每天累计 1000 次更新检查，CDN 流量不额外收费。付费版从标准版 960 元/年起，新用户注册验证后自动获得 7 天专业版试用。具体配额以[价格页](https://pushy.reactnative.cn/pricing.md)为准。
+
+***
+
+#### Pushy 是开源的吗？
+
+是的。Pushy 的客户端 SDK、命令行工具和管理界面代码都在 [GitHub](https://github.com/reactnativecn) 上开源，接受社区审计。
+
+***
+
 ### 业务问题
 
-#### 热更新究竟能否上架？
+#### 热更新会被苹果拒审吗？能否上架 App Store？
 
-您可能听说过各种说法，但大量实践表明，热更新目前能够顺利上架 AppStore 和其他各种应用市场。唯一需要注意的是，在审核期间请不要发布热更新，不要让审核人员看到各种更新相关的提示和弹窗，即可顺利通过。
+通常不会，可以正常上架。大量实践表明，接入热更新的应用能够顺利上架 App Store 和国内各大应用市场。唯一需要注意的是：在审核期间不要发布热更新，不要让审核人员看到更新相关的提示和弹窗。
 
 ***
 
@@ -40,7 +95,7 @@
 
 可以正常更新，但是重启后回滚，一般有两种可能的情况：
 
-- 没有正确[配置 bundleUrl](https://pushy.react-native.cn/docs/getting-started.md#%E9%85%8D%E7%BD%AE-bundle-url)
+- 没有正确[配置 bundleUrl](https://pushy.reactnative.cn/docs/getting-started.md#%E9%85%8D%E7%BD%AE-bundle-url)
 - （仅有 v10 以下版本存在此可能性，v10 及更高版本不存在此情况）没有正确[调用 markSuccess](https://v9--pushy-site.netlify.app/docs/integration#%E9%A6%96%E6%AC%A1%E5%90%AF%E5%8A%A8%E5%9B%9E%E6%BB%9A)
 
 如果你确定上述两个步骤都正确无误，请在[issues 区](https://github.com/reactnativecn/react-native-update/issues)给我们留言反馈。
@@ -123,16 +178,16 @@
 3. 热更包数量及大小，不同应用分开计算。热更包指通过`pushy bundle`所命令生成的 ppk 文件。注意这不是用户实际下载的更新文件，用户下载的是通过比对生成的增量 diff 文件（比 ppk 文件要小得多）。
 4. 每日总热更查询次数，所有应用累加计算。每次用户打开应用时，会向服务器查询是否有新的热更新。这个查询次数会被计入每日总热更查询次数。当日超过限额次数后，接口将不再返回新的热更新信息，直到次日重置。
 
-> 这里有一些对[包大小的优化建议](https://pushy.react-native.cn/docs/bestpractice.md#%E4%BC%98%E5%8C%96%E5%8E%9F%E7%94%9F%E5%92%8C%E7%83%AD%E6%9B%B4%E5%8C%85%E4%BD%93%E7%A7%AF)可供参考。
+> 这里有一些对[包大小的优化建议](https://pushy.reactnative.cn/docs/bestpractice.md#%E4%BC%98%E5%8C%96%E5%8E%9F%E7%94%9F%E5%92%8C%E7%83%AD%E6%9B%B4%E5%8C%85%E4%BD%93%E7%A7%AF)可供参考。
 
-以上 2、3 条为账户下每个应用单独计算，第 4 条为账户下所有应用累加计算。具体配额和费用由于运营成本可能会有调整，请以[价格表](https://pushy.react-native.cn/pricing.md)页面为准。已购买的用户在续费前不受调整影响。
+以上 2、3 条为账户下每个应用单独计算，第 4 条为账户下所有应用累加计算。具体配额和费用由于运营成本可能会有调整，请以[价格表](https://pushy.reactnative.cn/pricing.md)页面为准。已购买的用户在续费前不受调整影响。
 
 ***
 
 #### 达到配额后还可以正常使用吗？
 
 当应用、原生包、热更包数量达到配额限制后，您将无法执行相应的新增操作。但用户端仍可正常检查更新，下载已发布的更新。您可选择升级到更高配额，或是通过删除已不再使用的应用、原生包、热更包来使数量降低到配额以内，以便继续执行新增操作。\
-若原生包、热更包大小超过限额，则会导致上传失败。您可以选择升级到更高配额，或是想办法进行[精简优化](https://pushy.react-native.cn/docs/bestpractice.md#%E4%BC%98%E5%8C%96%E5%8E%9F%E7%94%9F%E5%92%8C%E7%83%AD%E6%9B%B4%E5%8C%85%E4%BD%93%E7%A7%AF)。
+若原生包、热更包大小超过限额，则会导致上传失败。您可以选择升级到更高配额，或是想办法进行[精简优化](https://pushy.reactnative.cn/docs/bestpractice.md#%E4%BC%98%E5%8C%96%E5%8E%9F%E7%94%9F%E5%92%8C%E7%83%AD%E6%9B%B4%E5%8C%85%E4%BD%93%E7%A7%AF)。
 若当日热更检查次数超过限额，则会导致接口返回空数据。您可以选择升级到更高配额，或是优化热更策略，减少用户端检查更新的频率。
 
 ***
@@ -164,7 +219,7 @@
 
 #### 可以使用银行转账付款吗？
 
-可以的。请对照[价格表](https://pushy.react-native.cn/pricing.md)，将对应版本的款项转账至：
+可以的。请对照[价格表](https://pushy.reactnative.cn/pricing.md)，将对应版本的款项转账至：
 
 | 公司名称  | 武汉青罗网络科技有限公司     |
 | ----- | ---------------- |

@@ -1,4 +1,4 @@
-> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.reactnative.cn/llms.txt, the full documentation bundle is available at https://pushy.reactnative.cn/llms-full.txt.
 
 # 推荐：先安装 Skill，再让 AI 自动集成
 
@@ -18,7 +18,7 @@
 1. 安装 `react-native-update` Skill。
 2. 在 AI 工具中打开你的 React Native / Expo 项目根目录。
 3. 直接提出接入需求，让 AI 根据现有工程自动改造。
-4. 用 [安装配置](https://pushy.react-native.cn/docs/getting-started.md) 和 [代码集成](https://pushy.react-native.cn/docs/integration.md) 作为校对基线。
+4. 用 [安装配置](https://pushy.reactnative.cn/docs/getting-started.md) 和 [代码集成](https://pushy.reactnative.cn/docs/integration.md) 作为校对基线。
 
 ## 安装（推荐优先）
 
