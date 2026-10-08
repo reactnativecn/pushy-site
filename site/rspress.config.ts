@@ -1,9 +1,10 @@
+import * as fs from 'fs';
 import * as path from 'path';
 import { defineConfig } from '@rspress/core';
 import { pluginSass } from '@rsbuild/plugin-sass';
 import rspressPluginMermaid from 'rspress-plugin-mermaid';
 
-const SITE_ORIGIN = 'https://pushy.react-native.cn';
+const SITE_ORIGIN = 'https://pushy.reactnative.cn';
 const OG_IMAGE = `${SITE_ORIGIN}/images/og.jpg`;
 
 const SOFTWARE_JSON_LD = JSON.stringify({
@@ -24,6 +25,38 @@ const SOFTWARE_JSON_LD = JSON.stringify({
   ],
 });
 
+/** Markdown answer → plain text for structured data. */
+function plainText(markdown: string) {
+  return markdown
+    .replace(/^:::.*$/gm, '')
+    .replace(/^\|?\s*-+\s*(\|\s*-+\s*)*\|?$/gm, '')
+    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/[`*>|]/g, ' ')
+    .replace(/^\s*(?:-|\d+\.)\s+/gm, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// FAQPage JSON-LD built from the "#### question" sections of the FAQ page, so
+// AI search engines can quote a question's answer directly.
+const FAQ_JSON_LD = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: fs
+    .readFileSync(path.join(__dirname, 'pages/docs/faq.mdx'), 'utf8')
+    .split(/^#### /m)
+    .slice(1)
+    .map((section) => {
+      const [question, ...rest] = section.split('\n');
+      const answer = rest.join('\n').split(/^(?:---|###? )/m)[0];
+      return {
+        '@type': 'Question',
+        name: question.trim(),
+        acceptedAnswer: { '@type': 'Answer', text: plainText(answer) },
+      };
+    }),
+}).replace(/</g, '\\u003c');
+
 export default defineConfig({
   llms: true,
   outDir: 'out',
@@ -40,6 +73,7 @@ export default defineConfig({
     (route) => ['link', { rel: 'canonical', href: `${SITE_ORIGIN}${route.routePath}` }],
     (route) => ['meta', { property: 'og:url', content: `${SITE_ORIGIN}${route.routePath}` }],
     ['meta', { property: 'og:site_name', content: 'Pushy 极速热更新' }],
+    ['meta', { name: 'baidu-site-verification', content: 'codeva-p98rK0Dlkk' }],
     ['meta', { property: 'og:locale', content: 'zh_CN' }],
     ['meta', { property: 'og:image', content: OG_IMAGE }],
     ['meta', { property: 'og:image:width', content: '1200' }],
@@ -50,6 +84,10 @@ export default defineConfig({
     (route) =>
       route.routePath === '/'
         ? `<script type="application/ld+json">${SOFTWARE_JSON_LD}</script>`
+        : undefined,
+    (route) =>
+      route.routePath === '/docs/faq'
+        ? `<script type="application/ld+json">${FAQ_JSON_LD}</script>`
         : undefined,
   ],
   icon: '/images/logo.svg',

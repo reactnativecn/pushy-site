@@ -24,7 +24,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const SCHEMA_VERSION = 1;
-const BASE_URL = 'https://pushy.react-native.cn';
+const BASE_URL = 'https://pushy.reactnative.cn';
 const RESOURCE_SCHEME = 'pushy-docs';
 const SITE_ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DOCS_PAGES = path.join(SITE_ROOT, 'pages', 'docs');

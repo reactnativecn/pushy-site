@@ -16,4 +16,10 @@ Allow: /
 User-agent: PerplexityBot
 Allow: /
 
-Sitemap: https://pushy.react-native.cn/sitemap.xml
+User-agent: Bytespider
+Allow: /
+
+User-agent: ToutiaoSpider
+Allow: /
+
+Sitemap: https://pushy.reactnative.cn/sitemap.xml

@@ -15,7 +15,7 @@ import { readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const BASE_URL = 'https://pushy.react-native.cn';
+const BASE_URL = 'https://pushy.reactnative.cn';
 const SITE_ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PAGES = path.join(SITE_ROOT, 'pages');
 const OUT = path.join(SITE_ROOT, 'out', 'sitemap.xml');
