@@ -1,4 +1,4 @@
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
 
 # 数据分析
 
@@ -75,7 +75,7 @@
 [![按系统版本和运营商比较下载成功、下载失败、补丁失败、激活、回滚及相应比率](/images/analytics/failure-dimensions.webp)](/images/analytics/failure-dimensions.webp)
 继续往下可按**操作系统版本**和**运营商**对比成功、失败与回滚，判断异常是否集中在某类环境。运营商事件当前没有热更版本维度，筛选单个版本时该表会说明限制，不会展示未经筛选的数据来代替。
 
-需要进一步检查 JavaScript 异常时，可进入「健康度」中的 [JS 报错监控](/docs/errors.md)，查看聚合错误、运行环境和还原后的源码堆栈。
+需要进一步检查 JavaScript 异常时，可进入「健康度」中的 [JS 报错监控](https://pushy.react-native.cn/docs/errors.md)，查看聚合错误、运行环境和还原后的源码堆栈。
 
 ## 数据范围与排查顺序
 

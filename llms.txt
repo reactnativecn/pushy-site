@@ -4,21 +4,21 @@
 
 ## 文档
 
-- [产品简介](/docs/intro.md): Pushy (npm 包名: react-native-update <a href="https://www.npmjs.com/package/react-native-update"><img src="https://badge.fury.io/js/react-native-update.svg" alt="npm version" style={{display: 'inline', verticalAlign: 'middle', margin: '0 4px'}} /></a>) 是面向 React Native 应用提供的专业热更新服务，由 React Native 中文网独家研发并持续维护。我们致力于为全球 React Native 开发者提供最快速、最稳定、最经济的热更新体验。
-- [推荐：先安装 Skill，再让 AI 自动集成](/docs/skills.md)
-- [安装配置](/docs/getting-started.md)
-- [代码集成](/docs/integration.md)
-- [发布热更新](/docs/publish.md)
-- [API参考](/docs/api.md)
-- [原生主动检测与更新](/docs/native-api.md): Pushy 提供 Android、iOS 和 HarmonyOS 原生宿主接口，支持原生配置 → 正常解析启动 bundle → 主动检查和下载更新。配置和检查均不必经过 JS Bridge：即使首次安装、JS 尚未执行，也可以由原生端准备配置，之后运行原生更新流程。 configure 只配置，不联网、不下载、不解析 bundle；prepareBundle 则不是仅查询版本的接口，有可执行热更新时会继续下载、校验，并按配置决定是否设置为下次启动使用的版本。两个接口都不会弹窗或立即重载正在运行的 React Native 页面。
-- [API Key](/docs/api-token.md): API Key 是一种用于在 CI/CD 流程或自动化脚本中调用 Pushy API 的认证方式。相比直接使用账号密码，API Key 更加安全且便于管理。
-- [MCP 服务](/docs/mcp.md): 把 Pushy 接进你的 AI 客户端（Claude Desktop、IDE、自建 Agent 等），让它直接查你的发布状态，再结合 GitHub、Sentry、CI 一起排查问题。全程只读，不会改动任何发布数据。
-- [命令行工具](/docs/cli.md)
-- [数据分析](/docs/analytics.md): 从请求趋势、版本漏斗到流量画像与失败诊断，详细了解 Pushy 热更新的触达、生效和运行情况。
-- [JS 报错监控](/docs/errors.md)
-- [场景实践](/docs/bestpractice.md)
-- [常见问题](/docs/faq.md)
+- [产品简介](https://pushy.react-native.cn/docs/intro.md): Pushy（react-native-update）是专为 React Native 打造的热更新服务：bsdiff/hdiff 增量包通常仅几十 KB，国内外 CDN 分发，崩溃自动回滚，支持 iOS、Android、鸿蒙与新架构。
+- [推荐：先安装 Skill，再让 AI 自动集成](https://pushy.react-native.cn/docs/skills.md): 安装 react-native-update Skill，让支持 Skills 的 AI 编程工具根据项目结构自动完成 Pushy 热更新的依赖安装、原生配置与代码集成。
+- [安装配置](https://pushy.react-native.cn/docs/getting-started.md): 在 React Native 或 Expo 项目中安装 react-native-update 与命令行工具，完成 iOS、Android、鸿蒙的原生配置，为接入 Pushy 热更新做好准备。
+- [代码集成](https://pushy.react-native.cn/docs/integration.md): 在 React Native 应用中获取 appKey、初始化 Pushy 客户端并用 UpdateProvider 包裹应用，配置检查、下载和应用热更新的策略。
+- [发布热更新](https://pushy.react-native.cn/docs/publish.md): Pushy 热更新发布流程：上传 apk/aab/ipa 原生基准包、打包并发布热更新版本，以及灰度发布与强制启动（救砖）的使用方法。
+- [API参考](https://pushy.react-native.cn/docs/api.md): react-native-update JavaScript API 参考：Pushy 构造参数、检查更新策略、下载与切换版本、事件回调等接口说明。
+- [原生主动检测与更新](https://pushy.react-native.cn/docs/native-api.md): 在 Android、iOS、鸿蒙原生层调用 configure 与 prepareBundle，不经过 JS Bridge 主动配置、检查和下载 Pushy 热更新（需 v10.59.0+）。
+- [API Key](https://pushy.react-native.cn/docs/api-token.md): 创建和使用 Pushy API Key，在 GitHub Actions、GitLab CI、Jenkins 等 CI/CD 流程或自动化脚本中安全地发布热更新。
+- [MCP 服务](https://pushy.react-native.cn/docs/mcp.md): 通过 MCP 把 Pushy 接入 Claude、IDE 或自建 Agent，只读查询发布状态、灰度比例、版本健康度与 JS 报错，辅助排查热更新问题。
+- [命令行工具](https://pushy.react-native.cn/docs/cli.md): react-native-update-cli 命令行工具参考：bundle 打包、上传原生包、发布热更新版本、管理应用等 pushy 命令与参数说明。
+- [数据分析](https://pushy.react-native.cn/docs/analytics.md): 从请求趋势、版本漏斗到流量画像与失败诊断，详细了解 Pushy 热更新的触达、生效和运行情况。
+- [JS 报错监控](https://pushy.react-native.cn/docs/errors.md): Pushy 自动收集热更新版本中的 JavaScript 异常，按版本和指纹聚合，并用发布时归档的 sourcemap 将调用堆栈还原到源码行（需 v10.55.0+）。
+- [场景实践](https://pushy.react-native.cn/docs/bestpractice.md): React Native 热更新场景实践：优化 ipa、apk 原生包与 ppk 热更包体积，多渠道包热更、aab 支持、测试回滚与元信息的推荐做法。
+- [常见问题](https://pushy.react-native.cn/docs/faq.md): Pushy 热更新常见问题：能否上架 App Store、海外能否使用、哪些修改可以热更新、回滚原因排查，以及配额、付费与发票等问题解答。
 
 ## 价格
 
-- [价格](/pricing.md)
+- [价格](https://pushy.react-native.cn/pricing.md): Pushy 热更新价格方案：免费版即可上手，付费版按应用数、包数量与更新查询配额计费，年付约 6.7 折并赠送 AI Token。

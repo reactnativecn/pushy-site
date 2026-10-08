@@ -1,10 +1,10 @@
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
 
 # API参考
 
 ### JavaScript 方法
 
-原生端主动配置、检测与下载的接口和完整首启顺序，参见[原生配置、检测与更新](/docs/native-api.md)。原生主导配置时，请在 JS 实例首次创建时设置 `nativeConfigSource: "native"`，避免 JS 初始化覆盖原生配置。
+原生端主动配置、检测与下载的接口和完整首启顺序，参见[原生配置、检测与更新](https://pushy.react-native.cn/docs/native-api.md)。原生主导配置时，请在 JS 实例首次创建时设置 `nativeConfigSource: "native"`，避免 JS 初始化覆盖原生配置。
 
 #### new Pushy(options: PushyOptions)
 
@@ -211,11 +211,11 @@ pushyClient.captureException(error, {
 });
 ```
 
-如不希望上报，可在初始化时设置 `disableErrorReporting: true`。完整说明（包括后台界面、sourcemap 归档要求与手动上报用法）见 [JS 报错监控](/docs/errors.md)。
+如不希望上报，可在初始化时设置 `disableErrorReporting: true`。完整说明（包括后台界面、sourcemap 归档要求与手动上报用法）见 [JS 报错监控](https://pushy.react-native.cn/docs/errors.md)。
 
 #### 原生冷启动检测
 
-自 v10.52.1 起，客户端会在每次冷启动几秒后，由**原生代码**独立发起一次后台检查更新（完全不依赖 JS）。它的意义在于救砖：如果某次热更把 JS 打死，设备再也无法运行 JS 侧的检查逻辑，此时只有这条原生通道还能把修复版本拉回来（配合管理后台的[强制启动](/docs/publish.md#强制启动救砖)标记激活）。
+自 v10.52.1 起，客户端会在每次冷启动几秒后，由**原生代码**独立发起一次后台检查更新（完全不依赖 JS）。它的意义在于救砖：如果某次热更把 JS 打死，设备再也无法运行 JS 侧的检查逻辑，此时只有这条原生通道还能把修复版本拉回来（配合管理后台的[强制启动](https://pushy.react-native.cn/docs/publish.md#%E5%BC%BA%E5%88%B6%E5%90%AF%E5%8A%A8%E6%95%91%E7%A0%96)标记激活）。
 
 行为要点：
 
@@ -382,7 +382,7 @@ interface UpdateContext {
 
 触发更新检查，返回`updateInfo`（注意在 v10.26.0 版本之前，`checkUpdate`方法本身没有返回值，只能从`useUpdate()`返回的`updateInfo`中获取，且我们仍然推荐优先使用`useUpdate()`来获取），返回值有三种情形：
 
-1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），需要引导用户下载或跳转到应用市场(需要在网页管理端设置中填写`downloadUrl`)。如需在应用内执行 apk 更新，还需配置[安装权限与系统确认流程](/docs/api.md#async-function-downloadandinstallapkurl)。
+1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），需要引导用户下载或跳转到应用市场(需要在网页管理端设置中填写`downloadUrl`)。如需在应用内执行 apk 更新，还需配置[安装权限与系统确认流程](https://pushy.react-native.cn/docs/api.md#async-function-downloadandinstallapkurl)。
 
 ```js
 {
@@ -393,7 +393,7 @@ interface UpdateContext {
 
 2. `{upToDate: true}`：当前已经更新到最新，无需进行更新。
 
-3. `{update: true}`：当前有新版本可以更新。`name`、`description`字段可以用于展示给用户版本号，更新内容等信息，而`metaInfo`字段则可以根据你的需求自定义一些标记(如是否静默更新、是否强制更新等等，自己根据标记的属性做一些条件流程控制)，具体用法可参考[场景实践](/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了热更新文件的下载地址，
+3. `{update: true}`：当前有新版本可以更新。`name`、`description`字段可以用于展示给用户版本号，更新内容等信息，而`metaInfo`字段则可以根据你的需求自定义一些标记(如是否静默更新、是否强制更新等等，自己根据标记的属性做一些条件流程控制)，具体用法可参考[场景实践](https://pushy.react-native.cn/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了热更新文件的下载地址，
 
 ```js
 {
@@ -471,7 +471,7 @@ console.log(currentVersionInfo.name);
 
 手动上报一个 JavaScript 异常，需 v10.55.0+ 版本。`context` 可选 `fatal`（是否致命，默认 false）、`componentStack`（React 组件堆栈）与 `extra`（自定义上下文，仅接受字符串、数字、布尔与 null，最多 32 个字段）。
 
-调用是同步返回、永不抛错的：传输在后台进行，失败静默，同一个 error 对象只会上报一次。仅在运行于热更版本时上报，调试环境（`__DEV__`）下不上报。详见 [JS 报错监控](/docs/errors.md)。
+调用是同步返回、永不抛错的：传输在后台进行，失败静默，同一个 error 对象只会上报一次。仅在运行于热更版本时上报，调试环境（`__DEV__`）下不上报。详见 [JS 报错监控](https://pushy.react-native.cn/docs/errors.md)。
 
 ```js
 try {

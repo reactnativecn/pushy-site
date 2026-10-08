@@ -1,4 +1,4 @@
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
 
 # 常见问题
 
@@ -40,7 +40,7 @@
 
 可以正常更新，但是重启后回滚，一般有两种可能的情况：
 
-- 没有正确[配置 bundleUrl](/docs/getting-started.md#配置-bundle-url)
+- 没有正确[配置 bundleUrl](https://pushy.react-native.cn/docs/getting-started.md#%E9%85%8D%E7%BD%AE-bundle-url)
 - （仅有 v10 以下版本存在此可能性，v10 及更高版本不存在此情况）没有正确[调用 markSuccess](https://v9--pushy-site.netlify.app/docs/integration#%E9%A6%96%E6%AC%A1%E5%90%AF%E5%8A%A8%E5%9B%9E%E6%BB%9A)
 
 如果你确定上述两个步骤都正确无误，请在[issues 区](https://github.com/reactnativecn/react-native-update/issues)给我们留言反馈。
@@ -123,16 +123,16 @@
 3. 热更包数量及大小，不同应用分开计算。热更包指通过`pushy bundle`所命令生成的 ppk 文件。注意这不是用户实际下载的更新文件，用户下载的是通过比对生成的增量 diff 文件（比 ppk 文件要小得多）。
 4. 每日总热更查询次数，所有应用累加计算。每次用户打开应用时，会向服务器查询是否有新的热更新。这个查询次数会被计入每日总热更查询次数。当日超过限额次数后，接口将不再返回新的热更新信息，直到次日重置。
 
-> 这里有一些对[包大小的优化建议](/docs/bestpractice.md#优化原生和热更包体积)可供参考。
+> 这里有一些对[包大小的优化建议](https://pushy.react-native.cn/docs/bestpractice.md#%E4%BC%98%E5%8C%96%E5%8E%9F%E7%94%9F%E5%92%8C%E7%83%AD%E6%9B%B4%E5%8C%85%E4%BD%93%E7%A7%AF)可供参考。
 
-以上 2、3 条为账户下每个应用单独计算，第 4 条为账户下所有应用累加计算。具体配额和费用由于运营成本可能会有调整，请以[价格表](/pricing.md)页面为准。已购买的用户在续费前不受调整影响。
+以上 2、3 条为账户下每个应用单独计算，第 4 条为账户下所有应用累加计算。具体配额和费用由于运营成本可能会有调整，请以[价格表](https://pushy.react-native.cn/pricing.md)页面为准。已购买的用户在续费前不受调整影响。
 
 ***
 
 #### 达到配额后还可以正常使用吗？
 
 当应用、原生包、热更包数量达到配额限制后，您将无法执行相应的新增操作。但用户端仍可正常检查更新，下载已发布的更新。您可选择升级到更高配额，或是通过删除已不再使用的应用、原生包、热更包来使数量降低到配额以内，以便继续执行新增操作。\
-若原生包、热更包大小超过限额，则会导致上传失败。您可以选择升级到更高配额，或是想办法进行[精简优化](/docs/bestpractice.md#优化原生和热更包体积)。
+若原生包、热更包大小超过限额，则会导致上传失败。您可以选择升级到更高配额，或是想办法进行[精简优化](https://pushy.react-native.cn/docs/bestpractice.md#%E4%BC%98%E5%8C%96%E5%8E%9F%E7%94%9F%E5%92%8C%E7%83%AD%E6%9B%B4%E5%8C%85%E4%BD%93%E7%A7%AF)。
 若当日热更检查次数超过限额，则会导致接口返回空数据。您可以选择升级到更高配额，或是优化热更策略，减少用户端检查更新的频率。
 
 ***
@@ -164,7 +164,7 @@
 
 #### 可以使用银行转账付款吗？
 
-可以的。请对照[价格表](/pricing.md)，将对应版本的款项转账至：
+可以的。请对照[价格表](https://pushy.react-native.cn/pricing.md)，将对应版本的款项转账至：
 
 | 公司名称  | 武汉青罗网络科技有限公司     |
 | ----- | ---------------- |

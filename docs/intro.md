@@ -1,4 +1,4 @@
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
 
 # Pushy - 专业的热更新解决方案
 
@@ -15,7 +15,7 @@ Pushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-n
 ](https://github.com/reactnativecn/react-native-update)[Star](https://github.com/reactnativecn/react-native-update)
 
 :::tip 推荐接入方式
-如果你正在使用支持 Skills 的 AI 编程工具，推荐优先阅读 [安装与使用 Skill](/docs/skills.md)，先安装 `react-native-update` Skill，再让 AI 根据你的项目结构自动完成大部分接入改动。手动文档更适合混编项目、monorepo 或需要逐项校对的场景。
+如果你正在使用支持 Skills 的 AI 编程工具，推荐优先阅读 [安装与使用 Skill](https://pushy.react-native.cn/docs/skills.md)，先安装 `react-native-update` Skill，再让 AI 根据你的项目结构自动完成大部分接入改动。手动文档更适合混编项目、monorepo 或需要逐项校对的场景。
 :::
 
 ## 🚀 为什么选择 Pushy？
@@ -103,17 +103,17 @@ const pushyClient = new Pushy({ appKey });
 
 推荐按下面的顺序完成接入：
 
-1. **[安装与使用 Skill](/docs/skills.md)** - 推荐先让 AI 自动完成接入改造
-2. **[安装配置](/docs/getting-started.md)** - 补齐依赖与原生侧配置
-3. **[代码集成](/docs/integration.md)** - 校对或手动定制 `UpdateProvider` 接入
-4. **[发布更新](/docs/publish.md)** - 一条命令推送新版本
+1. **[安装与使用 Skill](https://pushy.react-native.cn/docs/skills.md)** - 推荐先让 AI 自动完成接入改造
+2. **[安装配置](https://pushy.react-native.cn/docs/getting-started.md)** - 补齐依赖与原生侧配置
+3. **[代码集成](https://pushy.react-native.cn/docs/integration.md)** - 校对或手动定制 `UpdateProvider` 接入
+4. **[发布更新](https://pushy.react-native.cn/docs/publish.md)** - 一条命令推送新版本
 
 :::info
-不确定是否适合你的项目？查看[常见问题](/docs/faq.md)或者可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。
+不确定是否适合你的项目？查看[常见问题](https://pushy.react-native.cn/docs/faq.md)或者可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。
 :::
 
 立即开始使用 Pushy，让你的 React Native 应用拥有极致的热更新体验！
 
 ## 发布之后，继续用数据判断
 
-在[数据分析](/docs/analytics.md)中查看请求趋势、版本漏斗、生效时延、网络与地区分布以及失败原因。让每次发布从下发到激活都有迹可循。
+在[数据分析](https://pushy.react-native.cn/docs/analytics.md)中查看请求趋势、版本漏斗、生效时延、网络与地区分布以及失败原因。让每次发布从下发到激活都有迹可循。

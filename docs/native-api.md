@@ -1,4 +1,4 @@
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
 
 # 原生配置、检测与更新
 
@@ -14,7 +14,7 @@ Pushy 提供 Android、iOS 和 HarmonyOS 原生宿主接口，支持**原生配�
 
 ## 首次启动的调用顺序
 
-应用仍需完成[安装配置](/docs/getting-started.md)和[代码集成](/docs/integration.md)，保留原来的 Pushy bundle 加载方式和版本成功标记、回滚接入。原生配置解决的是配置来源问题，不代替整个 RN 启动流程。
+应用仍需完成[安装配置](https://pushy.react-native.cn/docs/getting-started.md)和[代码集成](https://pushy.react-native.cn/docs/integration.md)，保留原来的 Pushy bundle 加载方式和版本成功标记、回滚接入。原生配置解决的是配置来源问题，不代替整个 RN 启动流程。
 
 1. 原生调用 `configure`，等待成功回调或 Promise 完成。此时不要求 JS 或 RN Bridge 已启动。
 2. 继续应用原有的 RN 启动流程，由 Android 的 `UpdateContext.getBundleUrl(...)`、iOS 的 `RCTPushy.bundleURL` 或 HarmonyOS 的实际 `PushyFileJSBundleProvider` 完成本次启动的 bundle 解析。

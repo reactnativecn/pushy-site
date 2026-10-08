@@ -1,4 +1,4 @@
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
 
 # 场景实践
 
@@ -57,13 +57,13 @@ $ npm run package:android:release
 自 v10.11.2 版本开始，可以使用以下两种快捷扫码方案来测试热更，而无需提前进行绑定：
 
 ![testqrcode](/static/image/testqrcode.24c22c1ebe.png)
-- 首先请添加测试用的 [DeepLink](/docs/getting-started.md#%E6%B7%BB%E5%8A%A0%E6%B5%8B%E8%AF%95%E7%94%A8%E7%9A%84-deep-link) 功能
+- 首先请添加测试用的 [DeepLink](https://pushy.react-native.cn/docs/getting-started.md#%E6%B7%BB%E5%8A%A0%E6%B5%8B%E8%AF%95%E7%94%A8%E7%9A%84-deep-link) 功能
 
-先参考上述链接在原生端添加启用测试用的 [DeepLink](/docs/getting-started.md#%E6%B7%BB%E5%8A%A0%E6%B5%8B%E8%AF%95%E7%94%A8%E7%9A%84-deep-link)，重新打包。JS 代码中无需任何改动，只需在上述界面中勾选“使用 Deep Link”，填入您应用的协议名，例如"pushy://"，然后使用系统相机或系统内置的扫一扫功能扫码（注意不能使用微信扫码），即可自动调起应用并触发更新。
+先参考上述链接在原生端添加启用测试用的 [DeepLink](https://pushy.react-native.cn/docs/getting-started.md#%E6%B7%BB%E5%8A%A0%E6%B5%8B%E8%AF%95%E7%94%A8%E7%9A%84-deep-link)，重新打包。JS 代码中无需任何改动，只需在上述界面中勾选“使用 Deep Link”，填入您应用的协议名，例如"pushy://"，然后使用系统相机或系统内置的扫一扫功能扫码（注意不能使用微信扫码），即可自动调起应用并触发更新。
 
 - 若应用自带扫码功能
 
-请参考 [parseTestQrCode](/docs/api.md#function-parsetestqrcodeqrcode-string) 方法的说明。
+请参考 [parseTestQrCode](https://pushy.react-native.cn/docs/api.md#function-parsetestqrcodeqrcode-string) 方法的说明。
 
 <details>
 <summary>若您的应用不具有上述两项功能，或 pushy 版本低于 v10.11.2，则可以参考如下测试方式（不推荐）</summary>

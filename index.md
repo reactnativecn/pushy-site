@@ -1,4 +1,6 @@
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
+
+
 
 [官方 Skill 已上线 · AI 一句话完成接入→](/docs/skills)HarmonyOS 已支持
 

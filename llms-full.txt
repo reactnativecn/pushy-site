@@ -1,8 +1,8 @@
 ---
-url: /docs/intro.md
+url: https://pushy.react-native.cn/docs/intro.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
 
 # Pushy - 专业的热更新解决方案
 
@@ -19,7 +19,7 @@ Pushy (npm 包名: [`react-native-update`](https://www.npmjs.com/package/react-n
 ](https://github.com/reactnativecn/react-native-update)[Star](https://github.com/reactnativecn/react-native-update)
 
 :::tip 推荐接入方式
-如果你正在使用支持 Skills 的 AI 编程工具，推荐优先阅读 [安装与使用 Skill](/docs/skills.md)，先安装 `react-native-update` Skill，再让 AI 根据你的项目结构自动完成大部分接入改动。手动文档更适合混编项目、monorepo 或需要逐项校对的场景。
+如果你正在使用支持 Skills 的 AI 编程工具，推荐优先阅读 [安装与使用 Skill](https://pushy.react-native.cn/docs/skills.md)，先安装 `react-native-update` Skill，再让 AI 根据你的项目结构自动完成大部分接入改动。手动文档更适合混编项目、monorepo 或需要逐项校对的场景。
 :::
 
 ## 🚀 为什么选择 Pushy？
@@ -107,28 +107,28 @@ const pushyClient = new Pushy({ appKey });
 
 推荐按下面的顺序完成接入：
 
-1. **[安装与使用 Skill](/docs/skills.md)** - 推荐先让 AI 自动完成接入改造
-2. **[安装配置](/docs/getting-started.md)** - 补齐依赖与原生侧配置
-3. **[代码集成](/docs/integration.md)** - 校对或手动定制 `UpdateProvider` 接入
-4. **[发布更新](/docs/publish.md)** - 一条命令推送新版本
+1. **[安装与使用 Skill](https://pushy.react-native.cn/docs/skills.md)** - 推荐先让 AI 自动完成接入改造
+2. **[安装配置](https://pushy.react-native.cn/docs/getting-started.md)** - 补齐依赖与原生侧配置
+3. **[代码集成](https://pushy.react-native.cn/docs/integration.md)** - 校对或手动定制 `UpdateProvider` 接入
+4. **[发布更新](https://pushy.react-native.cn/docs/publish.md)** - 一条命令推送新版本
 
 :::info
-不确定是否适合你的项目？查看[常见问题](/docs/faq.md)或者可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。
+不确定是否适合你的项目？查看[常见问题](https://pushy.react-native.cn/docs/faq.md)或者可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。
 :::
 
 立即开始使用 Pushy，让你的 React Native 应用拥有极致的热更新体验！
 
 ## 发布之后，继续用数据判断
 
-在[数据分析](/docs/analytics.md)中查看请求趋势、版本漏斗、生效时延、网络与地区分布以及失败原因。让每次发布从下发到激活都有迹可循。
+在[数据分析](https://pushy.react-native.cn/docs/analytics.md)中查看请求趋势、版本漏斗、生效时延、网络与地区分布以及失败原因。让每次发布从下发到激活都有迹可循。
 
 
 
 ---
-url: /docs/skills.md
+url: https://pushy.react-native.cn/docs/skills.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
 
 # 推荐：先安装 Skill，再让 AI 自动集成
 
@@ -148,7 +148,7 @@ url: /docs/skills.md
 1. 安装 `react-native-update` Skill。
 2. 在 AI 工具中打开你的 React Native / Expo 项目根目录。
 3. 直接提出接入需求，让 AI 根据现有工程自动改造。
-4. 用 [安装配置](/docs/getting-started.md) 和 [代码集成](/docs/integration.md) 作为校对基线。
+4. 用 [安装配置](https://pushy.react-native.cn/docs/getting-started.md) 和 [代码集成](https://pushy.react-native.cn/docs/integration.md) 作为校对基线。
 
 ## 安装（推荐优先）
 
@@ -209,10 +209,10 @@ npx skills update
 
 
 ---
-url: /docs/getting-started.md
+url: https://pushy.react-native.cn/docs/getting-started.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
 
 # 安装配置
 
@@ -226,7 +226,7 @@ url: /docs/getting-started.md
 我们假设你已经拥有了开发 React Native 应用的一切环境，包括`Node.js`、`Xcode`、`Android SDK`等等。
 
 :::tip 推荐优先使用 Skill 自动接入
-如果你正在使用支持 Skills 的 AI 编程工具，建议先完成 [安装与使用 Skill](/docs/skills.md)，再让 AI 根据当前工程自动执行依赖安装、原生配置检查与接入改造。本页保留手动步骤，适合定制工程、混编项目或作为 AI 产出校对清单。
+如果你正在使用支持 Skills 的 AI 编程工具，建议先完成 [安装与使用 Skill](https://pushy.react-native.cn/docs/skills.md)，再让 AI 根据当前工程自动执行依赖安装、原生配置检查与接入改造。本页保留手动步骤，适合定制工程、混编项目或作为 AI 产出校对清单。
 :::
 
 
@@ -417,7 +417,7 @@ class AppDelegate: RCTAppDelegate {
 ```
 
 #### Android
-在 MainApplication 中增加如下代码（如果是混编原生的项目或其他原因没有使用 ReactApplication，请[使用此 api 集成](/docs/api.md#updatecontextsetcustominstancemanagerreactinstancemanager-instancemanager))：
+在 MainApplication 中增加如下代码（如果是混编原生的项目或其他原因没有使用 ReactApplication，请[使用此 api 集成](https://pushy.react-native.cn/docs/api.md#updatecontextsetcustominstancemanagerreactinstancemanager-instancemanager))：
 
 **Kotlin（RN 0.82 或以上）**
 
@@ -797,15 +797,15 @@ Enter appId: <输入应用前面的编号>
 }
 ```
 你可以安全的把`update.json`上传到 Git 等 CVS 系统上，与你的团队共享这个文件，它不包含任何敏感信息。当然，他们在使用任何功能之前，都必须首先输入`pushy login`进行登录。
-至此应用的创建/选择就已经成功了。下一步，你需要给代码添加相应的功能，请参阅[代码集成](/docs/integration.md)。
+至此应用的创建/选择就已经成功了。下一步，你需要给代码添加相应的功能，请参阅[代码集成](https://pushy.react-native.cn/docs/integration.md)。
 
 
 
 ---
-url: /docs/integration.md
+url: https://pushy.react-native.cn/docs/integration.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
 
 # 代码集成
 
@@ -816,7 +816,7 @@ url: /docs/integration.md
 安装配置完成后，确定应用编译顺利通过，下面我们来进行代码集成。
 
 :::tip 推荐做法
-优先使用 [安装与使用 Skill](/docs/skills.md) 让 AI 自动完成 `UpdateProvider` 包裹、客户端初始化与常见策略配置。本页保留为手动接入参考，也适合用来校对 AI 生成的改动。
+优先使用 [安装与使用 Skill](https://pushy.react-native.cn/docs/skills.md) 让 AI 自动完成 `UpdateProvider` 包裹、客户端初始化与常见策略配置。本页保留为手动接入参考，也适合用来校对 AI 生成的改动。
 :::
 
 ### 获取 appKey
@@ -859,7 +859,7 @@ export default function Root() {
 }
 ```
 
-如没有特别的自定义需求，那么到此热更新已经可以开始正常运作（如需在应用内执行 apk 更新，还需配置[安装权限与系统确认流程](/docs/api.md#async-function-downloadandinstallapkurl)）。在默认的配置下，在 App 启动，以及从后台切换到前台时会触发更新检查，弹出提示的内容也固定。
+如没有特别的自定义需求，那么到此热更新已经可以开始正常运作（如需在应用内执行 apk 更新，还需配置[安装权限与系统确认流程](https://pushy.react-native.cn/docs/api.md#async-function-downloadandinstallapkurl)）。在默认的配置下，在 App 启动，以及从后台切换到前台时会触发更新检查，弹出提示的内容也固定。
 
 如需简单调整检查和更新策略，可参考以下内置的策略参数：
 
@@ -916,7 +916,7 @@ const pushyClient = new Pushy({
 });
 ```
 
-所有更新相关的数据可以通过一个单一的[`useUpdate()`](/docs/api.md#useupdate)hook 函数来获取，然后可以根据其提供的数据来自行渲染自定义的界面，如下面的例子：
+所有更新相关的数据可以通过一个单一的[`useUpdate()`](https://pushy.react-native.cn/docs/api.md#useupdate)hook 函数来获取，然后可以根据其提供的数据来自行渲染自定义的界面，如下面的例子：
 
 ```js
 import { Text, View, TouchableOpacity } from 'react-native';
@@ -996,7 +996,7 @@ function App() {
 }
 ```
 
-其中`checkUpdate`方法可以用来手动触发更新检查。虽然这个方法会返回[`updateInfo`](/docs/api.md#async-function-checkupdate)（仅限 v10.26.0+ 版本），但我们仍然推荐优先使用`useUpdate()`来获取`updateInfo`。
+其中`checkUpdate`方法可以用来手动触发更新检查。虽然这个方法会返回[`updateInfo`](https://pushy.react-native.cn/docs/api.md#async-function-checkupdate)（仅限 v10.26.0+ 版本），但我们仍然推荐优先使用`useUpdate()`来获取`updateInfo`。
 
 :::info
 依赖`useUpdate()`而不是`checkUpdate`来获取`updateInfo`，这样做虽然一开始可能觉得不太直观，但可以将**检查逻辑**和**更新逻辑**完全解耦，使更新流程上的各个组件不需要互相依赖和影响。
@@ -1006,11 +1006,11 @@ function App() {
 
 `updateInfo` 有三种情况：
 
-1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），开发者应该在 pushy 的管理后台添加一个更新下载链接，并自行提示用户下载。如需在应用内执行 apk 更新，还需配置[安装权限与系统确认流程](/docs/api.md#async-function-downloadandinstallapkurl)。
+1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），开发者应该在 pushy 的管理后台添加一个更新下载链接，并自行提示用户下载。如需在应用内执行 apk 更新，还需配置[安装权限与系统确认流程](https://pushy.react-native.cn/docs/api.md#async-function-downloadandinstallapkurl)。
 
 2. `{upToDate: true}`：当前已经更新到最新，无需进行更新。
 
-3. `{update: true}`：当前有新版本可以更新。info 的`name`、`description`字段可以用于提示用户，而`metaInfo`字段则可以根据你的需求自定义其它属性(如是否静默更新、是否强制更新等等)，具体用法可参考[场景实践](/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了补丁包的下载地址等。 pushy 会首先尝试耗费流量更少的更新方式。
+3. `{update: true}`：当前有新版本可以更新。info 的`name`、`description`字段可以用于提示用户，而`metaInfo`字段则可以根据你的需求自定义其它属性(如是否静默更新、是否强制更新等等)，具体用法可参考[场景实践](https://pushy.react-native.cn/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了补丁包的下载地址等。 pushy 会首先尝试耗费流量更少的更新方式。
 
 当返回的`updateInfo`中`update`字段为 true 时，即可调用`downloadUpdate`方法来下载更新，此时可以获取到下载的进度数据`progress`。下载完成后（注意!不可依赖`progress`来判断下载完成，必须要`await downloadUpdate()`之后）可以调用`switchVersion`来立即重启更新，也可以使用`switchVersionLater`来标记下次启动时更新。
 
@@ -1030,17 +1030,17 @@ const pushyClient = new Pushy({
 });
 ```
 
-以上提及的所有 api 的说明文档可在[这里](/docs/api.md)查看。还有一些其他常见的场景可以参考[场景实践](/docs/bestpractice.md)。
+以上提及的所有 api 的说明文档可在[这里](https://pushy.react-native.cn/docs/api.md)查看。还有一些其他常见的场景可以参考[场景实践](https://pushy.react-native.cn/docs/bestpractice.md)。
 
-现在，你的应用已经可以通过 pushy 服务检查版本并进行更新了。下一步，你可以开始尝试发布应用包和版本，请参阅[发布热更新](/docs/publish.md)。
+现在，你的应用已经可以通过 pushy 服务检查版本并进行更新了。下一步，你可以开始尝试发布应用包和版本，请参阅[发布热更新](https://pushy.react-native.cn/docs/publish.md)。
 
 
 
 ---
-url: /docs/publish.md
+url: https://pushy.react-native.cn/docs/publish.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
 
 # 发布热更新
 
@@ -1071,7 +1071,7 @@ flowchart TD
 
 流程总结如下：
 
-1. 我们需要先打包一个原生 release 版本，在打包前请确保已集成了`react-native-update`并在调试过程中运行正常，安卓端[关闭了`crunchPngs`设置](/docs/getting-started.md#%E7%A6%81%E7%94%A8-android-%E7%9A%84-crunch-%E4%BC%98%E5%8C%96)，打包说明可参考[iOS 打包](https://reactnative.cn/docs/publishing-to-app-store)和[android 打包](https://reactnative.cn/docs/signed-apk-android)。打包完成后请使用`pushy uploadIpa`、`pushy uploadApk`或`pushy uploadAab`命令来把这个安装包上传到 pushy 服务器端，以作为之后热更差量对比的基准。同时请保留好这个安装包，上架和分发给用户所使用的安装包`需要和服务器端完全一致`。建议使用 git tag 功能来标记原生版本号（例如`v1.0.0`）。
+1. 我们需要先打包一个原生 release 版本，在打包前请确保已集成了`react-native-update`并在调试过程中运行正常，安卓端[关闭了`crunchPngs`设置](https://pushy.react-native.cn/docs/getting-started.md#%E7%A6%81%E7%94%A8-android-%E7%9A%84-crunch-%E4%BC%98%E5%8C%96)，打包说明可参考[iOS 打包](https://reactnative.cn/docs/publishing-to-app-store)和[android 打包](https://reactnative.cn/docs/signed-apk-android)。打包完成后请使用`pushy uploadIpa`、`pushy uploadApk`或`pushy uploadAab`命令来把这个安装包上传到 pushy 服务器端，以作为之后热更差量对比的基准。同时请保留好这个安装包，上架和分发给用户所使用的安装包`需要和服务器端完全一致`。建议使用 git tag 功能来标记原生版本号（例如`v1.0.0`）。
 2. 然后在基准版本之上迭代业务逻辑（增删 js 代码，增删图片等静态资源），使用`pushy bundle`命令来生成和发布热更新版本，而不需要重新打包。建议使用 git tag 功能来标记热更版本号（例如`v1.0.1`）。
 3. 如果迭代过程中有原生方面的修改，则需要发布并上传新的原生基准版本（重复步骤 1，但需要设置不同的原生版本号）。可以只保留一个原生基准版本，也可以多版本同时维护。
 
@@ -1096,7 +1096,7 @@ $ pushy uploadIpa <ipa后缀文件>
 
 随后你可以选择往 AppStore 上传这个版本（可以重新 export 并调整相关选项，但请不要重新 archive），也可以先通过[Test flight](https://developer.apple.com/cn/testflight/)或[蒲公英](https://www.pgyer.com/doc/view/build_ipa)等渠道进行真机安装测试。请注意：暂不支持通过 Xcode 直接进行热更新测试。
 
-如果后续需要再次 archive 打包（例如修改原生代码或配置。如果只是修改 js 代码则不需要重新打包。），请先**更改版本号**，并在打包完成后再次`uploadIpa`到服务器端记录，否则后续生成的相同版本的原生包会由于[编译时间戳不一致而`无法获取热更新`](/docs/faq.md#热更新报错：热更新已暂停，原因：buildtime-mismatch。)。
+如果后续需要再次 archive 打包（例如修改原生代码或配置。如果只是修改 js 代码则不需要重新打包。），请先**更改版本号**，并在打包完成后再次`uploadIpa`到服务器端记录，否则后续生成的相同版本的原生包会由于[编译时间戳不一致而`无法获取热更新`](https://pushy.react-native.cn/docs/faq.md#%E7%83%AD%E6%9B%B4%E6%96%B0%E6%8A%A5%E9%94%99%EF%BC%9A%E7%83%AD%E6%9B%B4%E6%96%B0%E5%B7%B2%E6%9A%82%E5%81%9C%EF%BC%8C%E5%8E%9F%E5%9B%A0%EF%BC%9Abuildtime-mismatch%E3%80%82)。
 
 ### Android
 
@@ -1137,7 +1137,7 @@ $ pushy uploadAab android/app/build/outputs/bundle/release/app-release.aab
 
 随后你可以选择往应用市场发布这个版本，也可以先往设备上直接安装 apk 文件以进行测试。若同一个版本同时产出了 APK 与 AAB，请根据渠道要求分发对应格式：Google Play 通常使用 AAB，其他直装或第三方渠道通常使用 APK。
 
-如果后续需要再次打包（例如修改原生代码或配置。如果只是修改 js 代码则不需要重新打包。），请先**更改版本号**，并再次上传对应原生包到服务器端记录，否则后续生成的相同版本的原生包会由于[编译时间戳不一致而`无法获取热更新`](/docs/faq.md#热更新报错：热更新已暂停，原因：buildtime-mismatch。)。
+如果后续需要再次打包（例如修改原生代码或配置。如果只是修改 js 代码则不需要重新打包。），请先**更改版本号**，并再次上传对应原生包到服务器端记录，否则后续生成的相同版本的原生包会由于[编译时间戳不一致而`无法获取热更新`](https://pushy.react-native.cn/docs/faq.md#%E7%83%AD%E6%9B%B4%E6%96%B0%E6%8A%A5%E9%94%99%EF%BC%9A%E7%83%AD%E6%9B%B4%E6%96%B0%E5%B7%B2%E6%9A%82%E5%81%9C%EF%BC%8C%E5%8E%9F%E5%9B%A0%EF%BC%9Abuildtime-mismatch%E3%80%82)。
 
 ### Harmony
 
@@ -1153,7 +1153,7 @@ $ pushy uploadApp harmony/build/outputs/default/harmony-default-unsigned.app
 
 随后你可以选择往华为应用市场发布这个版本，也可以先往设备上通过命令`hdc shell`命令安装这个 app 文件以进行测试。
 
-如果后续需要再次打包（例如修改原生代码或配置。如果只是修改 js 代码则不需要重新打包。），请先**更改版本号**，并再次`uploadApp`到服务器端记录，否则后续生成的相同版本的原生包会由于[编译时间戳不一致而`无法获取热更新`](/docs/faq.md#热更新报错：热更新已暂停，原因：buildtime-mismatch。)。
+如果后续需要再次打包（例如修改原生代码或配置。如果只是修改 js 代码则不需要重新打包。），请先**更改版本号**，并再次`uploadApp`到服务器端记录，否则后续生成的相同版本的原生包会由于[编译时间戳不一致而`无法获取热更新`](https://pushy.react-native.cn/docs/faq.md#%E7%83%AD%E6%9B%B4%E6%96%B0%E6%8A%A5%E9%94%99%EF%BC%9A%E7%83%AD%E6%9B%B4%E6%96%B0%E5%B7%B2%E6%9A%82%E5%81%9C%EF%BC%8C%E5%8E%9F%E5%9B%A0%EF%BC%9Abuildtime-mismatch%E3%80%82)。
 
 ## 发布热更新版本
 
@@ -1243,7 +1243,7 @@ Would you like to bind packages to this version?(Y/N)
 
 #### 通过命令行操作
 
-请查看[命令行工具文档中的 rollout 参数](/docs/cli.md#pushy-update)
+请查看[命令行工具文档中的 rollout 参数](https://pushy.react-native.cn/docs/cli.md#pushy-update)
 
 ### 注意事项
 
@@ -1286,16 +1286,16 @@ Would you like to bind packages to this version?(Y/N)
 
 
 ---
-url: /docs/api.md
+url: https://pushy.react-native.cn/docs/api.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
 
 # API参考
 
 ### JavaScript 方法
 
-原生端主动配置、检测与下载的接口和完整首启顺序，参见[原生配置、检测与更新](/docs/native-api.md)。原生主导配置时，请在 JS 实例首次创建时设置 `nativeConfigSource: "native"`，避免 JS 初始化覆盖原生配置。
+原生端主动配置、检测与下载的接口和完整首启顺序，参见[原生配置、检测与更新](https://pushy.react-native.cn/docs/native-api.md)。原生主导配置时，请在 JS 实例首次创建时设置 `nativeConfigSource: "native"`，避免 JS 初始化覆盖原生配置。
 
 #### new Pushy(options: PushyOptions)
 
@@ -1502,11 +1502,11 @@ pushyClient.captureException(error, {
 });
 ```
 
-如不希望上报，可在初始化时设置 `disableErrorReporting: true`。完整说明（包括后台界面、sourcemap 归档要求与手动上报用法）见 [JS 报错监控](/docs/errors.md)。
+如不希望上报，可在初始化时设置 `disableErrorReporting: true`。完整说明（包括后台界面、sourcemap 归档要求与手动上报用法）见 [JS 报错监控](https://pushy.react-native.cn/docs/errors.md)。
 
 #### 原生冷启动检测
 
-自 v10.52.1 起，客户端会在每次冷启动几秒后，由**原生代码**独立发起一次后台检查更新（完全不依赖 JS）。它的意义在于救砖：如果某次热更把 JS 打死，设备再也无法运行 JS 侧的检查逻辑，此时只有这条原生通道还能把修复版本拉回来（配合管理后台的[强制启动](/docs/publish.md#强制启动救砖)标记激活）。
+自 v10.52.1 起，客户端会在每次冷启动几秒后，由**原生代码**独立发起一次后台检查更新（完全不依赖 JS）。它的意义在于救砖：如果某次热更把 JS 打死，设备再也无法运行 JS 侧的检查逻辑，此时只有这条原生通道还能把修复版本拉回来（配合管理后台的[强制启动](https://pushy.react-native.cn/docs/publish.md#%E5%BC%BA%E5%88%B6%E5%90%AF%E5%8A%A8%E6%95%91%E7%A0%96)标记激活）。
 
 行为要点：
 
@@ -1673,7 +1673,7 @@ interface UpdateContext {
 
 触发更新检查，返回`updateInfo`（注意在 v10.26.0 版本之前，`checkUpdate`方法本身没有返回值，只能从`useUpdate()`返回的`updateInfo`中获取，且我们仍然推荐优先使用`useUpdate()`来获取），返回值有三种情形：
 
-1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），需要引导用户下载或跳转到应用市场(需要在网页管理端设置中填写`downloadUrl`)。如需在应用内执行 apk 更新，还需配置[安装权限与系统确认流程](/docs/api.md#async-function-downloadandinstallapkurl)。
+1. `{expired: true}`：该应用原生包已过期（三种情况：1. 主动设置为过期状态，2. 主动删除，3. 从未上传），需要引导用户下载或跳转到应用市场(需要在网页管理端设置中填写`downloadUrl`)。如需在应用内执行 apk 更新，还需配置[安装权限与系统确认流程](https://pushy.react-native.cn/docs/api.md#async-function-downloadandinstallapkurl)。
 
 ```js
 {
@@ -1684,7 +1684,7 @@ interface UpdateContext {
 
 2. `{upToDate: true}`：当前已经更新到最新，无需进行更新。
 
-3. `{update: true}`：当前有新版本可以更新。`name`、`description`字段可以用于展示给用户版本号，更新内容等信息，而`metaInfo`字段则可以根据你的需求自定义一些标记(如是否静默更新、是否强制更新等等，自己根据标记的属性做一些条件流程控制)，具体用法可参考[场景实践](/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了热更新文件的下载地址，
+3. `{update: true}`：当前有新版本可以更新。`name`、`description`字段可以用于展示给用户版本号，更新内容等信息，而`metaInfo`字段则可以根据你的需求自定义一些标记(如是否静默更新、是否强制更新等等，自己根据标记的属性做一些条件流程控制)，具体用法可参考[场景实践](https://pushy.react-native.cn/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。另外还有几个字段，包含了热更新文件的下载地址，
 
 ```js
 {
@@ -1762,7 +1762,7 @@ console.log(currentVersionInfo.name);
 
 手动上报一个 JavaScript 异常，需 v10.55.0+ 版本。`context` 可选 `fatal`（是否致命，默认 false）、`componentStack`（React 组件堆栈）与 `extra`（自定义上下文，仅接受字符串、数字、布尔与 null，最多 32 个字段）。
 
-调用是同步返回、永不抛错的：传输在后台进行，失败静默，同一个 error 对象只会上报一次。仅在运行于热更版本时上报，调试环境（`__DEV__`）下不上报。详见 [JS 报错监控](/docs/errors.md)。
+调用是同步返回、永不抛错的：传输在后台进行，失败静默，同一个 error 对象只会上报一次。仅在运行于热更版本时上报，调试环境（`__DEV__`）下不上报。详见 [JS 报错监控](https://pushy.react-native.cn/docs/errors.md)。
 
 ```js
 try {
@@ -1895,10 +1895,10 @@ UpdateContext.setCustomInstanceManager(mReactInstanceManager);
 
 
 ---
-url: /docs/native-api.md
+url: https://pushy.react-native.cn/docs/native-api.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
 
 # 原生配置、检测与更新
 
@@ -1914,7 +1914,7 @@ Pushy 提供 Android、iOS 和 HarmonyOS 原生宿主接口，支持**原生配�
 
 ## 首次启动的调用顺序
 
-应用仍需完成[安装配置](/docs/getting-started.md)和[代码集成](/docs/integration.md)，保留原来的 Pushy bundle 加载方式和版本成功标记、回滚接入。原生配置解决的是配置来源问题，不代替整个 RN 启动流程。
+应用仍需完成[安装配置](https://pushy.react-native.cn/docs/getting-started.md)和[代码集成](https://pushy.react-native.cn/docs/integration.md)，保留原来的 Pushy bundle 加载方式和版本成功标记、回滚接入。原生配置解决的是配置来源问题，不代替整个 RN 启动流程。
 
 1. 原生调用 `configure`，等待成功回调或 Promise 完成。此时不要求 JS 或 RN Bridge 已启动。
 2. 继续应用原有的 RN 启动流程，由 Android 的 `UpdateContext.getBundleUrl(...)`、iOS 的 `RCTPushy.bundleURL` 或 HarmonyOS 的实际 `PushyFileJSBundleProvider` 完成本次启动的 bundle 解析。
@@ -2219,10 +2219,10 @@ Android/iOS 调试构建的检查返回 `skipped / debug`；JS 的 `debug: true`
 
 
 ---
-url: /docs/api-token.md
+url: https://pushy.react-native.cn/docs/api-token.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
 
 # API Key
 
@@ -2356,10 +2356,10 @@ API Key 撤销后立即生效，使用该 API Key 的所有请求将被拒绝。
 
 
 ---
-url: /docs/mcp.md
+url: https://pushy.react-native.cn/docs/mcp.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
 
 # MCP 服务
 
@@ -2457,15 +2457,15 @@ AI 会汇总这个版本的下发、下载失败、patch 失败、激活与回�
 
 ## 能查到什么
 
-| 能力    | 说明                                                                                                        |
-| ----- | --------------------------------------------------------------------------------------------------------- |
-| 应用列表  | 令牌授权范围内的应用                                                                                                |
-| 发布拓扑  | 每个原生包当前绑定的版本、灰度版本与灰度比例                                                                                    |
-| 更新判定  | 用一组客户端参数重放判定，给出结论与原因                                                                                      |
-| 产物状态  | 增量补丁是否生成、生成任务是否失败                                                                                         |
-| 请求观测  | 近期真实请求按原生包版本汇总：上报的编译时间戳 / 内容指纹、客户端 SDK 版本，并与已登记的原生包逐一对照                                                   |
-| 版本健康度 | 每个热更版本的下发方式，客户端上报的下载失败、patch 失败、激活与回滚次数，以及累计观测到的设备数（需 `pushy:health:read`，客户端 v10.47.0+）                  |
-| JS 报错 | 按指纹聚合的报错列表与详情，有归档 sourcemap 时把堆栈还原到源码位置（需 `pushy:health:read`，客户端 v10.55.0+，见 [JS 报错监控](/docs/errors.md)） |
+| 能力    | 说明                                                                                                                                     |
+| ----- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| 应用列表  | 令牌授权范围内的应用                                                                                                                             |
+| 发布拓扑  | 每个原生包当前绑定的版本、灰度版本与灰度比例                                                                                                                 |
+| 更新判定  | 用一组客户端参数重放判定，给出结论与原因                                                                                                                   |
+| 产物状态  | 增量补丁是否生成、生成任务是否失败                                                                                                                      |
+| 请求观测  | 近期真实请求按原生包版本汇总：上报的编译时间戳 / 内容指纹、客户端 SDK 版本，并与已登记的原生包逐一对照                                                                                |
+| 版本健康度 | 每个热更版本的下发方式，客户端上报的下载失败、patch 失败、激活与回滚次数，以及累计观测到的设备数（需 `pushy:health:read`，客户端 v10.47.0+）                                               |
+| JS 报错 | 按指纹聚合的报错列表与详情，有归档 sourcemap 时把堆栈还原到源码位置（需 `pushy:health:read`，客户端 v10.55.0+，见 [JS 报错监控](https://pushy.react-native.cn/docs/errors.md)） |
 
 ## 注意事项
 
@@ -2479,10 +2479,10 @@ AI 会汇总这个版本的下发、下载失败、patch 失败、激活与回�
 
 
 ---
-url: /docs/cli.md
+url: https://pushy.react-native.cn/docs/cli.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
 
 # 命令行工具
 
@@ -2513,7 +2513,7 @@ $ npm install -g react-native-update-cli
 
 - name: 指定热更新版本的名字(热更自身的版本号)
 - description: 指定热更新版本的描述信息，可以对用户进行展示
-- metaInfo: 指定热更新版本的元信息，可以用来保存一些额外信息，具体用法可参考[场景实践](/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。
+- metaInfo: 指定热更新版本的元信息，可以用来保存一些额外信息，具体用法可参考[场景实践](https://pushy.react-native.cn/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。
 
 从 v1.46.1 版本开始，在传入 `name`， `description`， `metaInfo` 参数的同时，可继续叠加以下参数（等同于在调用`pushy publish` 命令后，再连续调用 `pushy update` 命令）：
 
@@ -2734,7 +2734,7 @@ pushy extractApk android/app/build/outputs/bundle/release/app-release.aab --incl
 - platform: ios|android|harmony 对应的平台
 - name: 当前热更新版本的名字(版本号)
 - description: 当前热更新版本的描述信息，可以对用户进行展示
-- metaInfo: 当前热更新版本的元信息，可以用来保存一些额外信息，具体用法可参考[场景实践](/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。
+- metaInfo: 当前热更新版本的元信息，可以用来保存一些额外信息，具体用法可参考[场景实践](https://pushy.react-native.cn/docs/bestpractice.md#%E5%85%83%E4%BF%A1%E6%81%AFmeta-info%E7%9A%84%E4%BD%BF%E7%94%A8)。
 
 从 v1.46.1 版本开始，支持以下参数（等同于在 调用`pushy publish` 命令后，再连续调用 `pushy update` 命令）：
 
@@ -2804,10 +2804,10 @@ react-native-update: 10.28.11 （最新：10.28.11）
 
 
 ---
-url: /docs/analytics.md
+url: https://pushy.react-native.cn/docs/analytics.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
 
 # 数据分析
 
@@ -2884,7 +2884,7 @@ url: /docs/analytics.md
 [![按系统版本和运营商比较下载成功、下载失败、补丁失败、激活、回滚及相应比率](/images/analytics/failure-dimensions.webp)](/images/analytics/failure-dimensions.webp)
 继续往下可按**操作系统版本**和**运营商**对比成功、失败与回滚，判断异常是否集中在某类环境。运营商事件当前没有热更版本维度，筛选单个版本时该表会说明限制，不会展示未经筛选的数据来代替。
 
-需要进一步检查 JavaScript 异常时，可进入「健康度」中的 [JS 报错监控](/docs/errors.md)，查看聚合错误、运行环境和还原后的源码堆栈。
+需要进一步检查 JavaScript 异常时，可进入「健康度」中的 [JS 报错监控](https://pushy.react-native.cn/docs/errors.md)，查看聚合错误、运行环境和还原后的源码堆栈。
 
 ## 数据范围与排查顺序
 
@@ -2899,10 +2899,10 @@ url: /docs/analytics.md
 
 
 ---
-url: /docs/errors.md
+url: https://pushy.react-native.cn/docs/errors.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
 
 # JS 报错监控
 
@@ -2993,7 +2993,7 @@ const pushyClient = new Pushy({
 });
 ```
 
-关闭后管理后台将不再收到该客户端的 JS 报错。它与[版本健康度事件上报](/docs/api.md#版本健康度事件上报)的开关 `disableTelemetry` 相互独立：关闭 `disableTelemetry` 会同时停掉两者，只关 `disableErrorReporting` 则仅停掉 JS 报错。
+关闭后管理后台将不再收到该客户端的 JS 报错。它与[版本健康度事件上报](https://pushy.react-native.cn/docs/api.md#%E7%89%88%E6%9C%AC%E5%81%A5%E5%BA%B7%E5%BA%A6%E4%BA%8B%E4%BB%B6%E4%B8%8A%E6%8A%A5)的开关 `disableTelemetry` 相互独立：关闭 `disableTelemetry` 会同时停掉两者，只关 `disableErrorReporting` 则仅停掉 JS 报错。
 
 ## 常见情况
 
@@ -3008,10 +3008,10 @@ const pushyClient = new Pushy({
 
 
 ---
-url: /docs/bestpractice.md
+url: https://pushy.react-native.cn/docs/bestpractice.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
 
 # 场景实践
 
@@ -3070,13 +3070,13 @@ $ npm run package:android:release
 自 v10.11.2 版本开始，可以使用以下两种快捷扫码方案来测试热更，而无需提前进行绑定：
 
 ![testqrcode](/static/image/testqrcode.24c22c1ebe.png)
-- 首先请添加测试用的 [DeepLink](/docs/getting-started.md#%E6%B7%BB%E5%8A%A0%E6%B5%8B%E8%AF%95%E7%94%A8%E7%9A%84-deep-link) 功能
+- 首先请添加测试用的 [DeepLink](https://pushy.react-native.cn/docs/getting-started.md#%E6%B7%BB%E5%8A%A0%E6%B5%8B%E8%AF%95%E7%94%A8%E7%9A%84-deep-link) 功能
 
-先参考上述链接在原生端添加启用测试用的 [DeepLink](/docs/getting-started.md#%E6%B7%BB%E5%8A%A0%E6%B5%8B%E8%AF%95%E7%94%A8%E7%9A%84-deep-link)，重新打包。JS 代码中无需任何改动，只需在上述界面中勾选“使用 Deep Link”，填入您应用的协议名，例如"pushy://"，然后使用系统相机或系统内置的扫一扫功能扫码（注意不能使用微信扫码），即可自动调起应用并触发更新。
+先参考上述链接在原生端添加启用测试用的 [DeepLink](https://pushy.react-native.cn/docs/getting-started.md#%E6%B7%BB%E5%8A%A0%E6%B5%8B%E8%AF%95%E7%94%A8%E7%9A%84-deep-link)，重新打包。JS 代码中无需任何改动，只需在上述界面中勾选“使用 Deep Link”，填入您应用的协议名，例如"pushy://"，然后使用系统相机或系统内置的扫一扫功能扫码（注意不能使用微信扫码），即可自动调起应用并触发更新。
 
 - 若应用自带扫码功能
 
-请参考 [parseTestQrCode](/docs/api.md#function-parsetestqrcodeqrcode-string) 方法的说明。
+请参考 [parseTestQrCode](https://pushy.react-native.cn/docs/api.md#function-parsetestqrcodeqrcode-string) 方法的说明。
 
 <details>
 <summary>若您的应用不具有上述两项功能，或 pushy 版本低于 v10.11.2，则可以参考如下测试方式（不推荐）</summary>
@@ -3161,10 +3161,10 @@ if (metaInfo.silent) {
 
 
 ---
-url: /docs/faq.md
+url: https://pushy.react-native.cn/docs/faq.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
 
 # 常见问题
 
@@ -3206,7 +3206,7 @@ url: /docs/faq.md
 
 可以正常更新，但是重启后回滚，一般有两种可能的情况：
 
-- 没有正确[配置 bundleUrl](/docs/getting-started.md#配置-bundle-url)
+- 没有正确[配置 bundleUrl](https://pushy.react-native.cn/docs/getting-started.md#%E9%85%8D%E7%BD%AE-bundle-url)
 - （仅有 v10 以下版本存在此可能性，v10 及更高版本不存在此情况）没有正确[调用 markSuccess](https://v9--pushy-site.netlify.app/docs/integration#%E9%A6%96%E6%AC%A1%E5%90%AF%E5%8A%A8%E5%9B%9E%E6%BB%9A)
 
 如果你确定上述两个步骤都正确无误，请在[issues 区](https://github.com/reactnativecn/react-native-update/issues)给我们留言反馈。
@@ -3289,16 +3289,16 @@ url: /docs/faq.md
 3. 热更包数量及大小，不同应用分开计算。热更包指通过`pushy bundle`所命令生成的 ppk 文件。注意这不是用户实际下载的更新文件，用户下载的是通过比对生成的增量 diff 文件（比 ppk 文件要小得多）。
 4. 每日总热更查询次数，所有应用累加计算。每次用户打开应用时，会向服务器查询是否有新的热更新。这个查询次数会被计入每日总热更查询次数。当日超过限额次数后，接口将不再返回新的热更新信息，直到次日重置。
 
-> 这里有一些对[包大小的优化建议](/docs/bestpractice.md#优化原生和热更包体积)可供参考。
+> 这里有一些对[包大小的优化建议](https://pushy.react-native.cn/docs/bestpractice.md#%E4%BC%98%E5%8C%96%E5%8E%9F%E7%94%9F%E5%92%8C%E7%83%AD%E6%9B%B4%E5%8C%85%E4%BD%93%E7%A7%AF)可供参考。
 
-以上 2、3 条为账户下每个应用单独计算，第 4 条为账户下所有应用累加计算。具体配额和费用由于运营成本可能会有调整，请以[价格表](/pricing.md)页面为准。已购买的用户在续费前不受调整影响。
+以上 2、3 条为账户下每个应用单独计算，第 4 条为账户下所有应用累加计算。具体配额和费用由于运营成本可能会有调整，请以[价格表](https://pushy.react-native.cn/pricing.md)页面为准。已购买的用户在续费前不受调整影响。
 
 ***
 
 #### 达到配额后还可以正常使用吗？
 
 当应用、原生包、热更包数量达到配额限制后，您将无法执行相应的新增操作。但用户端仍可正常检查更新，下载已发布的更新。您可选择升级到更高配额，或是通过删除已不再使用的应用、原生包、热更包来使数量降低到配额以内，以便继续执行新增操作。\
-若原生包、热更包大小超过限额，则会导致上传失败。您可以选择升级到更高配额，或是想办法进行[精简优化](/docs/bestpractice.md#优化原生和热更包体积)。
+若原生包、热更包大小超过限额，则会导致上传失败。您可以选择升级到更高配额，或是想办法进行[精简优化](https://pushy.react-native.cn/docs/bestpractice.md#%E4%BC%98%E5%8C%96%E5%8E%9F%E7%94%9F%E5%92%8C%E7%83%AD%E6%9B%B4%E5%8C%85%E4%BD%93%E7%A7%AF)。
 若当日热更检查次数超过限额，则会导致接口返回空数据。您可以选择升级到更高配额，或是优化热更策略，减少用户端检查更新的频率。
 
 ***
@@ -3330,7 +3330,7 @@ url: /docs/faq.md
 
 #### 可以使用银行转账付款吗？
 
-可以的。请对照[价格表](/pricing.md)，将对应版本的款项转账至：
+可以的。请对照[价格表](https://pushy.react-native.cn/pricing.md)，将对应版本的款项转账至：
 
 | 公司名称  | 武汉青罗网络科技有限公司     |
 | ----- | ---------------- |
@@ -3372,10 +3372,12 @@ url: /docs/faq.md
 
 
 ---
-url: /pricing.md
+url: https://pushy.react-native.cn/pricing.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
+
+
 
 ## 公平透明的价格体系
 
@@ -3561,10 +3563,12 @@ React Native 中文网 © 2026 武汉青罗网络科技有限公司
 
 
 ---
-url: /index.md
+url: https://pushy.react-native.cn/index.md
 ---
 
-> For AI agents: the complete documentation index is available at /llms.txt, the full documentation bundle is available at /llms-full.txt.
+> For AI agents: the complete documentation index is available at https://pushy.react-native.cn/llms.txt, the full documentation bundle is available at https://pushy.react-native.cn/llms-full.txt.
+
+
 
 [官方 Skill 已上线 · AI 一句话完成接入→](/docs/skills)HarmonyOS 已支持
 
