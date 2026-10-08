@@ -1,6 +1,7 @@
 ---
 order: 13
 title: 场景实践
+description: React Native 热更新场景实践：优化 ipa、apk 原生包与 ppk 热更包体积，多渠道包热更、aab 支持、测试回滚与元信息的推荐做法。
 type: 开发指南
 ---
 
@@ -61,9 +62,9 @@ $ npm run package:android:release
 
 ![testqrcode](./assets/testqrcode.png)
 
-- 首先请添加测试用的 [DeepLink](/docs/getting-started.html#%E6%B7%BB%E5%8A%A0%E6%B5%8B%E8%AF%95%E7%94%A8%E7%9A%84-deep-link) 功能
+- 首先请添加测试用的 [DeepLink](/docs/getting-started#%E6%B7%BB%E5%8A%A0%E6%B5%8B%E8%AF%95%E7%94%A8%E7%9A%84-deep-link) 功能
 
-先参考上述链接在原生端添加启用测试用的 [DeepLink](/docs/getting-started.html#%E6%B7%BB%E5%8A%A0%E6%B5%8B%E8%AF%95%E7%94%A8%E7%9A%84-deep-link)，重新打包。JS 代码中无需任何改动，只需在上述界面中勾选“使用 Deep Link”，填入您应用的协议名，例如"pushy://"，然后使用系统相机或系统内置的扫一扫功能扫码（注意不能使用微信扫码），即可自动调起应用并触发更新。
+先参考上述链接在原生端添加启用测试用的 [DeepLink](/docs/getting-started#%E6%B7%BB%E5%8A%A0%E6%B5%8B%E8%AF%95%E7%94%A8%E7%9A%84-deep-link)，重新打包。JS 代码中无需任何改动，只需在上述界面中勾选“使用 Deep Link”，填入您应用的协议名，例如"pushy://"，然后使用系统相机或系统内置的扫一扫功能扫码（注意不能使用微信扫码），即可自动调起应用并触发更新。
 
 - 若应用自带扫码功能
 

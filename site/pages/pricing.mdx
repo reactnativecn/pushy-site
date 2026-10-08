@@ -1,10 +1,20 @@
 ---
 pageType: custom
+head:
+  - - meta
+    - property: og:title
+      content: 价格 - Pushy 极速热更新
 title: 价格
+description: Pushy 热更新价格方案：免费版即可上手，付费版按应用数、包数量与更新查询配额计费，年付约 6.7 折并赠送 AI Token。
 ---
 
+import { Head } from "@rspress/core/runtime";
 import Pricing from "../components/pricing";
 import Footer from "../components/Footer";
+
+<Head>
+  <title>价格 - Pushy 极速热更新</title>
+</Head>
 
 <Pricing />
 <Footer />

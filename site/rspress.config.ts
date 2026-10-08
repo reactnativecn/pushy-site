@@ -3,13 +3,55 @@ import { defineConfig } from '@rspress/core';
 import { pluginSass } from '@rsbuild/plugin-sass';
 import rspressPluginMermaid from 'rspress-plugin-mermaid';
 
+const SITE_ORIGIN = 'https://pushy.react-native.cn';
+const OG_IMAGE = `${SITE_ORIGIN}/images/og.jpg`;
+
+const SOFTWARE_JSON_LD = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Pushy',
+  alternateName: ['Pushy 极速热更新', 'react-native-update'],
+  url: `${SITE_ORIGIN}/`,
+  image: OG_IMAGE,
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'iOS, Android, HarmonyOS',
+  description:
+    '为 React Native 打造的热更新服务：KB 级增量包、CDN 秒级分发、崩溃自动回滚，无需等待应用商店审核。',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'CNY' },
+  sameAs: [
+    'https://github.com/reactnativecn/react-native-update',
+    'https://www.npmjs.com/package/react-native-update',
+  ],
+});
+
 export default defineConfig({
   llms: true,
   outDir: 'out',
+  lang: 'zh-CN',
+  siteOrigin: SITE_ORIGIN,
+  // Clean URLs match the canonical links and sitemap; GitHub Pages serves
+  // /docs/intro from docs/intro.html.
+  route: { cleanUrls: true },
   root: path.join(__dirname, 'pages'),
   title: 'Pushy 极速热更新',
   description:
     'Pushy —— 为 React Native 打造的热更新服务。KB 级增量包、CDN 秒级分发、崩溃自动回滚，让每一次发布秒级抵达用户，无需等待应用商店审核。',
+  head: [
+    (route) => ['link', { rel: 'canonical', href: `${SITE_ORIGIN}${route.routePath}` }],
+    (route) => ['meta', { property: 'og:url', content: `${SITE_ORIGIN}${route.routePath}` }],
+    ['meta', { property: 'og:site_name', content: 'Pushy 极速热更新' }],
+    ['meta', { property: 'og:locale', content: 'zh_CN' }],
+    ['meta', { property: 'og:image', content: OG_IMAGE }],
+    ['meta', { property: 'og:image:width', content: '1200' }],
+    ['meta', { property: 'og:image:height', content: '630' }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'twitter:image', content: OG_IMAGE }],
+    ['meta', { name: 'keywords', content: 'React Native 热更新,RN 热更新,react-native-update,CodePush 替代,Expo 热更新,鸿蒙热更新,增量更新,免审核' }],
+    (route) =>
+      route.routePath === '/'
+        ? `<script type="application/ld+json">${SOFTWARE_JSON_LD}</script>`
+        : undefined,
+  ],
   icon: '/images/logo.svg',
   logo: {
     light: '/images/logo.svg',
@@ -113,13 +155,6 @@ export default defineConfig({
           attrs: {
             src: '/register-pwa.js',
             defer: true,
-          },
-        },
-        {
-          tag: 'meta',
-          attrs: {
-            property: 'og:keywords',
-            content: '热更新,hotupdate,免审核,快速上架',
           },
         },
       ],

@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "rspress dev",
-    "build": "rspress build && node scripts/build-mcp-docs-index.mjs",
+    "build": "rspress build && node scripts/build-mcp-docs-index.mjs && node scripts/build-sitemap.mjs",
     "preview": "rspress preview",
     "start": "rspress preview"
   },

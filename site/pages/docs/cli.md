@@ -1,6 +1,7 @@
 ---
 order: 12
 title: 命令行工具
+description: react-native-update-cli 命令行工具参考：bundle 打包、上传原生包、发布热更新版本、管理应用等 pushy 命令与参数说明。
 type: 开发指南
 ---
 
