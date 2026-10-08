@@ -74,6 +74,7 @@ export default defineConfig({
     (route) => ['meta', { property: 'og:url', content: `${SITE_ORIGIN}${route.routePath}` }],
     ['meta', { property: 'og:site_name', content: 'Pushy 极速热更新' }],
     ['meta', { name: 'baidu-site-verification', content: 'codeva-p98rK0Dlkk' }],
+    ['meta', { name: 'bytedance-verification-code', content: 'kLRVeDPrCWsZBJFx44/x' }],
     ['meta', { property: 'og:locale', content: 'zh_CN' }],
     ['meta', { property: 'og:image', content: OG_IMAGE }],
     ['meta', { property: 'og:image:width', content: '1200' }],
