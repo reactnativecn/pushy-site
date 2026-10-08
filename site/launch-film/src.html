@@ -175,7 +175,7 @@ html.compact #ctl span{display:none}
       </div>
     </div>
     <div id="s5badge" class="el" style="position:absolute;right:170px;top:170px;padding:22px 36px;border-radius:24px;background:linear-gradient(135deg,#4483ed,#7b5cff);font-size:48px;font-weight:800;box-shadow:0 20px 60px rgba(68,131,237,.5)">比全量小 559×</div>
-    <div id="s5foot" class="el" style="position:absolute;left:0;right:0;bottom:70px;text-align:center;font-size:22px;color:#5d6578;font-family:var(--mono)">实测 · RN 0.86 release 包 · Hermes 字节码 ~4.4 MB · 单行文案修改</div>
+    <div id="s5foot" class="el" style="position:absolute;left:0;right:0;bottom:70px;text-align:center;font-size:22px;color:#5d6578;font-family:var(--mono)">实测 · RN 0.86 release 包 · Hermes 字节码 ~3.5 MB · 单行文案修改</div>
   </div>
 
   <!-- S6: Hermes -->
@@ -502,14 +502,14 @@ function seek(t) {
     const out = eIn(prog(t, 27.4, 27.9));
     style($('s5top'), topIn * (1 - out), 0, (1 - topIn) * 40 + mv * -40, lerp(1, .62, mv), (1 - topIn) * 16 + out * 14);
     $('s5bars').style.marginTop = lerp(-420, 0, mv) + 'px';
-    const n = lerp(1901.5, 3.4, eExpo(prog(t, 20.9, 22.6)));
+    const n = lerp(1544.6, 3.4, eExpo(prog(t, 20.9, 22.6)));
     $('s5num').textContent = n.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
     $('s5num').style.color = t > 22.4 ? '#fff' : '#fff';
     $('s5lbl').textContent = t < 22.3 ? '改一行代码，用户需要下载' : '改一行代码，用户只需下载';
     style($('s5bars'), eOut(prog(t, 23.4, 23.9)) * (1 - out), 0, 0, 1, 0);
-    [[1, 1901.5, 23.6], [2, 93.7, 24.0], [3, 3.4, 24.4]].forEach(([i, v, a]) => {
+    [[1, 1544.6, 23.6], [2, 93.7, 24.0], [3, 3.4, 24.4]].forEach(([i, v, a]) => {
       show($('s5r' + i), t, a, 1e9, { dy: 20, dur: .5 });
-      const w = eOut(prog(t, a + .1, a + 1.1)) * Math.max(v / 1901.5 * 100, .6);
+      const w = eOut(prog(t, a + .1, a + 1.1)) * Math.max(v / 1544.6 * 100, .6);
       $('s5f' + i).style.width = w + '%';
     });
     const bk = prog(t, 25.4, 25.9);

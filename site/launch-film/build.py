@@ -71,8 +71,8 @@ EN = [
     ('全量 OTA（gzip）', 'Full OTA (gzip)'),
     ('通用 bsdiff', 'Generic bsdiff'),
     ('比全量小 559×', '559× smaller'),
-    ('实测 · RN 0.86 release 包 · Hermes 字节码 ~4.4 MB · 单行文案修改',
-     'Measured · RN 0.86 release build · Hermes bytecode ~4.4 MB · one-line text change'),
+    ('实测 · RN 0.86 release 包 · Hermes 字节码 ~3.5 MB · 单行文案修改',
+     'Measured · RN 0.86 release build · Hermes bytecode ~3.5 MB · one-line text change'),
     # S6
     ('03 — 为 Hermes 而生', '03 — Built for Hermes'),
     ('改一行，只动<span class="grad">真正变化的字节</span>。', 'Ship <span class="grad">only the bytes that changed</span>.'),
