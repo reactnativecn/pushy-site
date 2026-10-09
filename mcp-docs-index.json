@@ -3,7 +3,7 @@
   "product": "Pushy",
   "baseUrl": "https://pushy.reactnative.cn",
   "resourceScheme": "pushy-docs",
-  "sourceCommit": "8958ad5fcc64ffe3ffda4bf4f8497c19378794db",
+  "sourceCommit": "69b9e622fbb627e786f2d317923fe993e2a98eca",
   "documents": [
     {
       "slug": "analytics",
@@ -687,7 +687,7 @@
       "path": "pages/docs/faq.mdx",
       "url": "https://pushy.reactnative.cn/docs/faq",
       "resourceUri": "pushy-docs://docs/faq",
-      "content": "# 常见问题\n\n如果本页面没能回答您的疑问，您可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。\n\n### 关于 Pushy\n\n#### Pushy 是什么？\n\nPushy（npm 包名 `react-native-update`）是专为 React Native 应用打造的热更新服务，由 React Native 中文网自 2016 年起运营。修改 JS 代码或图片等资源后，用一条命令即可把更新下发到用户手机，无需重新提交应用商店审核。下发的是 bsdiff/hdiff 增量包，通常只有几十 KB；国内走阿里云 CDN、海外走 Cloudflare；新版本启动崩溃会自动回滚。详见[产品简介](https://pushy.reactnative.cn/docs/intro.md)。\n\n***\n\n#### React Native 有哪些热更新方案？Pushy 和 CodePush、Expo Updates 有什么区别？\n\n常见方案有三类：Microsoft CodePush（App Center）、Expo 官方的 EAS Update（`expo-updates`），以及 Pushy 这类第三方热更新服务。主要区别：\n\n- **CodePush**：已于 2025 年 3 月 31 日随 App Center 停止服务，现有用户需要迁移。\n- **EAS Update**：以下发全量 JS 包为主，体积通常为 MB 级；服务器在海外，国内访问较慢，不支持鸿蒙，超出额度的流量另行计费。\n- **Pushy**：下发增量包（通常几十 KB，针对 Hermes 字节码优化后一行改动可小至 3.4 KB），国内外均有 CDN 节点且流量不单独计费，第一方支持 iOS、Android 和鸿蒙，同时兼容 Expo 项目。\n\n详细对比见[产品简介中的性价比对比](https://pushy.reactnative.cn/docs/intro.md#-%E6%80%A7%E4%BB%B7%E6%AF%94%E4%B9%8B%E9%80%89)。\n\n***\n\n#### CodePush 停服了，用什么替代？如何迁移到 Pushy？\n\nMicrosoft App Center（含 CodePush）已于 2025 年 3 月 31 日停止服务，可以改用 Pushy。迁移步骤：\n\n1. 从项目中移除 `react-native-code-push` 及其原生配置；\n2. 按[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)安装 `react-native-update`，并完成 iOS、Android（及鸿蒙）的原生配置；\n3. 按[代码集成](https://pushy.reactnative.cn/docs/integration.md)用 `UpdateProvider` 包裹根组件；\n4. 重新打包原生包并上传到 Pushy，之后即可按[发布流程](https://pushy.reactnative.cn/docs/publish.md)发布热更新。\n\n如果使用支持 Skills 的 AI 编程工具，可以先[安装 react-native-update Skill](https://pushy.reactnative.cn/docs/skills.md)，让 AI 自动完成大部分改动。\n\n***\n\n#### Pushy 支持 Expo、鸿蒙和 React Native 新架构吗？\n\n都支持。\n\n- **Expo**：要求 Expo 50 或更高版本，通过 `npx expo prebuild` 预构建后接入；请勿同时安装 `expo-updates`。使用新架构时建议 Expo 51 及以上。\n- **鸿蒙（HarmonyOS）**：第一方支持，原生配置见[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)中的 Harmony 部分。\n- **新架构与 Hermes**：均已支持，并针对 Hermes 字节码做了专门的增量优化。\n\n***\n\n#### Pushy 免费吗？\n\n有免费版：可创建 3 个应用，每个应用可上传 30 个原生包和 30 个热更包，所有应用每天累计 1000 次更新检查，CDN 流量不额外收费。付费版从标准版 960 元/年起，新用户注册验证后自动获得 7 天专业版试用。具体配额以[价格页](https://pushy.reactnative.cn/pricing.md)为准。\n\n***\n\n#### Pushy 是开源的吗？\n\n是的。Pushy 的客户端 SDK、命令行工具和管理界面代码都在 [GitHub](https://github.com/reactnativecn) 上开源，接受社区审计。\n\n***\n\n### 业务问题\n\n#### 热更新会被苹果拒审吗？能否上架 App Store？\n\n通常不会，可以正常上架。大量实践表明，接入热更新的应用能够顺利上架 App Store 和国内各大应用市场。唯一需要注意的是：在审核期间不要发布热更新，不要让审核人员看到更新相关的提示和弹窗。\n\n***\n\n#### 是否可以在海外使用？\n\n可以。Pushy 本身在国内外都部署有可用的 CDN 节点，能够满足大多数出海应用的热更新分发要求。\n\n如果您的项目对海外合规、数据存放位置、运营主体隔离等方面还有额外要求，则可以考虑使用由不同公司实体独立运营的全球服务 [Cresc](https://cresc.dev/)。\n\n***\n\n#### 哪些修改可以热更新？哪些不能？\n\n我们把对应用的修改分为两类：\n\n- 不可热更新 —— 原生修改，即所有需要`编译`后才能生效的修改：\n  - 任何在 iOS 或者 Android 目录中的修改、增删。\n  - 任何含有原生代码的第三方组件的更新、修改。\n- 可以热更新 —— 非原生修改，即所有`无需编译`，刷新即可生效的修改：\n\n  - js 代码修改，包括第三方纯 js 组件的更新、修改。\n  - 可以在 js 代码中 require/import 的资源文件，例如图片。\n\n需要注意的是，即便资源文件可以热更新，但这些热更新后的资源文件会以`file://`协议的形式提供访问，某些读取资源文件的第三方可能并不支持`file://`协议。\n\n***\n\n#### 热更新成功完成，但是重启后又回滚了是怎么回事？\n\n可以正常更新，但是重启后回滚，一般有两种可能的情况：\n\n- 没有正确[配置 bundleUrl](https://pushy.reactnative.cn/docs/getting-started.md#%E9%85%8D%E7%BD%AE-bundle-url)\n- （仅有 v10 以下版本存在此可能性，v10 及更高版本不存在此情况）没有正确[调用 markSuccess](https://v9--pushy-site.netlify.app/docs/integration#%E9%A6%96%E6%AC%A1%E5%90%AF%E5%8A%A8%E5%9B%9E%E6%BB%9A)\n\n如果你确定上述两个步骤都正确无误，请在[issues 区](https://github.com/reactnativecn/react-native-update/issues)给我们留言反馈。\n\n***\n\n#### 热更新报错：“热更新已暂停，原因：编译时间戳与服务器记录不一致。”\n\n当您每次编译产生一个原生包时，其中都会记录一个编译时间戳`buildTime`(可以使用`pushy parseIpa a.ipa`或是`pushy parseApk a.apk`命令来查看)。如果您需要把这个包发给客户并希望使用热更新功能，那么就需要使用 upload 命令来上传到我们的服务器，而服务器端会记录这个包的版本号和编译时间戳以便后续比对记录。\n\n举例来说，假如我已经上传了一个 1.0 版本原生包（`1A包`），但后来由于种种原因我又重新打包了（`1B包`）但没有上传，这两个包有相同的版本号，但会有不同的编译时间戳。此时有几种可能的情况：\n\n1. 我忘记上传过`1A包`，`1B包`没有实质更改且还没有客户安装。此时应当放弃`1B包`，只让客户下载安装`1A包`。\n2. 我忘记上传过`1A包`，又生成了`1B包`且已有客户安装。此时`1A包`客户可以获取热更新，`1B包`客户无法获取热更新。要使两批客户都能获取热更新，要么想办法通知`1B包`客户装回`1A包`，要么重新发布一个`高于1.0`版本的原生包且上传到 pushy 服务器，并删除`1.0`版本的记录，此时`1A包`和`1B包`的客户都会收到版本过期需要下载新版本的通知。\n3. 我知道上传过`1A包`，但我有原生方面的修改需要打了一个新的`1B包`。此时若将`1B包`上传到 pushy 服务器会提示版本验证错误，因为已经存在有相同的`1.0`版本。所以需要首先更改原生版本号再次打包，并`首先`将此新版本上传到服务器，`然后`分发给客户。这样`1.0版本`和`新版本`可以并存且都可以获得热更新。\n\n请谨记，任何时候生成原生包，请 1)先修改原生版本号，2)并上传到 pushy 服务器，才可以正常获得热更新。\n\n:::info\n如果您是`高级版`、`专业版`或`大客户VIP版`客户，也可以考虑在管理后台的应用设置中启用`忽略编译时间戳`。此选项仅对比版本号，不校验时间戳，可提供更宽容的热更策略，但可能消耗更多流量，适合需要管理多个分发渠道的客户。\n:::\n\n***\n\n#### 后台已经显示了原生包的「内容指纹」，为什么还是提示编译时间戳不匹配？\n\n服务端记录的每个原生包有两个身份信息：\n\n- **编译时间戳（buildTime）**：打包时写入二进制，`pushy uploadApk` / `uploadIpa` / `uploadApp` 上传时记录。\n- **内容指纹（bundleHash）**：上传原生包时，CLI（`react-native-update-cli` ≥ 2.8.5）从包内提取内嵌的 JS bundle 计算出的 sha256。它描述的是「这个包里的 JS 是哪一份」，与 App 内集成的 SDK 版本无关。\n\n检查更新时，服务端只有在**两边都有指纹**时才用指纹代替时间戳做判定：\n\n1. 服务端记录的原生包带有内容指纹（用 ≥ 2.8.5 的 CLI 上传）；\n2. 客户端在请求中上报了 bundleHash——App 内集成的 `react-native-update` **≥ 10.49.0** 才会上报。\n\n两者缺一，就退回编译时间戳的严格比对。所以「后台有指纹却仍提示时间戳不匹配」几乎总是因为 App 里打包的 SDK 低于 10.49.0：指纹是 CLI 算出来的，旧版 SDK 并不知道它的存在。把 SDK 升级到 10.49.0 以上并重新打包发布后，同一份 JS 的重复打包会按指纹放行，不再被时间戳拦截。\n\n排查方法：在管理后台的「实时数据」里，或用 MCP 的 `pushy.check_update.observed` 工具，查看该应用近期请求是记录在 `packageVersion_buildTime`（未上报指纹）还是 `packageVersion_bundleHash`（已上报指纹）维度下，并对照客户端 SDK 版本分布。`pushy.check_update.diagnose` 在判定被拦截时也会给出 `BUNDLE_HASH_NOT_REPORTED` 提示。\n\n***\n\n### 付费问题\n\n#### 我应该选择哪个业务版本呢？\n\n其实完全无需考虑，先从最高配额的`专业版`开始体验（新用户注册验证通过后，将自动获得 7 天`专业版`试用），各个版本的使用流程完全一致！当试用时间到期后，若当前版本的配额不能满足需求，可随时补差价升级到更高配额的版本。升级自动按天数计算差价，绝无额外费用。\n\n目前仅有一项额外的付费专用功能，即`忽略编译时间戳`设置（在管理后台的应用设置中），此选项仅对比版本号，不校验时间戳，可提供更宽容的热更策略，但可能消耗更多流量，适合需要管理多个分发渠道的客户。此功能目前仅支持`高级版`、`专业版`和`大客户VIP版`。\n\n***\n\n#### 年付赠送的 Token 如何领取？\n\n年付购买（含续费）`标准版`、`高级版`、`专业版`，分别赠送 $30、$100、$360 的 Token，可用于 GPT、Claude、DeepSeek、GLM、Kimi 等主流模型，官方直连、按量计费。领取步骤：\n\n1. 前往 [36k.ai](https://36k.ai) 注册账号；\n2. 发送邮件至 [hi@charmlot.com](mailto:hi@charmlot.com) 告知注册邮箱，或联系微信客服 `sunnylqm`；\n3. 我们核对订单后将额度充入您的 AI 账户。\n\n规则说明：仅整单年付赠送，月付、升级补差价、加购更新查询额度、试用均不赠送。额度充入后永久有效，仅限平台内使用，不可提现或转让。大客户方案请与商务另行约定。\n\n> GPT、Claude 等模型计价参考官方美元挂牌价，但充值和消费时 1 元人民币等值 1 美元。\n\n***\n\n#### 我可以试用付费版本先评估一下效果吗？\n\n新用户注册验证通过后，将自动获得 7 天`专业版`试用。如您需要更长的评估时间，可将注册用户名、邮箱、公司（或个人）名称发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，标题注明“pushy 评估试用延长”，我们会为您酌情延长评估时间。\n试用期间只能选择续费专业版或升级到更高版本，如需购买其他版本，请等待试用期过期，或者联系客服去除试用。\n\n***\n\n#### 配额具体如何计算？\n\n配额主要分为 4 种：\n\n1. 可创建的应用数量，注意 iOS 和 Android 版本记做不同的应用。\n2. 原生包数量及大小，不同应用分开计算。原生包指通过`pushy uploadIpa/uploadApk`命令上传到 Pushy 服务器上作为热更新起始版本的完整 apk/ipa 安装包。\n3. 热更包数量及大小，不同应用分开计算。热更包指通过`pushy bundle`所命令生成的 ppk 文件。注意这不是用户实际下载的更新文件，用户下载的是通过比对生成的增量 diff 文件（比 ppk 文件要小得多）。\n4. 每日总热更查询次数，所有应用累加计算。每次用户打开应用时，会向服务器查询是否有新的热更新。这个查询次数会被计入每日总热更查询次数。当日超过限额次数后，接口将不再返回新的热更新信息，直到次日重置。\n\n> 这里有一些对[包大小的优化建议](https://pushy.reactnative.cn/docs/bestpractice.md#%E4%BC%98%E5%8C%96%E5%8E%9F%E7%94%9F%E5%92%8C%E7%83%AD%E6%9B%B4%E5%8C%85%E4%BD%93%E7%A7%AF)可供参考。\n\n以上 2、3 条为账户下每个应用单独计算，第 4 条为账户下所有应用累加计算。具体配额和费用由于运营成本可能会有调整，请以[价格表](https://pushy.reactnative.cn/pricing.md)页面为准。已购买的用户在续费前不受调整影响。\n\n***\n\n#### 达到配额后还可以正常使用吗？\n\n当应用、原生包、热更包数量达到配额限制后，您将无法执行相应的新增操作。但用户端仍可正常检查更新，下载已发布的更新。您可选择升级到更高配额，或是通过删除已不再使用的应用、原生包、热更包来使数量降低到配额以内，以便继续执行新增操作。\\\n若原生包、热更包大小超过限额，则会导致上传失败。您可以选择升级到更高配额，或是想办法进行[精简优化](https://pushy.reactnative.cn/docs/bestpractice.md#%E4%BC%98%E5%8C%96%E5%8E%9F%E7%94%9F%E5%92%8C%E7%83%AD%E6%9B%B4%E5%8C%85%E4%BD%93%E7%A7%AF)。\n若当日热更检查次数超过限额，则会导致接口返回空数据。您可以选择升级到更高配额，或是优化热更策略，减少用户端检查更新的频率。\n\n***\n\n#### 我可以单独升级某项配额吗？\n\n如果您需要单独升级某些配额（需要达到高级版以上），请通过邮件 [hi@charmlot.com](mailto:hi@charmlot.com) 或 QQ 34731408 与我们联系，我们将根据您的个性化需求为您定制方案和报价。\n\n***\n\n#### 付费业务到期后不续费，现有应用还能否正常使用？\n\n到期后按免费版额度执行。如您现有应用已超出配额，则必须通过删除操作降低到配额以内，方可执行新的操作（如创建应用，上传热更等），但不影响用户获取之前已发布的热更。\n\n***\n\n#### 如何获取付费的专人技术支持？\n\n请将您的用户名和订单截图发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，同时提供您希望的技术联系方式（QQ、微信等），核实后会有技术专员添加您为好友。\n\n***\n\n#### 如何开具发票？\n\n请将具体开票需求发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，并附上注册邮箱和订单截图。我们默认会回复普通电子发票到`注册邮箱`，类目为软件服务。如需指定接受邮箱或手机，请在`邮件正文`中注明。如需要邮寄纸质发票请注明邮寄地址，邮费为到付。\n如邮件发送后三个工作日内未收到回复，请联系 QQ 客服 34731408。\n\n***\n\n#### 可以使用银行转账付款吗？\n\n可以的。请对照[价格表](https://pushy.reactnative.cn/pricing.md)，将对应版本的款项转账至：\n\n| 公司名称  | 武汉青罗网络科技有限公司     |\n| ----- | ---------------- |\n| 账号    | 8888888048825564 |\n| 开户行名称 | 浙江网商银行           |\n| 开户地区  | 浙江省杭州市           |\n| 支行名称  | 浙江网商银行股份有限公司     |\n| 联行号   | 323331000001     |\n\n转账完成后请截图发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，并写明注册邮箱，我们将在一个工作日内开通对应服务。\n\n***\n\n#### 可以按月付款吗？\n\n需要月付的客户请联系 QQ 客服 34731408，月付价格为年付价格 / 8。如标准版当前价格为 960 元每年，则月付价格为 120 元每月。\n月付客户需累计支付满 500 元后才能开具发票。`大客户VIP版`不支持月付。\n\n如仅需增加检查额度，高级版及以上用户可以在管理后台单独购买检查额度。每 10 万次 / 日检查额度为 100 元每月，购买后账号会自动转为定制版，并支持自行续费。\n\n***\n\n#### 大客户方案\n\n如果您的应用有大规模的活跃用户，日均所有应用累计总查询次数超过 100 万次，则建议选择我们专门针对大规模应用优化的`大客户VIP版`。\n`大客户VIP版`在应用数量、原生包数量、热更包数量等方面配额与`专业版`相同。\n\n当前价格如下表：\n\n| 服务版本 | 日均总热更查询次数 | 价格（元/年） |\n| ---- | --------- | ------- |\n| VIP1 | 1000 万次   | 30000   |\n| VIP2 | 5000 万次   | 60000   |\n| VIP3 | 1 亿次      | 120000  |\n| VIP4 | 1 亿次以上    | 请联系客服   |\n\n具体试用和对接请联系 QQ 客服 34731408\n",
+      "content": "# 常见问题\n\n如果本页面没能回答您的疑问，您可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。\n\n### 关于 Pushy\n\n#### Pushy 是什么？\n\nPushy（npm 包名 `react-native-update`）是专为 React Native 应用打造的热更新服务，由 React Native 中文网自 2016 年起运营。修改 JS 代码或图片等资源后，用一条命令即可把更新下发到用户手机，无需重新提交应用商店审核。下发的是 bsdiff/hdiff 增量包，通常只有几十 KB；国内走阿里云 CDN、海外走 Cloudflare；新版本启动崩溃会自动回滚。详见[产品简介](https://pushy.reactnative.cn/docs/intro.md)。\n\n***\n\n#### React Native 有哪些热更新方案？Pushy 和 CodePush、Expo Updates 有什么区别？\n\n常见方案有三类：Microsoft CodePush（App Center）、Expo 官方的 EAS Update（`expo-updates`），以及 Pushy 这类第三方热更新服务。主要区别：\n\n- **CodePush**：已于 2025 年 3 月 31 日随 App Center 停止服务，现有用户需要迁移。\n- **EAS Update**：以下发全量 JS 包为主，体积通常为 MB 级；服务器在海外，国内访问较慢，不支持鸿蒙，超出额度的流量另行计费。\n- **Pushy**：下发增量包（通常几十 KB，针对 Hermes 字节码优化后一行改动可小至 3.4 KB），国内外均有 CDN 节点且流量不单独计费，第一方支持 iOS、Android 和鸿蒙，同时兼容 Expo 项目。\n\n详细对比见[产品简介中的性价比对比](https://pushy.reactnative.cn/docs/intro.md#-%E6%80%A7%E4%BB%B7%E6%AF%94%E4%B9%8B%E9%80%89)。\n\n***\n\n#### CodePush 停服了，用什么替代？如何迁移到 Pushy？\n\nMicrosoft App Center（含 CodePush）已于 2025 年 3 月 31 日停止服务，可以改用 Pushy。迁移步骤：\n\n1. 从项目中移除 `react-native-code-push` 及其原生配置；\n2. 按[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)安装 `react-native-update`，并完成 iOS、Android（及鸿蒙）的原生配置；\n3. 按[代码集成](https://pushy.reactnative.cn/docs/integration.md)用 `UpdateProvider` 包裹根组件；\n4. 重新打包原生包并上传到 Pushy，之后即可按[发布流程](https://pushy.reactnative.cn/docs/publish.md)发布热更新。\n\n如果使用支持 Skills 的 AI 编程工具，可以先[安装 react-native-update Skill](https://pushy.reactnative.cn/docs/skills.md)，让 AI 自动完成大部分改动。\n\n***\n\n#### Pushy 支持 Expo、鸿蒙和 React Native 新架构吗？\n\n都支持。\n\n- **Expo**：要求 Expo 50 或更高版本，通过 `npx expo prebuild` 预构建后接入；请勿同时安装 `expo-updates`。使用新架构时建议 Expo 51 及以上。\n- **鸿蒙（HarmonyOS）**：第一方支持，原生配置见[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)中的 Harmony 部分。\n- **新架构与 Hermes**：均已支持，并针对 Hermes 字节码做了专门的增量优化。\n\n***\n\n#### Pushy 免费吗？\n\n有免费版：可创建 3 个应用，每个应用可上传 30 个原生包和 30 个热更包，所有应用每天累计 1000 次更新检查，CDN 流量不额外收费。付费版从标准版 960 元/年起，新用户注册验证后自动获得 7 天专业版试用。具体配额以[价格页](https://pushy.reactnative.cn/pricing.md)为准。\n\n***\n\n#### Pushy 是开源的吗？\n\n是的。Pushy 的客户端 SDK、命令行工具和管理界面代码都在 [GitHub](https://github.com/reactnativecn) 上开源，接受社区审计。\n\n***\n\n### 业务问题\n\n#### 热更新会被苹果拒审吗？能否上架 App Store？\n\n通常不会，可以正常上架。大量实践表明，接入热更新的应用能够顺利上架 App Store 和国内各大应用市场。唯一需要注意的是：在审核期间不要发布热更新，不要让审核人员看到更新相关的提示和弹窗。\n\n***\n\n#### 是否可以在海外使用？\n\n可以。Pushy 本身在国内外都部署有可用的 CDN 节点，能够满足大多数出海应用的热更新分发要求。\n\n如果您的项目对海外合规、数据存放位置、运营主体隔离等方面还有额外要求，则可以考虑使用由不同公司实体独立运营的全球服务 [Cresc](https://cresc.dev/)。\n\n***\n\n#### 哪些修改可以热更新？哪些不能？\n\n我们把对应用的修改分为两类：\n\n- 不可热更新 —— 原生修改，即所有需要`编译`后才能生效的修改：\n  - 任何在 iOS 或者 Android 目录中的修改、增删。\n  - 任何含有原生代码的第三方组件的更新、修改。\n- 可以热更新 —— 非原生修改，即所有`无需编译`，刷新即可生效的修改：\n\n  - js 代码修改，包括第三方纯 js 组件的更新、修改。\n  - 可以在 js 代码中 require/import 的资源文件，例如图片。\n\n需要注意的是，即便资源文件可以热更新，但这些热更新后的资源文件会以`file://`协议的形式提供访问，某些读取资源文件的第三方可能并不支持`file://`协议。\n\n***\n\n#### 热更新成功完成，但是重启后又回滚了是怎么回事？\n\n可以正常更新，但是重启后回滚，一般有两种可能的情况：\n\n- 没有正确[配置 bundleUrl](https://pushy.reactnative.cn/docs/getting-started.md#%E9%85%8D%E7%BD%AE-bundle-url)\n- （仅有 v10 以下版本存在此可能性，v10 及更高版本不存在此情况）没有正确[调用 markSuccess](https://v9--pushy-site.netlify.app/docs/integration#%E9%A6%96%E6%AC%A1%E5%90%AF%E5%8A%A8%E5%9B%9E%E6%BB%9A)\n\n如果你确定上述两个步骤都正确无误，请在[issues 区](https://github.com/reactnativecn/react-native-update/issues)给我们留言反馈。\n\n***\n\n#### 热更新报错：“热更新已暂停，原因：编译时间戳与服务器记录不一致。”\n\n当您每次编译产生一个原生包时，其中都会记录一个编译时间戳`buildTime`(可以使用`pushy parseIpa a.ipa`或是`pushy parseApk a.apk`命令来查看)。如果您需要把这个包发给客户并希望使用热更新功能，那么就需要使用 upload 命令来上传到我们的服务器，而服务器端会记录这个包的版本号和编译时间戳以便后续比对记录。\n\n举例来说，假如我已经上传了一个 1.0 版本原生包（`1A包`），但后来由于种种原因我又重新打包了（`1B包`）但没有上传，这两个包有相同的版本号，但会有不同的编译时间戳。此时有几种可能的情况：\n\n1. 我忘记上传过`1A包`，`1B包`没有实质更改且还没有客户安装。此时应当放弃`1B包`，只让客户下载安装`1A包`。\n2. 我忘记上传过`1A包`，又生成了`1B包`且已有客户安装。此时`1A包`客户可以获取热更新，`1B包`客户无法获取热更新。要使两批客户都能获取热更新，要么想办法通知`1B包`客户装回`1A包`，要么重新发布一个`高于1.0`版本的原生包且上传到 pushy 服务器，并删除`1.0`版本的记录，此时`1A包`和`1B包`的客户都会收到版本过期需要下载新版本的通知。\n3. 我知道上传过`1A包`，但我有原生方面的修改需要打了一个新的`1B包`。此时若将`1B包`上传到 pushy 服务器会提示版本验证错误，因为已经存在有相同的`1.0`版本。所以需要首先更改原生版本号再次打包，并`首先`将此新版本上传到服务器，`然后`分发给客户。这样`1.0版本`和`新版本`可以并存且都可以获得热更新。\n\n请谨记，任何时候生成原生包，请 1)先修改原生版本号，2)并上传到 pushy 服务器，才可以正常获得热更新。\n\n为什么对不上就拿不到差量，可以看[发布流程中的演示](https://pushy.reactnative.cn/docs/publish.md#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%87%8D%E6%96%B0%E6%89%93%E5%8C%85%E5%90%8E%E8%A6%81%E5%85%88%E4%B8%8A%E4%BC%A0)。\n\n:::info\n如果您是`高级版`、`专业版`或`大客户VIP版`客户，也可以考虑在管理后台的应用设置中启用`忽略编译时间戳`。此选项仅对比版本号，不校验时间戳，可提供更宽容的热更策略，但可能消耗更多流量，适合需要管理多个分发渠道的客户。\n:::\n\n***\n\n#### 后台已经显示了原生包的「内容指纹」，为什么还是提示编译时间戳不匹配？\n\n服务端记录的每个原生包有两个身份信息：\n\n- **编译时间戳（buildTime）**：打包时写入二进制，`pushy uploadApk` / `uploadIpa` / `uploadApp` 上传时记录。\n- **内容指纹（bundleHash）**：上传原生包时，CLI（`react-native-update-cli` ≥ 2.8.5）从包内提取内嵌的 JS bundle 计算出的 sha256。它描述的是「这个包里的 JS 是哪一份」，与 App 内集成的 SDK 版本无关。\n\n检查更新时，服务端只有在**两边都有指纹**时才用指纹代替时间戳做判定：\n\n1. 服务端记录的原生包带有内容指纹（用 ≥ 2.8.5 的 CLI 上传）；\n2. 客户端在请求中上报了 bundleHash——App 内集成的 `react-native-update` **≥ 10.49.0** 才会上报。\n\n两者缺一，就退回编译时间戳的严格比对。所以「后台有指纹却仍提示时间戳不匹配」几乎总是因为 App 里打包的 SDK 低于 10.49.0：指纹是 CLI 算出来的，旧版 SDK 并不知道它的存在。把 SDK 升级到 10.49.0 以上并重新打包发布后，同一份 JS 的重复打包会按指纹放行，不再被时间戳拦截。\n\n排查方法：在管理后台的「实时数据」里，或用 MCP 的 `pushy.check_update.observed` 工具，查看该应用近期请求是记录在 `packageVersion_buildTime`（未上报指纹）还是 `packageVersion_bundleHash`（已上报指纹）维度下，并对照客户端 SDK 版本分布。`pushy.check_update.diagnose` 在判定被拦截时也会给出 `BUNDLE_HASH_NOT_REPORTED` 提示。\n\n***\n\n### 付费问题\n\n#### 我应该选择哪个业务版本呢？\n\n其实完全无需考虑，先从最高配额的`专业版`开始体验（新用户注册验证通过后，将自动获得 7 天`专业版`试用），各个版本的使用流程完全一致！当试用时间到期后，若当前版本的配额不能满足需求，可随时补差价升级到更高配额的版本。升级自动按天数计算差价，绝无额外费用。\n\n目前仅有一项额外的付费专用功能，即`忽略编译时间戳`设置（在管理后台的应用设置中），此选项仅对比版本号，不校验时间戳，可提供更宽容的热更策略，但可能消耗更多流量，适合需要管理多个分发渠道的客户。此功能目前仅支持`高级版`、`专业版`和`大客户VIP版`。\n\n***\n\n#### 年付赠送的 Token 如何领取？\n\n年付购买（含续费）`标准版`、`高级版`、`专业版`，分别赠送 $30、$100、$360 的 Token，可用于 GPT、Claude、DeepSeek、GLM、Kimi 等主流模型，官方直连、按量计费。领取步骤：\n\n1. 前往 [36k.ai](https://36k.ai) 注册账号；\n2. 发送邮件至 [hi@charmlot.com](mailto:hi@charmlot.com) 告知注册邮箱，或联系微信客服 `sunnylqm`；\n3. 我们核对订单后将额度充入您的 AI 账户。\n\n规则说明：仅整单年付赠送，月付、升级补差价、加购更新查询额度、试用均不赠送。额度充入后永久有效，仅限平台内使用，不可提现或转让。大客户方案请与商务另行约定。\n\n> GPT、Claude 等模型计价参考官方美元挂牌价，但充值和消费时 1 元人民币等值 1 美元。\n\n***\n\n#### 我可以试用付费版本先评估一下效果吗？\n\n新用户注册验证通过后，将自动获得 7 天`专业版`试用。如您需要更长的评估时间，可将注册用户名、邮箱、公司（或个人）名称发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，标题注明“pushy 评估试用延长”，我们会为您酌情延长评估时间。\n试用期间只能选择续费专业版或升级到更高版本，如需购买其他版本，请等待试用期过期，或者联系客服去除试用。\n\n***\n\n#### 配额具体如何计算？\n\n配额主要分为 4 种：\n\n1. 可创建的应用数量，注意 iOS 和 Android 版本记做不同的应用。\n2. 原生包数量及大小，不同应用分开计算。原生包指通过`pushy uploadIpa/uploadApk`命令上传到 Pushy 服务器上作为热更新起始版本的完整 apk/ipa 安装包。\n3. 热更包数量及大小，不同应用分开计算。热更包指通过`pushy bundle`所命令生成的 ppk 文件。注意这不是用户实际下载的更新文件，用户下载的是通过比对生成的增量 diff 文件（比 ppk 文件要小得多）。\n4. 每日总热更查询次数，所有应用累加计算。每次用户打开应用时，会向服务器查询是否有新的热更新。这个查询次数会被计入每日总热更查询次数。当日超过限额次数后，接口将不再返回新的热更新信息，直到次日重置。\n\n> 这里有一些对[包大小的优化建议](https://pushy.reactnative.cn/docs/bestpractice.md#%E4%BC%98%E5%8C%96%E5%8E%9F%E7%94%9F%E5%92%8C%E7%83%AD%E6%9B%B4%E5%8C%85%E4%BD%93%E7%A7%AF)可供参考。\n\n以上 2、3 条为账户下每个应用单独计算，第 4 条为账户下所有应用累加计算。具体配额和费用由于运营成本可能会有调整，请以[价格表](https://pushy.reactnative.cn/pricing.md)页面为准。已购买的用户在续费前不受调整影响。\n\n***\n\n#### 达到配额后还可以正常使用吗？\n\n当应用、原生包、热更包数量达到配额限制后，您将无法执行相应的新增操作。但用户端仍可正常检查更新，下载已发布的更新。您可选择升级到更高配额，或是通过删除已不再使用的应用、原生包、热更包来使数量降低到配额以内，以便继续执行新增操作。\\\n若原生包、热更包大小超过限额，则会导致上传失败。您可以选择升级到更高配额，或是想办法进行[精简优化](https://pushy.reactnative.cn/docs/bestpractice.md#%E4%BC%98%E5%8C%96%E5%8E%9F%E7%94%9F%E5%92%8C%E7%83%AD%E6%9B%B4%E5%8C%85%E4%BD%93%E7%A7%AF)。\n若当日热更检查次数超过限额，则会导致接口返回空数据。您可以选择升级到更高配额，或是优化热更策略，减少用户端检查更新的频率。\n\n***\n\n#### 我可以单独升级某项配额吗？\n\n如果您需要单独升级某些配额（需要达到高级版以上），请通过邮件 [hi@charmlot.com](mailto:hi@charmlot.com) 或 QQ 34731408 与我们联系，我们将根据您的个性化需求为您定制方案和报价。\n\n***\n\n#### 付费业务到期后不续费，现有应用还能否正常使用？\n\n到期后按免费版额度执行。如您现有应用已超出配额，则必须通过删除操作降低到配额以内，方可执行新的操作（如创建应用，上传热更等），但不影响用户获取之前已发布的热更。\n\n***\n\n#### 如何获取付费的专人技术支持？\n\n请将您的用户名和订单截图发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，同时提供您希望的技术联系方式（QQ、微信等），核实后会有技术专员添加您为好友。\n\n***\n\n#### 如何开具发票？\n\n请将具体开票需求发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，并附上注册邮箱和订单截图。我们默认会回复普通电子发票到`注册邮箱`，类目为软件服务。如需指定接受邮箱或手机，请在`邮件正文`中注明。如需要邮寄纸质发票请注明邮寄地址，邮费为到付。\n如邮件发送后三个工作日内未收到回复，请联系 QQ 客服 34731408。\n\n***\n\n#### 可以使用银行转账付款吗？\n\n可以的。请对照[价格表](https://pushy.reactnative.cn/pricing.md)，将对应版本的款项转账至：\n\n| 公司名称  | 武汉青罗网络科技有限公司     |\n| ----- | ---------------- |\n| 账号    | 8888888048825564 |\n| 开户行名称 | 浙江网商银行           |\n| 开户地区  | 浙江省杭州市           |\n| 支行名称  | 浙江网商银行股份有限公司     |\n| 联行号   | 323331000001     |\n\n转账完成后请截图发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，并写明注册邮箱，我们将在一个工作日内开通对应服务。\n\n***\n\n#### 可以按月付款吗？\n\n需要月付的客户请联系 QQ 客服 34731408，月付价格为年付价格 / 8。如标准版当前价格为 960 元每年，则月付价格为 120 元每月。\n月付客户需累计支付满 500 元后才能开具发票。`大客户VIP版`不支持月付。\n\n如仅需增加检查额度，高级版及以上用户可以在管理后台单独购买检查额度。每 10 万次 / 日检查额度为 100 元每月，购买后账号会自动转为定制版，并支持自行续费。\n\n***\n\n#### 大客户方案\n\n如果您的应用有大规模的活跃用户，日均所有应用累计总查询次数超过 100 万次，则建议选择我们专门针对大规模应用优化的`大客户VIP版`。\n`大客户VIP版`在应用数量、原生包数量、热更包数量等方面配额与`专业版`相同。\n\n当前价格如下表：\n\n| 服务版本 | 日均总热更查询次数 | 价格（元/年） |\n| ---- | --------- | ------- |\n| VIP1 | 1000 万次   | 30000   |\n| VIP2 | 5000 万次   | 60000   |\n| VIP3 | 1 亿次      | 120000  |\n| VIP4 | 1 亿次以上    | 请联系客服   |\n\n具体试用和对接请联系 QQ 客服 34731408\n",
       "sections": [
         {
           "heading": "常见问题",
@@ -785,104 +785,104 @@
           "level": 4,
           "anchor": "热更新报错热更新已暂停原因编译时间戳与服务器记录不一致",
           "offset": 3250,
-          "length": 920
+          "length": 1104
         },
         {
           "heading": "后台已经显示了原生包的「内容指纹」，为什么还是提示编译时间戳不匹配？",
           "level": 4,
           "anchor": "后台已经显示了原生包的内容指纹为什么还是提示编译时间戳不匹配",
-          "offset": 4170,
+          "offset": 4354,
           "length": 846
         },
         {
           "heading": "付费问题",
           "level": 3,
           "anchor": "付费问题",
-          "offset": 5016,
+          "offset": 5200,
           "length": 10
         },
         {
           "heading": "我应该选择哪个业务版本呢？",
           "level": 4,
           "anchor": "我应该选择哪个业务版本呢",
-          "offset": 5026,
+          "offset": 5210,
           "length": 285
         },
         {
           "heading": "年付赠送的 Token 如何领取？",
           "level": 4,
           "anchor": "年付赠送的-token-如何领取",
-          "offset": 5311,
+          "offset": 5495,
           "length": 412
         },
         {
           "heading": "我可以试用付费版本先评估一下效果吗？",
           "level": 4,
           "anchor": "我可以试用付费版本先评估一下效果吗",
-          "offset": 5723,
+          "offset": 5907,
           "length": 224
         },
         {
           "heading": "配额具体如何计算？",
           "level": 4,
           "anchor": "配额具体如何计算",
-          "offset": 5947,
+          "offset": 6131,
           "length": 681
         },
         {
           "heading": "达到配额后还可以正常使用吗？",
           "level": 4,
           "anchor": "达到配额后还可以正常使用吗",
-          "offset": 6628,
+          "offset": 6812,
           "length": 399
         },
         {
           "heading": "我可以单独升级某项配额吗？",
           "level": 4,
           "anchor": "我可以单独升级某项配额吗",
-          "offset": 7027,
+          "offset": 7211,
           "length": 142
         },
         {
           "heading": "付费业务到期后不续费，现有应用还能否正常使用？",
           "level": 4,
           "anchor": "付费业务到期后不续费现有应用还能否正常使用",
-          "offset": 7169,
+          "offset": 7353,
           "length": 117
         },
         {
           "heading": "如何获取付费的专人技术支持？",
           "level": 4,
           "anchor": "如何获取付费的专人技术支持",
-          "offset": 7286,
+          "offset": 7470,
           "length": 126
         },
         {
           "heading": "如何开具发票？",
           "level": 4,
           "anchor": "如何开具发票",
-          "offset": 7412,
+          "offset": 7596,
           "length": 203
         },
         {
           "heading": "可以使用银行转账付款吗？",
           "level": 4,
           "anchor": "可以使用银行转账付款吗",
-          "offset": 7615,
+          "offset": 7799,
           "length": 378
         },
         {
           "heading": "可以按月付款吗？",
           "level": 4,
           "anchor": "可以按月付款吗",
-          "offset": 7993,
+          "offset": 8177,
           "length": 218
         },
         {
           "heading": "大客户方案",
           "level": 4,
           "anchor": "大客户方案",
-          "offset": 8211,
+          "offset": 8395,
           "length": 346
         }
       ]
@@ -1321,7 +1321,7 @@
       "path": "pages/docs/publish.mdx",
       "url": "https://pushy.reactnative.cn/docs/publish",
       "resourceUri": "pushy-docs://docs/publish",
-      "content": "# 发布热更新\n\n现在你的应用已经具备了检测更新的功能，下面我们来尝试发布并更新它。流程可参考下图：\n\n```mermaid\nflowchart TD\n    codebase[\"🖥️&nbsp;&nbsp;项目代码库\"]\n    subgraph 发布原生基准版本\n    tagNativeVersion[\"🏷️&nbsp;&nbsp;(在 git 上)标记原生版本号\"]\n    newNativeVersion[\"🗂️&nbsp;&nbsp;新的原生基准版本\"]\n    nativePackage[\"📦&nbsp;&nbsp;原生完整包(apk、aab或ipa文件)\"]\n    tagNativeVersion--\"🔨&nbsp;&nbsp;编译\"-->nativePackage\n    nativePackage--\"⬆️&nbsp;&nbsp;使用<br/>pushy uploadApk/uploadAab/uploadIpa<br/>命令上传\"-->newNativeVersion\n    end\n    subgraph 发布热更新版本\n    tagBundleVersion[\"🏷️&nbsp;&nbsp;(在 git 上)标记热更新版本号\"]\n    bundlePackage[\"🎁&nbsp;&nbsp;js代码与资源包(ppk文件)\"]\n    tagBundleVersion--\"🔨&nbsp;&nbsp;使用<br/>pushy bundle<br/>命令生成并上传\"-->bundlePackage\n    someNativeVersions[\"🗂️&nbsp;&nbsp;一个或多个原生基准版本\"]\n    bundlePackage--\"🖇️&nbsp;&nbsp;绑定\"-->someNativeVersions\n    end\n    user[\"👨‍👩‍👧‍👦&nbsp;&nbsp;安装有对应原生基准版本的用户\"]\n    codebase--\"✏️&nbsp;&nbsp;改动js代码，<br/>或添加、更新js组件，<br/>或添加、更新js代码中引用的图片等资源\"-->发布热更新版本\n    codebase--\"🖊️&nbsp;&nbsp;改动原生代码、设置，<br/>或添加、更新原生组件，<br/>或添加、更新原生代码中引用的图片等资源\"-->发布原生基准版本\n    发布热更新版本--\"📲&nbsp;&nbsp;推送增量热更新(diff文件)\"-->user\n```\n\n流程总结如下：\n\n1. 我们需要先打包一个原生 release 版本，在打包前请确保已集成了`react-native-update`并在调试过程中运行正常，安卓端[关闭了`crunchPngs`设置](https://pushy.reactnative.cn/docs/getting-started.md#%E7%A6%81%E7%94%A8-android-%E7%9A%84-crunch-%E4%BC%98%E5%8C%96)，打包说明可参考[iOS 打包](https://reactnative.cn/docs/publishing-to-app-store)和[android 打包](https://reactnative.cn/docs/signed-apk-android)。打包完成后请使用`pushy uploadIpa`、`pushy uploadApk`或`pushy uploadAab`命令来把这个安装包上传到 pushy 服务器端，以作为之后热更差量对比的基准。同时请保留好这个安装包，上架和分发给用户所使用的安装包`需要和服务器端完全一致`。建议使用 git tag 功能来标记原生版本号（例如`v1.0.0`）。\n2. 然后在基准版本之上迭代业务逻辑（增删 js 代码，增删图片等静态资源），使用`pushy bundle`命令来生成和发布热更新版本，而不需要重新打包。建议使用 git tag 功能来标记热更版本号（例如`v1.0.1`）。\n3. 如果迭代过程中有原生方面的修改，则需要发布并上传新的原生基准版本（重复步骤 1，但需要设置不同的原生版本号）。可以只保留一个原生基准版本，也可以多版本同时维护。\n\n## 发布原生基准版本\n\n### iOS\n\n首先参考[文档-在设备上运行](https://reactnative.cn/docs/running-on-device)，确定你正在使用离线包。然后点击菜单。\n\n按照正常的发布流程打包`.ipa`文件：\n\n1. Xcode 中运行设备选真机或 Generic iOS Device\n2. 菜单中选择 Product - Archive\n3. Archive 完成后选择`Export`生成.ipa 文件\n4. 然后运行如下命令上传到 pushy 服务器以供后续版本比对之用\n\n```bash\n$ pushy uploadIpa <ipa后缀文件>\n```\n\n此 ipa 的`CFBundleShortVersionString`字段(位于`ios/项目名/Info.plist`中)会被记录为原生版本号`packageVersion`。\n\n随后你可以选择往 AppStore 上传这个版本（可以重新 export 并调整相关选项，但请不要重新 archive），也可以先通过[Test flight](https://developer.apple.com/cn/testflight/)或[蒲公英](https://www.pgyer.com/doc/view/build_ipa)等渠道进行真机安装测试。请注意：暂不支持通过 Xcode 直接进行热更新测试。\n\n如果后续需要再次 archive 打包（例如修改原生代码或配置。如果只是修改 js 代码则不需要重新打包。），请先**更改版本号**，并在打包完成后再次`uploadIpa`到服务器端记录，否则后续生成的相同版本的原生包会由于[编译时间戳不一致而`无法获取热更新`](https://pushy.reactnative.cn/docs/faq.md#%E7%83%AD%E6%9B%B4%E6%96%B0%E6%8A%A5%E9%94%99%E7%83%AD%E6%9B%B4%E6%96%B0%E5%B7%B2%E6%9A%82%E5%81%9C%E5%8E%9F%E5%9B%A0%E7%BC%96%E8%AF%91%E6%97%B6%E9%97%B4%E6%88%B3%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%B0%E5%BD%95%E4%B8%8D%E4%B8%80%E8%87%B4)。\n\n### Android\n\n首先参考[文档-打包 APK](https://reactnative.cn/docs/signed-apk-android)设置签名，然后在 android 文件夹下运行`./gradlew assembleRelease`或`./gradlew aR`，你就可以在`android/app/build/outputs/apk/release/app-release.apk`中找到你的应用包。\n\n如果你需要同时向 Google Play 等渠道分发 `.aab`，并向其他渠道分发 `.apk`，建议在项目根目录的`package.json`中配置一个 npm script，在同一次 Gradle 调用中同时执行`assembleRelease`和`bundleRelease`。这样 APK 与 AAB 会复用同一份 release 构建产物，内置 bundle 与编译时间戳保持一致，后续按渠道分发对应格式即可。如果已有`scripts`字段，只需要追加其中一项：\n\n```json\n{\n  \"scripts\": {\n    \"package:android:release\": \"cd android && ./gradlew clean assembleRelease bundleRelease\"\n  }\n}\n```\n\n```bash\n$ npm run package:android:release\n```\n\n产物路径如下：\n\n```text\nandroid/app/build/outputs/apk/release/app-release.apk\nandroid/app/build/outputs/bundle/release/app-release.aab\n```\n\n如果项目使用了 flavor，请按实际 variant 调整 npm script 中的任务名，例如`assembleProdRelease`和`bundleProdRelease`。不要先单独执行一次`assembleRelease`，再在另一次 Gradle 命令中执行`bundleRelease`，否则两个包可能带有不同的编译时间戳。\n\n然后根据实际分发格式运行对应命令\n\n```bash\n$ pushy uploadApk android/app/build/outputs/apk/release/app-release.apk\n# 如果你实际分发的是 aab 格式的包，则使用：\n$ pushy uploadAab android/app/build/outputs/bundle/release/app-release.aab\n```\n\n即可上传对应的 Android 原生包以供后续版本比对之用。此包的`versionName`字段(位于`android/app/build.gradle`中)会被记录为原生版本号`packageVersion`。\n\n随后你可以选择往应用市场发布这个版本，也可以先往设备上直接安装 apk 文件以进行测试。若同一个版本同时产出了 APK 与 AAB，请根据渠道要求分发对应格式：Google Play 通常使用 AAB，其他直装或第三方渠道通常使用 APK。\n\n如果后续需要再次打包（例如修改原生代码或配置。如果只是修改 js 代码则不需要重新打包。），请先**更改版本号**，并再次上传对应原生包到服务器端记录，否则后续生成的相同版本的原生包会由于[编译时间戳不一致而`无法获取热更新`](https://pushy.reactnative.cn/docs/faq.md#%E7%83%AD%E6%9B%B4%E6%96%B0%E6%8A%A5%E9%94%99%E7%83%AD%E6%9B%B4%E6%96%B0%E5%B7%B2%E6%9A%82%E5%81%9C%E5%8E%9F%E5%9B%A0%E7%BC%96%E8%AF%91%E6%97%B6%E9%97%B4%E6%88%B3%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%B0%E5%BD%95%E4%B8%8D%E4%B8%80%E8%87%B4)。\n\n### Harmony\n\n首先下载鸿蒙开发IDE DevEco-Studio，然后通过Build => Build Hap(s)/App(s) => Build App(s)，你就可以在`harmony/build/outputs/default/harmony-default-unsigned.app`中找到你的应用包。\n\n然后运行如下命令\n\n```bash\n$ pushy uploadApp harmony/build/outputs/default/harmony-default-unsigned.app\n```\n\n即可上传 app 以供后续版本比对之用。此 app 的`versionName`字段(位于`harmony/AppScope/app.json5`中)会被记录为原生版本号`packageVersion`。\n\n随后你可以选择往华为应用市场发布这个版本，也可以先往设备上通过命令`hdc shell`命令安装这个 app 文件以进行测试。\n\n如果后续需要再次打包（例如修改原生代码或配置。如果只是修改 js 代码则不需要重新打包。），请先**更改版本号**，并再次`uploadApp`到服务器端记录，否则后续生成的相同版本的原生包会由于[编译时间戳不一致而`无法获取热更新`](https://pushy.reactnative.cn/docs/faq.md#%E7%83%AD%E6%9B%B4%E6%96%B0%E6%8A%A5%E9%94%99%E7%83%AD%E6%9B%B4%E6%96%B0%E5%B7%B2%E6%9A%82%E5%81%9C%E5%8E%9F%E5%9B%A0%E7%BC%96%E8%AF%91%E6%97%B6%E9%97%B4%E6%88%B3%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%B0%E5%BD%95%E4%B8%8D%E4%B8%80%E8%87%B4)。\n\n## 发布热更新版本\n\n你可以尝试修改一行代码(譬如将版本一修改为版本二)，然后使用`pushy bundle --platform <ios|android|harmony>`命令来生成新的热更新版本。\n\n:::info\n如果你使用了较新版本的`expo`或其他没有`index.js`的框架，执行`bundle`命令时会报错。此时请手动创建一个`index.js`文件，在其中引用框架自身的入口文件即可。具体入口文件的路径如何，请参考框架的说明文档或者`package.json`中的`main`字段。例如针对`expo`的`index.js`可能是如下这样写：\n\n```js\nimport \"expo-router/entry\";\n```\n\n:::\n\n```bash\n$ pushy bundle --platform android\nBundling with React Native version:  0.22.2\n<各种进度输出>\nBundled saved to: build/output/android.1459850548545.ppk\nWould you like to publish it?(Y/N)\n```\n\n如果想要立即上传，此时输入 Y。当然，你也可以在将来使用`pushy publish --platform android build/output/android.1459850548545.ppk`来上传刚才打包好的热更新包。\n\n```\n  Uploading [========================================================] 100% 0.0s\nEnter version name: <输入热更新版本名字，如1.0.0-rc>\nEnter description: <输入热更新版本描述>\nEnter meta info: {\"ok\":1}\nOk.\nWould you like to bind packages to this version?(Y/N)\n```\n\n此时版本已经提交到 pushy 服务，但用户暂时看不到此更新，你需要先将特定的原生包版本绑定到此热更新版本上。\n\n此时输入 Y 立即绑定，你也可以在将来使用`pushy update --platform <ios|android|harmony>`来对已上传的热更包和原生包进行绑定。除此以外，你还可以在网页端操作，简单的将对应的原生包版本拖到需要的热更新版本下即可。\n\n```\n┌────────────┬──────────────────────────────────────┐\n│ Package Id │               Version                │\n├────────────┼──────────────────────────────────────┤\n│   46272    │ 2.0(normal)                          │\n├────────────┼──────────────────────────────────────┤\n│   45577    │ 1.0(normal)                          │\n└────────────┴──────────────────────────────────────┘\n共 2 个包\n输入原生包 id: 46272\n```\n\n版本绑定完毕后，服务器会在几秒内生成差量补丁，客户端就可以获取到更新了。\n\n后续要继续发布新的热更新，只需反复执行`pushy bundle`命令即可，不需要重新打包。\n\n恭喜你，至此为止，你已经完成了植入代码热更新的全部工作。\n\n## 灰度发布\n\n灰度发布（又称金丝雀发布、渐进式发布）是一种降低热更新发布风险的策略，通过逐步扩大更新范围来验证新版本的稳定性。\n\n### 什么是灰度发布\n\n灰度发布是指在正式全量发布热更新之前，先将更新推送给一小部分用户（如 5%、10%），观察这部分用户的使用情况后，再逐步扩大更新比例，直到最终推送给所有用户。\n\n### 灰度发布的作用\n\n- **降低风险**：如果新版本存在 bug，只会影响小部分用户，可以及时发现并回滚\n- **验证稳定性**：通过小范围用户的真实使用反馈，验证新版本在各种设备和网络环境下的表现\n- **平滑过渡**：避免突然的全量更新对服务器造成的压力峰值\n- **快速止损**：一旦发现问题，可以立即停止灰度，将影响范围控制在最小\n\n### 工作原理\n\n当你设置了灰度比例（如 10%）后，检查更新时会根据每个用户的设备 UUID 进行哈希计算，确定该用户是否在灰度范围内：\n\n- 灰度范围内的用户会收到新版本的更新推送\n- 灰度范围外的用户会收到上一个全量版本（如果有），或显示为已是最新\n- 同一用户的灰度状态是稳定的，不会因为多次检查更新而变化\n\n### 使用方法\n\n#### 通过网页端操作\n\n1. 登录 [Pushy 管理后台](https://update.reactnative.cn)\n2. 选择对应的应用和原生包版本\n3. 点击\"发布\"按钮\n4. 选择灰度发布比例\n\n#### 通过命令行操作\n\n请查看[命令行工具文档中的 rollout 参数](https://pushy.reactnative.cn/docs/cli.md#pushy-update)\n\n### 注意事项\n\n:::warning\n**重要提示**：灰度版本与全量版本是独立的绑定关系。\n:::\n\n- **同时只能有一个灰度版本**：每个原生包版本只能绑定一个灰度热更版本（比例小于100%）和一个全量热更版本\n- **优先级**：如果同时存在灰度版本和全量版本，灰度范围内命中的用户会收到灰度版本，没有命中的用户会收到全量版本\n- **提升为全量**：将灰度比例设置为 100% 后，该版本会自动提升为全量版本，替换原有的全量版本\n- **客户端版本要求**：`react-native-update` >= 10.32.0 才能支持同时发布灰度和全量版本。\n\n## 强制启动（救砖）\n\n强制启动（forceBoot）是挂在「热更版本 × 原生包」绑定上的一个标记：客户端的**原生冷启动检测**在下载到该版本后会直接激活（下次启动生效），无视应用内配置的更新策略（`updateStrategy` / `checkStrategy`）。\n\n### 为什么需要它\n\n如果某次热更把应用的 JS 打死（启动即崩溃、白屏），设备上的 JS 代码将永远没有机会再运行检查更新的逻辑——常规热更通道从此失效，这就是「变砖」。\n\n自 `react-native-update` 10.52.1 起，客户端会在每次冷启动几秒后，由**原生代码**独立发起一次后台检查（完全不依赖 JS）。强制启动正是给这条通道下达的指令：即使 JS 已经无法运行，原生检测也能把修复版本拉下来并激活，让设备在下一次启动时恢复正常。\n\n### 使用方法\n\n1. 登录 [Pushy 管理后台](https://update.reactnative.cn)\n2. 找到修复版本，发布时选择「全量+强制启动(救砖)」；或对已绑定的版本，在包名菜单中选择「强制启动(救砖)」\n3. 确认弹窗中的语义说明后发布\n\n### 注意事项\n\n:::warning\n强制启动会越过用户侧的更新策略，请只在救砖等紧急场景使用，并确保修复版本已经过验证。\n:::\n\n- **客户端版本要求**：原生包中的 `react-native-update` >= 10.52.1（低于此版本没有完整的原生冷启动检测能力，管理后台也不会显示该选项）\n- **仅作用于原生检测**：JS 侧的交互式检查更新流程不受此标记影响\n- **安全护栏依然生效**：设备本地的回滚保护（rolledBack 记录）优先于强制启动；首次启动崩溃保护（first_time）也依然生效，激活后如果再次崩溃仍会自动回滚\n- **标记随绑定存在**：重新发布（重新绑定）会替换绑定并清除强制启动标记；也可在包名菜单中选择「取消强制启动」\n",
+      "content": "# 发布热更新\n\n现在你的应用已经具备了检测更新的功能，下面我们来尝试发布并更新它。流程可参考下图：\n\n```mermaid\nflowchart TD\n    codebase[\"🖥️&nbsp;&nbsp;项目代码库\"]\n    subgraph 发布原生基准版本\n    tagNativeVersion[\"🏷️&nbsp;&nbsp;(在 git 上)标记原生版本号\"]\n    newNativeVersion[\"🗂️&nbsp;&nbsp;新的原生基准版本\"]\n    nativePackage[\"📦&nbsp;&nbsp;原生完整包(apk、aab或ipa文件)\"]\n    tagNativeVersion--\"🔨&nbsp;&nbsp;编译\"-->nativePackage\n    nativePackage--\"⬆️&nbsp;&nbsp;使用<br/>pushy uploadApk/uploadAab/uploadIpa<br/>命令上传\"-->newNativeVersion\n    end\n    subgraph 发布热更新版本\n    tagBundleVersion[\"🏷️&nbsp;&nbsp;(在 git 上)标记热更新版本号\"]\n    bundlePackage[\"🎁&nbsp;&nbsp;js代码与资源包(ppk文件)\"]\n    tagBundleVersion--\"🔨&nbsp;&nbsp;使用<br/>pushy bundle<br/>命令生成并上传\"-->bundlePackage\n    someNativeVersions[\"🗂️&nbsp;&nbsp;一个或多个原生基准版本\"]\n    bundlePackage--\"🖇️&nbsp;&nbsp;绑定\"-->someNativeVersions\n    end\n    user[\"👨‍👩‍👧‍👦&nbsp;&nbsp;安装有对应原生基准版本的用户\"]\n    codebase--\"✏️&nbsp;&nbsp;改动js代码，<br/>或添加、更新js组件，<br/>或添加、更新js代码中引用的图片等资源\"-->发布热更新版本\n    codebase--\"🖊️&nbsp;&nbsp;改动原生代码、设置，<br/>或添加、更新原生组件，<br/>或添加、更新原生代码中引用的图片等资源\"-->发布原生基准版本\n    发布热更新版本--\"📲&nbsp;&nbsp;推送增量热更新(diff文件)\"-->user\n```\n\n流程总结如下：\n\n1. 我们需要先打包一个原生 release 版本，在打包前请确保已集成了`react-native-update`并在调试过程中运行正常，安卓端[关闭了`crunchPngs`设置](https://pushy.reactnative.cn/docs/getting-started.md#%E7%A6%81%E7%94%A8-android-%E7%9A%84-crunch-%E4%BC%98%E5%8C%96)，打包说明可参考[iOS 打包](https://reactnative.cn/docs/publishing-to-app-store)和[android 打包](https://reactnative.cn/docs/signed-apk-android)。打包完成后请使用`pushy uploadIpa`、`pushy uploadApk`或`pushy uploadAab`命令来把这个安装包上传到 pushy 服务器端，以作为之后热更差量对比的基准。同时请保留好这个安装包，上架和分发给用户所使用的安装包`需要和服务器端完全一致`。建议使用 git tag 功能来标记原生版本号（例如`v1.0.0`）。\n2. 然后在基准版本之上迭代业务逻辑（增删 js 代码，增删图片等静态资源），使用`pushy bundle`命令来生成和发布热更新版本，而不需要重新打包。建议使用 git tag 功能来标记热更版本号（例如`v1.0.1`）。\n3. 如果迭代过程中有原生方面的修改，则需要发布并上传新的原生基准版本（重复步骤 1，但需要设置不同的原生版本号）。可以只保留一个原生基准版本，也可以多版本同时维护。\n\n## 发布原生基准版本\n\n### iOS\n\n首先参考[文档-在设备上运行](https://reactnative.cn/docs/running-on-device)，确定你正在使用离线包。然后点击菜单。\n\n按照正常的发布流程打包`.ipa`文件：\n\n1. Xcode 中运行设备选真机或 Generic iOS Device\n2. 菜单中选择 Product - Archive\n3. Archive 完成后选择`Export`生成.ipa 文件\n4. 然后运行如下命令上传到 pushy 服务器以供后续版本比对之用\n\n```bash\n$ pushy uploadIpa <ipa后缀文件>\n```\n\n此 ipa 的`CFBundleShortVersionString`字段(位于`ios/项目名/Info.plist`中)会被记录为原生版本号`packageVersion`。\n\n随后你可以选择往 AppStore 上传这个版本（可以重新 export 并调整相关选项，但请不要重新 archive），也可以先通过[Test flight](https://developer.apple.com/cn/testflight/)或[蒲公英](https://www.pgyer.com/doc/view/build_ipa)等渠道进行真机安装测试。请注意：暂不支持通过 Xcode 直接进行热更新测试。\n\n如果后续需要再次 archive 打包（例如修改原生代码或配置。如果只是修改 js 代码则不需要重新打包。），请先**更改版本号**，并在打包完成后再次`uploadIpa`到服务器端记录，否则后续生成的相同版本的原生包会由于[编译时间戳不一致而`无法获取热更新`](https://pushy.reactnative.cn/docs/faq.md#%E7%83%AD%E6%9B%B4%E6%96%B0%E6%8A%A5%E9%94%99%E7%83%AD%E6%9B%B4%E6%96%B0%E5%B7%B2%E6%9A%82%E5%81%9C%E5%8E%9F%E5%9B%A0%E7%BC%96%E8%AF%91%E6%97%B6%E9%97%B4%E6%88%B3%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%B0%E5%BD%95%E4%B8%8D%E4%B8%80%E8%87%B4)。\n\n### Android\n\n首先参考[文档-打包 APK](https://reactnative.cn/docs/signed-apk-android)设置签名，然后在 android 文件夹下运行`./gradlew assembleRelease`或`./gradlew aR`，你就可以在`android/app/build/outputs/apk/release/app-release.apk`中找到你的应用包。\n\n如果你需要同时向 Google Play 等渠道分发 `.aab`，并向其他渠道分发 `.apk`，建议在项目根目录的`package.json`中配置一个 npm script，在同一次 Gradle 调用中同时执行`assembleRelease`和`bundleRelease`。这样 APK 与 AAB 会复用同一份 release 构建产物，内置 bundle 与编译时间戳保持一致，后续按渠道分发对应格式即可。如果已有`scripts`字段，只需要追加其中一项：\n\n```json\n{\n  \"scripts\": {\n    \"package:android:release\": \"cd android && ./gradlew clean assembleRelease bundleRelease\"\n  }\n}\n```\n\n```bash\n$ npm run package:android:release\n```\n\n产物路径如下：\n\n```text\nandroid/app/build/outputs/apk/release/app-release.apk\nandroid/app/build/outputs/bundle/release/app-release.aab\n```\n\n如果项目使用了 flavor，请按实际 variant 调整 npm script 中的任务名，例如`assembleProdRelease`和`bundleProdRelease`。不要先单独执行一次`assembleRelease`，再在另一次 Gradle 命令中执行`bundleRelease`，否则两个包可能带有不同的编译时间戳。\n\n然后根据实际分发格式运行对应命令\n\n```bash\n$ pushy uploadApk android/app/build/outputs/apk/release/app-release.apk\n# 如果你实际分发的是 aab 格式的包，则使用：\n$ pushy uploadAab android/app/build/outputs/bundle/release/app-release.aab\n```\n\n即可上传对应的 Android 原生包以供后续版本比对之用。此包的`versionName`字段(位于`android/app/build.gradle`中)会被记录为原生版本号`packageVersion`。\n\n随后你可以选择往应用市场发布这个版本，也可以先往设备上直接安装 apk 文件以进行测试。若同一个版本同时产出了 APK 与 AAB，请根据渠道要求分发对应格式：Google Play 通常使用 AAB，其他直装或第三方渠道通常使用 APK。\n\n如果后续需要再次打包（例如修改原生代码或配置。如果只是修改 js 代码则不需要重新打包。），请先**更改版本号**，并再次上传对应原生包到服务器端记录，否则后续生成的相同版本的原生包会由于[编译时间戳不一致而`无法获取热更新`](https://pushy.reactnative.cn/docs/faq.md#%E7%83%AD%E6%9B%B4%E6%96%B0%E6%8A%A5%E9%94%99%E7%83%AD%E6%9B%B4%E6%96%B0%E5%B7%B2%E6%9A%82%E5%81%9C%E5%8E%9F%E5%9B%A0%E7%BC%96%E8%AF%91%E6%97%B6%E9%97%B4%E6%88%B3%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%B0%E5%BD%95%E4%B8%8D%E4%B8%80%E8%87%B4)。\n\n### Harmony\n\n首先下载鸿蒙开发IDE DevEco-Studio，然后通过Build => Build Hap(s)/App(s) => Build App(s)，你就可以在`harmony/build/outputs/default/harmony-default-unsigned.app`中找到你的应用包。\n\n然后运行如下命令\n\n```bash\n$ pushy uploadApp harmony/build/outputs/default/harmony-default-unsigned.app\n```\n\n即可上传 app 以供后续版本比对之用。此 app 的`versionName`字段(位于`harmony/AppScope/app.json5`中)会被记录为原生版本号`packageVersion`。\n\n随后你可以选择往华为应用市场发布这个版本，也可以先往设备上通过命令`hdc shell`命令安装这个 app 文件以进行测试。\n\n如果后续需要再次打包（例如修改原生代码或配置。如果只是修改 js 代码则不需要重新打包。），请先**更改版本号**，并再次`uploadApp`到服务器端记录，否则后续生成的相同版本的原生包会由于[编译时间戳不一致而`无法获取热更新`](https://pushy.reactnative.cn/docs/faq.md#%E7%83%AD%E6%9B%B4%E6%96%B0%E6%8A%A5%E9%94%99%E7%83%AD%E6%9B%B4%E6%96%B0%E5%B7%B2%E6%9A%82%E5%81%9C%E5%8E%9F%E5%9B%A0%E7%BC%96%E8%AF%91%E6%97%B6%E9%97%B4%E6%88%B3%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%B0%E5%BD%95%E4%B8%8D%E4%B8%80%E8%87%B4)。\n\n### 为什么重新打包后要先上传\n\n用户下载的热更新通常是基于原生包计算的差量补丁，只有设备上的原生包正是服务端登记的那一份，补丁才能打上。服务端靠编译时间戳和内容指纹来确认这一点：\n\n\n1补丁原理2身份核对3判定结果4如何避免\n\n差量包是一份补丁，内容是“从旧包第几字节复制、在哪插入新内容”。所以它只有几 KB，但**只对一份特定的旧包有效**。\n\n旧包对得上\n\nABCDE\n\n+补丁 →\n\nABxDE\n\n✓ 得到新版本\n\n旧包差一个字节\n\nAZBCD\n\n+补丁 →\n\nAZxCD\n\n✕ 内容错位，校验失败\n\n## 发布热更新版本\n\n你可以尝试修改一行代码(譬如将版本一修改为版本二)，然后使用`pushy bundle --platform <ios|android|harmony>`命令来生成新的热更新版本。\n\n:::info\n如果你使用了较新版本的`expo`或其他没有`index.js`的框架，执行`bundle`命令时会报错。此时请手动创建一个`index.js`文件，在其中引用框架自身的入口文件即可。具体入口文件的路径如何，请参考框架的说明文档或者`package.json`中的`main`字段。例如针对`expo`的`index.js`可能是如下这样写：\n\n```js\nimport \"expo-router/entry\";\n```\n\n:::\n\n```bash\n$ pushy bundle --platform android\nBundling with React Native version:  0.22.2\n<各种进度输出>\nBundled saved to: build/output/android.1459850548545.ppk\nWould you like to publish it?(Y/N)\n```\n\n如果想要立即上传，此时输入 Y。当然，你也可以在将来使用`pushy publish --platform android build/output/android.1459850548545.ppk`来上传刚才打包好的热更新包。\n\n```\n  Uploading [========================================================] 100% 0.0s\nEnter version name: <输入热更新版本名字，如1.0.0-rc>\nEnter description: <输入热更新版本描述>\nEnter meta info: {\"ok\":1}\nOk.\nWould you like to bind packages to this version?(Y/N)\n```\n\n此时版本已经提交到 pushy 服务，但用户暂时看不到此更新，你需要先将特定的原生包版本绑定到此热更新版本上。\n\n此时输入 Y 立即绑定，你也可以在将来使用`pushy update --platform <ios|android|harmony>`来对已上传的热更包和原生包进行绑定。除此以外，你还可以在网页端操作，简单的将对应的原生包版本拖到需要的热更新版本下即可。\n\n```\n┌────────────┬──────────────────────────────────────┐\n│ Package Id │               Version                │\n├────────────┼──────────────────────────────────────┤\n│   46272    │ 2.0(normal)                          │\n├────────────┼──────────────────────────────────────┤\n│   45577    │ 1.0(normal)                          │\n└────────────┴──────────────────────────────────────┘\n共 2 个包\n输入原生包 id: 46272\n```\n\n版本绑定完毕后，服务器会在几秒内生成差量补丁，客户端就可以获取到更新了。\n\n后续要继续发布新的热更新，只需反复执行`pushy bundle`命令即可，不需要重新打包。\n\n恭喜你，至此为止，你已经完成了植入代码热更新的全部工作。\n\n## 灰度发布\n\n灰度发布（又称金丝雀发布、渐进式发布）是一种降低热更新发布风险的策略，通过逐步扩大更新范围来验证新版本的稳定性。\n\n### 什么是灰度发布\n\n灰度发布是指在正式全量发布热更新之前，先将更新推送给一小部分用户（如 5%、10%），观察这部分用户的使用情况后，再逐步扩大更新比例，直到最终推送给所有用户。\n\n### 灰度发布的作用\n\n- **降低风险**：如果新版本存在 bug，只会影响小部分用户，可以及时发现并回滚\n- **验证稳定性**：通过小范围用户的真实使用反馈，验证新版本在各种设备和网络环境下的表现\n- **平滑过渡**：避免突然的全量更新对服务器造成的压力峰值\n- **快速止损**：一旦发现问题，可以立即停止灰度，将影响范围控制在最小\n\n### 工作原理\n\n当你设置了灰度比例（如 10%）后，检查更新时会根据每个用户的设备 UUID 进行哈希计算，确定该用户是否在灰度范围内：\n\n- 灰度范围内的用户会收到新版本的更新推送\n- 灰度范围外的用户会收到上一个全量版本（如果有），或显示为已是最新\n- 同一用户的灰度状态是稳定的，不会因为多次检查更新而变化\n\n### 使用方法\n\n#### 通过网页端操作\n\n1. 登录 [Pushy 管理后台](https://update.reactnative.cn)\n2. 选择对应的应用和原生包版本\n3. 点击\"发布\"按钮\n4. 选择灰度发布比例\n\n#### 通过命令行操作\n\n请查看[命令行工具文档中的 rollout 参数](https://pushy.reactnative.cn/docs/cli.md#pushy-update)\n\n### 注意事项\n\n:::warning\n**重要提示**：灰度版本与全量版本是独立的绑定关系。\n:::\n\n- **同时只能有一个灰度版本**：每个原生包版本只能绑定一个灰度热更版本（比例小于100%）和一个全量热更版本\n- **优先级**：如果同时存在灰度版本和全量版本，灰度范围内命中的用户会收到灰度版本，没有命中的用户会收到全量版本\n- **提升为全量**：将灰度比例设置为 100% 后，该版本会自动提升为全量版本，替换原有的全量版本\n- **客户端版本要求**：`react-native-update` >= 10.32.0 才能支持同时发布灰度和全量版本。\n\n## 强制启动（救砖）\n\n强制启动（forceBoot）是挂在「热更版本 × 原生包」绑定上的一个标记：客户端的**原生冷启动检测**在下载到该版本后会直接激活（下次启动生效），无视应用内配置的更新策略（`updateStrategy` / `checkStrategy`）。\n\n### 为什么需要它\n\n如果某次热更把应用的 JS 打死（启动即崩溃、白屏），设备上的 JS 代码将永远没有机会再运行检查更新的逻辑——常规热更通道从此失效，这就是「变砖」。\n\n自 `react-native-update` 10.52.1 起，客户端会在每次冷启动几秒后，由**原生代码**独立发起一次后台检查（完全不依赖 JS）。强制启动正是给这条通道下达的指令：即使 JS 已经无法运行，原生检测也能把修复版本拉下来并激活，让设备在下一次启动时恢复正常。\n\n### 使用方法\n\n1. 登录 [Pushy 管理后台](https://update.reactnative.cn)\n2. 找到修复版本，发布时选择「全量+强制启动(救砖)」；或对已绑定的版本，在包名菜单中选择「强制启动(救砖)」\n3. 确认弹窗中的语义说明后发布\n\n### 注意事项\n\n:::warning\n强制启动会越过用户侧的更新策略，请只在救砖等紧急场景使用，并确保修复版本已经过验证。\n:::\n\n- **客户端版本要求**：原生包中的 `react-native-update` >= 10.52.1（低于此版本没有完整的原生冷启动检测能力，管理后台也不会显示该选项）\n- **仅作用于原生检测**：JS 侧的交互式检查更新流程不受此标记影响\n- **安全护栏依然生效**：设备本地的回滚保护（rolledBack 记录）优先于强制启动；首次启动崩溃保护（first_time）也依然生效，激活后如果再次崩溃仍会自动回滚\n- **标记随绑定存在**：重新发布（重新绑定）会替换绑定并清除强制启动标记；也可在包名菜单中选择「取消强制启动」\n",
       "sections": [
         {
           "heading": "发布热更新",
@@ -1359,94 +1359,101 @@
           "length": 840
         },
         {
+          "heading": "为什么重新打包后要先上传",
+          "level": 3,
+          "anchor": "为什么重新打包后要先上传",
+          "offset": 5457,
+          "length": 257
+        },
+        {
           "heading": "发布热更新版本",
           "level": 2,
           "anchor": "发布热更新版本",
-          "offset": 5457,
+          "offset": 5714,
           "length": 1598
         },
         {
           "heading": "灰度发布",
           "level": 2,
           "anchor": "灰度发布",
-          "offset": 7055,
+          "offset": 7312,
           "length": 67
         },
         {
           "heading": "什么是灰度发布",
           "level": 3,
           "anchor": "什么是灰度发布",
-          "offset": 7122,
+          "offset": 7379,
           "length": 94
         },
         {
           "heading": "灰度发布的作用",
           "level": 3,
           "anchor": "灰度发布的作用",
-          "offset": 7216,
+          "offset": 7473,
           "length": 174
         },
         {
           "heading": "工作原理",
           "level": 3,
           "anchor": "工作原理",
-          "offset": 7390,
+          "offset": 7647,
           "length": 160
         },
         {
           "heading": "使用方法",
           "level": 3,
           "anchor": "使用方法",
-          "offset": 7550,
+          "offset": 7807,
           "length": 10
         },
         {
           "heading": "通过网页端操作",
           "level": 4,
           "anchor": "通过网页端操作",
-          "offset": 7560,
+          "offset": 7817,
           "length": 106
         },
         {
           "heading": "通过命令行操作",
           "level": 4,
           "anchor": "通过命令行操作",
-          "offset": 7666,
+          "offset": 7923,
           "length": 96
         },
         {
           "heading": "注意事项",
           "level": 3,
           "anchor": "注意事项",
-          "offset": 7762,
+          "offset": 8019,
           "length": 287
         },
         {
           "heading": "强制启动（救砖）",
           "level": 2,
           "anchor": "强制启动救砖",
-          "offset": 8049,
+          "offset": 8306,
           "length": 140
         },
         {
           "heading": "为什么需要它",
           "level": 3,
           "anchor": "为什么需要它",
-          "offset": 8189,
+          "offset": 8446,
           "length": 232
         },
         {
           "heading": "使用方法",
           "level": 3,
           "anchor": "使用方法-1",
-          "offset": 8421,
+          "offset": 8678,
           "length": 135
         },
         {
           "heading": "注意事项",
           "level": 3,
           "anchor": "注意事项-1",
-          "offset": 8556,
+          "offset": 8813,
           "length": 340
         }
       ]
