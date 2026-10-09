@@ -131,9 +131,9 @@ Why Pushy
 
 bsdiff / hdiff 双算法计算差量，只下发真正变化的部分； 针对 Hermes 字节码的专项优化更可把一行文案的修复压到 几 KB——用户几乎无感知。
 
-完整应用包26 MB
+完整更新包（gzip）1.5 MB
 
-Pushy 增量包42 KB
+Pushy 增量包（改一行）3.4 KB
 
 ### 极速下载
 
