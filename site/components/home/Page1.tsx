@@ -116,17 +116,17 @@ function Page1() {
 							<div className="mt-8 space-y-4 max-w-md">
 								<div>
 									<div className="flex justify-between text-xs text-slate-500 mb-2">
-										<span>完整应用包</span>
-										<span className="font-mono">26 MB</span>
+										<span>完整更新包（gzip）</span>
+										<span className="font-mono">1.5 MB</span>
 									</div>
 									<div className="h-2.5 rounded-full bg-slate-600/40 w-full" />
 								</div>
 								<div>
 									<div className="flex justify-between text-xs mb-2">
 										<span className="text-slate-300 font-medium">
-											Pushy 增量包
+											Pushy 增量包（改一行）
 										</span>
-										<span className="font-mono text-blue-300">42 KB</span>
+										<span className="font-mono text-blue-300">3.4 KB</span>
 									</div>
 									<div className="h-2.5 rounded-full bg-slate-600/25 w-full">
 										<div className="pushy-diff-bar h-full w-[4%] min-w-[14px] rounded-full bg-[linear-gradient(90deg,#38bdf8,#6366f1)] shadow-[0_0_12px_rgba(56,189,248,0.6)]" />
