@@ -3,7 +3,7 @@
   "product": "Pushy",
   "baseUrl": "https://pushy.reactnative.cn",
   "resourceScheme": "pushy-docs",
-  "sourceCommit": "96e309d85d239143aada5d8e42403fa21bff6a9f",
+  "sourceCommit": "ef06f68de170d215933c2444d9a70fa637178862",
   "documents": [
     {
       "slug": "analytics",
@@ -234,7 +234,7 @@
       "path": "pages/docs/api-token.mdx",
       "url": "https://pushy.reactnative.cn/docs/api-token",
       "resourceUri": "pushy-docs://docs/api-token",
-      "content": "# API Key\n\nAPI Key 是一种用于在 CI/CD 流程或自动化脚本中调用 [Pushy API](https://update.reactnative.cn/api/openapi) 的认证方式。相比直接使用账号密码，API Key 更加安全且便于管理。\n\n## 使用场景\n\n- **持续集成/持续部署 (CI/CD)**：在 GitHub Actions、GitLab CI、Jenkins 等平台中自动发布热更新\n- **自动化脚本**：编写脚本批量管理应用、版本或原生包\n- **第三方工具集成**：将 Pushy 与其他开发工具集成\n\n## 创建 API Key\n\n1. 登录 [Pushy 管理后台](https://pushy-admin.reactnative.cn)\n2. 在左侧菜单中点击「API Key」\n3. 点击「创建 API Key」按钮\n4. 填写 API Key 名称（如：CI/CD Pipeline）\n5. 选择所需权限\n6. 可选设置过期时间\n7. 点击创建后，**立即复制并安全保存 API Key**\n\n:::warning\nAPI Key 只会在创建时显示一次，之后无法再次查看。请务必在创建后立即复制保存！\n:::\n\n## 权限说明\n\n| 权限              | 说明                 |\n| --------------- | ------------------ |\n| **读取 (read)**   | 查看应用、版本、原生包信息      |\n| **写入 (write)**  | 创建和更新应用、发布版本、上传原生包 |\n| **删除 (delete)** | 删除应用、版本、原生包        |\n\n:::info\n创建 API Key 时至少需要选择一个权限。根据实际需求选择最小必要权限是最佳实践。\n:::\n\n## 使用 API Key 调用 API\n\n在调用 Pushy API 时，将 API Key 添加到请求头中：\n\n```bash\ncurl -X GET \"https://update.reactnative.cn/api/app/list\" \\\n  -H \"x-api-token: YOUR_API_TOKEN\"\n```\n\n:::info\n请求头 `x-api-token` 与环境变量 `PUSHY_API_TOKEN` 是接口层面的名字，为兼容既有集成保持不变；页面与文档中统称 API Key，两者指的是同一样东西。\n:::\n\n### 在命令行工具中使用\n\n如果使用 `react-native-update-cli` 命令行工具（需 v2.7.0+），可以通过环境变量设置 API Key：\n\n```bash\nexport PUSHY_API_TOKEN=your_api_token_here\npushy bundle --platform android\n```\n\n### 在 CI/CD 中使用\n\n以 GitHub Actions 为例：\n\n```yaml\n# .github/workflows/publish.yml\nname: Publish Hot Update\n\non:\n  push:\n    branches: [main]\n\njobs:\n  publish:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n      \n      - name: Setup Node.js\n        uses: actions/setup-node@v6\n          \n      - name: Install dependencies\n        run: npm install && npm i -g react-native-update-cli\n        \n      - name: Publish update\n        env:\n          PUSHY_API_TOKEN: ${{ secrets.PUSHY_API_TOKEN }}\n        run: pushy bundle --platform android\n```\n\n:::tip\n在 CI/CD 环境中，建议将 API Key 存储在密钥管理中（如 GitHub Secrets），而不是直接写入代码。\n:::\n\n## 管理 API Key\n\n### 查看 API Key 列表\n\n在「API Key」页面可以看到所有已创建的 API Key，包括：\n\n- API Key 名称\n- 权限\n- 过期时间\n- 最后使用时间\n- 状态（正常/已过期/已撤销）\n\n### 撤销 API Key\n\n如果 API Key 泄露或不再需要，可以随时撤销：\n\n1. 在 API Key 列表中找到目标 API Key\n2. 点击「撤销」按钮\n3. 确认撤销\n\n:::warning\nAPI Key 撤销后立即生效，使用该 API Key 的所有请求将被拒绝。请确保在撤销前更新相关的 CI/CD 配置。\n:::\n\n## 安全建议\n\n1. **最小权限原则**：只授予 API Key 必要的权限\n2. **设置过期时间**：为临时使用的 API Key 设置合理的过期时间\n3. **定期轮换**：定期撤销旧 API Key 并创建新 API Key\n4. **安全存储**：不要将 API Key 提交到代码仓库，使用环境变量或密钥管理工具\n5. **监控使用**：定期检查 API Key 的最后使用时间，及时清理不再使用的 API Key\n\n## 限制\n\n- 每个用户最多可创建 **10 个** API Key\n- 如需创建更多，请先撤销不再使用的 API Key\n",
+      "content": "# API Key\n\nAPI Key 是一种用于在 CI/CD 流程或自动化脚本中调用 [Pushy API](https://update.reactnative.cn/api/openapi) 的认证方式。相比直接使用账号密码，API Key 更加安全且便于管理。\n\n## 使用场景\n\n- **持续集成/持续部署 (CI/CD)**：在 GitHub Actions、GitLab CI、Jenkins 等平台中自动发布热更新\n- **自动化脚本**：编写脚本批量管理应用、版本或原生包\n- **第三方工具集成**：将 Pushy 与其他开发工具集成\n\n## 创建 API Key\n\n1. 登录 [Pushy 管理后台](https://pushy-admin.reactnative.cn)\n2. 在左侧菜单中点击「API Key」\n3. 点击「创建 API Key」按钮\n4. 填写 API Key 名称（如：CI/CD Pipeline）\n5. 选择所需权限\n6. 可选设置过期时间\n7. 点击创建后，**立即复制并安全保存 API Key**\n\n:::warning\nAPI Key 只会在创建时显示一次，之后无法再次查看。请务必在创建后立即复制保存！\n:::\n\n## 权限说明\n\n| 权限              | 说明                 |\n| --------------- | ------------------ |\n| **读取 (read)**   | 查看应用、版本、原生包信息      |\n| **写入 (write)**  | 创建和更新应用、发布版本、上传原生包 |\n| **删除 (delete)** | 删除应用、版本、原生包        |\n\n:::info\n创建 API Key 时至少需要选择一个权限。根据实际需求选择最小必要权限是最佳实践。\n:::\n\n## 使用 API Key 调用 API\n\n在调用 Pushy API 时，将 API Key 添加到请求头中：\n\n```bash\ncurl -X GET \"https://update.reactnative.cn/api/app/list\" \\\n  -H \"x-api-token: YOUR_API_TOKEN\"\n```\n\n:::info\n请求头 `x-api-token` 与环境变量 `PUSHY_API_TOKEN` 是接口层面的名字，为兼容既有集成保持不变；页面与文档中统称 API Key，两者指的是同一样东西。\n:::\n\n### 在命令行工具中使用\n\n如果使用 `react-native-update-cli` 命令行工具（需 v2.7.0+），可以通过环境变量设置 API Key：\n\n```bash\nexport PUSHY_API_TOKEN=your_api_token_here\npushy bundle --platform android\n```\n\n### 在 CI/CD 中使用\n\n以 GitHub Actions 为例：\n\n```yaml\n# .github/workflows/publish.yml\nname: Publish Hot Update\n\non:\n  push:\n    branches: [main]\n\njobs:\n  publish:\n    runs-on: ubuntu-latest\n    strategy:\n      matrix:\n        platform: [ios, android]\n    steps:\n      - uses: actions/checkout@v6\n\n      - name: Setup Node.js\n        uses: actions/setup-node@v6\n        with:\n          node-version: 22\n\n      - name: Install dependencies\n        run: npm ci && npm i -g react-native-update-cli\n\n      - name: Bundle, publish and bind\n        env:\n          PUSHY_API_TOKEN: ${{ secrets.PUSHY_API_TOKEN }}\n        run: |\n          pushy bundle --platform ${{ matrix.platform }} \\\n            --name \"${GITHUB_SHA::7}\" \\\n            --description \"OTA ${GITHUB_SHA::7}\" \\\n            --packageVersionRange \">=1.0.0 <2.0.0\" \\\n            --rollout 10\n```\n\n:::warning\nCI 环境没有交互终端，命令行工具会以非交互模式运行，跳过“是否发布”“是否绑定”的提问。不传 `--name` 时只会打包；不传绑定参数（`--packageVersionRange`、`--packageVersion`、`--packageId`、`--minPackageVersion` 或 `--maxPackageVersion`）时版本虽然发布了，但**不会有任何用户收到**。请提交 `update.json` 以便 CI 识别应用，并用 `--packageVersionRange` 指定要接收此次更新的原生版本范围。`--rollout` 可选（1–100，默认 100）。参见[命令行工具](https://pushy.reactnative.cn/docs/cli.md#pushy-bundle)。\n:::\n\n:::tip\n在 CI/CD 环境中，建议将 API Key 存储在密钥管理中（如 GitHub Secrets），而不是直接写入代码。\n:::\n\n## 管理 API Key\n\n### 查看 API Key 列表\n\n在「API Key」页面可以看到所有已创建的 API Key，包括：\n\n- API Key 名称\n- 权限\n- 过期时间\n- 最后使用时间\n- 状态（正常/已过期/已撤销）\n\n### 撤销 API Key\n\n如果 API Key 泄露或不再需要，可以随时撤销：\n\n1. 在 API Key 列表中找到目标 API Key\n2. 点击「撤销」按钮\n3. 确认撤销\n\n:::warning\nAPI Key 撤销后立即生效，使用该 API Key 的所有请求将被拒绝。请确保在撤销前更新相关的 CI/CD 配置。\n:::\n\n## 安全建议\n\n1. **最小权限原则**：只授予 API Key 必要的权限\n2. **设置过期时间**：为临时使用的 API Key 设置合理的过期时间\n3. **定期轮换**：定期撤销旧 API Key 并创建新 API Key\n4. **安全存储**：不要将 API Key 提交到代码仓库，使用环境变量或密钥管理工具\n5. **监控使用**：定期检查 API Key 的最后使用时间，及时清理不再使用的 API Key\n\n## 限制\n\n- 每个用户最多可创建 **10 个** API Key\n- 如需创建更多，请先撤销不再使用的 API Key\n",
       "sections": [
         {
           "heading": "API Key",
@@ -283,41 +283,41 @@
           "level": 3,
           "anchor": "在-cicd-中使用",
           "offset": 1252,
-          "length": 639
+          "length": 1301
         },
         {
           "heading": "管理 API Key",
           "level": 2,
           "anchor": "管理-api-key",
-          "offset": 1891,
+          "offset": 2553,
           "length": 15
         },
         {
           "heading": "查看 API Key 列表",
           "level": 3,
           "anchor": "查看-api-key-列表",
-          "offset": 1906,
+          "offset": 2568,
           "length": 107
         },
         {
           "heading": "撤销 API Key",
           "level": 3,
           "anchor": "撤销-api-key",
-          "offset": 2013,
+          "offset": 2675,
           "length": 171
         },
         {
           "heading": "安全建议",
           "level": 2,
           "anchor": "安全建议",
-          "offset": 2184,
+          "offset": 2846,
           "length": 217
         },
         {
           "heading": "限制",
           "level": 2,
           "anchor": "限制",
-          "offset": 2401,
+          "offset": 3063,
           "length": 63
         }
       ]
