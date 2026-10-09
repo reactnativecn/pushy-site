@@ -80,20 +80,34 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [ios, android]
     steps:
       - uses: actions/checkout@v6
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v6
-          
+        with:
+          node-version: 22
+
       - name: Install dependencies
-        run: npm install && npm i -g react-native-update-cli
-        
-      - name: Publish update
+        run: npm ci && npm i -g react-native-update-cli
+
+      - name: Bundle, publish and bind
         env:
           PUSHY_API_TOKEN: ${{ secrets.PUSHY_API_TOKEN }}
-        run: pushy bundle --platform android
+        run: |
+          pushy bundle --platform ${{ matrix.platform }} \
+            --name "${GITHUB_SHA::7}" \
+            --description "OTA ${GITHUB_SHA::7}" \
+            --packageVersionRange ">=1.0.0 <2.0.0" \
+            --rollout 10
 ```
+
+:::warning
+CI 环境没有交互终端，命令行工具会以非交互模式运行，跳过“是否发布”“是否绑定”的提问。不传 `--name` 时只会打包；不传绑定参数（`--packageVersionRange`、`--packageVersion`、`--packageId`、`--minPackageVersion` 或 `--maxPackageVersion`）时版本虽然发布了，但**不会有任何用户收到**。请提交 `update.json` 以便 CI 识别应用，并用 `--packageVersionRange` 指定要接收此次更新的原生版本范围。`--rollout` 可选（1–100，默认 100）。参见[命令行工具](/docs/cli#pushy-bundle)。
+:::
 
 :::tip
 在 CI/CD 环境中，建议将 API Key 存储在密钥管理中（如 GitHub Secrets），而不是直接写入代码。
