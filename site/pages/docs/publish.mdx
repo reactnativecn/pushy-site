@@ -5,7 +5,7 @@ description: Pushy 热更新发布流程：上传 apk/aab/ipa 原生基准包、
 type: 快速入门
 ---
 
-
+import DeltaExplainer from "../../components/DeltaExplainer";
 
 现在你的应用已经具备了检测更新的功能，下面我们来尝试发布并更新它。流程可参考下图：
 
@@ -117,6 +117,12 @@ $ pushy uploadApp harmony/build/outputs/default/harmony-default-unsigned.app
 随后你可以选择往华为应用市场发布这个版本，也可以先往设备上通过命令`hdc shell`命令安装这个 app 文件以进行测试。
 
 如果后续需要再次打包（例如修改原生代码或配置。如果只是修改 js 代码则不需要重新打包。），请先**更改版本号**，并再次`uploadApp`到服务器端记录，否则后续生成的相同版本的原生包会由于[编译时间戳不一致而`无法获取热更新`](/docs/faq#热更新报错热更新已暂停原因编译时间戳与服务器记录不一致)。
+
+### 为什么重新打包后要先上传
+
+用户下载的热更新通常是基于原生包计算的差量补丁，只有设备上的原生包正是服务端登记的那一份，补丁才能打上。服务端靠编译时间戳和内容指纹来确认这一点：
+
+<DeltaExplainer />
 
 ## 发布热更新版本
 

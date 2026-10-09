@@ -1,0 +1,40 @@
+.dx-pop {
+  animation: dx-pop 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+
+@keyframes dx-pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.dx-progress {
+  transform-origin: left;
+  animation: dx-progress var(--dur, 6s) linear both;
+}
+
+.dx-progress--static {
+  animation: none;
+}
+
+@keyframes dx-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dx-pop,
+  .dx-progress {
+    animation: none;
+  }
+}
