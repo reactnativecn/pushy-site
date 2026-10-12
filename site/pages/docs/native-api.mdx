@@ -242,7 +242,7 @@ RCTPushy.prepareBundle(completion: { result in
 
 completion 可以传 `nil`，但启动需要等待配置完成时应提供回调，不要依赖延迟几秒来猜测是否成功。页面相关的回调按生命周期使用弱引用。
 
-一轮检查在弱网下最长可能持续二十分钟左右（增量与全量下载各自有超时）。需要限定等待时间时，使用 `prepareBundleWithTimeout:completion:`（Swift 为 `prepareBundle(timeout:completion:)`，单位秒）：超时后回调立即收到 `failed / timeout`，这一轮仍在后台继续，结果照常作用于下次启动。不带超时的 `prepareBundleWithCompletion:` 最多等待 30 分钟（需 v10.60.0+）。
+一轮检查在弱网下最长可能持续二十分钟左右（增量与全量下载各自有超时）。需要限定等待时间时，使用 `prepareBundleWithTimeout:completion:`（Swift 为 `prepareBundle(timeout:completion:)`，单位秒，需 v10.60.0+）：超时后回调立即收到 `failed / timeout`，这一轮仍在后台继续，结果照常作用于下次启动。自 v10.60.0 起，不带超时的 `prepareBundleWithCompletion:` 最多等待 30 分钟。
 
 ## HarmonyOS：ArkTS
 
@@ -313,7 +313,7 @@ export const pushyClient = new Pushy({
 | `failed` | 检查、下载、配置读取或提交失败；不要提示“已是最新版本” |
 | `cancelled` | 配置已变更或恢复内置包使这轮结果失效 |
 
-常见 `reason` 包括 `not_initialized`、`not_configured`、`disabled`、`debug`、`invalid_config`、`check_failed`、`download_failed`、`commit_failed`、`internal_error`、`reset` 和 `config_changed`。Android 等待被中断时还可能返回 `interrupted`；iOS 等待超时返回 `timeout`。业务先按 `status` 分支，再用 `reason` 提示或诊断。
+常见 `reason` 包括 `not_initialized`、`not_configured`、`disabled`、`debug`、`invalid_config`、`check_failed`、`download_failed`、`commit_failed`、`internal_error`、`reset` 和 `config_changed`。Android 等待被中断时还可能返回 `interrupted`；iOS 等待超时返回 `timeout`（v10.60.0+）。业务先按 `status` 分支，再用 `reason` 提示或诊断。
 
 `configure` 不会设置热更版本或重载页面；`prepareBundle` 的普通激活受 `afterDownload` 控制，服务端 `forceBoot` 和已有救援规则继续生效。`activated: false` 时，下载并不意味着下次启动就一定加载这个版本，仍需后续激活处理。**不要在下载完成回调中提前调用 `markSuccess`**。
 
