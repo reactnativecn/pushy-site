@@ -242,6 +242,8 @@ RCTPushy.prepareBundle(completion: { result in
 
 completion 可以传 `nil`，但启动需要等待配置完成时应提供回调，不要依赖延迟几秒来猜测是否成功。页面相关的回调按生命周期使用弱引用。
 
+一轮检查在弱网下最长可能持续二十分钟左右（增量与全量下载各自有超时）。需要限定等待时间时，使用 `prepareBundleWithTimeout:completion:`（Swift 为 `prepareBundle(timeout:completion:)`，单位秒，需 v10.60.0+）：超时后回调立即收到 `failed / timeout`，这一轮仍在后台继续，结果照常作用于下次启动。自 v10.60.0 起，不带超时的 `prepareBundleWithCompletion:` 最多等待 30 分钟。
+
 ## HarmonyOS：ArkTS
 
 使用应用实际加载 bundle 的 `PushyFileJSBundleProvider` 实例。不要额外创建一个只用于检查的 provider，也不要为了初始化检查而调用一次多余的 `getURL()` 或 `getBundle()`。
@@ -295,6 +297,8 @@ export const pushyClient = new Pushy({
 
 省略 `nativeConfigSource` 或设置为 `'javascript'` 时，JS 继续按原有行为同步原生配置。可以先由原生 `configure` 提供首启配置，待 JS 正常运行后接管；**同一个配置存储以最后实际完成的写入为准**，不做跨来源字段合并。
 
+与已存配置**等价**的写入不算配置变更：补齐默认值（`disabled: false`、`queryUrls: []`、`afterDownload: 'none'` 等）、去掉服务地址末尾的 `/` 并去重、忽略字段顺序之后内容相同，就不会清空响应缓存，也不会让进行中的轮次以 `config_changed` 失效（需 v10.60.0+）。因此 JS 接管时只要 `appKey`、服务地址等与原生配置一致，就不会打断原生已经开始的检查。
+
 不要在两个来源之间反复切换。已经发出的异步 JS 配置写入不会因为随后切换选项就自动撤销；原生主导的应用应一开始就设置 `'native'`。既有 JS 写入未完成时，不应并行发起预期长期保留的原生配置。
 
 ## 返回结果和生效时机
@@ -309,7 +313,7 @@ export const pushyClient = new Pushy({
 | `failed` | 检查、下载、配置读取或提交失败；不要提示“已是最新版本” |
 | `cancelled` | 配置已变更或恢复内置包使这轮结果失效 |
 
-常见 `reason` 包括 `not_initialized`、`not_configured`、`disabled`、`debug`、`invalid_config`、`check_failed`、`download_failed`、`commit_failed`、`internal_error`、`reset` 和 `config_changed`。Android 等待被中断时还可能返回 `interrupted`。业务先按 `status` 分支，再用 `reason` 提示或诊断。
+常见 `reason` 包括 `not_initialized`、`not_configured`、`disabled`、`debug`、`invalid_config`、`check_failed`、`download_failed`、`commit_failed`、`internal_error`、`reset` 和 `config_changed`。Android 等待被中断时还可能返回 `interrupted`；iOS 等待超时返回 `timeout`（v10.60.0+）。业务先按 `status` 分支，再用 `reason` 提示或诊断。
 
 `configure` 不会设置热更版本或重载页面；`prepareBundle` 的普通激活受 `afterDownload` 控制，服务端 `forceBoot` 和已有救援规则继续生效。`activated: false` 时，下载并不意味着下次启动就一定加载这个版本，仍需后续激活处理。**不要在下载完成回调中提前调用 `markSuccess`**。
 
@@ -319,7 +323,7 @@ export const pushyClient = new Pushy({
 
 自动检查若因缺少或禁用配置而在开始前跳过，不会消耗实际轮次；之后原生配置成功，仍可在同一进程检查。配置更新本身不会启动新轮次，也不会把已完成的轮次重置为可再次执行。
 
-配置替换会使旧响应缓存和进行中的原生决策失效，旧轮次不能再用旧 appKey 或旧策略提交激活；已下载文件仍可能留作后续复用。正在进行的网络传输不保证立即中断，但不会把失效结果当成更新成功。此时结果通常为 `cancelled / config_changed`，下一次进程启动使用新配置。
+配置替换（与已存配置不等价的写入）会使旧响应缓存和进行中的原生决策失效，旧轮次不能再用旧 appKey 或旧策略提交激活；已下载文件仍可能留作后续复用。正在进行的网络传输不保证立即中断，但不会把失效结果当成更新成功。此时结果通常为 `cancelled / config_changed`，下一次进程启动使用新配置。
 
 原生与 JS 检查不是同一个网络任务，原有响应缓存和“JS 已完成则跳过延迟原生检查”的规则继续保留，但不承诺把主动原生请求与进行中的 JS 请求合并。
 
