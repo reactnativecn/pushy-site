@@ -11,8 +11,9 @@
  *
  * ZIP rather than .tar.gz: clients pick the format from Content-Type first,
  * and Alibaba ESA (pushy.reactnative.cn) serves .tar.gz as application/x-tar
- * with no way to override it from the repository; .zip is application/zip on
- * both ESA and GitHub Pages. The RFC requires clients to support both.
+ * with no way to override it from the repository; .zip comes back as a zip
+ * type from both (application/zip on ESA, application/x-zip-compressed on
+ * GitHub Pages). The RFC requires clients to support both formats.
  *
  * Reads the files from a tag of a local react-native-update-skill checkout,
  * writes public/.well-known/agent-skills/react-native-update.zip and points
