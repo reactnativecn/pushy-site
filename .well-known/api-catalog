@@ -1,0 +1,25 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://update.reactnative.cn/api/",
+      "service-desc": [
+        {
+          "href": "https://update.reactnative.cn/api/openapi",
+          "type": "application/json"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://pushy.reactnative.cn/docs/api",
+          "type": "text/html"
+        }
+      ],
+      "status": [
+        {
+          "href": "https://update.reactnative.cn/api/status",
+          "type": "application/json"
+        }
+      ]
+    }
+  ]
+}

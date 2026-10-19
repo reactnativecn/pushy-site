@@ -3,7 +3,7 @@
   "product": "Pushy",
   "baseUrl": "https://pushy.reactnative.cn",
   "resourceScheme": "pushy-docs",
-  "sourceCommit": "e8bf4e6639bf7431b3cb31e1f1f9649fe2be18cc",
+  "sourceCommit": "c5d153f999311626febd9fa9a715053b4c186093",
   "documents": [
     {
       "slug": "analytics",
