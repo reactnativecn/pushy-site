@@ -1,0 +1,11 @@
+{
+  "serverInfo": {
+    "name": "Pushy API Server",
+    "version": "1.0.0"
+  },
+  "endpoint": "https://update.reactnative.cn/api/mcp",
+  "capabilities": {
+    "tools": {},
+    "resources": {}
+  }
+}
