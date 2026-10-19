@@ -5,8 +5,8 @@
       "name": "react-native-update",
       "type": "archive",
       "description": "Integrate and troubleshoot React Native Update OTA for Pushy and Cresc. Use when wiring react-native-update into React Native CLI, Expo prebuild, tvOS/react-native-tvos, HarmonyOS, brownfield, monorepo, or mixed native apps; configuring update.json/appKey, Pushy/Cresc clients, UpdateProvider/useUpdate, native bundle loading, release baseline upload, native cold-start recovery/forceBoot/purgeRestore, bundleHash and error metadata, source maps, checkStrategy/updateStrategy, canary/metaInfo flows, Hermes-base verification, expo-updates conflicts, or OTA failures.",
-      "url": "/.well-known/agent-skills/react-native-update.tar.gz",
-      "digest": "sha256:721f3c12b007afba479a9952b8e369663aa7a1faefc65c34ece4914fa4ca2bf4"
+      "url": "/.well-known/agent-skills/react-native-update.zip",
+      "digest": "sha256:347458559403c8c9cb343eff682d839f9a54720815df363468e5b038a55d263b"
     }
   ]
 }

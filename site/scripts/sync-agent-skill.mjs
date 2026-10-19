@@ -4,13 +4,18 @@
  * /.well-known/agent-skills/ (Agent Skills Discovery RFC v0.2.0).
  *
  * The skill has references/ and scripts/ next to SKILL.md, so it ships as a
- * `type: "archive"` entry: a .tar.gz whose root is the skill directory itself
+ * `type: "archive"` entry: a .zip whose root is the skill directory itself
  * (the RFC forbids a wrapper directory, which the skill repo's own .skill ZIP
- * has). The archive is byte-reproducible (fixed mtime/owner, sorted entries,
- * gzip without a timestamp), so re-running on the same tag changes nothing.
+ * has). The archive is byte-reproducible (fixed timestamps, sorted entries),
+ * so re-running on the same tag changes nothing.
+ *
+ * ZIP rather than .tar.gz: clients pick the format from Content-Type first,
+ * and Alibaba ESA (pushy.reactnative.cn) serves .tar.gz as application/x-tar
+ * with no way to override it from the repository; .zip is application/zip on
+ * both ESA and GitHub Pages. The RFC requires clients to support both.
  *
  * Reads the files from a tag of a local react-native-update-skill checkout,
- * writes public/.well-known/agent-skills/react-native-update.tar.gz and points
+ * writes public/.well-known/agent-skills/react-native-update.zip and points
  * index.json at it with its sha256 digest. Run it after each skill release and
  * commit the result; the site build only copies public/.
  *
@@ -22,15 +27,17 @@ import { createHash } from 'node:crypto';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { gzipSync } from 'node:zlib';
+import { crc32, deflateRawSync } from 'node:zlib';
 
 const SKILL = 'react-native-update';
 const SOURCE_DIR = `skill/${SKILL}`;
 const SITE_ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT_DIR = path.join(SITE_ROOT, 'pages/public/.well-known/agent-skills');
-const ARCHIVE = `${SKILL}.tar.gz`;
-// 2020-01-01T00:00:00Z: any fixed value keeps the archive reproducible.
-const MTIME = 1577836800;
+const ARCHIVE = `${SKILL}.zip`;
+const LEGACY_ARCHIVES = [`${SKILL}.tar.gz`];
+// MS-DOS date 1980-01-01 00:00: any fixed value keeps the archive reproducible.
+const DOS_DATE = (0 << 9) | (1 << 5) | 1;
+const DOS_TIME = 0;
 
 const [tag, repoArg] = process.argv.slice(2);
 if (!tag) {
@@ -56,39 +63,58 @@ const files = git(['ls-tree', '-r', '--full-tree', tag, '--', SOURCE_DIR])
   .sort((a, b) => (a.name < b.name ? -1 : 1));
 if (!files.some((file) => file.name === 'SKILL.md')) throw new Error(`No SKILL.md in ${tag}:${SOURCE_DIR}`);
 
-function octal(value, width) {
-  return `${value.toString(8).padStart(width - 1, '0')}\0`;
-}
-
-// ustar header; entry names here are short, so the 100-byte name field is enough.
-function header(name, size, mode) {
-  if (Buffer.byteLength(name) > 100) throw new Error(`Name too long for ustar: ${name}`);
-  const block = Buffer.alloc(512);
-  block.write(name, 0);
-  block.write(octal(mode, 8), 100);
-  block.write(octal(0, 8), 108);
-  block.write(octal(0, 8), 116);
-  block.write(octal(size, 12), 124);
-  block.write(octal(MTIME, 12), 136);
-  block.fill(' ', 148, 156);
-  block.write('0', 156);
-  block.write('ustar\0', 257);
-  block.write('00', 263);
-  let sum = 0;
-  for (const byte of block) sum += byte;
-  block.write(`${sum.toString(8).padStart(6, '0')}\0 `, 148);
-  return block;
-}
-
-const blocks = [];
+// Local file headers and data, then the central directory and its end record.
+// Unix modes go in the external attributes so the doctor scripts stay
+// executable when extracted.
+const local = [];
+const central = [];
+let offset = 0;
 for (const file of files) {
   const data = git(['cat-file', 'blob', file.sha], 'buffer');
-  blocks.push(header(file.name, data.length, file.mode === '100755' ? 0o755 : 0o644), data);
-  blocks.push(Buffer.alloc((512 - (data.length % 512)) % 512));
+  const compressed = deflateRawSync(data, { level: 9 });
+  const name = Buffer.from(file.name);
+  const crc = crc32(data);
+  const mode = file.mode === '100755' ? 0o100755 : 0o100644;
+
+  const head = Buffer.alloc(30);
+  head.writeUInt32LE(0x04034b50, 0);
+  head.writeUInt16LE(20, 4);
+  head.writeUInt16LE(0x0800, 6); // UTF-8 names
+  head.writeUInt16LE(8, 8); // deflate
+  head.writeUInt16LE(DOS_TIME, 10);
+  head.writeUInt16LE(DOS_DATE, 12);
+  head.writeUInt32LE(crc, 14);
+  head.writeUInt32LE(compressed.length, 18);
+  head.writeUInt32LE(data.length, 22);
+  head.writeUInt16LE(name.length, 26);
+  local.push(head, name, compressed);
+
+  const entry = Buffer.alloc(46);
+  entry.writeUInt32LE(0x02014b50, 0);
+  entry.writeUInt16LE((3 << 8) | 20, 4); // made by Unix
+  entry.writeUInt16LE(20, 6);
+  entry.writeUInt16LE(0x0800, 8);
+  entry.writeUInt16LE(8, 10);
+  entry.writeUInt16LE(DOS_TIME, 12);
+  entry.writeUInt16LE(DOS_DATE, 14);
+  entry.writeUInt32LE(crc, 16);
+  entry.writeUInt32LE(compressed.length, 20);
+  entry.writeUInt32LE(data.length, 24);
+  entry.writeUInt16LE(name.length, 28);
+  entry.writeUInt32LE((mode << 16) >>> 0, 38);
+  entry.writeUInt32LE(offset, 42);
+  central.push(entry, name);
+
+  offset += head.length + name.length + compressed.length;
 }
-blocks.push(Buffer.alloc(1024));
-// Node writes a zero MTIME into the gzip header, so this is deterministic too.
-const archive = gzipSync(Buffer.concat(blocks), { level: 9 });
+const directory = Buffer.concat(central);
+const end = Buffer.alloc(22);
+end.writeUInt32LE(0x06054b50, 0);
+end.writeUInt16LE(files.length, 8);
+end.writeUInt16LE(files.length, 10);
+end.writeUInt32LE(directory.length, 12);
+end.writeUInt32LE(offset, 16);
+const archive = Buffer.concat([...local, directory, end]);
 const digest = `sha256:${createHash('sha256').update(archive).digest('hex')}`;
 
 const skillMd = git(['show', `${tag}:${SOURCE_DIR}/SKILL.md`]);
@@ -98,6 +124,7 @@ if (!description) throw new Error('SKILL.md has no description');
 mkdirSync(OUT_DIR, { recursive: true });
 // The old single-file copy is superseded by the archive.
 rmSync(path.join(OUT_DIR, SKILL), { recursive: true, force: true });
+for (const legacy of LEGACY_ARCHIVES) rmSync(path.join(OUT_DIR, legacy), { force: true });
 writeFileSync(path.join(OUT_DIR, ARCHIVE), archive);
 const index = {
   $schema: 'https://schemas.agentskills.io/discovery/0.2.0/schema.json',
