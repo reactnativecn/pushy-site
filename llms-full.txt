@@ -342,13 +342,38 @@ RN \< 0.60 或其他不能自动 link 的情况
 如果你使用 `expo` 48 或更高版本，且 `react-native-update` >= 10.28.2，则可以自动配置 bundle url，请直接去往[下一个步骤](#添加测试用的-deep-link)。
 如果你没有使用 `expo`，或 `expo` 版本低于 48，则需要按以下步骤手动配置。
 #### iOS
-在你的 AppDelegate.mm 或 AppDelegate.m 或 AppDelegate.swift 文件（不同 RN 版本可能后缀名不同）中增加如下代码：
+在提供 `bundleURL` 的文件中增加如下代码。RN 0.88 起，新建项目的 iOS 模板改用 UIScene 生命周期（使用 iOS 27 SDK 构建的应用必须采用），React Native 的启动入口和 `bundleURL` 方法从 `AppDelegate.swift` 移到了 `SceneDelegate.swift`；更早的版本则在 `AppDelegate.mm`、`AppDelegate.m` 或 `AppDelegate.swift` 中（不同 RN 版本可能后缀名不同）。不论在哪个文件里，需要修改的都是同一个 `bundleURL` 方法。
 :::warning
 注意：如果你是混编原生的项目，务必注意**不能直接指定 bundleURL 来初始化**
 rootView，需要先使用`initWithDelegate`方法来初始化
 bridge，然后使用`initWithBridge`方法来初始化
 rootView。否则热更新功能可能无法正常工作。
 :::
+
+**Swift（RN 0.88 或以上，SceneDelegate）**
+
+```swift
+import React
+import React_RCTAppDelegate
+import ReactAppDependencyProvider
+import UIKit
+import react_native_update    // <-- 在这里引入，需要 pushy v10.22.0+ 版本
+
+class SceneDelegate: RCTDefaultReactNativeFactoryDelegate, UIWindowSceneDelegate {
+  // ... 其他代码（scene(_:willConnectTo:options:) 等保持模板原样）
+
+  override func bundleURL() -> URL? {
+    #if DEBUG
+    // 原先 DEBUG 这里的写法不作修改(所以 DEBUG 模式下不可热更新)
+    RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+    #else
+    RCTPushy.bundleURL()  // <--  把这里非 DEBUG 的情况替换为热更新 bundle
+    #endif
+  }
+}
+```
+从 RN 0.87 或更早版本升级到 0.88 时，如果按 [Upgrade Helper](https://react-native-community.github.io/upgrade-helper/?from=0.87.1\&to=0.88.0) 把启动入口迁移到 `SceneDelegate`，记得把原先 `AppDelegate`（或 `ReactNativeDelegate`）中的 `RCTPushy.bundleURL()` 一并搬过来，否则 Release 包会一直加载安装包内置的 bundle，热更新不会生效。Objective-C 项目的写法可参考 [示例工程](https://github.com/reactnativecn/react-native-update/blob/master/Example/testHotUpdate/ios/AwesomeProject/AppDelegate.mm)。
+
 
 **Objective-C**
 
@@ -392,7 +417,7 @@ rootView。否则热更新功能可能无法正常工作。
 ```
 
 
-**Swift**
+**Swift（RN 0.87 或以下，AppDelegate）**
 
 ```swift
 import UIKit
@@ -402,6 +427,7 @@ import ReactAppDependencyProvider
 import react_native_update    // <-- 在这里引入，需要 pushy v10.22.0+ 版本
 
 
+// RN 0.79 ~ 0.87 的模板中 bundleURL 位于同文件的 ReactNativeDelegate 类里，改法相同
 @main
 class AppDelegate: RCTAppDelegate {
   // ... 其他代码
