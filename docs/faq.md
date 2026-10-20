@@ -233,6 +233,8 @@ Microsoft App Center（含 CodePush）已于 2025 年 3 月 31 日停止服务�
 
 转账完成后请截图发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，并写明注册邮箱，我们将在一个工作日内开通对应服务。
 
+请不要使用私人账户对公转账。转账有任何疑问，请联系 QQ 客服 34731408。
+
 ***
 
 #### 可以按月付款吗？
