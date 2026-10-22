@@ -1,0 +1,173 @@
+---
+order: 3
+title: Expo 项目热更新：Pushy 与 EAS Update 对比及接入
+description: Expo 热更新怎么选？对比 Pushy 与 EAS Update 的增量包、国内 CDN、计费、灰度回滚与鸿蒙支持，并介绍 Expo SDK 50+ 通过 prebuild 接入 Pushy、处理 expo-updates 冲突的步骤。
+type: 快速入门
+---
+
+import { Steps } from "@rspress/core/theme";
+
+Expo 项目要做热更新（OTA），常见的选择有两个：Expo 官方的 **EAS Update**（客户端为 `expo-updates`），以及 **Pushy**（客户端为 `react-native-update`）。两者都能在不重新提交应用商店审核的前提下更新 JS 代码和图片等资源，但在增量方式、分发网络、计费方式和平台覆盖上各有侧重。
+
+本页先说明 Pushy 在 Expo 项目中是如何工作的，再给出两者的客观对比和选型建议，最后列出接入步骤。具体的原生配置、代码集成与发布命令请以[安装配置](/docs/getting-started)、[代码集成](/docs/integration)和[发布热更新](/docs/publish)为准，本页只做串联和 Expo 相关的补充。
+
+:::tip 推荐先用 Skill 自动接入
+如果你使用支持 Skills 的 AI 编程工具，可以先[安装 react-native-update Skill](/docs/skills)。它覆盖 Expo prebuild 工程的接入流程，并会检查 `expo-updates` 冲突、原生目录是否已经生成等常见问题。
+:::
+
+## Pushy 在 Expo 项目中如何工作
+
+### 支持的 Expo SDK 版本
+
+- **要求 Expo SDK 50 或更高版本。** `react-native-update` 在 iOS（podspec）和 Android（`build.gradle`）构建时都会检测项目中安装的 `expo` 版本，只有 SDK 50 及以上才会启用其中的 Expo 模块；低于 50 时按普通 React Native 项目处理，需要像非 Expo 项目一样手动配置 Bundle URL。
+- **使用新架构时建议 Expo SDK 51 及以上**，Expo 51 以下的新架构支持并不完整。总体而言，建议使用尽可能新的 Expo 版本。
+- `react-native-update` 仓库中的 Expo 示例工程（`Example/expoUsePushy`）目前基于 Expo SDK 57，并在 CI 中对 iOS 和 Android 两端做构建验证。
+
+### 需要 prebuild，不能在 Expo Go 中使用
+
+`react-native-update` 包含原生代码，所以 Expo 项目需要通过 `npx expo prebuild` 生成 `ios`、`android` 原生目录（即 Expo 所说的 Continuous Native Generation，CNG），然后编译出自己的 release 包。这也意味着：
+
+- **Expo Go 无法使用 Pushy**，因为 Expo Go 不能加载项目自带的原生模块；
+- 热更新只在 release 包中生效，DEBUG 模式下依然走 Metro 开发服务器；
+- 原生包可以本地编译，也可以用 EAS Build 编译——Pushy 不依赖某种特定的构建方式，只要求把**最终分发给用户的那个安装包**上传为基准版本（见下文）。
+
+### 不需要 config plugin：以 Expo Module 形式自动接入
+
+`react-native-update` 没有提供 config plugin（没有 `app.plugin.js`），也**不需要**在 `app.json` 的 `plugins` 中声明。它在包内带有 `expo-module.config.json`，以 Expo Module 的形式被 Expo autolinking 自动链接：
+
+- **iOS**：注册了一个 `ExpoReactDelegateHandler`，在启动时把 JS bundle 的地址交给 `RCTPushy.bundleURL()` 决定；
+- **Android**：注册了一个 `ReactNativeHostHandler`，通过 `getJSBundleFile` 返回 `UpdateContext.getBundleUrl(...)`。
+
+因此，对于 Expo SDK 48 及以上且 `react-native-update` >= 10.28.2 的项目，[安装配置](/docs/getting-started)中「配置 Bundle URL」这一步可以跳过，`AppDelegate` / `MainApplication` 无需手改。
+
+:::info
+安装配置页中的其余原生步骤（例如关闭 Android 的 `crunchPngs`、`react-native-screens` 相关的 `MainActivity` 修改、测试用的 Deep Link）对 Expo 项目同样适用。注意在 CNG 工作流中，`ios`、`android` 目录会在 `npx expo prebuild --clean` 时重新生成，手动修改会丢失。请根据团队习惯选择：把原生目录提交到仓库长期维护，或用你自己的 config plugin 把这些修改固化下来。
+:::
+
+### 与 expo-updates 的关系：二选一，不要同时安装
+
+`expo-updates` 是 EAS Update 的客户端，它同样会在应用启动时接管 JS bundle 的加载。Pushy 与它的原理相同、作用位置相同，两者同时存在会争夺 bundle 加载权，导致热更新功能冲突。所以：
+
+- **使用 Pushy 时，请不要安装 `expo-updates`**；
+- 如果项目原本用的是 EAS Update，迁移时需要先移除 `expo-updates`，再重新 prebuild 和编译原生包（具体步骤见下文「接入步骤」）。
+
+注意 EAS Build、EAS Submit 等其他 Expo 服务与 Pushy 并不冲突，可以继续使用；需要二选一的只是负责 OTA 的 `expo-updates`。
+
+## Pushy 与 EAS Update 对比
+
+下表只比较热更新相关的能力。EAS Update 一侧的信息来自 Expo 官方文档（[How EAS Update works](https://docs.expo.dev/eas-update/how-it-works/)、[Bundle diffing](https://docs.expo.dev/eas-update/bundle-diffing/)、[Rollouts](https://docs.expo.dev/eas-update/rollouts/)、[Error recovery](https://docs.expo.dev/eas-update/error-recovery/)、[Standalone service](https://docs.expo.dev/eas-update/standalone-service/)、[Pricing](https://expo.dev/pricing)），产品会持续迭代，请以官方最新说明为准。
+
+| 对比项 | Pushy（react-native-update） | EAS Update（expo-updates） |
+|---|---|---|
+| **JS bundle 增量** | 基于 hdiff 的差量补丁，并针对 Hermes 字节码做了专项优化；首次热更新即可基于安装包内置的 bundle 计算差量 | 支持基于 bsdiff 的 bundle diffing（需 SDK 55+，SDK 56 起默认开启）；仅在补丁明显更小时下发补丁，否则下发完整 bundle；基于安装包内置 bundle 的补丁在 SDK 58+ 配合 EAS Build 自动启用，SDK 57 及以下为实验性选项 |
+| **图片等资源** | 只下发有变化的资源 | 只下载设备上尚未拥有的资源 |
+| **分发网络** | 国内使用阿里云 CDN，海外使用 Cloudflare | Expo 托管的全球服务；官方文档未针对中国大陆网络做专门说明，建议在目标用户网络下实测 |
+| **计费方式** | 提供免费版，按套餐计费，CDN 流量不单独计费，详见[价格页](/pricing) | 提供免费额度；付费套餐按月活用户（MAU）计费，超出套餐带宽另行计费，详见 [Expo 价格页](https://expo.dev/pricing) |
+| **灰度发布** | 按比例灰度，按设备 UUID 哈希稳定分组，可与全量版本并存，见[灰度发布](/docs/publish#灰度发布) | 支持按百分比灰度单个更新，也支持按分支（branch）灰度 |
+| **出错回滚** | 新版本启动崩溃自动回滚；可在后台暂停热更、改绑到旧版本；JS 无法运行时还可通过[强制启动（救砖）](/docs/publish#强制启动救砖)由原生侧拉取修复版本 | 首屏渲染前出错时会标记该更新失败并回退到之前成功的更新；首屏渲染后出错则不再回退、只能向前修复；服务端可回滚灰度或回退到内置版本 |
+| **是否需要 EAS Build** | 不需要，本地编译、EAS Build 或其他 CI 均可 | 不强制，官方说明可脱离 EAS Build 单独使用，但需自行配置 channel，部分依赖构建信息的功能不可用 |
+| **鸿蒙（HarmonyOS）** | 第一方支持，见[安装配置](/docs/getting-started)中的 Harmony 部分 | `expo-updates` 仅支持 iOS 和 Android |
+| **Expo Go** | 不支持，需要 prebuild 后自行编译 | 可配合 development build 预览更新 |
+| **客户端与工具** | 客户端、命令行工具与管理界面代码开源 | `expo-updates` 客户端开源，服务端为 Expo 托管服务 |
+
+关于鸿蒙需要说明一点：Expo 本身不面向鸿蒙构建。如果你的 React Native 应用同时有鸿蒙版本（基于 React Native for OpenHarmony），Pushy 可以用同一套服务和命令行管理 iOS、Android 与鸿蒙三端的热更新；鸿蒙端的接入方式与 Expo 无关，按[安装配置](/docs/getting-started)中的 Harmony 部分进行即可。
+
+关于增量包大小，Pushy 在真实 React Native 0.86 应用上的实测数据（一行文案改动约 3.4 KB）见[产品简介](/docs/intro)中的「实测数据」一节，评测代码与数据公开可复现。
+
+## 如何选择
+
+两者都是成熟可用的方案，可以按下面几个维度判断：
+
+**更适合 Pushy 的情况**
+
+- 主要用户在中国大陆，希望热更新走国内 CDN，提高下载速度和成功率；
+- 应用体积大、迭代频繁，希望从安装后的第一次热更新起就下发尽可能小的差量包；
+- 同时有鸿蒙版本，希望三端用同一套热更新服务；
+- 希望流量不单独计费、成本可预期，或需要中文文档和付费专人技术支持；
+- 需要「强制启动（救砖）」、版本健康度、按比例灰度等发布控制能力（参见[数据分析](/docs/analytics)）。
+
+**更适合 EAS Update 的情况**
+
+- 用户主要在海外，团队已深度使用 EAS Build、EAS Submit 等 Expo 服务，希望在同一个控制台管理构建与更新；
+- 依赖 channel / branch / runtimeVersion 这套 Expo 原生的发布模型，或需要在 Expo 的 development build 中预览更新；
+- 只发布 iOS 和 Android，没有鸿蒙需求。
+
+如果你的情况介于两者之间，可以先用 Pushy 的免费版在一个测试应用上实测下载速度和包体积，再做决定。无论选择哪一个，同一个应用里都只保留一套 OTA 客户端。
+
+## 接入步骤
+
+以下是 Expo 项目接入 Pushy 的主线，每一步的细节请点开对应文档。
+
+<Steps>
+
+### 确认 Expo 版本并移除 expo-updates
+
+确认 `expo` 为 SDK 50 或更高版本（使用新架构建议 51+）。如果项目已经安装了 `expo-updates`，先移除：
+
+```bash
+npm uninstall expo-updates
+```
+
+`app.json` 中仅供 `expo-updates` 使用的配置（如 `updates`、`runtimeVersion`）可以一并删掉。若此前用 EAS Build 发布过带 channel 的构建，`eas.json` 中的 channel 设置也不再需要。
+
+### 安装 react-native-update 与命令行工具
+
+```bash
+# 全局安装命令行工具
+npm i -g react-native-update-cli
+
+# 在项目中安装热更新模块
+npm i react-native-update
+```
+
+### 预构建原生工程
+
+```bash
+npx expo prebuild
+
+# 若之前生成过原生目录且里面残留 expo-updates 的配置，可使用 --clean 重新生成
+# npx expo prebuild --clean
+
+# 进入 iOS 目录安装 iOS 模块
+cd ios && pod install
+```
+
+Bundle URL 会由 Expo 模块自动接管，无需手改。然后按[安装配置](/docs/getting-started)补齐 Android 关闭 `crunchPngs`、`MainActivity`（如使用 `react-native-screens`）和测试用 Deep Link 等步骤，并在其中的「登录与创建应用」一节创建应用、生成 `update.json`。
+
+### 集成代码
+
+按[代码集成](/docs/integration)，从 `update.json` 读取 `appKey`，创建 `Pushy` 客户端并用 `UpdateProvider` 包裹根组件。使用 Expo Router 时，可以在根布局（如 `app/_layout.tsx`）中包裹。
+
+### 准备 index.js 入口
+
+`pushy bundle` 检测到 Expo 项目时会自动调用 `expo export:embed` 打包，默认入口文件为 `index.js`。使用 Expo Router 等没有 `index.js` 的项目，需要新建一个 `index.js` 引用框架入口，例如：
+
+```js
+import "expo-router/entry";
+```
+
+详见[发布热更新](/docs/publish#发布热更新版本)中的说明。
+
+### 编译 release 包并上传基准版本
+
+用本地编译或 EAS Build 生成 release 包，然后用 `pushy uploadIpa`、`pushy uploadApk` 或 `pushy uploadAab` 上传。**上传的必须是最终分发给用户的同一个文件**，否则服务端无法确认设备上的原生包，差量补丁也无法生成。使用 EAS Build 时，请下载构建产物后再上传，并用同一个产物提交商店。
+
+### 发布热更新
+
+修改 JS 代码或图片后，运行 `pushy bundle --platform <ios|android>` 生成并上传热更新包，再绑定到对应的原生包版本即可。可以先用[扫码测试](/docs/bestpractice#测试与回滚)验证，再通过[灰度发布](/docs/publish#灰度发布)逐步放量。命令参数见[命令行工具](/docs/cli)。
+
+</Steps>
+
+## 常见问题
+
+#### 已经用 EAS Build 打包，还能用 Pushy 吗？
+
+可以。EAS Build 只负责编译原生包，Pushy 只要求你把最终分发的那个安装包上传为基准版本。需要注意的只是不要在项目中保留 `expo-updates`。
+
+#### 新增或升级了带原生代码的 Expo 包，能热更新吗？
+
+不能。任何需要重新编译才能生效的修改（新增原生模块、修改 `app.json` 中影响原生工程的配置、升级 Expo SDK 等）都需要重新 prebuild、编译并上传新的原生基准版本。可热更新与不可热更新的范围见[常见问题](/docs/faq#哪些修改可以热更新哪些不能)。
+
+#### 接入后热更新没有生效怎么办？
+
+先确认测试的是 release 包而非 DEBUG 包，再检查是否残留了 `expo-updates`、原生包是否已上传为基准版本。其他报错可查阅[错误码说明](/docs/errors)与[常见问题](/docs/faq)，也可以到 [GitHub Issues](https://github.com/reactnativecn/react-native-update/issues) 提问。

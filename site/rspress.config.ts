@@ -1,8 +1,10 @@
+import { execFileSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import { defineConfig } from '@rspress/core';
 import { pluginSass } from '@rsbuild/plugin-sass';
 import rspressPluginMermaid from 'rspress-plugin-mermaid';
+import { PAID_PLANS } from './components/pricing/plans';
 
 const SITE_ORIGIN = 'https://pushy.reactnative.cn';
 const OG_IMAGE = `${SITE_ORIGIN}/images/og.jpg`;
@@ -18,7 +20,14 @@ const SOFTWARE_JSON_LD = JSON.stringify({
   operatingSystem: 'iOS, Android, HarmonyOS',
   description:
     '为 React Native 打造的热更新服务：KB 级增量包、CDN 秒级分发、崩溃自动回滚，无需等待应用商店审核。',
-  offers: { '@type': 'Offer', price: '0', priceCurrency: 'CNY' },
+  offers: {
+    '@type': 'AggregateOffer',
+    priceCurrency: 'CNY',
+    lowPrice: '0',
+    highPrice: String(Math.max(...Object.values(PAID_PLANS).map((plan) => plan.annualPrice))),
+    offerCount: String(Object.keys(PAID_PLANS).length + 1),
+    url: `${SITE_ORIGIN}/pricing`,
+  },
   sameAs: [
     'https://github.com/reactnativecn/react-native-update',
     'https://www.npmjs.com/package/react-native-update',
@@ -57,6 +66,67 @@ const FAQ_JSON_LD = JSON.stringify({
     }),
 }).replace(/</g, '\\u003c');
 
+const PUBLISHER = {
+  '@type': 'Organization',
+  name: 'Pushy 极速热更新',
+  url: `${SITE_ORIGIN}/`,
+  logo: `${SITE_ORIGIN}/images/logo.svg`,
+};
+
+// dateModified comes from each page's last commit, like the sitemap's lastmod;
+// a shallow clone would date every page the same, so it is left out there.
+const SHALLOW_CLONE = (() => {
+  try {
+    return execFileSync('git', ['rev-parse', '--is-shallow-repository'], { cwd: __dirname, encoding: 'utf8' }).trim() !== 'false';
+  } catch {
+    return true;
+  }
+})();
+
+function lastCommitDate(file: string) {
+  if (SHALLOW_CLONE) return undefined;
+  try {
+    return execFileSync('git', ['log', '-1', '--format=%cI', '--', file], { cwd: __dirname, encoding: 'utf8' }).trim() || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** TechArticle + BreadcrumbList JSON-LD for a /docs/ page, from its frontmatter. */
+function docJsonLd(routePath: string, absolutePath: string) {
+  const source = fs.readFileSync(absolutePath, 'utf8');
+  const frontmatter = source.match(/^---\n([\s\S]*?)\n---/)?.[1] ?? '';
+  const field = (name: string) => frontmatter.match(new RegExp(`^${name}:\\s*(.+)$`, 'm'))?.[1].trim().replace(/^(['"])(.*)\\1$/, '$2');
+  const title = field('title');
+  if (!title) return undefined;
+  const url = `${SITE_ORIGIN}${routePath}`;
+  return JSON.stringify([
+    {
+      '@context': 'https://schema.org',
+      '@type': 'TechArticle',
+      headline: title,
+      description: field('description'),
+      url,
+      mainEntityOfPage: url,
+      image: OG_IMAGE,
+      inLanguage: 'zh-CN',
+      dateModified: lastCommitDate(absolutePath),
+      author: PUBLISHER,
+      publisher: PUBLISHER,
+      about: { '@type': 'SoftwareApplication', name: 'Pushy', url: `${SITE_ORIGIN}/` },
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: '首页', item: `${SITE_ORIGIN}/` },
+        { '@type': 'ListItem', position: 2, name: '文档', item: `${SITE_ORIGIN}/docs/intro` },
+        { '@type': 'ListItem', position: 3, name: title, item: url },
+      ],
+    },
+  ]).replace(/</g, '\\u003c');
+}
+
 export default defineConfig({
   llms: true,
   outDir: 'out',
@@ -85,6 +155,10 @@ export default defineConfig({
     (route) =>
       route.routePath === '/'
         ? `<script type="application/ld+json">${SOFTWARE_JSON_LD}</script>`
+        : undefined,
+    (route) =>
+      route.routePath.startsWith('/docs/')
+        ? `<script type="application/ld+json">${docJsonLd(route.routePath, route.absolutePath)}</script>`
         : undefined,
     (route) =>
       route.routePath === '/docs/faq'
@@ -140,9 +214,19 @@ export default defineConfig({
           ],
         },
         {
+          text: '场景指南',
+          items: [
+            { text: '从 CodePush 迁移', link: '/docs/migrate-from-codepush' },
+            { text: 'Expo 项目', link: '/docs/expo' },
+            { text: '鸿蒙 HarmonyOS', link: '/docs/harmony' },
+            { text: '原生 App 混编（Brownfield）', link: '/docs/brownfield' },
+          ],
+        },
+        {
           text: '其他',
           items: [
             { text: '常见问题', link: '/docs/faq' },
+            { text: '更新日志', link: '/docs/changelog' },
           ],
         }
       ],

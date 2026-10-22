@@ -101,7 +101,7 @@ function Footer() {
               >
                 <img
                   src="https://img.alicdn.com/tfs/TB1..50QpXXXXX7XpXXXXXXXXXX-40-40.png"
-                  alt=""
+                  alt="公安备案图标"
                   className="w-4 h-4"
                 />
                 鄂公网安备 42011202001821号

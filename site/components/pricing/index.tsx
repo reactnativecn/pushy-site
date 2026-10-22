@@ -7,6 +7,7 @@ import {
   CheckCircleFilled,
 } from "@ant-design/icons";
 import { ReactNode } from "react";
+import { PAID_PLANS } from "./plans";
 
 const AppText = () => (
   <Tooltip title="iOS 和 Android 版本记做不同的应用。您可删除已不再使用的应用来有效利用配额。">
@@ -94,7 +95,7 @@ const AI_MODEL_PLAZA_URL = "https://36k.ai/model-plaza";
 const AI_MODELS = "GPT、Claude、DeepSeek、GLM、Kimi";
 
 // 年付赠送的 Token（美元计价额度）。只有年付送，版本越高送得越多，月付、升级和加购不送；
-// 数字要和 pushy-go internal/order/ai_bonus.go 保持一致。
+// 数字在 ./plans.ts。
 function AIBonusTag({ amount }: { amount: number }) {
   return (
     <div className="mt-3 rounded-xl border border-fuchsia-200 bg-gradient-to-r from-fuchsia-50 to-indigo-50 px-3 py-2 text-sm">
@@ -178,9 +179,9 @@ function Pricing() {
 
       <div className="max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-6">
-            公平透明的价格体系
-          </h2>
+          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-6">
+            公平透明的热更新价格
+          </h1>
           <p className="text-lg text-slate-600 leading-relaxed">
             新注册用户将自动获得
             <Tooltip title="您可将注册用户名、公司（或个人）名称发送至<hi@charmlot.com>，申请延长评估时间">
@@ -244,11 +245,11 @@ function Pricing() {
             <div className="mb-8 border-b border-slate-100 pb-8 flex flex-col justify-start">
               <div className="flex items-baseline text-slate-900">
                 <span className="text-3xl font-bold">¥</span>
-                <span className="text-5xl font-extrabold tracking-tight">960</span>
+                <span className="text-5xl font-extrabold tracking-tight">{PAID_PLANS.standard.annualPrice}</span>
                 <span className="text-slate-500 ml-2 font-medium">/ 年</span>
               </div>
-              <AnnualDiscount annualPrice={960} monthlyPrice={120} />
-              <AIBonusTag amount={30} />
+              <AnnualDiscount annualPrice={PAID_PLANS.standard.annualPrice} monthlyPrice={PAID_PLANS.standard.monthlyPrice} />
+              <AIBonusTag amount={PAID_PLANS.standard.aiBonus} />
             </div>
 
             <ul className="flex-1 flex flex-col gap-3 mb-8">
@@ -289,11 +290,11 @@ function Pricing() {
             <div className="mb-8 border-b border-slate-100 pb-8 flex flex-col justify-start">
               <div className="flex items-baseline text-indigo-600">
                 <span className="text-3xl font-bold">¥</span>
-                <span className="text-5xl font-extrabold tracking-tight">2400</span>
+                <span className="text-5xl font-extrabold tracking-tight">{PAID_PLANS.premium.annualPrice}</span>
                 <span className="text-slate-500 ml-2 font-medium">/ 年</span>
               </div>
-              <AnnualDiscount annualPrice={2400} monthlyPrice={300} />
-              <AIBonusTag amount={100} />
+              <AnnualDiscount annualPrice={PAID_PLANS.premium.annualPrice} monthlyPrice={PAID_PLANS.premium.monthlyPrice} />
+              <AIBonusTag amount={PAID_PLANS.premium.aiBonus} />
             </div>
 
             <ul className="flex-1 flex flex-col gap-3 mb-8">
@@ -328,11 +329,11 @@ function Pricing() {
             <div className="mb-8 border-b border-slate-100 pb-8 flex flex-col justify-start">
               <div className="flex items-baseline text-slate-900">
                 <span className="text-3xl font-bold">¥</span>
-                <span className="text-5xl font-extrabold tracking-tight">7200</span>
+                <span className="text-5xl font-extrabold tracking-tight">{PAID_PLANS.pro.annualPrice}</span>
                 <span className="text-slate-500 ml-2 font-medium">/ 年</span>
               </div>
-              <AnnualDiscount annualPrice={7200} monthlyPrice={900} />
-              <AIBonusTag amount={360} />
+              <AnnualDiscount annualPrice={PAID_PLANS.pro.annualPrice} monthlyPrice={PAID_PLANS.pro.monthlyPrice} />
+              <AIBonusTag amount={PAID_PLANS.pro.aiBonus} />
             </div>
 
             <ul className="flex-1 flex flex-col gap-3 mb-8">

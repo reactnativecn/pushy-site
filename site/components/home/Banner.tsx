@@ -166,6 +166,9 @@ function Banner(_props: BannerProps) {
 					</div>
 
 					<h1 className="text-[2.6rem] leading-[1.1] sm:text-6xl lg:text-[3.25rem] xl:text-[4rem] 2xl:text-[4.5rem] font-extrabold tracking-tight text-white">
+						<span className="block mb-4 text-base sm:text-lg font-semibold tracking-normal text-blue-300">
+							React Native 热更新服务
+						</span>
 						发布，
 						<br className="sm:hidden lg:inline" />
 						<span className="bg-clip-text text-transparent bg-[linear-gradient(100deg,#38bdf8_0%,#818cf8_50%,#c084fc_100%)]">
