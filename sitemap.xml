@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://pushy.reactnative.cn/</loc>
-    <lastmod>2026-10-09</lastmod>
+    <lastmod>2026-10-22</lastmod>
   </url>
   <url>
     <loc>https://pushy.reactnative.cn/docs/analytics</loc>
@@ -21,6 +21,14 @@
     <lastmod>2026-10-08</lastmod>
   </url>
   <url>
+    <loc>https://pushy.reactnative.cn/docs/brownfield</loc>
+    <lastmod>2026-10-22</lastmod>
+  </url>
+  <url>
+    <loc>https://pushy.reactnative.cn/docs/changelog</loc>
+    <lastmod>2026-10-22</lastmod>
+  </url>
+  <url>
     <loc>https://pushy.reactnative.cn/docs/cli</loc>
     <lastmod>2026-10-08</lastmod>
   </url>
@@ -29,12 +37,20 @@
     <lastmod>2026-10-08</lastmod>
   </url>
   <url>
+    <loc>https://pushy.reactnative.cn/docs/expo</loc>
+    <lastmod>2026-10-22</lastmod>
+  </url>
+  <url>
     <loc>https://pushy.reactnative.cn/docs/faq</loc>
-    <lastmod>2026-10-20</lastmod>
+    <lastmod>2026-10-22</lastmod>
   </url>
   <url>
     <loc>https://pushy.reactnative.cn/docs/getting-started</loc>
     <lastmod>2026-10-19</lastmod>
+  </url>
+  <url>
+    <loc>https://pushy.reactnative.cn/docs/harmony</loc>
+    <lastmod>2026-10-22</lastmod>
   </url>
   <url>
     <loc>https://pushy.reactnative.cn/docs/integration</loc>
@@ -42,11 +58,15 @@
   </url>
   <url>
     <loc>https://pushy.reactnative.cn/docs/intro</loc>
-    <lastmod>2026-10-08</lastmod>
+    <lastmod>2026-10-22</lastmod>
   </url>
   <url>
     <loc>https://pushy.reactnative.cn/docs/mcp</loc>
     <lastmod>2026-10-08</lastmod>
+  </url>
+  <url>
+    <loc>https://pushy.reactnative.cn/docs/migrate-from-codepush</loc>
+    <lastmod>2026-10-22</lastmod>
   </url>
   <url>
     <loc>https://pushy.reactnative.cn/docs/native-api</loc>
@@ -62,6 +82,6 @@
   </url>
   <url>
     <loc>https://pushy.reactnative.cn/pricing</loc>
-    <lastmod>2026-10-08</lastmod>
+    <lastmod>2026-10-22</lastmod>
   </url>
 </urlset>

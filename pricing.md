@@ -2,7 +2,7 @@
 
 
 
-## 公平透明的价格体系
+# 公平透明的热更新价格
 
 新注册用户将自动获得7 天的**专业版**试用评估。
 到期后转为免费版。年付较按月购买享约 6.7 折优惠，**还可获赠最高 $360 的 Token**。
@@ -182,4 +182,4 @@ React Native 中文网 © 2026 武汉青罗网络科技有限公司
 
 |
 
-[鄂ICP备20002031号-3](https://beian.miit.gov.cn/)[![](https://img.alicdn.com/tfs/TB1..50QpXXXXX7XpXXXXXXXXXX-40-40.png)鄂公网安备 42011202001821号](http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=42011202001821)
+[鄂ICP备20002031号-3](https://beian.miit.gov.cn/)[![公安备案图标](https://img.alicdn.com/tfs/TB1..50QpXXXXX7XpXXXXXXXXXX-40-40.png)鄂公网安备 42011202001821号](http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=42011202001821)

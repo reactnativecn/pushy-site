@@ -23,7 +23,7 @@ Pushy（npm 包名 `react-native-update`）是专为 React Native 应用打造�
 
 ### 极致的更新体验
 
-- **🎯 超小更新包**：基于 bsdiff/hdiff 算法的增量更新，通常只需**几十至几百 KB**（相比其他全量更新服务的几十 MB）；针对 Hermes 字节码的**独家深度优化**更可把一行文案的热修复压到 **3.4 KB**——比全量更新省 99.8% 的流量（见下方实测数据）
+- **🎯 超小更新包**：基于 bsdiff/hdiff 算法的增量更新，通常只需**几十至几百 KB**，安装后的第一次热更新就基于安装包内置的 bundle 计算差量；针对 Hermes 字节码的**独家深度优化**更可把一行文案的热修复压到 **3.4 KB**——比全量更新省 99.8% 的流量（见下方实测数据）
 - **⚡️ 极速分发**：国内用户使用阿里云高速 CDN，国外用户智能分流至 Cloudflare，在各地区都使用覆盖率最好的 CDN 服务商，更新成功率高达 **99.9%+**
 - **🛡️ 安全可靠**：内置崩溃回滚机制，出现问题自动回退，确保应用稳定运行
 - **🌐 全平台覆盖**：完美支持 <span style={{whiteSpace: 'nowrap'}}><AppleOutlined style={{fontSize: '16px', color: '#555', marginRight: '6px'}} /> **iOS**</span> <span style={{whiteSpace: 'nowrap'}}><AndroidOutlined style={{fontSize: '16px', color: '#3DDC84', marginRight: '6px'}} /> **Android**</span>, 且业内独家第一方支持 <span style={{whiteSpace: 'nowrap'}}><HarmonyOSOutlined style={{fontSize: '16px', color: '#000', marginRight: '6px'}} /> **鸿蒙（HarmonyOS）**</span>
@@ -61,16 +61,16 @@ Hermes 字节码在两个层面上都对通用二进制 diff 极不友好，Push
 
 相比同类服务，Pushy 不仅功能更强大，价格也更亲民：
 
-| 对比项       | Pushy        | Expo Update |
-| --------- | ------------ | ----------- |
-| **起步价**   | ¥66/月        | \~¥136/月    |
-| **流量计费**  | 不单独计费        | 超出需额外付费     |
-| **更新包大小** | 几十至几百 KB（增量） | 几十 MB（全量）   |
-| **国内速度**  | ⭐⭐⭐⭐⭐ 极快     | ⭐⭐ 较慢       |
-| **鸿蒙支持**  | ✅ 支持         | ❌ 不支持       |
+| 对比项      | Pushy                                           | EAS Update                                                                              |
+| -------- | ----------------------------------------------- | --------------------------------------------------------------------------------------- |
+| **起步价**  | ¥66/月                                           | \~¥136/月                                                                                |
+| **流量计费** | 不单独计费                                           | 超出需额外付费                                                                                 |
+| **增量更新** | hdiff 差量并针对 Hermes 字节码专项优化，首次热更新即基于内置 bundle 计算 | SDK 55 起支持 bsdiff 增量（56 起默认开启），补丁不够小时仍下发完整 bundle；基于内置 bundle 的增量需 SDK 58+ 配合 EAS Build |
+| **国内速度** | ⭐⭐⭐⭐⭐ 极快                                        | ⭐⭐ 较慢                                                                                   |
+| **鸿蒙支持** | ✅ 支持                                            | ❌ 不支持                                                                                   |
 
 :::warning
-**注意**：Microsoft App Center（Code Push）已于 2025 年 3 月 31 日正式停止服务。如果你正在使用 Code Push，现在正是迁移到 Pushy 的最佳时机！
+**注意**：Microsoft App Center（Code Push）已于 2025 年 3 月 31 日正式停止服务。如果你正在使用 Code Push，现在正是迁移到 Pushy 的最佳时机！迁移步骤见[从 CodePush 迁移](https://pushy.reactnative.cn/docs/migrate-from-codepush.md)。
 :::
 
 使用 Pushy 后，你的团队将获得：

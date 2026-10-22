@@ -4,7 +4,7 @@
 
 [官方 Skill 已上线 · AI 一句话完成接入→](/docs/skills)HarmonyOS 已支持
 
-# 发布，
+# React Native 热更新服务发布，
 就该这么快。
 
 1. 01一条命令发布
@@ -235,4 +235,4 @@ React Native 中文网 © 2026 武汉青罗网络科技有限公司
 
 |
 
-[鄂ICP备20002031号-3](https://beian.miit.gov.cn/)[![](https://img.alicdn.com/tfs/TB1..50QpXXXXX7XpXXXXXXXXXX-40-40.png)鄂公网安备 42011202001821号](http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=42011202001821)
+[鄂ICP备20002031号-3](https://beian.miit.gov.cn/)[![公安备案图标](https://img.alicdn.com/tfs/TB1..50QpXXXXX7XpXXXXXXXXXX-40-40.png)鄂公网安备 42011202001821号](http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=42011202001821)

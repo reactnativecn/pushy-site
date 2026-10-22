@@ -3,7 +3,7 @@
   "product": "Pushy",
   "baseUrl": "https://pushy.reactnative.cn",
   "resourceScheme": "pushy-docs",
-  "sourceCommit": "ed458972368c660de06cec2183b85172c1350986",
+  "sourceCommit": "baee212999e1e589a3361dad219b1423b9be4ee5",
   "documents": [
     {
       "slug": "analytics",
@@ -396,6 +396,432 @@
       ]
     },
     {
+      "slug": "brownfield",
+      "title": "原生 App 混编集成（Brownfield）",
+      "path": "pages/docs/brownfield.mdx",
+      "url": "https://pushy.reactnative.cn/docs/brownfield",
+      "resourceUri": "pushy-docs://docs/brownfield",
+      "content": "# 原生 App 混编集成（Brownfield）\n\n本页适用于通过 [`@callstack/react-native-brownfield`](https://oss.callstack.com/react-native-brownfield/) 生成 React Native AAR、再由 Android 原生 App 引入的混编项目。\n\n这类项目通常具有以下特点：\n\n- 宿主 `Application` 没有实现 `ReactApplication`\n- 宿主 `Activity` 没有继承 `ReactActivity`\n- React Native 运行时在 AAR 模块内部初始化，一般通过 `ReactNativeHostManager` 或类似的类完成\n\n不需要为了接入 Pushy 而修改宿主 App 的继承关系。只需在 AAR 模块创建 `ReactHost`、`ReactNativeHost` 或 `ReactInstanceManager` 的位置接入 Pushy 即可。\n\n:::info 原生宿主的更新控制（v10.59.0+）\n宿主也可以不经过 JS Bridge，直接在原生层配置并触发热更新。`PushyRuntime.configure(...)`、`prepareBundle(...)` 与 `nativeConfigSource: \"native\"` 的用法请参阅[原生主动检测与更新](https://pushy.reactnative.cn/docs/native-api.md)；原生配置省略 `endpoints` 时即使用 Pushy 内置服务地址。请在 RN 正常启动之前完成配置，或在本次启动已完成 bundle 解析之后再检查；不要仅为了触发检查而再次调用 `getBundleUrl`。React Native AAR 和宿主 APK／AAB 都需要使用 v10.59.0 或更高版本重新编译。下文的 JS 示例沿用默认的由 JS 管理配置的方式；如需由宿主原生端掌控配置，请使用原生文档中的配置归属选项。\n:::\n\n\n### 安装依赖\n在 React Native 项目根目录下运行：\n```bash\n# 先全局安装命令行工具\nnpm i -g react-native-update-cli\n\n# 然后在项目目录中安装热更新模块\nnpm i react-native-update\n```\n请确认 AAR 中包含了 `react-native-update` 的 Android 模块。如果自动 link 没有把它加入你的 library 模块，请手动添加：\n```groovy\ndependencies {\n    api project(\":react-native-update\")\n}\n```\n:::warning\n如果 `PackageList(application).packages` 中已经包含 `UpdatePackage()`，请不要重复添加。\n:::\n### 在 AAR 模块中注册 UpdatePackage\nJS 接口依赖 Android 原生模块。请在 AAR 模块创建 package 列表的位置确认已包含 `UpdatePackage`：\n```kotlin\nimport cn.reactnative.modules.update.UpdatePackage\nimport com.facebook.react.PackageList\n\nval packages = PackageList(application).packages.apply {\n  // 如果自动 link 已经包含 UpdatePackage，请删除这一行\n  add(UpdatePackage())\n}\n```\n### 新架构：配置 ReactHost\n对于 RN 0.82 及以上版本，或任何通过 `ReactHost`／`getDefaultReactHost` 初始化 React Native 的混编模块，请把 Pushy 提供的 bundle 路径传给 `jsBundleFilePath`：\n```kotlin\npackage com.yourapp.reactnativeapp\n\nimport android.app.Application\nimport cn.reactnative.modules.update.UpdateContext\nimport cn.reactnative.modules.update.UpdatePackage\nimport com.callstack.reactnativebrownfield.OnJSBundleLoaded\nimport com.callstack.reactnativebrownfield.ReactNativeBrownfield\nimport com.facebook.react.PackageList\nimport com.facebook.react.ReactHost\nimport com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative\nimport com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost\n\nobject ReactNativeHostManager {\n  private var reactHost: ReactHost? = null\n\n  fun initialize(\n    application: Application,\n    onJSBundleLoaded: OnJSBundleLoaded? = null,\n  ) {\n    // RN >= 0.80 必需\n    loadReactNative(application)\n\n    val packages = PackageList(application).packages.apply {\n      // 如果自动 link 已经包含 UpdatePackage，请删除这一行\n      add(UpdatePackage())\n    }\n\n    reactHost = getDefaultReactHost(\n      context = application.applicationContext,\n      packageList = packages,\n      // ↓↓↓ 使用 Pushy 提供的 bundle 路径\n      jsBundleFilePath = UpdateContext.getBundleUrl(\n        application,\n        \"assets://index.android.bundle\",\n      ),\n      // ↑↑↑\n    )\n\n    ReactNativeBrownfield.initialize(\n      application = application,\n      reactHost = reactHost,\n      onJSBundleLoaded = onJSBundleLoaded,\n    )\n  }\n\n  fun getReactHost(): ReactHost? = reactHost\n}\n```\n`assets://index.android.bundle` 是尚未应用任何热更新时使用的内置 bundle，请改成 AAR 中实际打包的 bundle 文件名。\n### 在宿主 Application 中暴露 ReactHost\n新架构下，热更新完成后调用 `switchVersion()` 或 `restartApp()` 重载 RN 运行时，Pushy 需要找到当前活动的 `ReactHost`。\n如果宿主 `Activity` 不是 `ReactActivity`，宿主 `Application` 也不是 `ReactApplication`，请在宿主 `Application` 中提供一个 public 的 `getReactHost()` 方法：\n```kotlin\nimport android.app.Application\nimport com.facebook.react.ReactHost\nimport com.yourapp.reactnativeapp.ReactNativeHostManager\n\nclass MainApplication : Application() {\n  override fun onCreate() {\n    super.onCreate()\n    ReactNativeHostManager.initialize(this)\n  }\n\n  fun getReactHost(): ReactHost? {\n    return ReactNativeHostManager.getReactHost()\n  }\n}\n```\nPushy 会通过反射查找这个方法，宿主 `Application` 不需要实现 `ReactApplication`。\n:::warning\n仅传入 `jsBundleFilePath` 即可保证冷启动加载热更新版本；而要让新架构混编 App 在 `switchVersion()`／`restartApp()` 时可靠地立即重载运行时，还需要暴露 `getReactHost()`。\n:::\n### 旧架构或自定义 ReactInstanceManager\n如果你的混编方案仍然手动创建 `ReactInstanceManager`，请在这里设置 bundle 路径：\n```kotlin\nimport cn.reactnative.modules.update.UpdateContext\n\nval reactInstanceManager = ReactInstanceManager.builder()\n  // ...其他设置\n  // 不要调用 setBundleAssetName(\"index.android.bundle\")\n  .setJSBundleFile(\n    UpdateContext.getBundleUrl(\n      application,\n      \"assets://index.android.bundle\",\n    )\n  )\n  .build()\n\nUpdateContext.setCustomInstanceManager(reactInstanceManager)\n```\n`setCustomInstanceManager` 的说明见 [API 文档](https://pushy.reactnative.cn/docs/api.md#updatecontextsetcustominstancemanagerreactinstancemanager-instancemanager)。新架构 App 请优先使用上面的 `ReactHost` 方式。\n### 包裹 JS 根组件\nJS 端与普通 React Native 应用相同（详见[代码集成](https://pushy.reactnative.cn/docs/integration.md)）：\n```tsx\nimport { Platform } from \"react-native\";\nimport { Pushy, UpdateProvider } from \"react-native-update\";\nimport updateConfig from \"./update.json\";\nimport App from \"./App\";\n\nconst pushyClient = new Pushy({\n  appKey: updateConfig[Platform.OS].appKey,\n  checkStrategy: \"both\",\n  updateStrategy: \"silentAndLater\",\n});\n\nexport default function Root() {\n  return (\n    <UpdateProvider client={pushyClient}>\n      <App />\n    </UpdateProvider>\n  );\n}\n```\n`update.json` 由 `pushy createApp` 或 `pushy selectApp` 生成，请参阅[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)中的「登录与创建应用」。\n### 打包与发布\n1. 重新编译 React Native AAR，并确认宿主 App 引用的是新产物。\n2. 编译最终的宿主 APK／AAB。\n3. 使用 `pushy uploadApk` 或 `pushy uploadAab` 上传最终的宿主安装包（参阅[命令行工具](https://pushy.reactnative.cn/docs/cli.md)）。\n4. 发布热更新时，选择与最终宿主 App 的 `versionName` 和编译时间戳一致的原生包版本（参阅[发布热更新](https://pushy.reactnative.cn/docs/publish.md)）。\n:::info\nPushy 只更新 JS bundle 和 JS 引用的静态资源。新增原生模块、修改 Kotlin／Java 代码、修改 Manifest 或 `.so` 等原生改动，仍需重新发布 AAR 和宿主 App。\n:::\n",
+      "sections": [
+        {
+          "heading": "原生 App 混编集成（Brownfield）",
+          "level": 1,
+          "anchor": "原生-app-混编集成brownfield",
+          "offset": 0,
+          "length": 895
+        },
+        {
+          "heading": "安装依赖",
+          "level": 3,
+          "anchor": "安装依赖",
+          "offset": 895,
+          "length": 380
+        },
+        {
+          "heading": "在 AAR 模块中注册 UpdatePackage",
+          "level": 3,
+          "anchor": "在-aar-模块中注册-updatepackage",
+          "offset": 1275,
+          "length": 326
+        },
+        {
+          "heading": "新架构：配置 ReactHost",
+          "level": 3,
+          "anchor": "新架构配置-reacthost",
+          "offset": 1601,
+          "length": 1628
+        },
+        {
+          "heading": "在宿主 Application 中暴露 ReactHost",
+          "level": 3,
+          "anchor": "在宿主-application-中暴露-reacthost",
+          "offset": 3229,
+          "length": 817
+        },
+        {
+          "heading": "旧架构或自定义 ReactInstanceManager",
+          "level": 3,
+          "anchor": "旧架构或自定义-reactinstancemanager",
+          "offset": 4046,
+          "length": 662
+        },
+        {
+          "heading": "包裹 JS 根组件",
+          "level": 3,
+          "anchor": "包裹-js-根组件",
+          "offset": 4708,
+          "length": 686
+        },
+        {
+          "heading": "打包与发布",
+          "level": 3,
+          "anchor": "打包与发布",
+          "offset": 5394,
+          "length": 410
+        }
+      ]
+    },
+    {
+      "slug": "changelog",
+      "title": "更新日志",
+      "path": "pages/docs/changelog.md",
+      "url": "https://pushy.reactnative.cn/docs/changelog",
+      "resourceUri": "pushy-docs://docs/changelog",
+      "content": "# 更新日志\n\n本页由 [GitHub Releases](https://github.com/reactnativecn/react-native-update/releases) 自动生成，列出最近的 19 个版本。更早的版本请查看 GitHub Releases。\n\n升级原生依赖后需要重新打包并上传原生包，参见[发布热更新](https://pushy.reactnative.cn/docs/publish.md)。\n\n## v10.62.1\n\n发布于 2026-10-19\n\n### 发布类型声明，不再发布 TS 源码\n\n包里现在附带编译好的类型声明（`lib/typescript/*.d.ts`），`package.json` 的 `types` 指向它，不再指向 `src/index.ts`。应用跑 `tsc --noEmit` 时不会再检查本包源码：`skipLibCheck` 重新生效，应用自己的编译选项（如 `noUnusedLocals`）和 React Native 类型版本的差异，都不会再在 `react-native-update` 里报错。\n\n### 修复\n\n- 在 React Native 0.88 类型、开启 `noUnusedLocals` 的情况下，10.62.0 会让应用的 `tsc` 报两个错误：`src/client.ts` 的 TS6133（未使用的私有 `emitError`）和 `src/clientDownload.ts` 的 TS2349（对事件发射器的联合类型调用 `addListener`）。两处均已修复，运行时行为不变。\n\n本次仅涉及 JS，无需重新编译原生代码。\n\n[完整变更](https://github.com/reactnativecn/react-native-update/compare/v10.62.0...v10.62.1)\n\n## v10.62.0\n\n发布于 2026-10-18\n\n### 三端统一的落盘格式\n\nAndroid、iOS、鸿蒙现在用同一种格式保存更新状态：两个存储 `pushy_state` 和 `pushy_cache`（Android 是 SharedPreferences 文件，iOS 是 `NSUserDefaults` suite，鸿蒙是 preferences 文件），三端键名相同，值一律是字符串，并带有 `schemaVersion`。这是原生版本，需要重新构建应用，iOS 请执行 `pod install`。\n\n新二进制第一次启动时会一次性迁移旧格式：\n\n- **保留**：uuid（灰度分桶保持不变）、原生配置、流程中断标记、bundle 摘要缓存和二进制身份。\n- **丢弃**：热更状态、版本元信息、首次加载标记和响应缓存。release 构建每次都会写入新的构建时间，这次启动本来就会被判为二进制升级并清掉这些内容；应用从内置包启动，与任何一次应用升级相同。debug 构建（构建时间固定为 `\"0\"`）也会回到内置包一次。\n- **可以中断**：迁移在任何一步被杀，下次启动都会继续完成。迁移无法执行时，应用按全新安装启动但保留 uuid，下次启动再重试迁移。\n- **旧键会删除**：新存储写好后才删旧键，只删本 SDK 写过的键。\n\n### 行为变化\n\n- **降级**到旧二进制（侧载、`adb install -d`、企业分发；应用市场不允许降级）时，旧二进制会表现为全新安装：没有热更版本，JS 运行前没有原生配置，uuid 重新生成，所以降级期间灰度分桶会变。再升级回来时，uuid 恢复为降级前的值。\n- **iOS** 把更新状态放在独立的 `pushy_state` / `pushy_cache` suite 里，不再写 `standardUserDefaults`。清空应用的 defaults 域（常见于退出登录）不会再抹掉 uuid 和热更状态，SDK 也不再与宿主的键（比如无前缀的 `packageVersion`）冲突。现有的隐私清单条目（`CA92.1`）照样覆盖。\n\n### 接入方须知\n\n- 如果代码直接读取过 SDK 的键（Android 的 `update` SharedPreferences 文件、iOS 的 `standardUserDefaults`、鸿蒙的 `update` preferences），升级后将读不到：这些键已被删除，它们也从来不是公开接口。\n- 存储格式与迁移规则见 [docs/STORED_STATE_LAYOUT.md](https://github.com/reactnativecn/react-native-update/blob/master/docs/STORED_STATE_LAYOUT.md)。\n- iOS 示例工程（`Example/e2etest`、`Example/testHotUpdate`、`Example/expoUsePushy`）改用 UIScene 生命周期，用 iOS 27 SDK 构建的应用需要它才能在 iOS 27 上启动。Expo 示例使用 Expo 自带的 `EXExpoAppSceneDelegate`（需 Expo 57.0.23 及以上）。\n\n[完整变更记录](https://github.com/reactnativecn/react-native-update/compare/v10.61.0...v10.62.0)\n\n## v10.61.0\n\n发布于 2026-10-17\n\n### 原生更新流程只用一个引擎\n\n原生冷启动流程（不依赖 JS、用来救回变砖设备的检查）在 Android、iOS、鸿蒙上改由同一个 C++ 引擎驱动，不再是三份手写的循环。此前规则已经共用，现在连执行顺序也共用，并由回放的事件轨迹锁定。这是原生版本，需要重新构建应用，iOS 请执行 `pod install`。\n\n原来三端不一致的地方，现在行为相同：\n\n- **请求超时**：流程中的每个请求都是空闲 10 秒、整次 15 秒的上限，并受整轮截止时间约束。\n- **配置变更**：结果输给配置变更的流程，统一以 `cancelled` / `config_changed` 结束。\n- **断点续传**：续传的判断（sidecar 校验、`Range` / `If-Range`、响应处理、`Content-Range` 解析）也改为共用。下载完成后三端都会用最终大小刷新 sidecar（此前只有鸿蒙这样做），进程如果死在下载完成之后、解压之前，不会再把总长未知的归档整包重下。sidecar 上限为 64 KB，`Content-Range` 只接受纯数字。\n- **持久化项**：二进制升级和 reset 到内置包时，三端删除同样的内容（版本信息、首次加载标记、响应缓存），保留同样的内容（uuid、原生配置、流程中断标记、bundle 摘要缓存）。不迁移任何已落盘的数据。\n\n### 行为变化\n\n- **JS `client.checkUpdate()`** 返回按本设备解析后的结果（依据它的灰度分桶和正在运行的版本），与 provider 一直呈现的一致。返回对象里不再有 `expVersion`。直接调用 `client.checkUpdate()` 再 `client.downloadUpdate()` 的应用，现在会遵守灰度比例，而不是装上根版本。\n- **JS `useUpdate().switchVersion()` / `switchVersionLater()` 不带参数时**，切换到已下载的版本。以前用的是最近一次检查到的版本：下载完成后如果又检查到更新的版本，「立即更新」会变成没有任何提示的空操作。\n- **iOS `resetToPackagedBundle`** 在 reset 状态落盘后就返回，已下载的版本在后台删除，与 Android、鸿蒙一致。`RESET_FAILED` 现在只表示 reset 状态没能落盘。\n- **Android**：二进制升级和 reset 不再清掉 uuid 与原生配置。以前每次应用升级都会重新洗牌灰度分桶，原生检查和崩溃救援在 JS 再次运行前也没有配置可用。\n- **JS 端点回退**：一次检查最多发 8 个端点请求，与原生流程的上限相同。以前远程端点列表可能让一次失败的检查把每个条目都请求一遍。\n\n### 新增\n\n- **Android 与鸿蒙的 `prepareBundle` 可以设置超时**：`PushyRuntime.prepareBundle(context, timeoutMillis, callback)` 和 `PushyFileJSBundleProvider.prepareBundle(timeoutMs)`，iOS 此前已有。超时返回 `failed` / `timeout`，流程继续在后台运行。不传超时时，Android 现在最多等 30 分钟（与 iOS 默认值相同），并发调用者也不再互相排队。\n\n### 修复\n\n- iOS：原生流程和崩溃救援在激活版本前会校验 bundle 摘要（`CheckActivation`），与 `switchVersion` 和其他两端一致。\n- iOS 与鸿蒙：共享内核抛出的 C++ 异常会在 iOS 入口和鸿蒙 NAPI 回调处被捕获，不再穿透到运行时。启动状态无法解析时，iOS 回退到内置包。\n- 鸿蒙：激活与破坏性清理不会再相互竞争（以前清理可能删掉刚校验过的版本）；`switchVersion` 会复查校验期间是否发生过 reset。\n- 鸿蒙：磁盘空间不足和归档超限，在下载阶段报 `DOWNLOAD_FAILED`，在解压阶段报 `PATCH_FAILED`，与 Android、iOS 一致，换镜像判定和遥测口径因此统一。\n- 鸿蒙：`meta.json` 里没有构建时间时改用应用安装时间，保留 `versionName` 的二进制升级也能被识别。下载的连接超时改为 15 秒，不再等于整个阶段的预算。\n- JS：「bundle 未注册」提示里的命令按品牌显示（Cresc 显示 `cresc`）。\n\n### 接入方须知\n\n- npm 包只发布构建实际编译的 HDiffPatch / lzma 源码（文件数 910 → 177）。\n- README 的选项表补上了 `nativeConfigSource`。\n\n[完整变更记录](https://github.com/reactnativecn/react-native-update/compare/v10.60.0...v10.61.0)\n\n## v10.60.0\n\n发布于 2026-10-12\n\n### 三端共用一份原生内核\n\n原生更新流程（不依赖 JS 的冷启动检查）、补丁清单解析、安装记录和归档限额，过去在 Android、iOS、鸿蒙上各写一份，现在都只在共享 C++ 内核里实现一次，三端规则保持一致。公开 API、服务端路径、配置项和持久化状态都没有变化。这是原生版本，需要重新构建应用。\n\n原来三端不一致的地方，现在统一按 JS SDK 或此前最严格的那一端处理：\n\n- **原生配置**：`disabled` 按 JS 的真值规则判断（`1`、`\"true\"` 都会关闭原生检查；原来 Android 只认 `true`/`\"true\"`）。`appKey` 按 JS 的空白规则去除首尾空白；配置文本后面带多余内容时直接判为无效。\n- **原生流程的下载**：补丁下载成功但无法应用（`PATCH_FAILED`）时，不再逐个镜像重新下载，而是和 JS 一样直接换下一个策略。\n- **仅 https**：配置的端点全部是 https 时，Android 和 iOS 现在也会忽略 `queryUrls` 列表里的非 https 端点和 `http://` 下载地址，与鸿蒙一致。\n- **`__diff.json`**：三端共用一个解析器。字段类型错误、`copiesCrc` 不是整数或相互矛盾、`hbcTransform` 不是对象等畸形清单，现在会让补丁失败并回退到全量包，不再被强转或静默忽略。\n- **安装记录**：三端统一原子写入（临时文件、fsync、rename、目录 fsync）。缺少 `bundleSha256` 的 schema 1 记录不再被信任；记录在 current/last 中的版本激活前也会校验；计算 bundle 摘要失败会让安装失败。\n- **归档限额**：三端执行同一套检查：单条和整包都按精确的 100:1 压缩比限制，拒绝符号链接，任意层级的 `.pushy-` 保留名都拒绝。\n\n### 修复\n\n- iOS：使用 `use_frameworks!` 时找不到 `hpatch.h`、编译失败的问题。\n- iOS 15.4 以下（JSC）：复用原生检查缓存时因 `Object.hasOwn` 抛错而被静默跳过的问题。\n- Android：原生传给 Java 的字符串遇到 BMP 以外的字符（如路径中的 emoji）时出错的问题。\n- 遥测：下载被后续策略救回时，不再把其间的网络错误上报为 `patch_fail`。\n- JS：收紧原生配置同步、检查缓存复用和下载重试（每个策略只做一次镜像测速，失败的优选镜像会被降级）。\n\n### 接入方须知\n\n- Android：新旧架构的模块已合并为同一个 `UpdateModule`，应用侧无需改动。库代码使用 Java 8 lambda，已显式设置 `compileOptions`，兼容较老的 Android Gradle Plugin。\n- iOS：`RCTPushy.mm` 拆成了多个文件，podspec 会自动包含。升级后请执行 `pod install`。\n\n[完整变更记录](https://github.com/reactnativecn/react-native-update/compare/v10.59.2...v10.60.0)\n\n## v10.59.2\n\n发布于 2026-10-03\n\n### Android：应用内 APK 安装恢复可用\n\n- 修复 10.53.0 起 `downloadAndInstallApk` 在所有 Android 版本上都会失败的问题。APK 能正常下载完成，但安装阶段会以 `APK_INSTALL_FAILED: Unable to stage APK installation` 失败，系统安装界面不出现。原因是安装时在 APK 写入流尚未关闭时就提交了 `PackageInstaller` 会话，系统会拒绝提交（`SecurityException: Files still open`）并放弃该会话。现在先关闭写入流，再提交会话。\n- 受影响版本：10.53.0 至 10.59.1（APK 安装改用 `PackageInstaller` 之后的版本）。10.52.x 及更早版本用的是旧的安装方式，不受影响。iOS 和鸿蒙不受影响。\n- 这是原生改动：需要用 10.59.2 重新构建 Android 应用，并通过应用商店或直装渠道发布。JS 热更新无法修复已安装的应用，所以已经装了受影响版本的用户需要通过其他途径（应用商店、官网下载等）安装一次修复后的版本，此后应用内 APK 更新即可正常使用。\n\n[完整变更记录](https://github.com/reactnativecn/react-native-update/compare/v10.59.1...v10.59.2)\n\n## v10.59.1\n\n发布于 2026-09-29\n\n### 原生内部整理\n\n没有接口或行为变化。JS SDK、JS 桥接、原生宿主接口（`configure` / `prepareBundle`）、服务端请求和持久化状态均不变。\n\n- Android：native 方法改为在库加载时注册，原生库对外只导出一个入口，不再每个方法一个符号。库文件由 `librnupdate.so` 改名为 `librnpushy.so`；如果你的 `packagingOptions` / `jniLibs` 配置里写了 `librnupdate.so`，请同步修改。\n- iOS：共用的 C/C++ 核心拆为独立的 `Core` subspec，并隐藏符号可见性，以动态 framework 集成时不再导出核心内部符号。按正常原生升级流程重新运行 `pod install`。\n- 三端：内部类名、方法名和日志措辞统一；内置服务地址和协议常量不再以明文字符串存放在二进制中。\n- 需要重新构建原生应用才会生效；这些改动与 JS 热更新无关。\n\n### Android：pnpm workspace 下的 Expo 检测\n\n- 解析 `expo` 声明版本时跳过 pnpm 协议写法（`catalog:`、`workspace:`、`link:`、`file:`、git 地址）。此前名为 `catalog:v2` 之类的 catalog 会被误读成 Expo SDK 2，导致 Expo 模块被静默禁用。`npm:` 别名按最后一个 `@` 之后的部分解析。\n- 用 Node 兜底解析 Expo 版本的逻辑在 Gradle 9 上恢复可用（原来用的 `Project.exec` 在 Gradle 9 中已移除，兜底会静默返回空）。\n\n[完整变更记录](https://github.com/reactnativecn/react-native-update/compare/v10.59.0...v10.59.1)\n\n## v10.59.0\n\n发布于 2026-09-28\n\n### 原生宿主接口\n\n- 原生宿主通过 `configure` 配置 Pushy，通过 `prepareBundle` 准备下次启动使用的 bundle：\n  - Android：`PushyRuntime.configure(Context, JSONObject, ConfigurationCallback)` 和 `PushyRuntime.prepareBundle(Context, Callback)`，结果类型为 `BundlePreparationResult`。\n  - iOS：`+[RCTPushy configure:completion:]` 和 `+[RCTPushy prepareBundleWithCompletion:]`，Swift 对应 `configure(_:completion:)` 和 `prepareBundle(completion:)`；回调类型为 `RCTPushyConfigurationCompletion` 和 `RCTPushyBundlePreparationCompletion`。\n  - HarmonyOS：`PushyFileJSBundleProvider.configure(options: PushyConfiguration)` 和 `prepareBundle(): Promise<BundlePreparationResult>`。\n- 在正常解析启动 bundle 之前调用 `configure`，解析之后调用 `prepareBundle`。`prepareBundle` 不会再次解析 bundle、不会重载 React Native，也不会弹窗；选定的 bundle 从下次启动开始使用。\n- 调用了这些原生接口的宿主需要同步修改调用代码并重新构建原生应用。JS SDK、JS 桥接、服务端路径、配置值、结果字段和持久化状态均不变，未调用原生宿主接口的应用正常升级即可。\n\n完整示例见[原生配置与更新](https://pushy.react-native.cn/docs/native-api)。\n\n[完整变更记录](https://github.com/reactnativecn/react-native-update/compare/v10.58.1...v10.59.0)\n\n## v10.58.1\n\n发布于 2026-09-26\n\n### React Native 0.87 的 TypeScript 修复\n\n- 修复在 React Native 0.87 工程中出现的 TypeScript 报错。本库以 TypeScript 源码发布，所以应用里运行 `tsc` 时也会检查本库，`skipLibCheck` 不会跳过它。10.58.0 在三处会报错：\n  - `client.ts:980`（检查更新时的 `AbortSignal`）：工程同时加载了 DOM 风格的 fetch 类型（例如 `@types/bun`）时报错。\n  - `client.ts` 里的 `setTimeout(resolve)`：RN 0.87 把定时器回调声明为不带参数。\n  - `core.ts` 里的 `global`：RN 0.87 的类型声明里已经没有它了。\n- 已用 `tsc` 在 React Native 0.87.1、react-native-tvos 0.87.1-1 和 Expo SDK 58 预览版工程中验证（模板 tsconfig、`types` 设为 `[\"bun\"]` 或 `[\"jest\", \"node\"]`、使用 DOM lib）。\n- 没有运行时行为变化。只需升级 JS 包，不需要重新编译原生应用。\n\n[完整变更记录](https://github.com/reactnativecn/react-native-update/compare/v10.58.0...v10.58.1)\n\n## v10.58.0\n\n发布于 2026-09-26\n\n### 支持 tvOS 并提升 iOS 启动可靠性\n\n- 支持 `react-native-tvos`：podspec 新增 tvOS 平台；更新包改存到 tvOS 可写的 Caches 目录；tvOS 检测到缓存被系统清理后，会在启动前重新安装并激活最新可用更新。\n- 修复 iOS 和 tvOS 的延迟 purge-restore 激活竞态。启动已经选择内置包回退后，恢复任务不再把持久化的当前版本切换到另一个版本。\n- 修复 Expo 在 `expo-modules-core` 嵌套安装布局下的集成问题，包括与 `react-native-tvos` 一起使用 npm 安装时的场景。\n- 客户端信息将 tvOS 设备标记为 `tvos <version>`，使服务端发布分组与 iOS 保持隔离。\n- 新增确定性的原生回归测试，覆盖 purge restore 顺序、超时、重置锁以及测试宿主行为。\n\n**需要重新构建原生应用：** tvOS 支持和启动修复都属于原生变更，升级后请重新构建并分发原生应用。\n\n[完整变更记录](https://github.com/reactnativecn/react-native-update/compare/v10.57.1...v10.58.0)\n\n## v10.57.1\n\n发布于 2026-09-26\n\n### Xcode 27 编译修复（iOS）\n\n- 修复 10.56.0～10.57.0 在 Xcode 27 下 iOS 编译失败的问题（#645）。隐私清单资源包 target（`react-native-update-react-native-update_privacy`）沿用了 podspec 写死的 `11.0` 部署版本。React Native 的 `post_install` 不会调整资源包 target，而 Xcode 27 不接受低于 iOS 15.0 的部署版本。现在改为使用 React Native 的 `min_ios_version_supported`。\n- Expo 工程不受影响。本版本没有运行时改动，升级后重新执行 `pod install` 即可。\n- 暂时无法升级的，可以在 Podfile 的 `post_install` 里把 `react-native-update-react-native-update_privacy` target 的 `IPHONEOS_DEPLOYMENT_TARGET` 设为 `15.1`。\n\n[完整变更记录](https://github.com/reactnativecn/react-native-update/compare/v10.57.0...v10.57.1)\n\n## v10.57.0\n\n发布于 2026-09-19\n\n### 原生配置与更新接口\n\n- Android、iOS 和 HarmonyOS 新增供原生宿主使用的 `configure` 与 `checkAndUpdate` 接口（#641）。宿主可在 JavaScript 或 React Native bridge 启动前配置 Pushy，在应用正常解析启动 bundle 后，通过现有原生更新链路检查并下载更新。\n- Android：`PushyNativeUpdate.configure(Context, JSONObject, ConfigurationCallback)` 和 `checkAndUpdate(Context, Callback)`。iOS：`+[RCTPushy configure:completion:]` 和 `+[RCTPushy checkAndUpdateWithCompletion:]`，Swift 对应 `configure(_:completion:)` 和 `checkAndUpdate(completion:)`。HarmonyOS：`PushyFileJSBundleProvider.configure(...)` 和 `checkAndUpdate()`，并导出配置与结果类型。\n- 替换现有配置前校验 `appKey`、服务端地址、发现地址和激活策略；原生首次配置会生成稳定的安装标识。配置变更会使旧响应缓存和进行中的旧原生决策失效。\n- 新增 JS 选项 `nativeConfigSource: 'native'`，防止 JavaScript 初始化和 `setOptions` 覆盖原生管理的配置。默认仍为 `'javascript'`，保持现有接入方式兼容；原生配置不会自动回填 JS 选项。\n- 返回状态区分 `skipped`、`noUpdate`、`downloaded`、`failed` 和 `cancelled`。并发原生调用共享同一轮任务，已完成轮次复用结果。尚无配置时跳过，不再消耗本进程首次实际检查机会。\n\n### 兼容性与接入\n\n- **必须重新构建并分发原生安装包，不能仅通过 JS 热更新添加这些原生接口。** 从源码接入 HarmonyOS 时需重新构建 HAR；npm 包已包含更新后的 HAR。\n- 配置可以在 JS 启动前完成，但检查仍需要应用正常的启动 bundle 解析。不要仅为初始化检查而再次解析 bundle。\n- `afterDownload` 默认为 `none`；使用 `setNeedUpdate` 可将普通下载更新选为下次启动版本。`activated: true` 表示已选为下次启动使用的版本，不表示立即重载 React Native。原有服务端 `forceBoot` 和崩溃救援规则继续生效。\n- 每进程至多执行一轮实际原生更新，包括失败轮次。重新配置会使旧结果失效，但不会增加新轮次。原生调用不展示更新弹窗，也不执行 JS 生命周期钩子。\n- 三端示例与配置所有权说明见[原生配置与更新指南](https://pushy.reactnative.cn/docs/native-api)。\n\n### 测试与示例\n\n- 新增 38 项原生宿主与配置回归测试。合并实现已通过 lint、JS/C++ 测试、Android/iOS E2E 和 HarmonyOS 构建检查。\n- 包含 v10.56.1 以来的 Expo、HarmonyOS 示例及本地 E2E 工具更新。\n\n[完整变更记录](https://github.com/reactnativecn/react-native-update/compare/v10.56.1...v10.57.0)\n\n## v10.56.1\n\n发布于 2026-09-14\n\n修复 Expo modular builds 下 iOS `ImportReact.h` 公共头文件导入问题，确保使用 modular headers 的 Expo 项目能够正常集成。\n\n## v10.56.0\n\n发布于 2026-09-04\n\n本版本落地 2026-09 的安全与稳定性审计（#635、#637），覆盖 JS、Android、iOS、C++ 与鸿蒙五层。建议所有应用升级：共享的 C++ 内核加上了硬性输入上限，三端原生下载器都开始强制归档大小与磁盘余量约束，并关闭了多处状态竞态。\n\n### 安全加固\n\n- **路径校验与归档上限（全平台）。** manifest 与归档中的相对路径拒绝 NUL/控制字节和超过 64 层的嵌套（此前鸿蒙存在通过内嵌 NUL 逃逸 staging 目录的问题）。归档上限：压缩 512 MiB / 解压 2 GiB / 20 000 条目、单条压缩比 100:1；任意深度的符号链接与保留的 `.pushy-*` 名字一律拒绝；patch 声明的 LZMA 字典上限 128 MiB。解析 check 响应的 JSON 解析器限制输入 1 MiB、65 536 个节点。\n- **磁盘空间保护（全平台）。** 下载前校验可用空间（另加 64 MiB 余量），未知长度的响应体每 8 MiB 重新探测；解压前先校验解压后总量。鸿蒙在 zlib 报不出展开量时直接拒绝归档，而不是盲目解压。\n- **远程发现的端点与 APK 安装只接受 HTTPS**；iOS 的 check 请求拒绝 `https -> http` 重定向；非 2xx 的 check 响应会先截断再进入弹窗或日志。\n- **JNI 边界。** 每个 JNI 入口捕获 C++ 异常并转为 Java 异常，不再穿越虚拟机栈展开。\n- **Content-Range 校验。** 续传时拒绝 range 与 total 自相矛盾的 `206`（`bytes 100-199/0` 此前会被当作\"总长未知\"而跳过最终尺寸检查）。\n\n### 稳定性\n\n- **Android：** 所有\"状态快照 → JNI → 提交\"序列在同一把锁下执行（`switchVersion`、`markSuccess`、`rollBack`、启动解析、原生检查提交、reset）；`restartApp` 的版本切换移出 UI 线程，失败时 reject `RESTART_FAILED`，不再回退到会加载旧 bundle 的 `Activity.recreate()`；安装器在 staging rename 之后对版本根目录 fsync；清理永远不会删掉本进程启动所用的版本。\n- **iOS：** `packageVersion` / `buildTime` 改存到 `REACTNATIVECN_PUSHY_*` 键下（从可能被宿主覆盖的无前缀键一次性迁移）；`use_frameworks!` 下 `buildTime` 通过 `bundleForClass:` 解析；reload 不再在监听器运行前预先消费首启状态；`restartApp` / `markSuccess` / reset 失败时分别 reject `RESTART_FAILED` / `MARK_SUCCESS_FAILED` / `RESET_FAILED`，而不是照样 resolve；空间检查前先释放已失效的 partial，全量重下不会永远卡在自己占用的空间上。\n- **鸿蒙：** 所有返回 Promise 的方法都按异步注册，拒绝能真正到达 JS；持久化会等待真实的 preferences flush；归档与 bundle 的 SHA-256 在 NAPI 工作线程计算，不再阻塞 UI；下载超时受剩余 deadline 约束；所有错误携带稳定错误码（`ErrorCodes.ts` 镜像 C++ 头文件）。\n- **JS：** `setOptions` 不再重复触发检查、重置自动 markSuccess 计时器或重复订阅 AppState；`setOptions({ locale })` 运行时即时生效；以不可重试错误码失败的策略不会在重试时再次执行；`switchVersion` 返回布尔值，reload 未真正重启时看门狗会清掉 `applyingUpdate`；web 构建不再每次加载都上报一次假的 rollback；运行中版本没有记录时 `getCurrentVersionInfo()` 返回 `{}` 而不是 reject。\n\n### 需要留意的行为变化\n\n- **iOS 隐私清单。** `ios/PrivacyInfo.xcprivacy` 随 pod 一起发布，声明了 SDK 使用的 required-reason API（磁盘空间、文件时间戳、系统启动时间、UserDefaults）以及 release 构建默认发往 `/report` 的数据：崩溃数据（JS 异常上报，`disableErrorReporting` 可关）与其他诊断数据（生命周期事件，`disableTelemetry` 可关）。两者均不关联用户身份、不用于追踪。请据此核对 App Store 的隐私问卷。\n- **Android 旧架构桥：** `setNeedUpdate`、`markSuccess`、`setUuid`、`setLocalHashInfo` 现与新架构一样接收 Promise，持久化失败会 reject 而不是被吞掉。\n- **Android ProGuard 规则**由对 `com.facebook.react.**` 的整体 `-keepnames` 收窄为精确的 JNI 结果类、native 方法与反射目标，并已在 RN 0.85 新架构、开启 R8 混淆的 release 构建上验证（所有 keep 的类、字段、native 方法与反射目标均在，含 `ReactHost.reload`）。若你的应用曾为本模块额外添加过 keep 规则，现在不再需要。\n- **Android `build.gradle`：** 根工程未设置时的默认 `compileSdkVersion` / `targetSdkVersion` 由 31/27 提升到 34；Expo（SDK 50+）模块仅在 `expo-modules-core` 参与构建时才编译。\n- **鸿蒙 HAR** 的 `oh-package.json5` 现与 npm 版本一致，且 `cpp/` 或 `android/jni/` 变更时一定会重建原生核心（此前可能发出比 Android/iOS 更旧的内核）。\n- **移除：** 从未展示的 locale 字符串（`downloading_update`、`installing_update`、`update_available`、`update_downloaded`、`update_installed`、`no_update_available`、`network_error`、`download_failed`、`install_failed`、`download_speed`、`file_size`、`time_remaining`）、`react-native-url-polyfill` 依赖，以及从未触发的事件类型 / 错误码。\n\n### 类型、文档与工具\n\n- `ClientOptions` 及相关选项类型从包根导出；context 类型与 provider 实际提供的值一致（含 progress）。\n- README（中英）新增覆盖全部 `ClientOptions` 字段的选项索引表。\n- `CODE_AUDIT.md` 记录了全部发现项、严重级别与处理状态。\n- CI：鸿蒙 HAR 在每个 PR 上编译并做类型检查；`patch_core` 在 ASan/UBSan 下运行并附带有界的 libFuzzer；原生 spec 一致性检查守住四端绑定；C++ 常量与 Java/ArkTS 镜像自动比对。\n\n## v10.55.1\n\n发布于 2026-08-31\n\n### 问题修复\n\n- **iOS:新架构下 `use_frameworks!` 构建的应用,`switchVersion` / `restartApp` 不会触发重启。** 重启路径此前用引号形式的 `__has_include` 探测 `RCTReloadCommand.h`,该形式只在静态链接构建下可解析;在 `use_frameworks!`(混编应用常因 Swift pod 被迫开启动态框架)下探测失败,编入的兜底 `[self.bridge reload]` 在 bridgeless 模式下是静默空操作——`switchVersion` 正常 resolve 但应用不会重载,更新只能在用户手动杀掉进程重开后生效。现探测失败时回退到 `<React/RCTReloadCommand.h>`,两种构建方式均会触发 `RCTTriggerReloadCommandListeners`。(89c638e)\n- **开发环境:无内容可下载时不再伪造下载成功。** 开发环境下,当检查结果中没有全量包 URL 时,`downloadUpdate` 此前会在未安装任何内容的情况下上报 `downloadSuccess` 并返回目标 hash,引导业务代码调用 `switchVersion`,进而报 `SWITCH_VERSION_FAILED: Bundle version … not found.`。现改为打印开发环境提示并返回 `undefined`,下游不会再把这次空操作当成真实更新。(9ad95fb)\n\n建议所有使用 `use_frameworks!` 构建的 iOS 应用升级——受影响的集成方式下,此前热更新只能在手动重启应用后生效。\n\n## v10.55.0\n\n发布于 2026-08-31\n\n- 默认开启 JavaScript 未捕获错误上报，并关联当前热更版本。\n- 新增 `captureException` 手动上报和 `disableErrorReporting` 显式退出。\n- 上报尽力而为，保留并链式调用 Sentry、Crashlytics 等既有全局处理器。\n\n## v10.54.0\n\n发布于 2026-08-30\n\n本版本集中完成安全加固（CODE_AUDIT §13）：禁止 HTTPS→HTTP 降级；采用两阶段安装并在完成记录中携带摘要；按 fingerprint 隔离检查去重；支持多镜像下载回退；以事务方式持久化状态；限制归档资源用量并严格校验检查响应 schema；同时新增 `markJsCheckCompleted`、`autoMarkSuccessDelayMs` / `healthCheck` / `testChannel` 选项、`getUpdateMetadata` 及 Sentry/Crashlytics 辅助方法、嵌套的 `checkUpdate` extra 数据和 `currentBundleSha256`。此外移除了 Expo postinstall 脚本，并通过白名单限制 npm 包中发布的文件。\n\n## v10.53.1\n\n发布于 2026-08-20\n\n针对 [10.53.0](https://github.com/reactnativecn/react-native-update/releases/tag/v10.53.0) `PackageInstaller` 迁移的加固版本。正常路径行为不变,无 API 变更。\n\n## v10.52.3\n\n发布于 2026-08-15\n\n`v10.52.2` 虽已创建 tag，但从未发布到 npm——其发布流程在 `prepack` 阶段失败，因此 **`v10.52.3` 取代该版本**并包含其全部内容。此前 npm 上的最新版本为 `v10.52.1`。\n\n### 修复 React Native 0.87+ 类型错误\n\n本包会发布 TypeScript 源码，因此每个使用方项目都会使用 React Native 自身的类型定义对其进行类型检查。React Native 0.87 生成的新类型（`types_generated/`，在 `moduleResolution: \"bundler\"` 下使用）使以下三处代码无法通过检查：\n\n- `NativeEventEmitter` / `DeviceEventEmitter` 现在是泛型，并将监听器定义为 `(...args: readonly Object[]) => unknown`，因此 `(data: ProgressData) => void` 回调无法直接赋值。下载进度监听器现在会接收原始事件，并在内部收窄类型。\n- `PermissionsAndroidStatic` 不再导出；Web/非原生 shim 改为从导出的值推导类型（`typeof PermissionsAndroid`）。\n- `Linking.getInitialURL()` 的返回类型扩大为 `string | null | undefined`，因此 `parseLinking` 现在接受可选 URL。\n\n以上三处写法均已在 React Native 0.73 与 0.87 的类型定义下验证通过，因此最低 React Native 版本不变。\n\n### Pushy：新增 API 端点\n\nPushy preset 的主要端点新增 `1-4.rnupdate.online`，与 `update.react-native.cn` 和 `update.reactnative.cn` 一同使用。\n\n本版本不包含 Android、iOS 或 HarmonyOS 原生代码变更。\n\n## v10.52.2\n\n发布于 2026-08-13\n\n为 Pushy preset 新增更多 API 端点。\n\n> **注意：** 此 tag 的发布流程在 `prepack` 阶段失败，因此从未发布到 npm。它已由包含其全部变更的 [`v10.52.3`](https://github.com/reactnativecn/react-native-update/releases/tag/v10.52.3) 取代。\n",
+      "sections": [
+        {
+          "heading": "更新日志",
+          "level": 1,
+          "anchor": "更新日志",
+          "offset": 0,
+          "length": 216
+        },
+        {
+          "heading": "v10.62.1",
+          "level": 2,
+          "anchor": "v10621",
+          "offset": 216,
+          "length": 29
+        },
+        {
+          "heading": "发布类型声明，不再发布 TS 源码",
+          "level": 3,
+          "anchor": "发布类型声明不再发布-ts-源码",
+          "offset": 245,
+          "length": 248
+        },
+        {
+          "heading": "修复",
+          "level": 3,
+          "anchor": "修复",
+          "offset": 493,
+          "length": 321
+        },
+        {
+          "heading": "v10.62.0",
+          "level": 2,
+          "anchor": "v10620",
+          "offset": 814,
+          "length": 29
+        },
+        {
+          "heading": "三端统一的落盘格式",
+          "level": 3,
+          "anchor": "三端统一的落盘格式",
+          "offset": 843,
+          "length": 552
+        },
+        {
+          "heading": "行为变化",
+          "level": 3,
+          "anchor": "行为变化",
+          "offset": 1395,
+          "length": 333
+        },
+        {
+          "heading": "接入方须知",
+          "level": 3,
+          "anchor": "接入方须知",
+          "offset": 1728,
+          "length": 578
+        },
+        {
+          "heading": "v10.61.0",
+          "level": 2,
+          "anchor": "v10610",
+          "offset": 2306,
+          "length": 29
+        },
+        {
+          "heading": "原生更新流程只用一个引擎",
+          "level": 3,
+          "anchor": "原生更新流程只用一个引擎",
+          "offset": 2335,
+          "length": 595
+        },
+        {
+          "heading": "行为变化",
+          "level": 3,
+          "anchor": "行为变化-1",
+          "offset": 2930,
+          "length": 603
+        },
+        {
+          "heading": "新增",
+          "level": 3,
+          "anchor": "新增",
+          "offset": 3533,
+          "length": 267
+        },
+        {
+          "heading": "修复",
+          "level": 3,
+          "anchor": "修复-1",
+          "offset": 3800,
+          "length": 480
+        },
+        {
+          "heading": "接入方须知",
+          "level": 3,
+          "anchor": "接入方须知-1",
+          "offset": 4280,
+          "length": 198
+        },
+        {
+          "heading": "v10.60.0",
+          "level": 2,
+          "anchor": "v10600",
+          "offset": 4478,
+          "length": 29
+        },
+        {
+          "heading": "三端共用一份原生内核",
+          "level": 3,
+          "anchor": "三端共用一份原生内核",
+          "offset": 4507,
+          "length": 826
+        },
+        {
+          "heading": "修复",
+          "level": 3,
+          "anchor": "修复-2",
+          "offset": 5333,
+          "length": 274
+        },
+        {
+          "heading": "接入方须知",
+          "level": 3,
+          "anchor": "接入方须知-2",
+          "offset": 5607,
+          "length": 288
+        },
+        {
+          "heading": "v10.59.2",
+          "level": 2,
+          "anchor": "v10592",
+          "offset": 5895,
+          "length": 29
+        },
+        {
+          "heading": "Android：应用内 APK 安装恢复可用",
+          "level": 3,
+          "anchor": "android应用内-apk-安装恢复可用",
+          "offset": 5924,
+          "length": 623
+        },
+        {
+          "heading": "v10.59.1",
+          "level": 2,
+          "anchor": "v10591",
+          "offset": 6547,
+          "length": 29
+        },
+        {
+          "heading": "原生内部整理",
+          "level": 3,
+          "anchor": "原生内部整理",
+          "offset": 6576,
+          "length": 439
+        },
+        {
+          "heading": "Android：pnpm workspace 下的 Expo 检测",
+          "level": 3,
+          "anchor": "androidpnpm-workspace-下的-expo-检测",
+          "offset": 7015,
+          "length": 389
+        },
+        {
+          "heading": "v10.59.0",
+          "level": 2,
+          "anchor": "v10590",
+          "offset": 7404,
+          "length": 29
+        },
+        {
+          "heading": "原生宿主接口",
+          "level": 3,
+          "anchor": "原生宿主接口",
+          "offset": 7433,
+          "length": 997
+        },
+        {
+          "heading": "v10.58.1",
+          "level": 2,
+          "anchor": "v10581",
+          "offset": 8430,
+          "length": 29
+        },
+        {
+          "heading": "React Native 0.87 的 TypeScript 修复",
+          "level": 3,
+          "anchor": "react-native-087-的-typescript-修复",
+          "offset": 8459,
+          "length": 641
+        },
+        {
+          "heading": "v10.58.0",
+          "level": 2,
+          "anchor": "v10580",
+          "offset": 9100,
+          "length": 29
+        },
+        {
+          "heading": "支持 tvOS 并提升 iOS 启动可靠性",
+          "level": 3,
+          "anchor": "支持-tvos-并提升-ios-启动可靠性",
+          "offset": 9129,
+          "length": 552
+        },
+        {
+          "heading": "v10.57.1",
+          "level": 2,
+          "anchor": "v10571",
+          "offset": 9681,
+          "length": 29
+        },
+        {
+          "heading": "Xcode 27 编译修复（iOS）",
+          "level": 3,
+          "anchor": "xcode-27-编译修复ios",
+          "offset": 9710,
+          "length": 582
+        },
+        {
+          "heading": "v10.57.0",
+          "level": 2,
+          "anchor": "v10570",
+          "offset": 10292,
+          "length": 29
+        },
+        {
+          "heading": "原生配置与更新接口",
+          "level": 3,
+          "anchor": "原生配置与更新接口",
+          "offset": 10321,
+          "length": 870
+        },
+        {
+          "heading": "兼容性与接入",
+          "level": 3,
+          "anchor": "兼容性与接入",
+          "offset": 11191,
+          "length": 463
+        },
+        {
+          "heading": "测试与示例",
+          "level": 3,
+          "anchor": "测试与示例",
+          "offset": 11654,
+          "length": 231
+        },
+        {
+          "heading": "v10.56.1",
+          "level": 2,
+          "anchor": "v10561",
+          "offset": 11885,
+          "length": 123
+        },
+        {
+          "heading": "v10.56.0",
+          "level": 2,
+          "anchor": "v10560",
+          "offset": 12008,
+          "length": 158
+        },
+        {
+          "heading": "安全加固",
+          "level": 3,
+          "anchor": "安全加固",
+          "offset": 12166,
+          "length": 622
+        },
+        {
+          "heading": "稳定性",
+          "level": 3,
+          "anchor": "稳定性",
+          "offset": 12788,
+          "length": 1048
+        },
+        {
+          "heading": "需要留意的行为变化",
+          "level": 3,
+          "anchor": "需要留意的行为变化",
+          "offset": 13836,
+          "length": 1181
+        },
+        {
+          "heading": "类型、文档与工具",
+          "level": 3,
+          "anchor": "类型文档与工具",
+          "offset": 15017,
+          "length": 294
+        },
+        {
+          "heading": "v10.55.1",
+          "level": 2,
+          "anchor": "v10551",
+          "offset": 15311,
+          "length": 29
+        },
+        {
+          "heading": "问题修复",
+          "level": 3,
+          "anchor": "问题修复",
+          "offset": 15340,
+          "length": 734
+        },
+        {
+          "heading": "v10.55.0",
+          "level": 2,
+          "anchor": "v10550",
+          "offset": 16074,
+          "length": 173
+        },
+        {
+          "heading": "v10.54.0",
+          "level": 2,
+          "anchor": "v10540",
+          "offset": 16247,
+          "length": 393
+        },
+        {
+          "heading": "v10.53.1",
+          "level": 2,
+          "anchor": "v10531",
+          "offset": 16640,
+          "length": 165
+        },
+        {
+          "heading": "v10.52.3",
+          "level": 2,
+          "anchor": "v10523",
+          "offset": 16805,
+          "length": 143
+        },
+        {
+          "heading": "修复 React Native 0.87+ 类型错误",
+          "level": 3,
+          "anchor": "修复-react-native-087-类型错误",
+          "offset": 16948,
+          "length": 620
+        },
+        {
+          "heading": "Pushy：新增 API 端点",
+          "level": 3,
+          "anchor": "pushy新增-api-端点",
+          "offset": 17568,
+          "length": 164
+        },
+        {
+          "heading": "v10.52.2",
+          "level": 2,
+          "anchor": "v10522",
+          "offset": 17732,
+          "length": 213
+        }
+      ]
+    },
+    {
       "slug": "cli",
       "title": "命令行工具",
       "path": "pages/docs/cli.md",
@@ -682,12 +1108,162 @@
       ]
     },
     {
+      "slug": "expo",
+      "title": "Expo 项目热更新：Pushy 与 EAS Update 对比及接入",
+      "path": "pages/docs/expo.mdx",
+      "url": "https://pushy.reactnative.cn/docs/expo",
+      "resourceUri": "pushy-docs://docs/expo",
+      "content": "# Expo 项目热更新：Pushy 与 EAS Update 对比及接入\n\nExpo 项目要做热更新（OTA），常见的选择有两个：Expo 官方的 **EAS Update**（客户端为 `expo-updates`），以及 **Pushy**（客户端为 `react-native-update`）。两者都能在不重新提交应用商店审核的前提下更新 JS 代码和图片等资源，但在增量方式、分发网络、计费方式和平台覆盖上各有侧重。\n\n本页先说明 Pushy 在 Expo 项目中是如何工作的，再给出两者的客观对比和选型建议，最后列出接入步骤。具体的原生配置、代码集成与发布命令请以[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)、[代码集成](https://pushy.reactnative.cn/docs/integration.md)和[发布热更新](https://pushy.reactnative.cn/docs/publish.md)为准，本页只做串联和 Expo 相关的补充。\n\n:::tip 推荐先用 Skill 自动接入\n如果你使用支持 Skills 的 AI 编程工具，可以先[安装 react-native-update Skill](https://pushy.reactnative.cn/docs/skills.md)。它覆盖 Expo prebuild 工程的接入流程，并会检查 `expo-updates` 冲突、原生目录是否已经生成等常见问题。\n:::\n\n## Pushy 在 Expo 项目中如何工作\n\n### 支持的 Expo SDK 版本\n\n- **要求 Expo SDK 50 或更高版本。** `react-native-update` 在 iOS（podspec）和 Android（`build.gradle`）构建时都会检测项目中安装的 `expo` 版本，只有 SDK 50 及以上才会启用其中的 Expo 模块；低于 50 时按普通 React Native 项目处理，需要像非 Expo 项目一样手动配置 Bundle URL。\n- **使用新架构时建议 Expo SDK 51 及以上**，Expo 51 以下的新架构支持并不完整。总体而言，建议使用尽可能新的 Expo 版本。\n- `react-native-update` 仓库中的 Expo 示例工程（`Example/expoUsePushy`）目前基于 Expo SDK 57，并在 CI 中对 iOS 和 Android 两端做构建验证。\n\n### 需要 prebuild，不能在 Expo Go 中使用\n\n`react-native-update` 包含原生代码，所以 Expo 项目需要通过 `npx expo prebuild` 生成 `ios`、`android` 原生目录（即 Expo 所说的 Continuous Native Generation，CNG），然后编译出自己的 release 包。这也意味着：\n\n- **Expo Go 无法使用 Pushy**，因为 Expo Go 不能加载项目自带的原生模块；\n- 热更新只在 release 包中生效，DEBUG 模式下依然走 Metro 开发服务器；\n- 原生包可以本地编译，也可以用 EAS Build 编译——Pushy 不依赖某种特定的构建方式，只要求把**最终分发给用户的那个安装包**上传为基准版本（见下文）。\n\n### 不需要 config plugin：以 Expo Module 形式自动接入\n\n`react-native-update` 没有提供 config plugin（没有 `app.plugin.js`），也**不需要**在 `app.json` 的 `plugins` 中声明。它在包内带有 `expo-module.config.json`，以 Expo Module 的形式被 Expo autolinking 自动链接：\n\n- **iOS**：注册了一个 `ExpoReactDelegateHandler`，在启动时把 JS bundle 的地址交给 `RCTPushy.bundleURL()` 决定；\n- **Android**：注册了一个 `ReactNativeHostHandler`，通过 `getJSBundleFile` 返回 `UpdateContext.getBundleUrl(...)`。\n\n因此，对于 Expo SDK 48 及以上且 `react-native-update` >= 10.28.2 的项目，[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)中「配置 Bundle URL」这一步可以跳过，`AppDelegate` / `MainApplication` 无需手改。\n\n:::info\n安装配置页中的其余原生步骤（例如关闭 Android 的 `crunchPngs`、`react-native-screens` 相关的 `MainActivity` 修改、测试用的 Deep Link）对 Expo 项目同样适用。注意在 CNG 工作流中，`ios`、`android` 目录会在 `npx expo prebuild --clean` 时重新生成，手动修改会丢失。请根据团队习惯选择：把原生目录提交到仓库长期维护，或用你自己的 config plugin 把这些修改固化下来。\n:::\n\n### 与 expo-updates 的关系：二选一，不要同时安装\n\n`expo-updates` 是 EAS Update 的客户端，它同样会在应用启动时接管 JS bundle 的加载。Pushy 与它的原理相同、作用位置相同，两者同时存在会争夺 bundle 加载权，导致热更新功能冲突。所以：\n\n- **使用 Pushy 时，请不要安装 `expo-updates`**；\n- 如果项目原本用的是 EAS Update，迁移时需要先移除 `expo-updates`，再重新 prebuild 和编译原生包（具体步骤见下文「接入步骤」）。\n\n注意 EAS Build、EAS Submit 等其他 Expo 服务与 Pushy 并不冲突，可以继续使用；需要二选一的只是负责 OTA 的 `expo-updates`。\n\n## Pushy 与 EAS Update 对比\n\n下表只比较热更新相关的能力。EAS Update 一侧的信息来自 Expo 官方文档（[How EAS Update works](https://docs.expo.dev/eas-update/how-it-works/)、[Bundle diffing](https://docs.expo.dev/eas-update/bundle-diffing/)、[Rollouts](https://docs.expo.dev/eas-update/rollouts/)、[Error recovery](https://docs.expo.dev/eas-update/error-recovery/)、[Standalone service](https://docs.expo.dev/eas-update/standalone-service/)、[Pricing](https://expo.dev/pricing)），产品会持续迭代，请以官方最新说明为准。\n\n| 对比项                | Pushy（react-native-update）                                                                                                                                        | EAS Update（expo-updates）                                                                                                                        |\n| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |\n| **JS bundle 增量**   | 基于 hdiff 的差量补丁，并针对 Hermes 字节码做了专项优化；首次热更新即可基于安装包内置的 bundle 计算差量                                                                                                   | 支持基于 bsdiff 的 bundle diffing（需 SDK 55+，SDK 56 起默认开启）；仅在补丁明显更小时下发补丁，否则下发完整 bundle；基于安装包内置 bundle 的补丁在 SDK 58+ 配合 EAS Build 自动启用，SDK 57 及以下为实验性选项 |\n| **图片等资源**          | 只下发有变化的资源                                                                                                                                                         | 只下载设备上尚未拥有的资源                                                                                                                                   |\n| **分发网络**           | 国内使用阿里云 CDN，海外使用 Cloudflare                                                                                                                                       | Expo 托管的全球服务；官方文档未针对中国大陆网络做专门说明，建议在目标用户网络下实测                                                                                                    |\n| **计费方式**           | 提供免费版，按套餐计费，CDN 流量不单独计费，详见[价格页](https://pushy.reactnative.cn/pricing.md)                                                                                          | 提供免费额度；付费套餐按月活用户（MAU）计费，超出套餐带宽另行计费，详见 [Expo 价格页](https://expo.dev/pricing)                                                                      |\n| **灰度发布**           | 按比例灰度，按设备 UUID 哈希稳定分组，可与全量版本并存，见[灰度发布](https://pushy.reactnative.cn/docs/publish.md#%E7%81%B0%E5%BA%A6%E5%8F%91%E5%B8%83)                                         | 支持按百分比灰度单个更新，也支持按分支（branch）灰度                                                                                                                   |\n| **出错回滚**           | 新版本启动崩溃自动回滚；可在后台暂停热更、改绑到旧版本；JS 无法运行时还可通过[强制启动（救砖）](https://pushy.reactnative.cn/docs/publish.md#%E5%BC%BA%E5%88%B6%E5%90%AF%E5%8A%A8%E6%95%91%E7%A0%96)由原生侧拉取修复版本 | 首屏渲染前出错时会标记该更新失败并回退到之前成功的更新；首屏渲染后出错则不再回退、只能向前修复；服务端可回滚灰度或回退到内置版本                                                                                |\n| **是否需要 EAS Build** | 不需要，本地编译、EAS Build 或其他 CI 均可                                                                                                                                      | 不强制，官方说明可脱离 EAS Build 单独使用，但需自行配置 channel，部分依赖构建信息的功能不可用                                                                                        |\n| **鸿蒙（HarmonyOS）**  | 第一方支持，见[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)中的 Harmony 部分                                                                                  | `expo-updates` 仅支持 iOS 和 Android                                                                                                                |\n| **Expo Go**        | 不支持，需要 prebuild 后自行编译                                                                                                                                             | 可配合 development build 预览更新                                                                                                                      |\n| **客户端与工具**         | 客户端、命令行工具与管理界面代码开源                                                                                                                                                | `expo-updates` 客户端开源，服务端为 Expo 托管服务                                                                                                             |\n\n关于鸿蒙需要说明一点：Expo 本身不面向鸿蒙构建。如果你的 React Native 应用同时有鸿蒙版本（基于 React Native for OpenHarmony），Pushy 可以用同一套服务和命令行管理 iOS、Android 与鸿蒙三端的热更新；鸿蒙端的接入方式与 Expo 无关，按[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)中的 Harmony 部分进行即可。\n\n关于增量包大小，Pushy 在真实 React Native 0.86 应用上的实测数据（一行文案改动约 3.4 KB）见[产品简介](https://pushy.reactnative.cn/docs/intro.md)中的「实测数据」一节，评测代码与数据公开可复现。\n\n## 如何选择\n\n两者都是成熟可用的方案，可以按下面几个维度判断：\n\n**更适合 Pushy 的情况**\n\n- 主要用户在中国大陆，希望热更新走国内 CDN，提高下载速度和成功率；\n- 应用体积大、迭代频繁，希望从安装后的第一次热更新起就下发尽可能小的差量包；\n- 同时有鸿蒙版本，希望三端用同一套热更新服务；\n- 希望流量不单独计费、成本可预期，或需要中文文档和付费专人技术支持；\n- 需要「强制启动（救砖）」、版本健康度、按比例灰度等发布控制能力（参见[数据分析](https://pushy.reactnative.cn/docs/analytics.md)）。\n\n**更适合 EAS Update 的情况**\n\n- 用户主要在海外，团队已深度使用 EAS Build、EAS Submit 等 Expo 服务，希望在同一个控制台管理构建与更新；\n- 依赖 channel / branch / runtimeVersion 这套 Expo 原生的发布模型，或需要在 Expo 的 development build 中预览更新；\n- 只发布 iOS 和 Android，没有鸿蒙需求。\n\n如果你的情况介于两者之间，可以先用 Pushy 的免费版在一个测试应用上实测下载速度和包体积，再做决定。无论选择哪一个，同一个应用里都只保留一套 OTA 客户端。\n\n## 接入步骤\n\n以下是 Expo 项目接入 Pushy 的主线，每一步的细节请点开对应文档。\n\n\n### 确认 Expo 版本并移除 expo-updates\n确认 `expo` 为 SDK 50 或更高版本（使用新架构建议 51+）。如果项目已经安装了 `expo-updates`，先移除：\n```bash\nnpm uninstall expo-updates\n```\n`app.json` 中仅供 `expo-updates` 使用的配置（如 `updates`、`runtimeVersion`）可以一并删掉。若此前用 EAS Build 发布过带 channel 的构建，`eas.json` 中的 channel 设置也不再需要。\n### 安装 react-native-update 与命令行工具\n```bash\n# 全局安装命令行工具\nnpm i -g react-native-update-cli\n\n# 在项目中安装热更新模块\nnpm i react-native-update\n```\n### 预构建原生工程\n```bash\nnpx expo prebuild\n\n# 若之前生成过原生目录且里面残留 expo-updates 的配置，可使用 --clean 重新生成\n# npx expo prebuild --clean\n\n# 进入 iOS 目录安装 iOS 模块\ncd ios && pod install\n```\nBundle URL 会由 Expo 模块自动接管，无需手改。然后按[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)补齐 Android 关闭 `crunchPngs`、`MainActivity`（如使用 `react-native-screens`）和测试用 Deep Link 等步骤，并在其中的「登录与创建应用」一节创建应用、生成 `update.json`。\n### 集成代码\n按[代码集成](https://pushy.reactnative.cn/docs/integration.md)，从 `update.json` 读取 `appKey`，创建 `Pushy` 客户端并用 `UpdateProvider` 包裹根组件。使用 Expo Router 时，可以在根布局（如 `app/_layout.tsx`）中包裹。\n### 准备 index.js 入口\n`pushy bundle` 检测到 Expo 项目时会自动调用 `expo export:embed` 打包，默认入口文件为 `index.js`。使用 Expo Router 等没有 `index.js` 的项目，需要新建一个 `index.js` 引用框架入口，例如：\n```js\nimport \"expo-router/entry\";\n```\n详见[发布热更新](https://pushy.reactnative.cn/docs/publish.md#%E5%8F%91%E5%B8%83%E7%83%AD%E6%9B%B4%E6%96%B0%E7%89%88%E6%9C%AC)中的说明。\n### 编译 release 包并上传基准版本\n用本地编译或 EAS Build 生成 release 包，然后用 `pushy uploadIpa`、`pushy uploadApk` 或 `pushy uploadAab` 上传。**上传的必须是最终分发给用户的同一个文件**，否则服务端无法确认设备上的原生包，差量补丁也无法生成。使用 EAS Build 时，请下载构建产物后再上传，并用同一个产物提交商店。\n### 发布热更新\n修改 JS 代码或图片后，运行 `pushy bundle --platform <ios|android>` 生成并上传热更新包，再绑定到对应的原生包版本即可。可以先用[扫码测试](https://pushy.reactnative.cn/docs/bestpractice.md#%E6%B5%8B%E8%AF%95%E4%B8%8E%E5%9B%9E%E6%BB%9A)验证，再通过[灰度发布](https://pushy.reactnative.cn/docs/publish.md#%E7%81%B0%E5%BA%A6%E5%8F%91%E5%B8%83)逐步放量。命令参数见[命令行工具](https://pushy.reactnative.cn/docs/cli.md)。\n\n## 常见问题\n\n#### 已经用 EAS Build 打包，还能用 Pushy 吗？\n\n可以。EAS Build 只负责编译原生包，Pushy 只要求你把最终分发的那个安装包上传为基准版本。需要注意的只是不要在项目中保留 `expo-updates`。\n\n#### 新增或升级了带原生代码的 Expo 包，能热更新吗？\n\n不能。任何需要重新编译才能生效的修改（新增原生模块、修改 `app.json` 中影响原生工程的配置、升级 Expo SDK 等）都需要重新 prebuild、编译并上传新的原生基准版本。可热更新与不可热更新的范围见[常见问题](https://pushy.reactnative.cn/docs/faq.md#%E5%93%AA%E4%BA%9B%E4%BF%AE%E6%94%B9%E5%8F%AF%E4%BB%A5%E7%83%AD%E6%9B%B4%E6%96%B0%E5%93%AA%E4%BA%9B%E4%B8%8D%E8%83%BD)。\n\n#### 接入后热更新没有生效怎么办？\n\n先确认测试的是 release 包而非 DEBUG 包，再检查是否残留了 `expo-updates`、原生包是否已上传为基准版本。其他报错可查阅[错误码说明](https://pushy.reactnative.cn/docs/errors.md)与[常见问题](https://pushy.reactnative.cn/docs/faq.md)，也可以到 [GitHub Issues](https://github.com/reactnativecn/react-native-update/issues) 提问。\n",
+      "sections": [
+        {
+          "heading": "Expo 项目热更新：Pushy 与 EAS Update 对比及接入",
+          "level": 1,
+          "anchor": "expo-项目热更新pushy-与-eas-update-对比及接入",
+          "offset": 0,
+          "length": 682
+        },
+        {
+          "heading": "Pushy 在 Expo 项目中如何工作",
+          "level": 2,
+          "anchor": "pushy-在-expo-项目中如何工作",
+          "offset": 682,
+          "length": 25
+        },
+        {
+          "heading": "支持的 Expo SDK 版本",
+          "level": 3,
+          "anchor": "支持的-expo-sdk-版本",
+          "offset": 707,
+          "length": 411
+        },
+        {
+          "heading": "需要 prebuild，不能在 Expo Go 中使用",
+          "level": 3,
+          "anchor": "需要-prebuild不能在-expo-go-中使用",
+          "offset": 1118,
+          "length": 377
+        },
+        {
+          "heading": "不需要 config plugin：以 Expo Module 形式自动接入",
+          "level": 3,
+          "anchor": "不需要-config-plugin以-expo-module-形式自动接入",
+          "offset": 1495,
+          "length": 862
+        },
+        {
+          "heading": "与 expo-updates 的关系：二选一，不要同时安装",
+          "level": 3,
+          "anchor": "与-expo-updates-的关系二选一不要同时安装",
+          "offset": 2357,
+          "length": 364
+        },
+        {
+          "heading": "Pushy 与 EAS Update 对比",
+          "level": 2,
+          "anchor": "pushy-与-eas-update-对比",
+          "offset": 2721,
+          "length": 4825
+        },
+        {
+          "heading": "如何选择",
+          "level": 2,
+          "anchor": "如何选择",
+          "offset": 7546,
+          "length": 581
+        },
+        {
+          "heading": "接入步骤",
+          "level": 2,
+          "anchor": "接入步骤",
+          "offset": 8127,
+          "length": 50
+        },
+        {
+          "heading": "确认 Expo 版本并移除 expo-updates",
+          "level": 3,
+          "anchor": "确认-expo-版本并移除-expo-updates",
+          "offset": 8177,
+          "length": 273
+        },
+        {
+          "heading": "安装 react-native-update 与命令行工具",
+          "level": 3,
+          "anchor": "安装-react-native-update-与命令行工具",
+          "offset": 8450,
+          "length": 132
+        },
+        {
+          "heading": "预构建原生工程",
+          "level": 3,
+          "anchor": "预构建原生工程",
+          "offset": 8582,
+          "length": 388
+        },
+        {
+          "heading": "集成代码",
+          "level": 3,
+          "anchor": "集成代码",
+          "offset": 8970,
+          "length": 184
+        },
+        {
+          "heading": "准备 index.js 入口",
+          "level": 3,
+          "anchor": "准备-indexjs-入口",
+          "offset": 9154,
+          "length": 320
+        },
+        {
+          "heading": "编译 release 包并上传基准版本",
+          "level": 3,
+          "anchor": "编译-release-包并上传基准版本",
+          "offset": 9474,
+          "length": 208
+        },
+        {
+          "heading": "发布热更新",
+          "level": 3,
+          "anchor": "发布热更新",
+          "offset": 9682,
+          "length": 355
+        },
+        {
+          "heading": "常见问题",
+          "level": 2,
+          "anchor": "常见问题",
+          "offset": 10037,
+          "length": 9
+        },
+        {
+          "heading": "已经用 EAS Build 打包，还能用 Pushy 吗？",
+          "level": 4,
+          "anchor": "已经用-eas-build-打包还能用-pushy-吗",
+          "offset": 10046,
+          "length": 120
+        },
+        {
+          "heading": "新增或升级了带原生代码的 Expo 包，能热更新吗？",
+          "level": 4,
+          "anchor": "新增或升级了带原生代码的-expo-包能热更新吗",
+          "offset": 10166,
+          "length": 310
+        },
+        {
+          "heading": "接入后热更新没有生效怎么办？",
+          "level": 4,
+          "anchor": "接入后热更新没有生效怎么办",
+          "offset": 10476,
+          "length": 282
+        }
+      ]
+    },
+    {
       "slug": "faq",
       "title": "常见问题",
       "path": "pages/docs/faq.mdx",
       "url": "https://pushy.reactnative.cn/docs/faq",
       "resourceUri": "pushy-docs://docs/faq",
-      "content": "# 常见问题\n\n如果本页面没能回答您的疑问，您可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。\n\n### 关于 Pushy\n\n#### Pushy 是什么？\n\nPushy（npm 包名 `react-native-update`）是专为 React Native 应用打造的热更新服务，由 React Native 中文网自 2016 年起运营。修改 JS 代码或图片等资源后，用一条命令即可把更新下发到用户手机，无需重新提交应用商店审核。下发的是 bsdiff/hdiff 增量包，通常只有几十 KB；国内走阿里云 CDN、海外走 Cloudflare；新版本启动崩溃会自动回滚。详见[产品简介](https://pushy.reactnative.cn/docs/intro.md)。\n\n***\n\n#### React Native 有哪些热更新方案？Pushy 和 CodePush、Expo Updates 有什么区别？\n\n常见方案有三类：Microsoft CodePush（App Center）、Expo 官方的 EAS Update（`expo-updates`），以及 Pushy 这类第三方热更新服务。主要区别：\n\n- **CodePush**：已于 2025 年 3 月 31 日随 App Center 停止服务，现有用户需要迁移。\n- **EAS Update**：以下发全量 JS 包为主，体积通常为 MB 级；服务器在海外，国内访问较慢，不支持鸿蒙，超出额度的流量另行计费。\n- **Pushy**：下发增量包（通常几十 KB，针对 Hermes 字节码优化后一行改动可小至 3.4 KB），国内外均有 CDN 节点且流量不单独计费，第一方支持 iOS、Android 和鸿蒙，同时兼容 Expo 项目。\n\n详细对比见[产品简介中的性价比对比](https://pushy.reactnative.cn/docs/intro.md#-%E6%80%A7%E4%BB%B7%E6%AF%94%E4%B9%8B%E9%80%89)。\n\n***\n\n#### CodePush 停服了，用什么替代？如何迁移到 Pushy？\n\nMicrosoft App Center（含 CodePush）已于 2025 年 3 月 31 日停止服务，可以改用 Pushy。迁移步骤：\n\n1. 从项目中移除 `react-native-code-push` 及其原生配置；\n2. 按[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)安装 `react-native-update`，并完成 iOS、Android（及鸿蒙）的原生配置；\n3. 按[代码集成](https://pushy.reactnative.cn/docs/integration.md)用 `UpdateProvider` 包裹根组件；\n4. 重新打包原生包并上传到 Pushy，之后即可按[发布流程](https://pushy.reactnative.cn/docs/publish.md)发布热更新。\n\n如果使用支持 Skills 的 AI 编程工具，可以先[安装 react-native-update Skill](https://pushy.reactnative.cn/docs/skills.md)，让 AI 自动完成大部分改动。\n\n***\n\n#### Pushy 支持 Expo、鸿蒙和 React Native 新架构吗？\n\n都支持。\n\n- **Expo**：要求 Expo 50 或更高版本，通过 `npx expo prebuild` 预构建后接入；请勿同时安装 `expo-updates`。使用新架构时建议 Expo 51 及以上。\n- **鸿蒙（HarmonyOS）**：第一方支持，原生配置见[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)中的 Harmony 部分。\n- **新架构与 Hermes**：均已支持，并针对 Hermes 字节码做了专门的增量优化。\n\n***\n\n#### Pushy 免费吗？\n\n有免费版：可创建 3 个应用，每个应用可上传 30 个原生包和 30 个热更包，所有应用每天累计 1000 次更新检查，CDN 流量不额外收费。付费版从标准版 960 元/年起，新用户注册验证后自动获得 7 天专业版试用。具体配额以[价格页](https://pushy.reactnative.cn/pricing.md)为准。\n\n***\n\n#### Pushy 是开源的吗？\n\n是的。Pushy 的客户端 SDK、命令行工具和管理界面代码都在 [GitHub](https://github.com/reactnativecn) 上开源，接受社区审计。\n\n***\n\n### 业务问题\n\n#### 热更新会被苹果拒审吗？能否上架 App Store？\n\n通常不会，可以正常上架。大量实践表明，接入热更新的应用能够顺利上架 App Store 和国内各大应用市场。唯一需要注意的是：在审核期间不要发布热更新，不要让审核人员看到更新相关的提示和弹窗。\n\n***\n\n#### 是否可以在海外使用？\n\n可以。Pushy 本身在国内外都部署有可用的 CDN 节点，能够满足大多数出海应用的热更新分发要求。\n\n如果您的项目对海外合规、数据存放位置、运营主体隔离等方面还有额外要求，则可以考虑使用由不同公司实体独立运营的全球服务 [Cresc](https://cresc.dev/)。\n\n***\n\n#### 哪些修改可以热更新？哪些不能？\n\n我们把对应用的修改分为两类：\n\n- 不可热更新 —— 原生修改，即所有需要`编译`后才能生效的修改：\n  - 任何在 iOS 或者 Android 目录中的修改、增删。\n  - 任何含有原生代码的第三方组件的更新、修改。\n- 可以热更新 —— 非原生修改，即所有`无需编译`，刷新即可生效的修改：\n\n  - js 代码修改，包括第三方纯 js 组件的更新、修改。\n  - 可以在 js 代码中 require/import 的资源文件，例如图片。\n\n需要注意的是，即便资源文件可以热更新，但这些热更新后的资源文件会以`file://`协议的形式提供访问，某些读取资源文件的第三方可能并不支持`file://`协议。\n\n***\n\n#### 热更新成功完成，但是重启后又回滚了是怎么回事？\n\n可以正常更新，但是重启后回滚，一般有两种可能的情况：\n\n- 没有正确[配置 bundleUrl](https://pushy.reactnative.cn/docs/getting-started.md#%E9%85%8D%E7%BD%AE-bundle-url)\n- （仅有 v10 以下版本存在此可能性，v10 及更高版本不存在此情况）没有正确[调用 markSuccess](https://v9--pushy-site.netlify.app/docs/integration#%E9%A6%96%E6%AC%A1%E5%90%AF%E5%8A%A8%E5%9B%9E%E6%BB%9A)\n\n如果你确定上述两个步骤都正确无误，请在[issues 区](https://github.com/reactnativecn/react-native-update/issues)给我们留言反馈。\n\n***\n\n#### 热更新报错：“热更新已暂停，原因：编译时间戳与服务器记录不一致。”\n\n当您每次编译产生一个原生包时，其中都会记录一个编译时间戳`buildTime`(可以使用`pushy parseIpa a.ipa`或是`pushy parseApk a.apk`命令来查看)。如果您需要把这个包发给客户并希望使用热更新功能，那么就需要使用 upload 命令来上传到我们的服务器，而服务器端会记录这个包的版本号和编译时间戳以便后续比对记录。\n\n举例来说，假如我已经上传了一个 1.0 版本原生包（`1A包`），但后来由于种种原因我又重新打包了（`1B包`）但没有上传，这两个包有相同的版本号，但会有不同的编译时间戳。此时有几种可能的情况：\n\n1. 我忘记上传过`1A包`，`1B包`没有实质更改且还没有客户安装。此时应当放弃`1B包`，只让客户下载安装`1A包`。\n2. 我忘记上传过`1A包`，又生成了`1B包`且已有客户安装。此时`1A包`客户可以获取热更新，`1B包`客户无法获取热更新。要使两批客户都能获取热更新，要么想办法通知`1B包`客户装回`1A包`，要么重新发布一个`高于1.0`版本的原生包且上传到 pushy 服务器，并删除`1.0`版本的记录，此时`1A包`和`1B包`的客户都会收到版本过期需要下载新版本的通知。\n3. 我知道上传过`1A包`，但我有原生方面的修改需要打了一个新的`1B包`。此时若将`1B包`上传到 pushy 服务器会提示版本验证错误，因为已经存在有相同的`1.0`版本。所以需要首先更改原生版本号再次打包，并`首先`将此新版本上传到服务器，`然后`分发给客户。这样`1.0版本`和`新版本`可以并存且都可以获得热更新。\n\n请谨记，任何时候生成原生包，请 1)先修改原生版本号，2)并上传到 pushy 服务器，才可以正常获得热更新。\n\n为什么对不上就拿不到差量，可以看[发布流程中的演示](https://pushy.reactnative.cn/docs/publish.md#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%87%8D%E6%96%B0%E6%89%93%E5%8C%85%E5%90%8E%E8%A6%81%E5%85%88%E4%B8%8A%E4%BC%A0)。\n\n:::info\n如果您是`高级版`、`专业版`或`大客户VIP版`客户，也可以考虑在管理后台的应用设置中启用`忽略编译时间戳`。此选项仅对比版本号，不校验时间戳，可提供更宽容的热更策略，但可能消耗更多流量，适合需要管理多个分发渠道的客户。\n:::\n\n***\n\n#### 后台已经显示了原生包的「内容指纹」，为什么还是提示编译时间戳不匹配？\n\n服务端记录的每个原生包有两个身份信息：\n\n- **编译时间戳（buildTime）**：打包时写入二进制，`pushy uploadApk` / `uploadIpa` / `uploadApp` 上传时记录。\n- **内容指纹（bundleHash）**：上传原生包时，CLI（`react-native-update-cli` ≥ 2.8.5）从包内提取内嵌的 JS bundle 计算出的 sha256。它描述的是「这个包里的 JS 是哪一份」，与 App 内集成的 SDK 版本无关。\n\n检查更新时，服务端只有在**两边都有指纹**时才用指纹代替时间戳做判定：\n\n1. 服务端记录的原生包带有内容指纹（用 ≥ 2.8.5 的 CLI 上传）；\n2. 客户端在请求中上报了 bundleHash——App 内集成的 `react-native-update` **≥ 10.49.0** 才会上报。\n\n两者缺一，就退回编译时间戳的严格比对。所以「后台有指纹却仍提示时间戳不匹配」几乎总是因为 App 里打包的 SDK 低于 10.49.0：指纹是 CLI 算出来的，旧版 SDK 并不知道它的存在。把 SDK 升级到 10.49.0 以上并重新打包发布后，同一份 JS 的重复打包会按指纹放行，不再被时间戳拦截。\n\n排查方法：在管理后台的「实时数据」里，或用 MCP 的 `pushy.check_update.observed` 工具，查看该应用近期请求是记录在 `packageVersion_buildTime`（未上报指纹）还是 `packageVersion_bundleHash`（已上报指纹）维度下，并对照客户端 SDK 版本分布。`pushy.check_update.diagnose` 在判定被拦截时也会给出 `BUNDLE_HASH_NOT_REPORTED` 提示。\n\n***\n\n### 付费问题\n\n#### 我应该选择哪个业务版本呢？\n\n其实完全无需考虑，先从最高配额的`专业版`开始体验（新用户注册验证通过后，将自动获得 7 天`专业版`试用），各个版本的使用流程完全一致！当试用时间到期后，若当前版本的配额不能满足需求，可随时补差价升级到更高配额的版本。升级自动按天数计算差价，绝无额外费用。\n\n目前仅有一项额外的付费专用功能，即`忽略编译时间戳`设置（在管理后台的应用设置中），此选项仅对比版本号，不校验时间戳，可提供更宽容的热更策略，但可能消耗更多流量，适合需要管理多个分发渠道的客户。此功能目前仅支持`高级版`、`专业版`和`大客户VIP版`。\n\n***\n\n#### 年付赠送的 Token 如何领取？\n\n年付购买（含续费）`标准版`、`高级版`、`专业版`，分别赠送 $30、$100、$360 的 Token，可用于 GPT、Claude、DeepSeek、GLM、Kimi 等主流模型，官方直连、按量计费。领取步骤：\n\n1. 前往 [36k.ai](https://36k.ai) 注册账号；\n2. 发送邮件至 [hi@charmlot.com](mailto:hi@charmlot.com) 告知注册邮箱，或联系微信客服 `sunnylqm`；\n3. 我们核对订单后将额度充入您的 AI 账户。\n\n规则说明：仅整单年付赠送，月付、升级补差价、加购更新查询额度、试用均不赠送。额度充入后永久有效，仅限平台内使用，不可提现或转让。大客户方案请与商务另行约定。\n\n> GPT、Claude 等模型计价参考官方美元挂牌价，但充值和消费时 1 元人民币等值 1 美元。\n\n***\n\n#### 我可以试用付费版本先评估一下效果吗？\n\n新用户注册验证通过后，将自动获得 7 天`专业版`试用。如您需要更长的评估时间，可将注册用户名、邮箱、公司（或个人）名称发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，标题注明“pushy 评估试用延长”，我们会为您酌情延长评估时间。\n试用期间只能选择续费专业版或升级到更高版本，如需购买其他版本，请等待试用期过期，或者联系客服去除试用。\n\n***\n\n#### 配额具体如何计算？\n\n配额主要分为 4 种：\n\n1. 可创建的应用数量，注意 iOS 和 Android 版本记做不同的应用。\n2. 原生包数量及大小，不同应用分开计算。原生包指通过`pushy uploadIpa/uploadApk`命令上传到 Pushy 服务器上作为热更新起始版本的完整 apk/ipa 安装包。\n3. 热更包数量及大小，不同应用分开计算。热更包指通过`pushy bundle`所命令生成的 ppk 文件。注意这不是用户实际下载的更新文件，用户下载的是通过比对生成的增量 diff 文件（比 ppk 文件要小得多）。\n4. 每日总热更查询次数，所有应用累加计算。每次用户打开应用时，会向服务器查询是否有新的热更新。这个查询次数会被计入每日总热更查询次数。当日超过限额次数后，接口将不再返回新的热更新信息，直到次日重置。\n\n> 这里有一些对[包大小的优化建议](https://pushy.reactnative.cn/docs/bestpractice.md#%E4%BC%98%E5%8C%96%E5%8E%9F%E7%94%9F%E5%92%8C%E7%83%AD%E6%9B%B4%E5%8C%85%E4%BD%93%E7%A7%AF)可供参考。\n\n以上 2、3 条为账户下每个应用单独计算，第 4 条为账户下所有应用累加计算。具体配额和费用由于运营成本可能会有调整，请以[价格表](https://pushy.reactnative.cn/pricing.md)页面为准。已购买的用户在续费前不受调整影响。\n\n***\n\n#### 达到配额后还可以正常使用吗？\n\n当应用、原生包、热更包数量达到配额限制后，您将无法执行相应的新增操作。但用户端仍可正常检查更新，下载已发布的更新。您可选择升级到更高配额，或是通过删除已不再使用的应用、原生包、热更包来使数量降低到配额以内，以便继续执行新增操作。\\\n若原生包、热更包大小超过限额，则会导致上传失败。您可以选择升级到更高配额，或是想办法进行[精简优化](https://pushy.reactnative.cn/docs/bestpractice.md#%E4%BC%98%E5%8C%96%E5%8E%9F%E7%94%9F%E5%92%8C%E7%83%AD%E6%9B%B4%E5%8C%85%E4%BD%93%E7%A7%AF)。\n若当日热更检查次数超过限额，则会导致接口返回空数据。您可以选择升级到更高配额，或是优化热更策略，减少用户端检查更新的频率。\n\n***\n\n#### 我可以单独升级某项配额吗？\n\n如果您需要单独升级某些配额（需要达到高级版以上），请通过邮件 [hi@charmlot.com](mailto:hi@charmlot.com) 或 QQ 34731408 与我们联系，我们将根据您的个性化需求为您定制方案和报价。\n\n***\n\n#### 付费业务到期后不续费，现有应用还能否正常使用？\n\n到期后按免费版额度执行。如您现有应用已超出配额，则必须通过删除操作降低到配额以内，方可执行新的操作（如创建应用，上传热更等），但不影响用户获取之前已发布的热更。\n\n***\n\n#### 如何获取付费的专人技术支持？\n\n请将您的用户名和订单截图发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，同时提供您希望的技术联系方式（QQ、微信等），核实后会有技术专员添加您为好友。\n\n***\n\n#### 如何开具发票？\n\n请将具体开票需求发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，并附上注册邮箱和订单截图。我们默认会回复普通电子发票到`注册邮箱`，类目为软件服务。如需指定接受邮箱或手机，请在`邮件正文`中注明。如需要邮寄纸质发票请注明邮寄地址，邮费为到付。\n如邮件发送后三个工作日内未收到回复，请联系 QQ 客服 34731408。\n\n***\n\n#### 可以使用银行转账付款吗？\n\n可以的。请对照[价格表](https://pushy.reactnative.cn/pricing.md)，将对应版本的款项转账至：\n\n| 公司名称  | 武汉青罗网络科技有限公司     |\n| ----- | ---------------- |\n| 账号    | 8888888048825564 |\n| 开户行名称 | 浙江网商银行           |\n| 开户地区  | 浙江省杭州市           |\n| 支行名称  | 浙江网商银行股份有限公司     |\n| 联行号   | 323331000001     |\n\n转账完成后请截图发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，并写明注册邮箱，我们将在一个工作日内开通对应服务。\n\n请不要使用私人账户对公转账。转账有任何疑问，请联系 QQ 客服 34731408。\n\n***\n\n#### 可以按月付款吗？\n\n需要月付的客户请联系 QQ 客服 34731408，月付价格为年付价格 / 8。如标准版当前价格为 960 元每年，则月付价格为 120 元每月。\n月付客户需累计支付满 500 元后才能开具发票。`大客户VIP版`不支持月付。\n\n如仅需增加检查额度，高级版及以上用户可以在管理后台单独购买检查额度。每 10 万次 / 日检查额度为 100 元每月，购买后账号会自动转为定制版，并支持自行续费。\n\n***\n\n#### 大客户方案\n\n如果您的应用有大规模的活跃用户，日均所有应用累计总查询次数超过 100 万次，则建议选择我们专门针对大规模应用优化的`大客户VIP版`。\n`大客户VIP版`在应用数量、原生包数量、热更包数量等方面配额与`专业版`相同。\n\n当前价格如下表：\n\n| 服务版本 | 日均总热更查询次数 | 价格（元/年） |\n| ---- | --------- | ------- |\n| VIP1 | 1000 万次   | 30000   |\n| VIP2 | 5000 万次   | 60000   |\n| VIP3 | 1 亿次      | 120000  |\n| VIP4 | 1 亿次以上    | 请联系客服   |\n\n具体试用和对接请联系 QQ 客服 34731408\n",
+      "content": "# 常见问题\n\n如果本页面没能回答您的疑问，您可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。\n\n### 关于 Pushy\n\n#### Pushy 是什么？\n\nPushy（npm 包名 `react-native-update`）是专为 React Native 应用打造的热更新服务，由 React Native 中文网自 2016 年起运营。修改 JS 代码或图片等资源后，用一条命令即可把更新下发到用户手机，无需重新提交应用商店审核。下发的是 bsdiff/hdiff 增量包，通常只有几十 KB；国内走阿里云 CDN、海外走 Cloudflare；新版本启动崩溃会自动回滚。详见[产品简介](https://pushy.reactnative.cn/docs/intro.md)。\n\n***\n\n#### React Native 有哪些热更新方案？Pushy 和 CodePush、Expo Updates 有什么区别？\n\n常见方案有三类：Microsoft CodePush（App Center）、Expo 官方的 EAS Update（`expo-updates`），以及 Pushy 这类第三方热更新服务。主要区别：\n\n- **CodePush**：已于 2025 年 3 月 31 日随 App Center 停止服务，现有用户需要迁移。\n- **EAS Update**：SDK 55 起支持 bsdiff 增量（56 起默认开启），补丁不够小时仍下发完整 bundle，基于安装包内置 bundle 的增量需 SDK 58+ 配合 EAS Build；服务器在海外，国内访问较慢，不支持鸿蒙，超出额度的流量另行计费。\n- **Pushy**：下发增量包（通常几十 KB，针对 Hermes 字节码优化后一行改动可小至 3.4 KB），国内外均有 CDN 节点且流量不单独计费，第一方支持 iOS、Android 和鸿蒙，同时兼容 Expo 项目。\n\n详细对比见[产品简介中的性价比对比](https://pushy.reactnative.cn/docs/intro.md#-%E6%80%A7%E4%BB%B7%E6%AF%94%E4%B9%8B%E9%80%89)和 [Expo 项目热更新](https://pushy.reactnative.cn/docs/expo.md)。\n\n***\n\n#### CodePush 停服了，用什么替代？如何迁移到 Pushy？\n\nMicrosoft App Center（含 CodePush）已于 2025 年 3 月 31 日停止服务，可以改用 Pushy。迁移步骤：\n\n1. 从项目中移除 `react-native-code-push` 及其原生配置；\n2. 按[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)安装 `react-native-update`，并完成 iOS、Android（及鸿蒙）的原生配置；\n3. 按[代码集成](https://pushy.reactnative.cn/docs/integration.md)用 `UpdateProvider` 包裹根组件；\n4. 重新打包原生包并上传到 Pushy，之后即可按[发布流程](https://pushy.reactnative.cn/docs/publish.md)发布热更新。\n\n完整的概念、命令与 API 对照见[从 CodePush 迁移](https://pushy.reactnative.cn/docs/migrate-from-codepush.md)。\n\n如果使用支持 Skills 的 AI 编程工具，可以先[安装 react-native-update Skill](https://pushy.reactnative.cn/docs/skills.md)，让 AI 自动完成大部分改动。\n\n***\n\n#### Pushy 支持 Expo、鸿蒙和 React Native 新架构吗？\n\n都支持。\n\n- **Expo**：要求 Expo 50 或更高版本，通过 `npx expo prebuild` 预构建后接入；请勿同时安装 `expo-updates`。使用新架构时建议 Expo 51 及以上。\n- **鸿蒙（HarmonyOS）**：第一方支持，原生配置见[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)中的 Harmony 部分。\n- **新架构与 Hermes**：均已支持，并针对 Hermes 字节码做了专门的增量优化。\n\n***\n\n#### Pushy 免费吗？\n\n有免费版：可创建 3 个应用，每个应用可上传 30 个原生包和 30 个热更包，所有应用每天累计 1000 次更新检查，CDN 流量不额外收费。付费版从标准版 960 元/年起，新用户注册验证后自动获得 7 天专业版试用。具体配额以[价格页](https://pushy.reactnative.cn/pricing.md)为准。\n\n***\n\n#### Pushy 是开源的吗？\n\n是的。Pushy 的客户端 SDK、命令行工具和管理界面代码都在 [GitHub](https://github.com/reactnativecn) 上开源，接受社区审计。\n\n***\n\n### 业务问题\n\n#### 热更新会被苹果拒审吗？能否上架 App Store？\n\n通常不会，可以正常上架。大量实践表明，接入热更新的应用能够顺利上架 App Store 和国内各大应用市场。唯一需要注意的是：在审核期间不要发布热更新，不要让审核人员看到更新相关的提示和弹窗。\n\n***\n\n#### 是否可以在海外使用？\n\n可以。Pushy 本身在国内外都部署有可用的 CDN 节点，能够满足大多数出海应用的热更新分发要求。\n\n如果您的项目对海外合规、数据存放位置、运营主体隔离等方面还有额外要求，则可以考虑使用由不同公司实体独立运营的全球服务 [Cresc](https://cresc.dev/)。\n\n***\n\n#### 哪些修改可以热更新？哪些不能？\n\n我们把对应用的修改分为两类：\n\n- 不可热更新 —— 原生修改，即所有需要`编译`后才能生效的修改：\n  - 任何在 iOS 或者 Android 目录中的修改、增删。\n  - 任何含有原生代码的第三方组件的更新、修改。\n- 可以热更新 —— 非原生修改，即所有`无需编译`，刷新即可生效的修改：\n\n  - js 代码修改，包括第三方纯 js 组件的更新、修改。\n  - 可以在 js 代码中 require/import 的资源文件，例如图片。\n\n需要注意的是，即便资源文件可以热更新，但这些热更新后的资源文件会以`file://`协议的形式提供访问，某些读取资源文件的第三方可能并不支持`file://`协议。\n\n***\n\n#### 热更新成功完成，但是重启后又回滚了是怎么回事？\n\n可以正常更新，但是重启后回滚，一般有两种可能的情况：\n\n- 没有正确[配置 bundleUrl](https://pushy.reactnative.cn/docs/getting-started.md#%E9%85%8D%E7%BD%AE-bundle-url)\n- （仅有 v10 以下版本存在此可能性，v10 及更高版本不存在此情况）没有正确[调用 markSuccess](https://v9--pushy-site.netlify.app/docs/integration#%E9%A6%96%E6%AC%A1%E5%90%AF%E5%8A%A8%E5%9B%9E%E6%BB%9A)\n\n如果你确定上述两个步骤都正确无误，请在[issues 区](https://github.com/reactnativecn/react-native-update/issues)给我们留言反馈。\n\n***\n\n#### 热更新报错：“热更新已暂停，原因：编译时间戳与服务器记录不一致。”\n\n当您每次编译产生一个原生包时，其中都会记录一个编译时间戳`buildTime`(可以使用`pushy parseIpa a.ipa`或是`pushy parseApk a.apk`命令来查看)。如果您需要把这个包发给客户并希望使用热更新功能，那么就需要使用 upload 命令来上传到我们的服务器，而服务器端会记录这个包的版本号和编译时间戳以便后续比对记录。\n\n举例来说，假如我已经上传了一个 1.0 版本原生包（`1A包`），但后来由于种种原因我又重新打包了（`1B包`）但没有上传，这两个包有相同的版本号，但会有不同的编译时间戳。此时有几种可能的情况：\n\n1. 我忘记上传过`1A包`，`1B包`没有实质更改且还没有客户安装。此时应当放弃`1B包`，只让客户下载安装`1A包`。\n2. 我忘记上传过`1A包`，又生成了`1B包`且已有客户安装。此时`1A包`客户可以获取热更新，`1B包`客户无法获取热更新。要使两批客户都能获取热更新，要么想办法通知`1B包`客户装回`1A包`，要么重新发布一个`高于1.0`版本的原生包且上传到 pushy 服务器，并删除`1.0`版本的记录，此时`1A包`和`1B包`的客户都会收到版本过期需要下载新版本的通知。\n3. 我知道上传过`1A包`，但我有原生方面的修改需要打了一个新的`1B包`。此时若将`1B包`上传到 pushy 服务器会提示版本验证错误，因为已经存在有相同的`1.0`版本。所以需要首先更改原生版本号再次打包，并`首先`将此新版本上传到服务器，`然后`分发给客户。这样`1.0版本`和`新版本`可以并存且都可以获得热更新。\n\n请谨记，任何时候生成原生包，请 1)先修改原生版本号，2)并上传到 pushy 服务器，才可以正常获得热更新。\n\n为什么对不上就拿不到差量，可以看[发布流程中的演示](https://pushy.reactnative.cn/docs/publish.md#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%87%8D%E6%96%B0%E6%89%93%E5%8C%85%E5%90%8E%E8%A6%81%E5%85%88%E4%B8%8A%E4%BC%A0)。\n\n:::info\n如果您是`高级版`、`专业版`或`大客户VIP版`客户，也可以考虑在管理后台的应用设置中启用`忽略编译时间戳`。此选项仅对比版本号，不校验时间戳，可提供更宽容的热更策略，但可能消耗更多流量，适合需要管理多个分发渠道的客户。\n:::\n\n***\n\n#### 后台已经显示了原生包的「内容指纹」，为什么还是提示编译时间戳不匹配？\n\n服务端记录的每个原生包有两个身份信息：\n\n- **编译时间戳（buildTime）**：打包时写入二进制，`pushy uploadApk` / `uploadIpa` / `uploadApp` 上传时记录。\n- **内容指纹（bundleHash）**：上传原生包时，CLI（`react-native-update-cli` ≥ 2.8.5）从包内提取内嵌的 JS bundle 计算出的 sha256。它描述的是「这个包里的 JS 是哪一份」，与 App 内集成的 SDK 版本无关。\n\n检查更新时，服务端只有在**两边都有指纹**时才用指纹代替时间戳做判定：\n\n1. 服务端记录的原生包带有内容指纹（用 ≥ 2.8.5 的 CLI 上传）；\n2. 客户端在请求中上报了 bundleHash——App 内集成的 `react-native-update` **≥ 10.49.0** 才会上报。\n\n两者缺一，就退回编译时间戳的严格比对。所以「后台有指纹却仍提示时间戳不匹配」几乎总是因为 App 里打包的 SDK 低于 10.49.0：指纹是 CLI 算出来的，旧版 SDK 并不知道它的存在。把 SDK 升级到 10.49.0 以上并重新打包发布后，同一份 JS 的重复打包会按指纹放行，不再被时间戳拦截。\n\n排查方法：在管理后台的「实时数据」里，或用 MCP 的 `pushy.check_update.observed` 工具，查看该应用近期请求是记录在 `packageVersion_buildTime`（未上报指纹）还是 `packageVersion_bundleHash`（已上报指纹）维度下，并对照客户端 SDK 版本分布。`pushy.check_update.diagnose` 在判定被拦截时也会给出 `BUNDLE_HASH_NOT_REPORTED` 提示。\n\n***\n\n### 付费问题\n\n#### 我应该选择哪个业务版本呢？\n\n其实完全无需考虑，先从最高配额的`专业版`开始体验（新用户注册验证通过后，将自动获得 7 天`专业版`试用），各个版本的使用流程完全一致！当试用时间到期后，若当前版本的配额不能满足需求，可随时补差价升级到更高配额的版本。升级自动按天数计算差价，绝无额外费用。\n\n目前仅有一项额外的付费专用功能，即`忽略编译时间戳`设置（在管理后台的应用设置中），此选项仅对比版本号，不校验时间戳，可提供更宽容的热更策略，但可能消耗更多流量，适合需要管理多个分发渠道的客户。此功能目前仅支持`高级版`、`专业版`和`大客户VIP版`。\n\n***\n\n#### 年付赠送的 Token 如何领取？\n\n年付购买（含续费）`标准版`、`高级版`、`专业版`，分别赠送 $30、$100、$360 的 Token，可用于 GPT、Claude、DeepSeek、GLM、Kimi 等主流模型，官方直连、按量计费。领取步骤：\n\n1. 前往 [36k.ai](https://36k.ai) 注册账号；\n2. 发送邮件至 [hi@charmlot.com](mailto:hi@charmlot.com) 告知注册邮箱，或联系微信客服 `sunnylqm`；\n3. 我们核对订单后将额度充入您的 AI 账户。\n\n规则说明：仅整单年付赠送，月付、升级补差价、加购更新查询额度、试用均不赠送。额度充入后永久有效，仅限平台内使用，不可提现或转让。大客户方案请与商务另行约定。\n\n> GPT、Claude 等模型计价参考官方美元挂牌价，但充值和消费时 1 元人民币等值 1 美元。\n\n***\n\n#### 我可以试用付费版本先评估一下效果吗？\n\n新用户注册验证通过后，将自动获得 7 天`专业版`试用。如您需要更长的评估时间，可将注册用户名、邮箱、公司（或个人）名称发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，标题注明“pushy 评估试用延长”，我们会为您酌情延长评估时间。\n试用期间只能选择续费专业版或升级到更高版本，如需购买其他版本，请等待试用期过期，或者联系客服去除试用。\n\n***\n\n#### 配额具体如何计算？\n\n配额主要分为 4 种：\n\n1. 可创建的应用数量，注意 iOS 和 Android 版本记做不同的应用。\n2. 原生包数量及大小，不同应用分开计算。原生包指通过`pushy uploadIpa/uploadApk`命令上传到 Pushy 服务器上作为热更新起始版本的完整 apk/ipa 安装包。\n3. 热更包数量及大小，不同应用分开计算。热更包指通过`pushy bundle`所命令生成的 ppk 文件。注意这不是用户实际下载的更新文件，用户下载的是通过比对生成的增量 diff 文件（比 ppk 文件要小得多）。\n4. 每日总热更查询次数，所有应用累加计算。每次用户打开应用时，会向服务器查询是否有新的热更新。这个查询次数会被计入每日总热更查询次数。当日超过限额次数后，接口将不再返回新的热更新信息，直到次日重置。\n\n> 这里有一些对[包大小的优化建议](https://pushy.reactnative.cn/docs/bestpractice.md#%E4%BC%98%E5%8C%96%E5%8E%9F%E7%94%9F%E5%92%8C%E7%83%AD%E6%9B%B4%E5%8C%85%E4%BD%93%E7%A7%AF)可供参考。\n\n以上 2、3 条为账户下每个应用单独计算，第 4 条为账户下所有应用累加计算。具体配额和费用由于运营成本可能会有调整，请以[价格表](https://pushy.reactnative.cn/pricing.md)页面为准。已购买的用户在续费前不受调整影响。\n\n***\n\n#### 达到配额后还可以正常使用吗？\n\n当应用、原生包、热更包数量达到配额限制后，您将无法执行相应的新增操作。但用户端仍可正常检查更新，下载已发布的更新。您可选择升级到更高配额，或是通过删除已不再使用的应用、原生包、热更包来使数量降低到配额以内，以便继续执行新增操作。\\\n若原生包、热更包大小超过限额，则会导致上传失败。您可以选择升级到更高配额，或是想办法进行[精简优化](https://pushy.reactnative.cn/docs/bestpractice.md#%E4%BC%98%E5%8C%96%E5%8E%9F%E7%94%9F%E5%92%8C%E7%83%AD%E6%9B%B4%E5%8C%85%E4%BD%93%E7%A7%AF)。\n若当日热更检查次数超过限额，则会导致接口返回空数据。您可以选择升级到更高配额，或是优化热更策略，减少用户端检查更新的频率。\n\n***\n\n#### 我可以单独升级某项配额吗？\n\n如果您需要单独升级某些配额（需要达到高级版以上），请通过邮件 [hi@charmlot.com](mailto:hi@charmlot.com) 或 QQ 34731408 与我们联系，我们将根据您的个性化需求为您定制方案和报价。\n\n***\n\n#### 付费业务到期后不续费，现有应用还能否正常使用？\n\n到期后按免费版额度执行。如您现有应用已超出配额，则必须通过删除操作降低到配额以内，方可执行新的操作（如创建应用，上传热更等），但不影响用户获取之前已发布的热更。\n\n***\n\n#### 如何获取付费的专人技术支持？\n\n请将您的用户名和订单截图发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，同时提供您希望的技术联系方式（QQ、微信等），核实后会有技术专员添加您为好友。\n\n***\n\n#### 如何开具发票？\n\n请将具体开票需求发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，并附上注册邮箱和订单截图。我们默认会回复普通电子发票到`注册邮箱`，类目为软件服务。如需指定接受邮箱或手机，请在`邮件正文`中注明。如需要邮寄纸质发票请注明邮寄地址，邮费为到付。\n如邮件发送后三个工作日内未收到回复，请联系 QQ 客服 34731408。\n\n***\n\n#### 可以使用银行转账付款吗？\n\n可以的。请对照[价格表](https://pushy.reactnative.cn/pricing.md)，将对应版本的款项转账至：\n\n| 公司名称  | 武汉青罗网络科技有限公司     |\n| ----- | ---------------- |\n| 账号    | 8888888048825564 |\n| 开户行名称 | 浙江网商银行           |\n| 开户地区  | 浙江省杭州市           |\n| 支行名称  | 浙江网商银行股份有限公司     |\n| 联行号   | 323331000001     |\n\n转账完成后请截图发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，并写明注册邮箱，我们将在一个工作日内开通对应服务。\n\n请不要使用私人账户对公转账。转账有任何疑问，请联系 QQ 客服 34731408。\n\n***\n\n#### 可以按月付款吗？\n\n需要月付的客户请联系 QQ 客服 34731408，月付价格为年付价格 / 8。如标准版当前价格为 960 元每年，则月付价格为 120 元每月。\n月付客户需累计支付满 500 元后才能开具发票。`大客户VIP版`不支持月付。\n\n如仅需增加检查额度，高级版及以上用户可以在管理后台单独购买检查额度。每 10 万次 / 日检查额度为 100 元每月，购买后账号会自动转为定制版，并支持自行续费。\n\n***\n\n#### 大客户方案\n\n如果您的应用有大规模的活跃用户，日均所有应用累计总查询次数超过 100 万次，则建议选择我们专门针对大规模应用优化的`大客户VIP版`。\n`大客户VIP版`在应用数量、原生包数量、热更包数量等方面配额与`专业版`相同。\n\n当前价格如下表：\n\n| 服务版本 | 日均总热更查询次数 | 价格（元/年） |\n| ---- | --------- | ------- |\n| VIP1 | 1000 万次   | 30000   |\n| VIP2 | 5000 万次   | 60000   |\n| VIP3 | 1 亿次      | 120000  |\n| VIP4 | 1 亿次以上    | 请联系客服   |\n\n具体试用和对接请联系 QQ 客服 34731408\n",
       "sections": [
         {
           "heading": "常见问题",
@@ -715,174 +1291,174 @@
           "level": 4,
           "anchor": "react-native-有哪些热更新方案pushy-和-codepushexpo-updates-有什么区别",
           "offset": 455,
-          "length": 535
+          "length": 659
         },
         {
           "heading": "CodePush 停服了，用什么替代？如何迁移到 Pushy？",
           "level": 4,
           "anchor": "codepush-停服了用什么替代如何迁移到-pushy",
-          "offset": 990,
-          "length": 567
+          "offset": 1114,
+          "length": 662
         },
         {
           "heading": "Pushy 支持 Expo、鸿蒙和 React Native 新架构吗？",
           "level": 4,
           "anchor": "pushy-支持-expo鸿蒙和-react-native-新架构吗",
-          "offset": 1557,
+          "offset": 1776,
           "length": 311
         },
         {
           "heading": "Pushy 免费吗？",
           "level": 4,
           "anchor": "pushy-免费吗",
-          "offset": 1868,
+          "offset": 2087,
           "length": 189
         },
         {
           "heading": "Pushy 是开源的吗？",
           "level": 4,
           "anchor": "pushy-是开源的吗",
-          "offset": 2057,
+          "offset": 2276,
           "length": 113
         },
         {
           "heading": "业务问题",
           "level": 3,
           "anchor": "业务问题",
-          "offset": 2170,
+          "offset": 2389,
           "length": 10
         },
         {
           "heading": "热更新会被苹果拒审吗？能否上架 App Store？",
           "level": 4,
           "anchor": "热更新会被苹果拒审吗能否上架-app-store",
-          "offset": 2180,
+          "offset": 2399,
           "length": 136
         },
         {
           "heading": "是否可以在海外使用？",
           "level": 4,
           "anchor": "是否可以在海外使用",
-          "offset": 2316,
+          "offset": 2535,
           "length": 163
         },
         {
           "heading": "哪些修改可以热更新？哪些不能？",
           "level": 4,
           "anchor": "哪些修改可以热更新哪些不能",
-          "offset": 2479,
+          "offset": 2698,
           "length": 336
         },
         {
           "heading": "热更新成功完成，但是重启后又回滚了是怎么回事？",
           "level": 4,
           "anchor": "热更新成功完成但是重启后又回滚了是怎么回事",
-          "offset": 2815,
+          "offset": 3034,
           "length": 435
         },
         {
           "heading": "热更新报错：“热更新已暂停，原因：编译时间戳与服务器记录不一致。”",
           "level": 4,
           "anchor": "热更新报错热更新已暂停原因编译时间戳与服务器记录不一致",
-          "offset": 3250,
+          "offset": 3469,
           "length": 1104
         },
         {
           "heading": "后台已经显示了原生包的「内容指纹」，为什么还是提示编译时间戳不匹配？",
           "level": 4,
           "anchor": "后台已经显示了原生包的内容指纹为什么还是提示编译时间戳不匹配",
-          "offset": 4354,
+          "offset": 4573,
           "length": 846
         },
         {
           "heading": "付费问题",
           "level": 3,
           "anchor": "付费问题",
-          "offset": 5200,
+          "offset": 5419,
           "length": 10
         },
         {
           "heading": "我应该选择哪个业务版本呢？",
           "level": 4,
           "anchor": "我应该选择哪个业务版本呢",
-          "offset": 5210,
+          "offset": 5429,
           "length": 285
         },
         {
           "heading": "年付赠送的 Token 如何领取？",
           "level": 4,
           "anchor": "年付赠送的-token-如何领取",
-          "offset": 5495,
+          "offset": 5714,
           "length": 412
         },
         {
           "heading": "我可以试用付费版本先评估一下效果吗？",
           "level": 4,
           "anchor": "我可以试用付费版本先评估一下效果吗",
-          "offset": 5907,
+          "offset": 6126,
           "length": 224
         },
         {
           "heading": "配额具体如何计算？",
           "level": 4,
           "anchor": "配额具体如何计算",
-          "offset": 6131,
+          "offset": 6350,
           "length": 681
         },
         {
           "heading": "达到配额后还可以正常使用吗？",
           "level": 4,
           "anchor": "达到配额后还可以正常使用吗",
-          "offset": 6812,
+          "offset": 7031,
           "length": 399
         },
         {
           "heading": "我可以单独升级某项配额吗？",
           "level": 4,
           "anchor": "我可以单独升级某项配额吗",
-          "offset": 7211,
+          "offset": 7430,
           "length": 142
         },
         {
           "heading": "付费业务到期后不续费，现有应用还能否正常使用？",
           "level": 4,
           "anchor": "付费业务到期后不续费现有应用还能否正常使用",
-          "offset": 7353,
+          "offset": 7572,
           "length": 117
         },
         {
           "heading": "如何获取付费的专人技术支持？",
           "level": 4,
           "anchor": "如何获取付费的专人技术支持",
-          "offset": 7470,
+          "offset": 7689,
           "length": 126
         },
         {
           "heading": "如何开具发票？",
           "level": 4,
           "anchor": "如何开具发票",
-          "offset": 7596,
+          "offset": 7815,
           "length": 203
         },
         {
           "heading": "可以使用银行转账付款吗？",
           "level": 4,
           "anchor": "可以使用银行转账付款吗",
-          "offset": 7799,
+          "offset": 8018,
           "length": 421
         },
         {
           "heading": "可以按月付款吗？",
           "level": 4,
           "anchor": "可以按月付款吗",
-          "offset": 8220,
+          "offset": 8439,
           "length": 218
         },
         {
           "heading": "大客户方案",
           "level": 4,
           "anchor": "大客户方案",
-          "offset": 8438,
+          "offset": 8657,
           "length": 346
         }
       ]
@@ -996,6 +1572,212 @@
       ]
     },
     {
+      "slug": "harmony",
+      "title": "鸿蒙（HarmonyOS NEXT）React Native 热更新",
+      "path": "pages/docs/harmony.mdx",
+      "url": "https://pushy.reactnative.cn/docs/harmony",
+      "resourceUri": "pushy-docs://docs/harmony",
+      "content": "# 鸿蒙（HarmonyOS NEXT）React Native 热更新\n\nPushy（npm 包 `react-native-update`）第一方支持鸿蒙：同一套 React Native 业务代码在 iOS、Android 与 HarmonyOS NEXT 上都可以通过 Pushy 下发增量热更新，命令行、管理后台、灰度发布和崩溃回滚的用法与另外两个平台一致。\n\n本页把鸿蒙相关的内容集中在一处，按「背景 → 原生配置 → 代码集成 → 发布原生基准包 → 发布热更新 → 原生侧接口 → 常见问题」的顺序组织。各步骤的权威说明仍以[安装配置](https://pushy.reactnative.cn/docs/getting-started.md#harmony)、[代码集成](https://pushy.reactnative.cn/docs/integration.md)和[发布热更新](https://pushy.reactnative.cn/docs/publish.md#harmony)为准，本页与之保持一致，并补充鸿蒙特有的注意事项。\n\n:::tip 推荐优先使用 Skill 自动接入\n如果你使用支持 Skills 的 AI 编程工具，可以先完成[安装与使用 Skill](https://pushy.reactnative.cn/docs/skills.md)，让 AI 根据工程自动完成依赖安装和原生配置，再用本页作为校对清单。\n:::\n\n## React Native 如何运行在鸿蒙上\n\nHarmonyOS NEXT（纯血鸿蒙）不再兼容 Android 应用，原生开发使用 ArkTS 与 ArkUI，工程由 DevEco Studio 与 hvigor 构建，第三方依赖通过 ohpm 以 `har` 包分发。React Native 官方并没有鸿蒙平台，目前的方案是 **RNOH（React Native for OpenHarmony）**：由华为与 Software Mansion 等社区力量共同开发的鸿蒙适配层。它基于 React Native 新架构（Fabric 与 TurboModule），把 React 组件映射为 ArkUI 原生组件。\n\n一个 RNOH 工程通常由两部分依赖组成：\n\n- **JS 侧**：npm 包 `@react-native-oh/react-native-harmony`，以及提供 `react-native bundle-harmony` 等命令的 `@react-native-oh/react-native-harmony-cli`；\n- **原生侧**：`harmony/` 目录下的鸿蒙工程，依赖 ohpm 包 `@rnoh/react-native-openharmony`，在 `RNApp` 组件中通过 `jsBundleProvider` 决定从哪里加载 JS bundle。\n\n运行时 `Platform.OS` 的值为 `'harmony'`，因此大部分业务代码可以与 iOS、Android 共用，只在必要处按平台分支。RNOH 的版本与 React Native 版本对应演进，具体支持情况请以 RNOH 官方仓库的发布说明为准。Pushy 仓库中的鸿蒙示例工程 [harmony_use_pushy](https://github.com/reactnativecn/react-native-update/tree/master/Example/harmony_use_pushy) 基于 React Native 0.82.1 与 RNOH 0.82.33，可作为参考。\n\n### 为什么鸿蒙应用更需要热更新\n\n鸿蒙原生包需要经过签名、打包并提交华为应用市场审核，修复一个 JS 层的问题同样要走完整的发版流程，用户还要手动升级。而 React Native 应用的业务逻辑和图片资源都在 JS bundle 中，正适合热更新：\n\n- **修复上线快**：JS 问题修复后几分钟内即可下发，不必重新打包、审核；\n- **多端同步**：同一份 JS 改动可以同时发布到 iOS、Android 与鸿蒙，避免某个平台因审核节奏不同而版本落后；\n- **体积小**：Pushy 基于原生包内置的 bundle 计算增量补丁，用户只需下载改动部分；\n- **风险可控**：支持灰度发布，新版本启动失败会自动回滚到上一个可用版本。\n\n## 接入前的准备\n\n- 一个可以正常编译运行的 RNOH 工程，鸿蒙原生工程位于项目根目录的 `harmony/` 下；\n- 已全局安装命令行工具：`npm i -g react-native-update-cli`；\n- 项目中已安装 `react-native-update`：`npm i react-native-update`。鸿蒙所需的 `pushy.har`、hvigor 插件与 C++ 源码都包含在这个 npm 包的 `harmony/` 目录中，不需要单独下载；\n- 项目的 devDependencies 中有 `@react-native-oh/react-native-harmony-cli`，`pushy bundle --platform harmony` 会调用它提供的 `bundle-harmony` 命令；\n- DevEco Studio 与 hvigor 5 或更高版本（Pushy 的 hvigor 插件需要在模块中注册构建任务，旧版本 hvigor 会直接报错）；`pushy.har` 的最低兼容 SDK 为 `5.0.0(12)`，即 API 12。\n\n:::warning\n请不要混用 `npm/yarn/pnpm` 等包管理器及对应的 lock 文件。任何在 `harmony` 目录下的修改，都需要重新编译后才能生效。\n:::\n\n## 原生配置\n\n以下配置与[安装配置 - Harmony](https://pushy.reactnative.cn/docs/getting-started.md#harmony)一节完全相同，这里逐项说明每一步的作用。\n\n\n### 编译 C++ 胶水代码\n在 `harmony/entry/src/main/cpp/CMakeLists.txt` 中，`add_library(rnoh_app ...)` 之后增加：\n```cmake\nset(PUSHY_CPP_DIR \"${NODE_MODULES}/react-native-update/harmony/pushy/src/main/cpp\")\ntarget_include_directories(rnoh_app PRIVATE \"${PUSHY_CPP_DIR}\")\ntarget_sources(rnoh_app PRIVATE \"${PUSHY_CPP_DIR}/PushyTurboModule.cpp\")\n```\nPushy 的 RNOH TurboModule 胶水代码直接编译进 `rnoh_app`，负责补丁合成的原生库则由 `pushy.har` 提供。\n### 注册 C++ 侧 Package\n在 `harmony/entry/src/main/cpp/PackageProvider.cpp` 中加入 `PushyPackage`：\n```cpp\n#include \"RNOH/PackageProvider.h\"\n#include \"PushyPackage.h\"\nusing namespace rnoh;\n\nstd::vector<std::shared_ptr<Package>> PackageProvider::getPackages(Package::Context ctx) {\n    return {\n         std::make_shared<PushyPackage>(ctx)\n    };\n}\n```\n如果工程里已有其他 Package，把 `std::make_shared<PushyPackage>(ctx)` 追加到返回列表中即可。\n### 添加 har 依赖\n在 `harmony/entry/oh-package.json5` 中增加：\n```json5\n\"dependencies\": {\n  \"pushy\": \"file:../../node_modules/react-native-update/harmony/pushy.har\",\n}\n```\n依赖名 `pushy` 会在后面的 ArkTS 代码和 hvigor 插件中用到。如果你改成了其他名字，后续 import 路径要一并修改。\n### 注册 hvigor 插件\n在 `harmony/hvigor/hvigor-config.json5` 中增加：\n```json5\n{\n  dependencies: {\n    pushy: \"file:../../node_modules/react-native-update/harmony\",\n  },\n}\n```\n然后在 `harmony/entry/hvigorfile.ts` 中启用插件：\n```ts\nimport {hapTasks} from '@ohos/hvigor-ohos-plugin';\nimport {reactNativeUpdatePlugin} from 'pushy/hvigor-plugin';\n\nexport default {\n  system: hapTasks /* Built-in plugin of Hvigor. It cannot be modified. */,\n  plugins: [\n    reactNativeUpdatePlugin(),\n  ] /* Custom plugin to extend the functionality of Hvigor. */,\n};\n```\n这个插件在构建时向 `entry/src/main/resources/rawfile/meta.json` 写入编译时间戳 `pushy_build_time` 和 `AppScope/app.json5` 中的 `versionName`，服务端靠它们识别原生包。它只在 `assemble` 类构建（包括 DevEco 的 Build 与 Run）时执行，IDE 同步和 `clean` 不会改写该文件；**debug 构建写入的时间戳固定为 `0`**，只有 release 构建才会写入真实时间，这一点在[发布原生基准包](#发布原生基准包)时很关键。插件应放在模块级的 `entry/hvigorfile.ts` 中，而不是工程根目录的 hvigorfile。\n### 注册 ArkTS 侧 Package\n`harmony/entry/src/main/ets/RNPackagesFactory.ts`：\n```ts\nimport type {\n  RNPackageContext,\n  RNPackage,\n} from \"@rnoh/react-native-openharmony/ts\";\nimport { PushyPackage } from \"pushy/ts\";\n\nexport function createRNPackages(ctx: RNPackageContext): RNPackage[] {\n  return [new PushyPackage(ctx)];\n}\n```\n已有其他 RNPackage 时同样只需追加 `new PushyPackage(ctx)`。\n### 用 Pushy 加载 bundle\n在 `harmony/entry/src/main/ets/pages/Index.ets` 中，把 `PushyFileJSBundleProvider` 加入 `AnyJSBundleProvider` 的列表，放在内置 bundle 的 `ResourceJSBundleProvider` 之前：\n```ts\n// ↓↓↓请注意不要少了这句import\nimport { PushyFileJSBundleProvider } from 'pushy/src/main/ets/PushyFileJSBundleProvider';\n// ↑↑↑\n\n// ... RNApp 的其他配置\njsBundleProvider: new TraceJSBundleProviderDecorator(\n  new AnyJSBundleProvider([\n    // MetroJSBundleProvider.fromServerIp('127.0.0.1'),\n    // ↓↓↓将下面这一段添加到 AnyJSBundleProvider 内部！\n    new PushyFileJSBundleProvider(this.rnohCoreContext.uiAbilityContext),\n\n    // 注意无论是否使用 hermes 格式，请保持 bundle 文件名为 bundle.harmony.js\n    new ResourceJSBundleProvider(this.rnohCoreContext.uiAbilityContext.resourceManager, 'bundle.harmony.js')\n  ]),\n  this.rnohCoreContext.logger),\n```\n完整的 `Index.ets` 示例见[安装配置](https://pushy.reactnative.cn/docs/getting-started.md#harmony)。`AnyJSBundleProvider` 按顺序尝试：有已生效的热更新时由 `PushyFileJSBundleProvider` 加载热更新版本，否则回落到应用内置的 `bundle.harmony.js`。这也是热更新「重启后回滚」最常见的原因——如果没有正确接入这个 provider，下载的更新永远不会被加载。\n内置 bundle 的文件名必须保持为 `bundle.harmony.js`：命令行工具打包、上传原生包解析内置 bundle、生成增量补丁时都按这个固定文件名匹配。\n\n## 代码集成\n\nJS 侧的集成与 iOS、Android 完全相同，参见[代码集成](https://pushy.reactnative.cn/docs/integration.md)。`update.json` 按平台保存 appKey，鸿蒙对应 `harmony` 字段，而 RNOH 上 `Platform.OS` 正好是 `'harmony'`，所以通用写法不需要改动：\n\n```javascript\nimport { Platform } from \"react-native\";\nimport { UpdateProvider, Pushy } from \"react-native-update\";\nimport _updateConfig from \"./update.json\";\n\nconst { appKey } = _updateConfig[Platform.OS];\n\nconst pushyClient = new Pushy({ appKey });\n\nexport default function Root() {\n  return (\n    <UpdateProvider client={pushyClient}>\n      <App />\n    </UpdateProvider>\n  );\n}\n```\n\n`update.json` 中的 `harmony` 字段来自登录后创建或选择鸿蒙应用。**iOS、Android、鸿蒙需要分别创建应用**：\n\n```bash\n$ pushy login\n$ pushy createApp --platform harmony\nApp Name: <输入应用名字>\n# 或者选择已在网页端创建的应用\n$ pushy selectApp --platform harmony\n```\n\n完成后 `update.json` 类似：\n\n```json\n{\n  \"ios\": { \"appId\": 1, \"appKey\": \"<一串随机字符串>\" },\n  \"android\": { \"appId\": 2, \"appKey\": \"<一串随机字符串>\" },\n  \"harmony\": { \"appId\": 3, \"appKey\": \"<一串随机字符串>\" }\n}\n```\n\n`update.json` 不含敏感信息，可以提交到 Git；登录生成的 `.update` 文件则不要提交。\n\n## 发布原生基准包\n\n热更新的增量补丁是基于用户设备上的原生包计算的，所以每个对外分发的鸿蒙原生包都要先上传到 Pushy 登记。流程与[发布热更新 - Harmony](https://pushy.reactnative.cn/docs/publish.md#harmony)一致：\n\n\n### 生成内置 bundle\n在项目根目录执行：\n```bash\n$ pushy bundle --platform harmony --no-interactive\n```\n鸿蒙平台下，命令行会调用 `react-native bundle-harmony` 打包，除生成 ppk 外，还会把 `bundle.harmony.js` 复制到 `harmony/entry/src/main/resources/rawfile/`，把图片等资源复制到同目录的 `assets/` 下（sourcemap 不会复制进去），这样接下来编译的原生包就内置了最新的 JS。`--no-interactive` 表示打包后不询问是否发布，适合只为原生包准备内置 bundle 的场景。示例工程的 `npm run build` 就是这条命令。\n### 以 release 模式编译 .app\n在 DevEco Studio 中通过 Build => Build Hap(s)/App(s) => Build App(s) 编译，产物位于 `harmony/build/outputs/default/harmony-default-unsigned.app`（实际文件名随工程名与签名配置变化）。\n请确认构建模式为 **release**。前面提到 hvigor 插件在 debug 构建中写入的编译时间戳为 `0`，这样的包上传时会因为取不到编译时间戳而失败。\n### 上传 .app\n```bash\n$ pushy uploadApp harmony/build/outputs/default/harmony-default-unsigned.app\n```\n`AppScope/app.json5` 中的 `versionName` 会被记录为原生版本号 `packageVersion`。上传前可以用 `pushy parseApp <app文件>` 查看命令行从包中解析出的版本号与编译时间戳。`.app` 内部嵌套的 hap 会被自动解析，不需要单独上传 hap。\n### 分发同一个包\n之后向华为应用市场提交，或用 `hdc` 安装到设备测试的，都必须是**刚才上传的这一个包**。如果修改了原生代码或配置需要重新打包，请先修改 `versionName`，再重新编译并 `uploadApp`。否则同版本号、不同编译时间戳的包会[无法获取热更新](https://pushy.reactnative.cn/docs/faq.md#%E7%83%AD%E6%9B%B4%E6%96%B0%E6%8A%A5%E9%94%99%E7%83%AD%E6%9B%B4%E6%96%B0%E5%B7%B2%E6%9A%82%E5%81%9C%E5%8E%9F%E5%9B%A0%E7%BC%96%E8%AF%91%E6%97%B6%E9%97%B4%E6%88%B3%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%B0%E5%BD%95%E4%B8%8D%E4%B8%80%E8%87%B4)。原理可参考[为什么重新打包后要先上传](https://pushy.reactnative.cn/docs/publish.md#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%87%8D%E6%96%B0%E6%89%93%E5%8C%85%E5%90%8E%E8%A6%81%E5%85%88%E4%B8%8A%E4%BC%A0)。\n\n## 发布热更新\n\n原生基准包上传后，修改 JS 代码或图片资源，然后执行：\n\n```bash\n$ pushy bundle --platform harmony\n```\n\n打包完成后输入 `Y` 即可上传，再按提示输入版本名、描述和元信息，并绑定到对应的原生包。也可以用参数一次完成打包、发布和绑定：\n\n```bash\n$ pushy bundle --platform harmony --name \"1.0.1\" --description \"修复首页问题\" --packageVersion \"1.0.0\"\n```\n\n绑定方式还可以使用 `--packageId`、`--minPackageVersion`、`--maxPackageVersion` 或 `--packageVersionRange`，参数说明见[命令行工具](https://pushy.reactnative.cn/docs/cli.md#pushy-bundle)。已经打好的 ppk 可以稍后用 `pushy publish --platform harmony <ppk文件>` 上传，再用 `pushy update --platform harmony` 绑定；也可以在网页后台把原生包版本拖到热更新版本下。绑定后服务器会在几秒内生成增量补丁，客户端即可检查到更新。\n\n注意，`pushy bundle --platform harmony` 每次都会覆盖 `rawfile/` 下的 `bundle.harmony.js` 和 `assets/`。这不影响已经上传的原生包，但下一次编译原生包时会内置当前的 JS，请确认这符合你的预期。\n\n灰度发布、强制启动（救砖）等能力在鸿蒙上同样可用，参见[发布热更新](https://pushy.reactnative.cn/docs/publish.md#%E7%81%B0%E5%BA%A6%E5%8F%91%E5%B8%83)。\n\n## 原生侧主动检查更新\n\n除了在 JS 中检查更新，`react-native-update` v10.59.0 起提供原生宿主接口：HarmonyOS 上直接调用应用实际加载 bundle 的那个 `PushyFileJSBundleProvider` 实例的 `configure` 与 `prepareBundle`，不经过 JS Bridge：\n\n```ts\nimport {\n  PushyFileJSBundleProvider,\n  PushyConfiguration,\n  BundlePreparationResult,\n} from 'pushy';\n\nasync function configurePushy(provider: PushyFileJSBundleProvider): Promise<void> {\n  const options: PushyConfiguration = {\n    appKey: '你的 HarmonyOS appKey',\n    afterDownload: 'setNeedUpdate',\n  };\n  await provider.configure(options);\n}\n\nasync function checkFromNative(provider: PushyFileJSBundleProvider): Promise<void> {\n  const result: BundlePreparationResult = await provider.prepareBundle();\n  console.info(`Pushy: ${result.status} / ${result.reason}`);\n}\n```\n\n要点：\n\n- 不要为了检查另外创建一个 provider，也不要额外调用 `getURL()` 或 `getBundle()`；\n- `prepareBundle` 要在 provider 已经参与正常启动解析之后调用，否则返回 `not_initialized`（开发环境走 Metro 时也是如此）；\n- 从 v10.61.0 起可以传入超时毫秒数 `prepareBundle(timeoutMs)`，超时返回 `failed / timeout`，这一轮检查仍在后台继续并作用于下次启动；不传超时则一直等到这一轮结束；\n- 升级到包含这些接口的版本后，必须重新编译并上传鸿蒙原生包，不能只发 JS 热更新。\n\n配置字段、返回值含义以及 JS 与原生谁来管理配置，详见[原生主动检测与更新](https://pushy.reactnative.cn/docs/native-api.md#harmonyosarkts)。\n\n## 常见问题\n\n### iOS、Android 和鸿蒙可以共用一套 JS 代码吗？\n\n可以。业务代码只需维护一份，但**发布时需要按平台分别打包**：`pushy bundle --platform ios`、`--platform android`、`--platform harmony` 各自生成并上传到对应平台的应用，并分别绑定各平台的原生包。三个平台在 Pushy 中是三个独立应用，appKey、原生包版本和热更新版本互不影响。代码中使用了仅某个平台存在的原生模块时，请用 `Platform.OS` 做分支。\n\n### 哪些改动可以通过热更新发布到鸿蒙？\n\n与其他平台的规则相同（见[哪些修改可以热更新](https://pushy.reactnative.cn/docs/faq.md#%E5%93%AA%E4%BA%9B%E4%BF%AE%E6%94%B9%E5%8F%AF%E4%BB%A5%E7%83%AD%E6%9B%B4%E6%96%B0%E5%93%AA%E4%BA%9B%E4%B8%8D%E8%83%BD)）：JS 代码、纯 JS 第三方库，以及在 JS 中 `require`/`import` 的图片等资源可以热更新；`harmony/` 目录下的任何改动，包括 ArkTS/C++ 代码、`oh-package.json5` 依赖、权限和 `app.json5` 配置，以及升级含原生代码的第三方库（包括升级 RNOH 本身），都必须重新编译原生包并上传。\n\n### 为什么在 debug 包里热更新后，重启又回滚了？\n\nRNOH 的 debug 构建会把 `isDebugModeEnabled` 置为 true，此时 Pushy 不会执行 `markSuccess`，热更新在下次启动时会被回滚。这是预期行为。请用 release 构建验证热更新的完整流程。JS 侧默认在开发环境（`__DEV__`）中也不检查更新，需要调试检查流程时可以设置 `debug: true`，但实际应用更新仍需在 release 包中进行。\n\n### 上传 .app 时提示无法获取编译时间戳？\n\n逐项检查：\n\n1. `entry/hvigorfile.ts` 中是否已启用 `reactNativeUpdatePlugin()`；\n2. 是否以 release 模式构建（debug 构建写入的时间戳为 `0`）；\n3. `react-native-update` 是否为最新版本，更新后需要重新编译。\n\n可以先运行 `pushy parseApp <app文件>` 查看解析结果。\n\n### 上传时提示找不到 bundle 文件？\n\n命令行从 `.app` 中嵌套的 hap 里查找 `resources/rawfile/bundle.harmony.js`。请确认编译前已执行 `pushy bundle --platform harmony`（或用你自己的方式）把 bundle 放到了 `harmony/entry/src/main/resources/rawfile/`，并且文件名没有被改成其他名字。\n\n### 鸿蒙上热更新后如何重启应用？\n\n调用 JS 的重启接口（例如 `updateStrategy` 为 `silentAndNow`，或在自定义界面中调用切换版本的方法）时，release 模式下 Pushy 会通过系统的 `restartApp` 重启应用；若系统在短时间内限制了重启（例如冷启动后几秒内），会在约 1.5 秒后自动改为重载 RN 实例。debug 模式下则直接重载 RN 实例。\n\n### 可以只用鸿蒙的预编译 har，不从源码编译吗？\n\n`pushy.har` 已随 npm 包发布，按上文配置即引用预编译的 har，C++ 侧只需编译少量 TurboModule 胶水代码。升级 `react-native-update` 后 har 随之更新，需要重新编译原生包。若你从源码自行构建 har，请确保使用与 npm 包版本对应的源码。\n\n### 还有其他问题？\n\n可以先查阅[常见问题](https://pushy.reactnative.cn/docs/faq.md)，或在 [GitHub issues](https://github.com/reactnativecn/react-native-update/issues) 中反馈，反馈时请注明 React Native、RNOH 与 `react-native-update` 的版本。\n",
+      "sections": [
+        {
+          "heading": "鸿蒙（HarmonyOS NEXT）React Native 热更新",
+          "level": 1,
+          "anchor": "鸿蒙harmonyos-nextreact-native-热更新",
+          "offset": 0,
+          "length": 638
+        },
+        {
+          "heading": "React Native 如何运行在鸿蒙上",
+          "level": 2,
+          "anchor": "react-native-如何运行在鸿蒙上",
+          "offset": 638,
+          "length": 912
+        },
+        {
+          "heading": "为什么鸿蒙应用更需要热更新",
+          "level": 3,
+          "anchor": "为什么鸿蒙应用更需要热更新",
+          "offset": 1550,
+          "length": 325
+        },
+        {
+          "heading": "接入前的准备",
+          "level": 2,
+          "anchor": "接入前的准备",
+          "offset": 1875,
+          "length": 594
+        },
+        {
+          "heading": "原生配置",
+          "level": 2,
+          "anchor": "原生配置",
+          "offset": 2469,
+          "length": 115
+        },
+        {
+          "heading": "编译 C++ 胶水代码",
+          "level": 3,
+          "anchor": "编译-c-胶水代码",
+          "offset": 2584,
+          "length": 407
+        },
+        {
+          "heading": "注册 C++ 侧 Package",
+          "level": 3,
+          "anchor": "注册-c-侧-package",
+          "offset": 2991,
+          "length": 414
+        },
+        {
+          "heading": "添加 har 依赖",
+          "level": 3,
+          "anchor": "添加-har-依赖",
+          "offset": 3405,
+          "length": 234
+        },
+        {
+          "heading": "注册 hvigor 插件",
+          "level": 3,
+          "anchor": "注册-hvigor-插件",
+          "offset": 3639,
+          "length": 872
+        },
+        {
+          "heading": "注册 ArkTS 侧 Package",
+          "level": 3,
+          "anchor": "注册-arkts-侧-package",
+          "offset": 4511,
+          "length": 372
+        },
+        {
+          "heading": "用 Pushy 加载 bundle",
+          "level": 3,
+          "anchor": "用-pushy-加载-bundle",
+          "offset": 4883,
+          "length": 1123
+        },
+        {
+          "heading": "代码集成",
+          "level": 2,
+          "anchor": "代码集成",
+          "offset": 6006,
+          "length": 1036
+        },
+        {
+          "heading": "发布原生基准包",
+          "level": 2,
+          "anchor": "发布原生基准包",
+          "offset": 7042,
+          "length": 146
+        },
+        {
+          "heading": "生成内置 bundle",
+          "level": 3,
+          "anchor": "生成内置-bundle",
+          "offset": 7188,
+          "length": 368
+        },
+        {
+          "heading": "以 release 模式编译 .app",
+          "level": 3,
+          "anchor": "以-release-模式编译-app",
+          "offset": 7556,
+          "length": 260
+        },
+        {
+          "heading": "上传 .app",
+          "level": 3,
+          "anchor": "上传-app",
+          "offset": 7816,
+          "length": 258
+        },
+        {
+          "heading": "分发同一个包",
+          "level": 3,
+          "anchor": "分发同一个包",
+          "offset": 8074,
+          "length": 606
+        },
+        {
+          "heading": "发布热更新",
+          "level": 2,
+          "anchor": "发布热更新",
+          "offset": 8680,
+          "length": 837
+        },
+        {
+          "heading": "原生侧主动检查更新",
+          "level": 2,
+          "anchor": "原生侧主动检查更新",
+          "offset": 9517,
+          "length": 1172
+        },
+        {
+          "heading": "常见问题",
+          "level": 2,
+          "anchor": "常见问题",
+          "offset": 10689,
+          "length": 9
+        },
+        {
+          "heading": "iOS、Android 和鸿蒙可以共用一套 JS 代码吗？",
+          "level": 3,
+          "anchor": "iosandroid-和鸿蒙可以共用一套-js-代码吗",
+          "offset": 10698,
+          "length": 255
+        },
+        {
+          "heading": "哪些改动可以通过热更新发布到鸿蒙？",
+          "level": 3,
+          "anchor": "哪些改动可以通过热更新发布到鸿蒙",
+          "offset": 10953,
+          "length": 386
+        },
+        {
+          "heading": "为什么在 debug 包里热更新后，重启又回滚了？",
+          "level": 3,
+          "anchor": "为什么在-debug-包里热更新后重启又回滚了",
+          "offset": 11339,
+          "length": 235
+        },
+        {
+          "heading": "上传 .app 时提示无法获取编译时间戳？",
+          "level": 3,
+          "anchor": "上传-app-时提示无法获取编译时间戳",
+          "offset": 11574,
+          "length": 222
+        },
+        {
+          "heading": "上传时提示找不到 bundle 文件？",
+          "level": 3,
+          "anchor": "上传时提示找不到-bundle-文件",
+          "offset": 11796,
+          "length": 215
+        },
+        {
+          "heading": "鸿蒙上热更新后如何重启应用？",
+          "level": 3,
+          "anchor": "鸿蒙上热更新后如何重启应用",
+          "offset": 12011,
+          "length": 203
+        },
+        {
+          "heading": "可以只用鸿蒙的预编译 har，不从源码编译吗？",
+          "level": 3,
+          "anchor": "可以只用鸿蒙的预编译-har不从源码编译吗",
+          "offset": 12214,
+          "length": 180
+        },
+        {
+          "heading": "还有其他问题？",
+          "level": 3,
+          "anchor": "还有其他问题",
+          "offset": 12394,
+          "length": 205
+        }
+      ]
+    },
+    {
       "slug": "integration",
       "title": "代码集成",
       "path": "pages/docs/integration.mdx",
@@ -1060,7 +1842,7 @@
       "path": "pages/docs/intro.mdx",
       "url": "https://pushy.reactnative.cn/docs/intro",
       "resourceUri": "pushy-docs://docs/intro",
-      "content": "# Pushy - 专业的热更新解决方案\n\nPushy（npm 包名 `react-native-update`）是专为 React Native 应用打造的热更新服务，由 React Native 中文网自 2016 年起研发并持续运营。它让 JS 代码和图片等资源的修改无需重新提交应用商店审核即可下发到用户手机：增量包通常只有几十 KB，国内走阿里云 CDN、海外走 Cloudflare 分发，新版本启动崩溃会自动回滚。Pushy 支持 iOS、Android 和鸿蒙（HarmonyOS），兼容 Expo、Hermes 与 React Native 新架构，客户端和命令行工具完全开源，提供免费版，可直接替代已于 2025 年 3 月 31 日停服的 Microsoft CodePush（App Center）。\n\n[![npm version](https://badge.fury.io/js/react-native-update.svg)](https://www.npmjs.com/package/react-native-update)\n:::info\n**现已全面支持鸿蒙系统以及 React Native 新架构！**\n:::\n\n我们致力于为全球 React Native 开发者提供最快速、最稳定、最经济的热更新体验。\n\n\n[reactnativecn/react-native-updatePushy 的核心代码在 GitHub 上完全开源。如果它帮到了你，欢迎点个 Star，这是对我们持续维护最好的鼓励。\n](https://github.com/reactnativecn/react-native-update)[Star](https://github.com/reactnativecn/react-native-update)\n\n:::tip 推荐接入方式\n如果你正在使用支持 Skills 的 AI 编程工具，推荐优先阅读 [安装与使用 Skill](https://pushy.reactnative.cn/docs/skills.md)，先安装 `react-native-update` Skill，再让 AI 根据你的项目结构自动完成大部分接入改动。手动文档更适合混编项目、monorepo 或需要逐项校对的场景。\n:::\n\n## 🚀 为什么选择 Pushy？\n\n### 极致的更新体验\n\n- **🎯 超小更新包**：基于 bsdiff/hdiff 算法的增量更新，通常只需**几十至几百 KB**（相比其他全量更新服务的几十 MB）；针对 Hermes 字节码的**独家深度优化**更可把一行文案的热修复压到 **3.4 KB**——比全量更新省 99.8% 的流量（见下方实测数据）\n- **⚡️ 极速分发**：国内用户使用阿里云高速 CDN，国外用户智能分流至 Cloudflare，在各地区都使用覆盖率最好的 CDN 服务商，更新成功率高达 **99.9%+**\n- **🛡️ 安全可靠**：内置崩溃回滚机制，出现问题自动回退，确保应用稳定运行\n- **🌐 全平台覆盖**：完美支持 <span style={{whiteSpace: 'nowrap'}}><AppleOutlined style={{fontSize: '16px', color: '#555', marginRight: '6px'}} /> **iOS**</span> <span style={{whiteSpace: 'nowrap'}}><AndroidOutlined style={{fontSize: '16px', color: '#3DDC84', marginRight: '6px'}} /> **Android**</span>, 且业内独家第一方支持 <span style={{whiteSpace: 'nowrap'}}><HarmonyOSOutlined style={{fontSize: '16px', color: '#000', marginRight: '6px'}} /> **鸿蒙（HarmonyOS）**</span>\n- **🔍 深耕 React Native 生态**：\n  - ✅ **Expo** - 无缝集成\n  - ✅ **新架构** - 第一时间跟进支持\n  - ✅ **Hermes** - 完整支持字节码格式\n- **📖 核心逻辑完全开源**：客户端、命令行工具以及管理界面代码都[完全开源](https://github.com/reactnativecn)，接受社区审计，代码透明可信，你可以随时迁移到自建服务器或其他服务\n- **📊 发布全程可控**：后台自带**版本统计、按比例灰度发布、健康度监控**，每次发布的覆盖进度和稳定性一目了然，无需自建数据链路\n- **🔒 数据安全**：可以自行插入数据埋点，完全掌控自己的数据\n- **💬 专业人工支持**：提供付费专人技术支持，有问必答，确保你的应用稳定运行\n- **🏆 多年稳定运营**：从 2016 年开始运营至今，服务众多知名企业和应用\n\n### 📊 实测数据：针对 Hermes 深度优化的增量算法\n\nHermes 字节码在两个层面上都对通用二进制 diff 极不友好，Pushy 把两者一并消除，收益叠加：\n\n- Hermes **每次编译都会重排字符串表**，JS 改一行就会让大部分字符串 ID 重新编号，两份几乎相同的字节码于是处处不同。Pushy 会以同一应用更早的一份字节码为基准编译，把这些 ID 钉死在原位，只有真正的改动才会进入 diff。\n- Hermes 字节码中还充&#x6EE1;**\"偏移量表\"**，中间插入几个字节就会让其后所有偏移整体位移。Pushy 独家引入 **HBC（Hermes 字节码）结构感知的可逆变换**，从根源上消除这种放大。\n\n在真实 React Native 0.86 应用上的实测结果（Hermes HBC v98，剥离调试信息后字节码约 3.5 MB，[评测代码与数据完全公开可复现](https://github.com/sunnylqm/hbc-diff-benchmark)）：\n\n| 迭代场景            | 全量更新   | 传统增量（bsdiff） | Pushy 增量（Hermes 专项优化） |\n| --------------- | ------ | ------------ | --------------------- |\n| 修改一行文案          | 1.5 MB | 93.7 KB      | **3.4 KB**（小 28 倍）    |\n| 新增小功能（约 60 行）   | 1.5 MB | 411.6 KB     | **50.2 KB**（小 8.2 倍）  |\n| 新增中等功能（约 300 行） | 1.6 MB | 551.6 KB     | **97.8 KB**（小 5.6 倍）  |\n\n- 一行文案的热修复只需下发 **3.4 KB**——比全量更新少 **99.8%**，比传统 bsdiff 增量**小 28 倍**\n- **改动越小、收益越大**——恰好是热修复中最高频的场景\n- **应用侧无需任何改动**：两项优化都发生在构建期，已上架的应用从下一次发版起自动受益\n- 安全兜底：每次构建都会与未优化的产物比对校验，任何不匹配自动回退；Hermes 版本升级时**客户端零改动**自动兼容\n\n## 💰 性价比之选\n\n相比同类服务，Pushy 不仅功能更强大，价格也更亲民：\n\n| 对比项       | Pushy        | Expo Update |\n| --------- | ------------ | ----------- |\n| **起步价**   | ¥66/月        | \\~¥136/月    |\n| **流量计费**  | 不单独计费        | 超出需额外付费     |\n| **更新包大小** | 几十至几百 KB（增量） | 几十 MB（全量）   |\n| **国内速度**  | ⭐⭐⭐⭐⭐ 极快     | ⭐⭐ 较慢       |\n| **鸿蒙支持**  | ✅ 支持         | ❌ 不支持       |\n\n:::warning\n**注意**：Microsoft App Center（Code Push）已于 2025 年 3 月 31 日正式停止服务。如果你正在使用 Code Push，现在正是迁移到 Pushy 的最佳时机！\n:::\n\n使用 Pushy 后，你的团队将获得：\n\n- ✅ **节省 90% 以上的流量成本**\n- ✅ **发版速度提升 10 倍以上**（无需等待应用商店审核）\n- ✅ **Bug 修复时间缩短至分钟级**\n- ✅ **用户更新率提升至 99%+**（相比应用商店的自然更新率）\n- ✅ **开发迭代更加灵活自由**\n\n### 简单易用\n\n```js\n// 三行代码即可集成\nimport { UpdateProvider, Pushy } from \"react-native-update\";\n\nconst pushyClient = new Pushy({ appKey });\n\n<UpdateProvider client={pushyClient}>\n  <App />\n</UpdateProvider>\n```\n\n内置多种更新策略，开箱即用：\n\n- 🔕 **静默更新** - 后台自动下载，用户无感知\n- 💬 **提示更新** - 友好的系统弹窗提醒\n- ⚙️ **自定义策略** - 完全可控的更新流程\n\n## 🚦 开始使用\n\n推荐按下面的顺序完成接入：\n\n1. **[安装与使用 Skill](https://pushy.reactnative.cn/docs/skills.md)** - 推荐先让 AI 自动完成接入改造\n2. **[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)** - 补齐依赖与原生侧配置\n3. **[代码集成](https://pushy.reactnative.cn/docs/integration.md)** - 校对或手动定制 `UpdateProvider` 接入\n4. **[发布更新](https://pushy.reactnative.cn/docs/publish.md)** - 一条命令推送新版本\n\n:::info\n不确定是否适合你的项目？查看[常见问题](https://pushy.reactnative.cn/docs/faq.md)或者可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。\n:::\n\n立即开始使用 Pushy，让你的 React Native 应用拥有极致的热更新体验！\n\n## 发布之后，继续用数据判断\n\n在[数据分析](https://pushy.reactnative.cn/docs/analytics.md)中查看请求趋势、版本漏斗、生效时延、网络与地区分布以及失败原因。让每次发布从下发到激活都有迹可循。\n",
+      "content": "# Pushy - 专业的热更新解决方案\n\nPushy（npm 包名 `react-native-update`）是专为 React Native 应用打造的热更新服务，由 React Native 中文网自 2016 年起研发并持续运营。它让 JS 代码和图片等资源的修改无需重新提交应用商店审核即可下发到用户手机：增量包通常只有几十 KB，国内走阿里云 CDN、海外走 Cloudflare 分发，新版本启动崩溃会自动回滚。Pushy 支持 iOS、Android 和鸿蒙（HarmonyOS），兼容 Expo、Hermes 与 React Native 新架构，客户端和命令行工具完全开源，提供免费版，可直接替代已于 2025 年 3 月 31 日停服的 Microsoft CodePush（App Center）。\n\n[![npm version](https://badge.fury.io/js/react-native-update.svg)](https://www.npmjs.com/package/react-native-update)\n:::info\n**现已全面支持鸿蒙系统以及 React Native 新架构！**\n:::\n\n我们致力于为全球 React Native 开发者提供最快速、最稳定、最经济的热更新体验。\n\n\n[reactnativecn/react-native-updatePushy 的核心代码在 GitHub 上完全开源。如果它帮到了你，欢迎点个 Star，这是对我们持续维护最好的鼓励。\n](https://github.com/reactnativecn/react-native-update)[Star](https://github.com/reactnativecn/react-native-update)\n\n:::tip 推荐接入方式\n如果你正在使用支持 Skills 的 AI 编程工具，推荐优先阅读 [安装与使用 Skill](https://pushy.reactnative.cn/docs/skills.md)，先安装 `react-native-update` Skill，再让 AI 根据你的项目结构自动完成大部分接入改动。手动文档更适合混编项目、monorepo 或需要逐项校对的场景。\n:::\n\n## 🚀 为什么选择 Pushy？\n\n### 极致的更新体验\n\n- **🎯 超小更新包**：基于 bsdiff/hdiff 算法的增量更新，通常只需**几十至几百 KB**，安装后的第一次热更新就基于安装包内置的 bundle 计算差量；针对 Hermes 字节码的**独家深度优化**更可把一行文案的热修复压到 **3.4 KB**——比全量更新省 99.8% 的流量（见下方实测数据）\n- **⚡️ 极速分发**：国内用户使用阿里云高速 CDN，国外用户智能分流至 Cloudflare，在各地区都使用覆盖率最好的 CDN 服务商，更新成功率高达 **99.9%+**\n- **🛡️ 安全可靠**：内置崩溃回滚机制，出现问题自动回退，确保应用稳定运行\n- **🌐 全平台覆盖**：完美支持 <span style={{whiteSpace: 'nowrap'}}><AppleOutlined style={{fontSize: '16px', color: '#555', marginRight: '6px'}} /> **iOS**</span> <span style={{whiteSpace: 'nowrap'}}><AndroidOutlined style={{fontSize: '16px', color: '#3DDC84', marginRight: '6px'}} /> **Android**</span>, 且业内独家第一方支持 <span style={{whiteSpace: 'nowrap'}}><HarmonyOSOutlined style={{fontSize: '16px', color: '#000', marginRight: '6px'}} /> **鸿蒙（HarmonyOS）**</span>\n- **🔍 深耕 React Native 生态**：\n  - ✅ **Expo** - 无缝集成\n  - ✅ **新架构** - 第一时间跟进支持\n  - ✅ **Hermes** - 完整支持字节码格式\n- **📖 核心逻辑完全开源**：客户端、命令行工具以及管理界面代码都[完全开源](https://github.com/reactnativecn)，接受社区审计，代码透明可信，你可以随时迁移到自建服务器或其他服务\n- **📊 发布全程可控**：后台自带**版本统计、按比例灰度发布、健康度监控**，每次发布的覆盖进度和稳定性一目了然，无需自建数据链路\n- **🔒 数据安全**：可以自行插入数据埋点，完全掌控自己的数据\n- **💬 专业人工支持**：提供付费专人技术支持，有问必答，确保你的应用稳定运行\n- **🏆 多年稳定运营**：从 2016 年开始运营至今，服务众多知名企业和应用\n\n### 📊 实测数据：针对 Hermes 深度优化的增量算法\n\nHermes 字节码在两个层面上都对通用二进制 diff 极不友好，Pushy 把两者一并消除，收益叠加：\n\n- Hermes **每次编译都会重排字符串表**，JS 改一行就会让大部分字符串 ID 重新编号，两份几乎相同的字节码于是处处不同。Pushy 会以同一应用更早的一份字节码为基准编译，把这些 ID 钉死在原位，只有真正的改动才会进入 diff。\n- Hermes 字节码中还充&#x6EE1;**\"偏移量表\"**，中间插入几个字节就会让其后所有偏移整体位移。Pushy 独家引入 **HBC（Hermes 字节码）结构感知的可逆变换**，从根源上消除这种放大。\n\n在真实 React Native 0.86 应用上的实测结果（Hermes HBC v98，剥离调试信息后字节码约 3.5 MB，[评测代码与数据完全公开可复现](https://github.com/sunnylqm/hbc-diff-benchmark)）：\n\n| 迭代场景            | 全量更新   | 传统增量（bsdiff） | Pushy 增量（Hermes 专项优化） |\n| --------------- | ------ | ------------ | --------------------- |\n| 修改一行文案          | 1.5 MB | 93.7 KB      | **3.4 KB**（小 28 倍）    |\n| 新增小功能（约 60 行）   | 1.5 MB | 411.6 KB     | **50.2 KB**（小 8.2 倍）  |\n| 新增中等功能（约 300 行） | 1.6 MB | 551.6 KB     | **97.8 KB**（小 5.6 倍）  |\n\n- 一行文案的热修复只需下发 **3.4 KB**——比全量更新少 **99.8%**，比传统 bsdiff 增量**小 28 倍**\n- **改动越小、收益越大**——恰好是热修复中最高频的场景\n- **应用侧无需任何改动**：两项优化都发生在构建期，已上架的应用从下一次发版起自动受益\n- 安全兜底：每次构建都会与未优化的产物比对校验，任何不匹配自动回退；Hermes 版本升级时**客户端零改动**自动兼容\n\n## 💰 性价比之选\n\n相比同类服务，Pushy 不仅功能更强大，价格也更亲民：\n\n| 对比项      | Pushy                                           | EAS Update                                                                              |\n| -------- | ----------------------------------------------- | --------------------------------------------------------------------------------------- |\n| **起步价**  | ¥66/月                                           | \\~¥136/月                                                                                |\n| **流量计费** | 不单独计费                                           | 超出需额外付费                                                                                 |\n| **增量更新** | hdiff 差量并针对 Hermes 字节码专项优化，首次热更新即基于内置 bundle 计算 | SDK 55 起支持 bsdiff 增量（56 起默认开启），补丁不够小时仍下发完整 bundle；基于内置 bundle 的增量需 SDK 58+ 配合 EAS Build |\n| **国内速度** | ⭐⭐⭐⭐⭐ 极快                                        | ⭐⭐ 较慢                                                                                   |\n| **鸿蒙支持** | ✅ 支持                                            | ❌ 不支持                                                                                   |\n\n:::warning\n**注意**：Microsoft App Center（Code Push）已于 2025 年 3 月 31 日正式停止服务。如果你正在使用 Code Push，现在正是迁移到 Pushy 的最佳时机！迁移步骤见[从 CodePush 迁移](https://pushy.reactnative.cn/docs/migrate-from-codepush.md)。\n:::\n\n使用 Pushy 后，你的团队将获得：\n\n- ✅ **节省 90% 以上的流量成本**\n- ✅ **发版速度提升 10 倍以上**（无需等待应用商店审核）\n- ✅ **Bug 修复时间缩短至分钟级**\n- ✅ **用户更新率提升至 99%+**（相比应用商店的自然更新率）\n- ✅ **开发迭代更加灵活自由**\n\n### 简单易用\n\n```js\n// 三行代码即可集成\nimport { UpdateProvider, Pushy } from \"react-native-update\";\n\nconst pushyClient = new Pushy({ appKey });\n\n<UpdateProvider client={pushyClient}>\n  <App />\n</UpdateProvider>\n```\n\n内置多种更新策略，开箱即用：\n\n- 🔕 **静默更新** - 后台自动下载，用户无感知\n- 💬 **提示更新** - 友好的系统弹窗提醒\n- ⚙️ **自定义策略** - 完全可控的更新流程\n\n## 🚦 开始使用\n\n推荐按下面的顺序完成接入：\n\n1. **[安装与使用 Skill](https://pushy.reactnative.cn/docs/skills.md)** - 推荐先让 AI 自动完成接入改造\n2. **[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)** - 补齐依赖与原生侧配置\n3. **[代码集成](https://pushy.reactnative.cn/docs/integration.md)** - 校对或手动定制 `UpdateProvider` 接入\n4. **[发布更新](https://pushy.reactnative.cn/docs/publish.md)** - 一条命令推送新版本\n\n:::info\n不确定是否适合你的项目？查看[常见问题](https://pushy.reactnative.cn/docs/faq.md)或者可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。\n:::\n\n立即开始使用 Pushy，让你的 React Native 应用拥有极致的热更新体验！\n\n## 发布之后，继续用数据判断\n\n在[数据分析](https://pushy.reactnative.cn/docs/analytics.md)中查看请求趋势、版本漏斗、生效时延、网络与地区分布以及失败原因。让每次发布从下发到激活都有迹可循。\n",
       "sections": [
         {
           "heading": "Pushy - 专业的热更新解决方案",
@@ -1081,41 +1863,41 @@
           "level": 3,
           "anchor": "极致的更新体验",
           "offset": 1012,
-          "length": 1155
+          "length": 1169
         },
         {
           "heading": "📊 实测数据：针对 Hermes 深度优化的增量算法",
           "level": 3,
           "anchor": "实测数据针对-hermes-深度优化的增量算法",
-          "offset": 2167,
+          "offset": 2181,
           "length": 1003
         },
         {
           "heading": "💰 性价比之选",
           "level": 2,
           "anchor": "性价比之选",
-          "offset": 3170,
-          "length": 620
+          "offset": 3184,
+          "length": 1471
         },
         {
           "heading": "简单易用",
           "level": 3,
           "anchor": "简单易用",
-          "offset": 3790,
+          "offset": 4655,
           "length": 304
         },
         {
           "heading": "🚦 开始使用",
           "level": 2,
           "anchor": "开始使用",
-          "offset": 4094,
+          "offset": 4959,
           "length": 611
         },
         {
           "heading": "发布之后，继续用数据判断",
           "level": 2,
           "anchor": "发布之后继续用数据判断",
-          "offset": 4705,
+          "offset": 5570,
           "length": 122
         }
       ]
@@ -1190,6 +1972,156 @@
           "anchor": "注意事项",
           "offset": 3610,
           "length": 389
+        }
+      ]
+    },
+    {
+      "slug": "migrate-from-codepush",
+      "title": "从 CodePush 迁移到 Pushy",
+      "path": "pages/docs/migrate-from-codepush.mdx",
+      "url": "https://pushy.reactnative.cn/docs/migrate-from-codepush",
+      "resourceUri": "pushy-docs://docs/migrate-from-codepush",
+      "content": "# 从 CodePush 迁移到 Pushy\n\n本文面向正在使用 `react-native-code-push`（Microsoft CodePush）的 React Native 项目，说明如何把热更新迁移到 Pushy（npm 包名 `react-native-update`）：先对照两边的概念、API 和命令，再按步骤替换依赖与原生配置、发布第一个热更新，最后说明迁移期间需要注意的事项。\n\n:::tip 推荐做法\n如果你使用支持 Skills 的 AI 编程工具，可以先[安装 react-native-update Skill](https://pushy.reactnative.cn/docs/skills.md)，再让 AI 按本文的清单移除 CodePush 并完成 Pushy 接入，然后对照本文逐项校对改动。\n:::\n\n## 背景：CodePush 已随 App Center 退役\n\n根据微软官方的 [App Center 退役公告](https://learn.microsoft.com/en-us/appcenter/retirement)，Visual Studio App Center 已于 **2025 年 3 月 31 日**退役，此后无法再登录账号或调用其 API。CodePush 托管服务随之停止；仅 Analytics 与 Diagnostics 两项功能获得了延期支持，与热更新无关。\n\n对于 CodePush，微软给出的后续方案是一个可独立于 App Center 运行的版本 [microsoft/code-push-server](https://github.com/microsoft/code-push-server)，需要自行部署和运维。该仓库与客户端仓库 [microsoft/react-native-code-push](https://github.com/microsoft/react-native-code-push) 均已于 2025 年 5 月归档为只读，code-push-server 的说明中写明微软不为其提供支持服务。\n\n因此，原本使用托管版 CodePush 的团队通常有两个选择：自建并长期维护 code-push-server，或者迁移到仍在持续维护的托管热更新服务。如果你选择后者，Pushy 提供以下能力，可以覆盖 CodePush 的常用场景：\n\n- 下发增量补丁（bsdiff/hdiff，并针对 Hermes 字节码做了专项优化），而不是完整 bundle，详见[产品简介](https://pushy.reactnative.cn/docs/intro.md)；\n- 新版本启动崩溃自动回滚，后台支持按比例[灰度发布](https://pushy.reactnative.cn/docs/publish.md#%E7%81%B0%E5%BA%A6%E5%8F%91%E5%B8%83)和版本健康度统计；\n- 支持 iOS、Android 和鸿蒙（HarmonyOS），兼容 Expo、Hermes 与新架构；\n- 客户端 SDK 与命令行工具开源，有免费版，配额见[价格页](https://pushy.reactnative.cn/pricing.md)。\n\n## 概念对照\n\n### 发布模型\n\nCodePush 和 Pushy 最大的区别在于「热更新与原生包如何关联」：\n\n- **CodePush**：每次 `release-react` 会把 bundle 发布到某个 deployment（如 `Staging`、`Production`），并按 `targetBinaryVersion` 匹配客户端的原生版本号。\n- **Pushy**：先把编译好的原生包（ipa/apk/aab/app）上传到服务器作为**原生基准版本**，再把热更新版本**绑定**到一个或多个原生基准版本上。服务器以原生包内置的 bundle 为基准计算增量补丁，客户端只下载差异部分。\n\n所以迁移后多了一个「上传原生包」的步骤，而且**上架分发的安装包必须和上传到 Pushy 的那一份完全一致**（服务器会比对编译时间戳），否则无法获取热更新，原因见[发布热更新](https://pushy.reactnative.cn/docs/publish.md)中「为什么重新打包后要先上传」一节。\n\n| CodePush                                        | Pushy                                             | 说明                                                                     |\n| ----------------------------------------------- | ------------------------------------------------- | ---------------------------------------------------------------------- |\n| App（通常 iOS、Android 各建一个）                        | 应用（iOS、Android、鸿蒙分别创建）                            | 用 `pushy createApp` 或 `pushy selectApp` 创建/选择，信息写入项目根目录的 `update.json` |\n| Deployment Key（写在 `Info.plist` / `strings.xml`） | `appKey`（写在 `update.json`，在 JS 中传给 `new Pushy()`） | Pushy 不需要在原生工程里配置 key                                                  |\n| Deployment（`Staging` / `Production`）            | 无 deployment 概念                                   | 测试用扫码/Deep Link 直接安装任意热更版本，线上用灰度控制范围，见下文                               |\n| Release（`v1`、`v2` 等 label）                      | 热更新版本（ppk 文件，含名称、描述和元信息）                          | 由 `pushy bundle` 生成并发布                                                 |\n| `targetBinaryVersion`                           | 绑定的原生包版本（`packageVersion`）                        | 可按单个版本、最低/最高版本或 semver 范围绑定                                            |\n| `--rollout` 百分比                                 | 灰度比例（`rollout`，1–100）                             | 同一原生包可同时有一个灰度版本和一个全量版本                                                 |\n| `--mandatory` 强制更新                              | 元信息（`metaInfo`）+ 自定义逻辑，或 `updateStrategy`         | Pushy 没有内置的「强制」标记，见[注意事项](#强制更新)                                       |\n| `rollback` / `promote`                          | 在管理后台或用 `pushy update` 重新绑定版本                     | 见[回滚](#回滚)                                                             |\n\n### 命令行\n\nApp Center CLI（`appcenter codepush ...`）已随服务停用，下表 CodePush 一列以微软 code-push-server 自带的 CLI（命令名 `code-push-standalone`）为准。Pushy 的命令来自 `react-native-update-cli`，完整参数见[命令行工具](https://pushy.reactnative.cn/docs/cli.md)。\n\n| 用途          | CodePush（code-push-standalone）                     | Pushy                                                                                  |\n| ----------- | -------------------------------------------------- | -------------------------------------------------------------------------------------- |\n| 登录          | `login`                                            | `pushy login`                                                                          |\n| 创建应用        | `app add <appName>`                                | `pushy createApp --platform ios`                                                       |\n| 查看应用 / key  | `deployment ls <appName> -k`                       | `pushy apps`、`pushy selectApp`（或在网页管理端查看 appKey）                                       |\n| 上传原生基准包     | 无此步骤                                               | `pushy uploadIpa`、`pushy uploadApk`、`pushy uploadAab`、`pushy uploadApp`                |\n| 打包并发布热更新    | `release-react <appName> <platform> -d Production` | `pushy bundle --platform <ios/android/harmony>`                                        |\n| 发布时指定目标原生版本 | `--targetBinaryVersion`                            | `--packageVersion`、`--minPackageVersion`、`--maxPackageVersion`、`--packageVersionRange` |\n| 发布已打好的包     | —                                                  | `pushy publish <ppk 文件>`                                                               |\n| 调整灰度比例      | `patch <appName> <deploymentName> --rollout 50`    | `pushy update --versionId <id> --packageVersion <版本> --rollout 50`                     |\n| 回滚到上一版      | `rollback <appName> <deploymentName>`              | 把原生包重新绑定到之前的热更版本（管理后台拖拽，或 `pushy update`）                                              |\n| 查看历史版本      | `deployment history`                               | `pushy versions`、`pushy packages`                                                      |\n\n### 客户端 API\n\n| CodePush                                                                      | Pushy                                                                                                        | 说明                                                                  |\n| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |\n| `codePush(options)(App)` 高阶组件                                                 | `new Pushy({ appKey, ... })` + `<UpdateProvider client={pushyClient}>`                                       | 见[代码集成](https://pushy.reactnative.cn/docs/integration.md)           |\n| `checkFrequency: ON_APP_START`（默认）                                            | `checkStrategy: \"onAppStart\"`                                                                                | Pushy 默认值是 `\"both\"`（启动和回到前台都检查）                                     |\n| `checkFrequency: ON_APP_RESUME`                                               | `checkStrategy: \"onAppResume\"`                                                                               |                                                                     |\n| `checkFrequency: MANUAL`                                                      | `checkStrategy: null`，再手动调用 `checkUpdate()`                                                                  | `null` 需 v10.4.2+                                                   |\n| `installMode: IMMEDIATE`                                                      | `updateStrategy: \"silentAndNow\"`，或手动调用 `switchVersion()`                                                     | 下载后立即重启应用                                                           |\n| `installMode: ON_NEXT_RESTART`（默认）                                            | `updateStrategy: \"silentAndLater\"`，或手动调用 `switchVersionLater()`                                              | 下次冷启动时生效                                                            |\n| `installMode: ON_NEXT_RESUME` / `ON_NEXT_SUSPEND`、`minimumBackgroundDuration` | 无直接对应                                                                                                        | 如有需要，可在 `updateStrategy: null` 下自行监听 AppState 并调用 `switchVersion()` |\n| `updateDialog`                                                                | `updateStrategy: \"alertUpdateAndIgnoreError\"`（生产环境默认）                                                        | 用系统 alert 提示；完全自定义界面用 `updateStrategy: null` + `useUpdate()`        |\n| `codePush.sync()`                                                             | `checkUpdate()` → `downloadUpdate()` → `switchVersion()` / `switchVersionLater()`                            | 均可从 `useUpdate()` 中取得                                               |\n| `codePush.checkForUpdate()`                                                   | `checkUpdate()`，结果读 `useUpdate()` 的 `updateInfo`                                                             |                                                                     |\n| `codePush.notifyAppReady()`                                                   | 无需调用（`autoMarkSuccess` 默认开启）；手动时用 `markSuccess()`                                                            | 一般不建议手动标记                                                           |\n| `codePush.getUpdateMetadata()`                                                | `currentVersionInfo`（v10.31.2+）                                                                              | 返回当前热更版本的 `name`、`description`、`metaInfo`                           |\n| `codePush.restartApp()`                                                       | `restartApp()`（v10.28.2+）                                                                                    |                                                                     |\n| `codePush.disallowRestart()` / `allowRestart()`                               | `beforeReload` 回调返回 `false` 可取消一次重启（v10.42.2+）                                                               | 语义不完全相同，请按需评估                                                       |\n| `codePush.clearUpdates()`                                                     | `resetToPackagedBundle()`（v10.48.0+）                                                                         | 清空热更状态，回到安装包内置 bundle                                               |\n| `rollbackRetryOptions`                                                        | 无直接对应                                                                                                        | Pushy 不会自动重装已回滚过的版本                                                 |\n| `SyncStatus` 回调                                                               | `logger` 事件（`checking`、`downloading`、`downloadSuccess`、`rollback` 等）与 `useUpdate()` 的 `progress`、`lastError` | 见[API 参考](https://pushy.reactnative.cn/docs/api.md)                 |\n\n## 迁移步骤\n\n下面的步骤以「已有一个接入了 CodePush 的 React Native 工程」为起点。迁移需要发布新的原生包，建议在一个新的原生版本号上完成。\n\n\n### 移除 react-native-code-push\n在项目根目录卸载依赖：\n```bash\nnpm uninstall react-native-code-push\n```\n然后清理原生侧的 CodePush 配置。CodePush 的接入方式随 RN 版本和项目历史有所不同，请以你项目里实际存在的内容为准，逐项检查：\n**iOS**\n- `AppDelegate`（或你的 `bundleURL` 所在文件）中的 `#import <CodePush/CodePush.h>`，以及 `return [CodePush bundleURL];`（Swift 项目中为对应的 `CodePush.bundleURL()` 调用）。下一步会把它替换为 Pushy 的写法。\n- `Info.plist` 中的 `CodePushDeploymentKey`，以及可能存在的 `CodePushServerURL`（自建 code-push-server 时使用）、`CodePushPublicKey`（代码签名时使用）。\n- 如果是 RN 0.60 以下手动在 `Podfile` 中添加过 `pod 'CodePush', ...`，一并删除。修改后在 `ios` 目录重新执行 `pod install`。\n**Android**\n- `android/app/build.gradle` 中的 `apply from: \"../../node_modules/react-native-code-push/android/codepush.gradle\"`。\n- `android/settings.gradle` 中手动添加过的 `include ':react-native-code-push'` 和对应的 `projectDir` 配置（RN 0.60 以上的自动链接项目一般没有）。\n- `MainApplication` 中的 `import com.microsoft.codepush.react.CodePush` 和返回 `CodePush.getJSBundleFile()` 的 `getJSBundleFile` 覆盖。\n- `res/values/strings.xml` 中的 `CodePushDeploymentKey`，以及可能存在的 `CodePushServerUrl`、`CodePushPublicKey`。\n**JS**\n- 删除所有 `import codePush from \"react-native-code-push\"`，以及根组件外的 `codePush(...)(App)` 包裹和 `codePush.sync()` 调用。下文会用 Pushy 的写法替换。\n:::warning\n不要让 CodePush 和 Pushy 同时生效。两者都通过接管 `bundleURL` / `getJSBundleFile` 来加载热更新 bundle，同时保留会导致加载哪个 bundle 不可预期。\n:::\n### 安装 react-native-update 并完成原生配置\n按[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)安装命令行工具和 `react-native-update`，并完成各平台的原生配置。对于 CodePush 迁移来说，关键是把上一步删掉的 bundle 入口换成 Pushy 的：\n```bash\nnpm i -g react-native-update-cli\nnpm i react-native-update\ncd ios && pod install\n```\niOS（Objective-C 示例；Swift、RN 0.88 起的 `SceneDelegate` 写法见[配置 Bundle URL](https://pushy.reactnative.cn/docs/getting-started.md#%E9%85%8D%E7%BD%AE-bundle-url)）：\n```diff\n-#import <CodePush/CodePush.h>\n+#import \"RCTPushy.h\"\n\n - (NSURL *)bundleURL\n {\n #if DEBUG\n   return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@\"index\"];\n #else\n-  return [CodePush bundleURL];\n+  return [RCTPushy bundleURL];\n #endif\n }\n```\nAndroid（Kotlin，RN 0.81 或以下的 `DefaultReactNativeHost` 写法；RN 0.82 起改为给 `getDefaultReactHost` 传入 `jsBundleFilePath = UpdateContext.getBundleUrl(this)`，见[配置 Bundle URL](https://pushy.reactnative.cn/docs/getting-started.md#%E9%85%8D%E7%BD%AE-bundle-url)）：\n```diff\n-import com.microsoft.codepush.react.CodePush\n+import cn.reactnative.modules.update.UpdateContext\n\n // DefaultReactNativeHost 内部\n-override fun getJSBundleFile(): String {\n-    return CodePush.getJSBundleFile()\n-}\n+override fun getJSBundleFile(): String? {\n+    return UpdateContext.getBundleUrl(this@MainApplication)\n+}\n```\n同时请按安装配置页完成这几项 CodePush 没有要求、但 Pushy 需要的设置：\n- Android 在 `android/app/build.gradle` 的 release 配置中[关闭 `crunchPngs`](https://pushy.reactnative.cn/docs/getting-started.md#%E7%A6%81%E7%94%A8-android-%E7%9A%84-crunch-%E4%BC%98%E5%8C%96)，否则会影响增量补丁生成；\n- 使用 `react-native-screens` 时，按文档覆盖 Android `MainActivity` 的 `onCreate`，避免热更后重启白屏；\n- 建议添加[测试用的 Deep Link](https://pushy.reactnative.cn/docs/getting-started.md#%E6%B7%BB%E5%8A%A0%E6%B5%8B%E8%AF%95%E7%94%A8%E7%9A%84-deep-link)，用来替代 CodePush 的 Staging deployment 做发布前测试（见下文）；\n- 鸿蒙项目按文档完成 Harmony 部分的配置。\nExpo 项目要求 Expo 50 或以上并通过 `npx expo prebuild` 预构建，且不要同时安装 `expo-updates`。\n### 登录并创建应用\n在 [Pushy 管理后台](https://pushy-admin.reactnative.cn)注册账号后，在项目根目录登录并按平台分别创建应用：\n```bash\npushy login\npushy createApp --platform ios\npushy createApp --platform android\n```\n完成后项目根目录会生成 `update.json`，其中包含各平台的 `appId` 和 `appKey`，可以提交到 Git；登录生成的 `.update` 文件则不要提交。详见[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)中的「登录与创建应用」。\n### 替换 JS 代码\n以一个典型的 CodePush 接入为例：\n```js\n// 迁移前（CodePush）\nimport codePush from \"react-native-code-push\";\n\nconst codePushOptions = {\n  checkFrequency: codePush.CheckFrequency.ON_APP_RESUME,\n  installMode: codePush.InstallMode.ON_NEXT_RESTART,\n};\n\nexport default codePush(codePushOptions)(App);\n```\n对应的 Pushy 写法：\n```js\n// 迁移后（Pushy）\nimport { Platform } from \"react-native\";\nimport { Pushy, UpdateProvider } from \"react-native-update\";\nimport _updateConfig from \"./update.json\";\n\nconst { appKey } = _updateConfig[Platform.OS];\n\nconst pushyClient = new Pushy({\n  appKey,\n  checkStrategy: \"onAppResume\", // 对应 CheckFrequency.ON_APP_RESUME\n  updateStrategy: \"silentAndLater\", // 静默下载，下次启动生效，对应 InstallMode.ON_NEXT_RESTART\n});\n\nexport default function Root() {\n  return (\n    <UpdateProvider client={pushyClient}>\n      <App />\n    </UpdateProvider>\n  );\n}\n```\n如果原来是用 `codePush.sync()` 手动控制流程、自己画更新界面，可以设置 `updateStrategy: null`，在 `UpdateProvider` 的子组件中通过 `useUpdate()` 取得 `checkUpdate`、`downloadUpdate`、`switchVersion`、`switchVersionLater`、`updateInfo`、`progress` 等自行组合，完整示例见[代码集成](https://pushy.reactnative.cn/docs/integration.md)中的「自定义更新界面」。注意 `useUpdate()` 只能在 `UpdateProvider` 的子组件里调用。\nPushy 默认在开发环境（`__DEV__`）中不检查更新；即便打开 `debug: true`，也只能检查和下载，实际应用热更新必须在 release 包中进行。\n### 打包并上传原生基准包\n这是 CodePush 没有、但 Pushy 必需的一步。先**提高原生版本号**（iOS 的 `CFBundleShortVersionString`、Android 的 `versionName`），按正常流程打 release 包，然后上传：\n```bash\npushy uploadIpa <ipa 文件>\npushy uploadApk android/app/build/outputs/apk/release/app-release.apk\n# 如果实际分发的是 aab：\npushy uploadAab android/app/build/outputs/bundle/release/app-release.aab\n```\n上传后再把**同一份**安装包提交到应用商店或分发渠道。以后只要重新打原生包，都要先改版本号、再上传，最后分发。同时产出 apk 和 aab、iOS 不要重新 archive 等细节，见[发布热更新](https://pushy.reactnative.cn/docs/publish.md)。\n### 发布第一个热更新\n修改一处 JS 代码后执行：\n```bash\npushy bundle --platform android\n```\n按提示发布并绑定原生包即可；也可以一条命令完成打包、发布和绑定（需 cli v1.46.1+）：\n```bash\npushy bundle --platform android --name \"1.0.1\" --description \"首个 Pushy 热更新\" --packageVersion \"2.0.0\"\n```\n其中 `--packageVersion` 换成你刚上传的原生版本号，作用类似 CodePush 的 `--targetBinaryVersion`；需要一次绑定多个原生版本时可改用 `--packageVersionRange`。绑定后服务器会在几秒内生成增量补丁。\n### 测试与灰度验证\nCodePush 常用 `Staging` deployment 做发布前测试。在 Pushy 中，推荐用管理后台的测试二维码：配置好测试用 Deep Link 后，用系统相机扫描某个热更版本的二维码，即可在与线上用户完全一致的 release 包上安装该版本，**无需先绑定、也不影响线上用户**，详见[测试与回滚](https://pushy.reactnative.cn/docs/bestpractice.md#%E6%B5%8B%E8%AF%95%E4%B8%8E%E5%9B%9E%E6%BB%9A)。如果应用自带扫码功能，也可以用 [`parseTestQrCode`](https://pushy.reactnative.cn/docs/api.md) 实现。\n测试通过后，先以较小比例灰度发布，观察版本健康度和[数据分析](https://pushy.reactnative.cn/docs/analytics.md)，再逐步扩大到 100%：\n```bash\npushy update --platform android --versionId <热更版本 id> --packageVersion \"2.0.0\" --rollout 10\n```\n灰度的工作原理和注意事项见[灰度发布](https://pushy.reactnative.cn/docs/publish.md#%E7%81%B0%E5%BA%A6%E5%8F%91%E5%B8%83)。同一原生包同时保留一个灰度版本和一个全量版本需要客户端 `react-native-update` v10.32.0+、cli v2.4.0+。\n\n## 注意事项\n\n### 已发出的老版本仍连着 CodePush\n\n热更新 SDK 是编译进原生包里的，**已经安装在用户手机上的老版本仍然使用 CodePush 客户端**，无法通过热更新切换到 Pushy。只有安装了集成 Pushy 的新原生包的用户，才会从 Pushy 获取热更新。\n\n因此迁移的实际节奏是：\n\n1. 发布集成 Pushy 的新原生包（上一节的步骤），并通过应用商店让用户升级；\n2. 在新原生包覆盖率上升之前，老版本用户无法再从托管版 CodePush 获得更新。如果你在过渡期使用了自建 code-push-server，可以继续用它维护老版本，直到老版本用户占比足够低；\n3. 如果需要引导老版本用户尽快升级，可以通过你自己的业务接口或应用内提示实现。对于已接入 Pushy 的原生包，以后若再发布不兼容的新原生版本，可以在管理后台把旧原生包设为过期，客户端会收到 `expired` 结果并引导用户下载（需在后台填写下载地址），见 [API 参考](https://pushy.reactnative.cn/docs/api.md)中 `checkUpdate` 的说明。\n\n### 回滚\n\n- **客户端自动回滚**：CodePush 要求新版本调用 `notifyAppReady()`，否则下次启动会回滚。Pushy 默认在新版本启动后自动标记成功（`autoMarkSuccess` 默认为 `true`），新版本启动崩溃会自动回滚到上一个可用版本，一般不需要手动调用 `markSuccess()`。设备上已回滚过的版本不会被再次安装。\n- **服务端回滚**：对应 CodePush 的 `rollback` 命令，Pushy 中可先在管理后台对原生包或整个应用暂停热更，再把原生包重新绑定到之前正常的热更版本（后台拖拽，或 `pushy update --versionId <旧版本 id>`），也可以回滚代码后重新发布一个修复版本，见[测试与回滚](https://pushy.reactnative.cn/docs/bestpractice.md#%E6%B5%8B%E8%AF%95%E4%B8%8E%E5%9B%9E%E6%BB%9A)。\n- **救砖**：如果某个热更版本让应用启动即崩溃、JS 已无法运行，可以对修复版本使用「强制启动（救砖）」，由原生冷启动检测把修复版本拉下来并在下次启动生效。需要原生包中的 `react-native-update` v10.52.1+，详见[发布热更新](https://pushy.reactnative.cn/docs/publish.md)中的「强制启动（救砖）」一节。CodePush 没有对应功能。\n\n### 强制更新\n\nCodePush 发布时可加 `--mandatory`，客户端据此跳过用户确认。Pushy 没有内置的强制标记，常见做法有两种：\n\n- 全局采用 `updateStrategy: \"silentAndNow\"`，下载后立即应用；\n- 在发布时填写元信息（`--metaInfo '{\"mandatory\": true}'`，字段名由你自定），在 `updateStrategy: null` 的自定义流程里读取 `updateInfo.metaInfo` 决定是否跳过确认、立即调用 `switchVersion()`。元信息的用法见[场景实践](https://pushy.reactnative.cn/docs/bestpractice.md)中的「元信息(Meta Info)的使用」。\n\n注意「强制启动（救砖）」是救急用的通道，会越过客户端的更新策略，不建议当作日常的强制更新使用。\n\n### 其他差异\n\n- **原生包必须先上传**：重新打包而没有上传，会因编译时间戳不一致无法获取热更新，见[常见问题](https://pushy.reactnative.cn/docs/faq.md)。\n- **哪些修改能热更新**：与 CodePush 相同，只有 JS 代码和 JS 中引用的图片等资源可以热更新，任何原生代码或原生依赖的变更都需要发新原生包。\n- **海外合规**：如果项目对海外数据存放或运营主体有额外要求，可以考虑由独立公司实体运营的全球服务 [Cresc](https://cresc.dev/)。\n\n## 下一步\n\n- [安装配置](https://pushy.reactnative.cn/docs/getting-started.md)：完整的原生配置步骤\n- [代码集成](https://pushy.reactnative.cn/docs/integration.md)：`UpdateProvider`、更新策略和自定义界面\n- [发布热更新](https://pushy.reactnative.cn/docs/publish.md)：原生包上传、热更新发布、灰度与强制启动\n- [命令行工具](https://pushy.reactnative.cn/docs/cli.md)：全部 `pushy` 命令与参数\n- [常见问题](https://pushy.reactnative.cn/docs/faq.md)：遇到问题先查这里，或到 [issues 区](https://github.com/reactnativecn/react-native-update/issues)提问\n",
+      "sections": [
+        {
+          "heading": "从 CodePush 迁移到 Pushy",
+          "level": 1,
+          "anchor": "从-codepush-迁移到-pushy",
+          "offset": 0,
+          "length": 373
+        },
+        {
+          "heading": "背景：CodePush 已随 App Center 退役",
+          "level": 2,
+          "anchor": "背景codepush-已随-app-center-退役",
+          "offset": 373,
+          "length": 1014
+        },
+        {
+          "heading": "概念对照",
+          "level": 2,
+          "anchor": "概念对照",
+          "offset": 1387,
+          "length": 9
+        },
+        {
+          "heading": "发布模型",
+          "level": 3,
+          "anchor": "发布模型",
+          "offset": 1396,
+          "length": 2226
+        },
+        {
+          "heading": "命令行",
+          "level": 3,
+          "anchor": "命令行",
+          "offset": 3622,
+          "length": 2121
+        },
+        {
+          "heading": "客户端 API",
+          "level": 3,
+          "anchor": "客户端-api",
+          "offset": 5743,
+          "length": 5011
+        },
+        {
+          "heading": "迁移步骤",
+          "level": 2,
+          "anchor": "迁移步骤",
+          "offset": 10754,
+          "length": 86
+        },
+        {
+          "heading": "移除 react-native-code-push",
+          "level": 3,
+          "anchor": "移除-react-native-code-push",
+          "offset": 10840,
+          "length": 1289
+        },
+        {
+          "heading": "安装 react-native-update 并完成原生配置",
+          "level": 3,
+          "anchor": "安装-react-native-update-并完成原生配置",
+          "offset": 12129,
+          "length": 1907
+        },
+        {
+          "heading": "登录并创建应用",
+          "level": 3,
+          "anchor": "登录并创建应用",
+          "offset": 14036,
+          "length": 341
+        },
+        {
+          "heading": "替换 JS 代码",
+          "level": 3,
+          "anchor": "替换-js-代码",
+          "offset": 14377,
+          "length": 1268
+        },
+        {
+          "heading": "打包并上传原生基准包",
+          "level": 3,
+          "anchor": "打包并上传原生基准包",
+          "offset": 15645,
+          "length": 484
+        },
+        {
+          "heading": "发布第一个热更新",
+          "level": 3,
+          "anchor": "发布第一个热更新",
+          "offset": 16129,
+          "length": 369
+        },
+        {
+          "heading": "测试与灰度验证",
+          "level": 3,
+          "anchor": "测试与灰度验证",
+          "offset": 16498,
+          "length": 725
+        },
+        {
+          "heading": "注意事项",
+          "level": 2,
+          "anchor": "注意事项",
+          "offset": 17223,
+          "length": 9
+        },
+        {
+          "heading": "已发出的老版本仍连着 CodePush",
+          "level": 3,
+          "anchor": "已发出的老版本仍连着-codepush",
+          "offset": 17232,
+          "length": 494
+        },
+        {
+          "heading": "回滚",
+          "level": 3,
+          "anchor": "回滚",
+          "offset": 17726,
+          "length": 652
+        },
+        {
+          "heading": "强制更新",
+          "level": 3,
+          "anchor": "强制更新",
+          "offset": 18378,
+          "length": 408
+        },
+        {
+          "heading": "其他差异",
+          "level": 3,
+          "anchor": "其他差异",
+          "offset": 18786,
+          "length": 267
+        },
+        {
+          "heading": "下一步",
+          "level": 2,
+          "anchor": "下一步",
+          "offset": 19053,
+          "length": 450
         }
       ]
     },

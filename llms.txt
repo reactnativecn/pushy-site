@@ -17,7 +17,12 @@
 - [数据分析](https://pushy.reactnative.cn/docs/analytics.md): 从请求趋势、版本漏斗到流量画像与失败诊断，详细了解 Pushy 热更新的触达、生效和运行情况。
 - [JS 报错监控](https://pushy.reactnative.cn/docs/errors.md): Pushy 自动收集热更新版本中的 JavaScript 异常，按版本和指纹聚合，并用发布时归档的 sourcemap 将调用堆栈还原到源码行（需 v10.55.0+）。
 - [场景实践](https://pushy.reactnative.cn/docs/bestpractice.md): React Native 热更新场景实践：优化 ipa、apk 原生包与 ppk 热更包体积，多渠道包热更、aab 支持、测试回滚与元信息的推荐做法。
+- [从 CodePush 迁移到 Pushy](https://pushy.reactnative.cn/docs/migrate-from-codepush.md): Microsoft CodePush 随 App Center 停服后的 React Native 热更新迁移指南：概念、API 与命令对照，移除 CodePush 原生配置，上传原生包、发布首个热更新并灰度验证。
+- [Expo 项目热更新：Pushy 与 EAS Update 对比及接入](https://pushy.reactnative.cn/docs/expo.md): Expo 热更新怎么选？对比 Pushy 与 EAS Update 的增量包、国内 CDN、计费、灰度回滚与鸿蒙支持，并介绍 Expo SDK 50+ 通过 prebuild 接入 Pushy、处理 expo-updates 冲突的步骤。
+- [鸿蒙 React Native 热更新](https://pushy.reactnative.cn/docs/harmony.md): 在鸿蒙 HarmonyOS NEXT 上为 React Native（RNOH）应用接入 Pushy 热更新：react-native-update 的 har 包与 CMake 配置、打包 bundle.harmony.js、上传 .app 原生包、发布增量更新与常见问题。
+- [原生 App 混编集成（Brownfield）](https://pushy.reactnative.cn/docs/brownfield.md): 原生 App 接入 React Native 热更新：在以 AAR 引入 RN 的 Android brownfield 混编项目中接入 Pushy，配置 ReactHost 与热更新 bundle 路径。
 - [常见问题](https://pushy.reactnative.cn/docs/faq.md): Pushy 热更新常见问题：能否上架 App Store、海外能否使用、哪些修改可以热更新、回滚原因排查，以及配额、付费与发票等问题解答。
+- [更新日志](https://pushy.reactnative.cn/docs/changelog.md): react-native-update（Pushy 热更新 React Native SDK）版本更新日志：新功能、行为变更、问题修复与升级注意事项，最新版本 v10.62.1。
 
 ## 价格
 
