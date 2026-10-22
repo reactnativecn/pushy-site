@@ -22,10 +22,10 @@ Pushy（npm 包名 `react-native-update`）是专为 React Native 应用打造�
 常见方案有三类：Microsoft CodePush（App Center）、Expo 官方的 EAS Update（`expo-updates`），以及 Pushy 这类第三方热更新服务。主要区别：
 
 - **CodePush**：已于 2025 年 3 月 31 日随 App Center 停止服务，现有用户需要迁移。
-- **EAS Update**：以下发全量 JS 包为主，体积通常为 MB 级；服务器在海外，国内访问较慢，不支持鸿蒙，超出额度的流量另行计费。
+- **EAS Update**：SDK 55 起支持 bsdiff 增量（56 起默认开启），补丁不够小时仍下发完整 bundle，基于安装包内置 bundle 的增量需 SDK 58+ 配合 EAS Build；服务器在海外，国内访问较慢，不支持鸿蒙，超出额度的流量另行计费。
 - **Pushy**：下发增量包（通常几十 KB，针对 Hermes 字节码优化后一行改动可小至 3.4 KB），国内外均有 CDN 节点且流量不单独计费，第一方支持 iOS、Android 和鸿蒙，同时兼容 Expo 项目。
 
-详细对比见[产品简介中的性价比对比](/docs/intro#-性价比之选)。
+详细对比见[产品简介中的性价比对比](/docs/intro#-性价比之选)和 [Expo 项目热更新](/docs/expo)。
 
 ---
 
@@ -37,6 +37,8 @@ Microsoft App Center（含 CodePush）已于 2025 年 3 月 31 日停止服务�
 2. 按[安装配置](/docs/getting-started)安装 `react-native-update`，并完成 iOS、Android（及鸿蒙）的原生配置；
 3. 按[代码集成](/docs/integration)用 `UpdateProvider` 包裹根组件；
 4. 重新打包原生包并上传到 Pushy，之后即可按[发布流程](/docs/publish)发布热更新。
+
+完整的概念、命令与 API 对照见[从 CodePush 迁移](/docs/migrate-from-codepush)。
 
 如果使用支持 Skills 的 AI 编程工具，可以先[安装 react-native-update Skill](/docs/skills)，让 AI 自动完成大部分改动。
 
