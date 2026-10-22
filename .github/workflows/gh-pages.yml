@@ -12,7 +12,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v7
         with:
@@ -41,6 +41,7 @@ jobs:
 
       - name: Submit changed pages to search engines
         continue-on-error: true
+        timeout-minutes: 8
         env:
           BAIDU_PUSH_TOKEN: ${{ secrets.BAIDU_PUSH_TOKEN }}
         # out/ has moved to the repo root; the script reads site/out/sitemap.xml.

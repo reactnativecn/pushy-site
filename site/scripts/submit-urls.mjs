@@ -10,6 +10,12 @@
  * for /pricing. URLs are taken from out/sitemap.xml, so a deleted page is not
  * submitted.
  *
+ * The deploy only pushes to the gh-pages branch; the site behind
+ * pushy.reactnative.cn picks it up a minute or so later. Engines fetch what
+ * they are sent right away, so this first waits until the live
+ * /mcp-docs-index.json reports this commit as its sourceCommit (up to
+ * WAIT_MINUTES) and submits nothing if it never does.
+ *
  * Baidu needs BAIDU_PUSH_TOKEN (站长平台 → 普通收录 → API 提交); without it that
  * engine is skipped. The IndexNow key is public by design and is served from
  * pages/public/<key>.txt. Failures are reported but never fail the deploy.
@@ -24,6 +30,7 @@ import { fileURLToPath } from 'node:url';
 const BASE_URL = 'https://pushy.reactnative.cn';
 const INDEXNOW_KEY = '75a8aa17ce0049fbb279d1d19f3f4daf';
 const SITE_ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const WAIT_MINUTES = 6;
 
 const base = process.argv[2];
 if (!base || /^0+$/.test(base)) {
@@ -62,6 +69,27 @@ if (urls.length === 0) {
   console.log('submit-urls: no page changed');
   process.exit(0);
 }
+
+const head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: SITE_ROOT, encoding: 'utf8' }).trim();
+async function liveCommit() {
+  try {
+    const res = await fetch(`${BASE_URL}/mcp-docs-index.json`, { cache: 'no-store' });
+    return res.ok ? (await res.json()).sourceCommit : undefined;
+  } catch {
+    return undefined;
+  }
+}
+const deadline = Date.now() + WAIT_MINUTES * 60_000;
+let live = await liveCommit();
+while (live !== head && Date.now() < deadline) {
+  await new Promise((resolve) => setTimeout(resolve, 15_000));
+  live = await liveCommit();
+}
+if (live !== head) {
+  console.warn(`submit-urls: ${BASE_URL} still serves ${live ?? 'nothing'} after ${WAIT_MINUTES} minutes, not ${head}; nothing submitted`);
+  process.exit(0);
+}
+
 console.log(`submit-urls: ${urls.join(' ')}`);
 
 async function submit(name, request) {
