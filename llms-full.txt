@@ -339,8 +339,8 @@ RN \< 0.60 或其他不能自动 link 的情况
 - 在`getPackages()` 方法中增加 `new UpdatePackage()`(注意上一行可能要增加一个逗号)
 
 ### 配置 Bundle URL
-如果你使用 `expo` 48 或更高版本，且 `react-native-update` >= 10.28.2，则可以自动配置 bundle url，请直接去往[下一个步骤](#添加测试用的-deep-link)。
-如果你没有使用 `expo`，或 `expo` 版本低于 48，则需要按以下步骤手动配置。
+如果你使用 `expo` 50 或更高版本，且 `react-native-update` >= 10.28.2，则可以自动配置 bundle url，请直接去往[下一个步骤](#添加测试用的-deep-link)。
+如果你没有使用 `expo`，或 `expo` 版本低于 50，则需要按以下步骤手动配置。
 #### iOS
 在提供 `bundleURL` 的文件中增加如下代码。RN 0.88 起，新建项目的 iOS 模板改用 UIScene 生命周期（使用 iOS 27 SDK 构建的应用必须采用），React Native 的启动入口和 `bundleURL` 方法从 `AppDelegate.swift` 移到了 `SceneDelegate.swift`；更早的版本则在 `AppDelegate.mm`、`AppDelegate.m` 或 `AppDelegate.swift` 中（不同 RN 版本可能后缀名不同）。不论在哪个文件里，需要修改的都是同一个 `bundleURL` 方法。
 :::warning

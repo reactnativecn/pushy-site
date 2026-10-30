@@ -5,12 +5,12 @@
 <title>安装配置 - Pushy 极速热更新</title>
 <script>(function(){var h=location.hostname;if(h!=='localhost'&&h!=='127.0.0.1'&&h!=='::1'&&h!=='[::1]')return;if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})})}if('caches' in window){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})})}})();</script>
 <link href="/static/css/styles.240d1ef4cb.css" rel="stylesheet">
-<link rel="preload" href="/static/js/async/route-0003fa5a1ccd.77e03c96cc.js" as="script">
-<script defer src="/static/js/styles.3f186cd36b.js"></script>
+<link rel="preload" href="/static/js/async/route-0003fa5a1ccd.65264ef05e.js" as="script">
+<script defer src="/static/js/styles.b6a8603acf.js"></script>
 <script defer src="/static/js/lib-react.261297288f.js"></script>
-<script defer src="/static/js/lib-router.3b6f241069.js"></script>
-<script defer src="/static/js/8.5c9d3b255e.js"></script>
-<script defer src="/static/js/index.64a6aee223.js"></script>
+<script defer src="/static/js/lib-router.fb9dedb508.js"></script>
+<script defer src="/static/js/8.106739dd32.js"></script>
+<script defer src="/static/js/index.db95257a8c.js"></script>
 <script src="/register-pwa.js" defer></script>
 <meta property="og:type" content="article">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -32,7 +32,7 @@
 <link rel="canonical" href="https://pushy.reactnative.cn/docs/getting-started">
 <link rel="icon" href="/logo.svg" type="image/svg+xml">
 <link rel="manifest" href="/manifest.webmanifest">
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"安装配置","description":"在 React Native 或 Expo 项目中安装 react-native-update 与命令行工具，完成 iOS、Android、鸿蒙的原生配置，为接入 Pushy 热更新做好准备。","url":"https://pushy.reactnative.cn/docs/getting-started","mainEntityOfPage":"https://pushy.reactnative.cn/docs/getting-started","image":"https://pushy.reactnative.cn/images/og.jpg","inLanguage":"zh-CN","dateModified":"2026-10-19T15:59:30+08:00","author":{"@type":"Organization","name":"Pushy 极速热更新","url":"https://pushy.reactnative.cn/","logo":"https://pushy.reactnative.cn/images/logo.svg"},"publisher":{"@type":"Organization","name":"Pushy 极速热更新","url":"https://pushy.reactnative.cn/","logo":"https://pushy.reactnative.cn/images/logo.svg"},"about":{"@type":"SoftwareApplication","name":"Pushy","url":"https://pushy.reactnative.cn/"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://pushy.reactnative.cn/"},{"@type":"ListItem","position":2,"name":"文档","item":"https://pushy.reactnative.cn/docs/intro"},{"@type":"ListItem","position":3,"name":"安装配置","item":"https://pushy.reactnative.cn/docs/getting-started"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"安装配置","description":"在 React Native 或 Expo 项目中安装 react-native-update 与命令行工具，完成 iOS、Android、鸿蒙的原生配置，为接入 Pushy 热更新做好准备。","url":"https://pushy.reactnative.cn/docs/getting-started","mainEntityOfPage":"https://pushy.reactnative.cn/docs/getting-started","image":"https://pushy.reactnative.cn/images/og.jpg","inLanguage":"zh-CN","dateModified":"2026-10-30T19:25:37+08:00","author":{"@type":"Organization","name":"Pushy 极速热更新","url":"https://pushy.reactnative.cn/","logo":"https://pushy.reactnative.cn/images/logo.svg"},"publisher":{"@type":"Organization","name":"Pushy 极速热更新","url":"https://pushy.reactnative.cn/","logo":"https://pushy.reactnative.cn/images/logo.svg"},"about":{"@type":"SoftwareApplication","name":"Pushy","url":"https://pushy.reactnative.cn/"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://pushy.reactnative.cn/"},{"@type":"ListItem","position":2,"name":"文档","item":"https://pushy.reactnative.cn/docs/intro"},{"@type":"ListItem","position":3,"name":"安装配置","item":"https://pushy.reactnative.cn/docs/getting-started"}]}]</script>
 <link rel="alternate" type="text/markdown" href="https://pushy.reactnative.cn/docs/getting-started.md">
 <link rel="describedby" href="https://pushy.reactnative.cn/llms.txt">
 <meta property="og:title" content="安装配置 - Pushy 极速热更新">
@@ -111,8 +111,8 @@ link 操作。</p></div></div><h4 class="rp-toc-include" id="ios"><a href="#ios"
 </ol><ul>
 <li>在文件开头增加 <code>import cn.reactnative.modules.update.UpdatePackage;</code></li>
 <li>在<code>getPackages()</code> 方法中增加 <code>new UpdatePackage()</code>(注意上一行可能要增加一个逗号)</li>
-</ul></details><h3 class="rp-toc-include" id="配置-bundle-url"><a href="#配置-bundle-url" class="rp-header-anchor rp-link" aria-hidden="true">#</a>配置 Bundle URL</h3><p>如果你使用 <code>expo</code> 48 或更高版本，且 <code>react-native-update</code> &gt;= 10.28.2，则可以自动配置 bundle url，请直接去往<a href="#%E6%B7%BB%E5%8A%A0%E6%B5%8B%E8%AF%95%E7%94%A8%E7%9A%84-deep-link" class="rp-link">下一个步骤</a>。
-如果你没有使用 <code>expo</code>，或 <code>expo</code> 版本低于 48，则需要按以下步骤手动配置。</p><h4 class="rp-toc-include" id="ios-1"><a href="#ios-1" class="rp-header-anchor rp-link" aria-hidden="true">#</a>iOS</h4><p>在提供 <code>bundleURL</code> 的文件中增加如下代码。RN 0.88 起，新建项目的 iOS 模板改用 UIScene 生命周期（使用 iOS 27 SDK 构建的应用必须采用），React Native 的启动入口和 <code>bundleURL</code> 方法从 <code>AppDelegate.swift</code> 移到了 <code>SceneDelegate.swift</code>；更早的版本则在 <code>AppDelegate.mm</code>、<code>AppDelegate.m</code> 或 <code>AppDelegate.swift</code> 中（不同 RN 版本可能后缀名不同）。不论在哪个文件里，需要修改的都是同一个 <code>bundleURL</code> 方法。</p><div class="rp-callout rp-callout--warning"><div class="rp-callout__title">Warning</div><div class="rp-callout__content"><p>
+</ul></details><h3 class="rp-toc-include" id="配置-bundle-url"><a href="#配置-bundle-url" class="rp-header-anchor rp-link" aria-hidden="true">#</a>配置 Bundle URL</h3><p>如果你使用 <code>expo</code> 50 或更高版本，且 <code>react-native-update</code> &gt;= 10.28.2，则可以自动配置 bundle url，请直接去往<a href="#%E6%B7%BB%E5%8A%A0%E6%B5%8B%E8%AF%95%E7%94%A8%E7%9A%84-deep-link" class="rp-link">下一个步骤</a>。
+如果你没有使用 <code>expo</code>，或 <code>expo</code> 版本低于 50，则需要按以下步骤手动配置。</p><h4 class="rp-toc-include" id="ios-1"><a href="#ios-1" class="rp-header-anchor rp-link" aria-hidden="true">#</a>iOS</h4><p>在提供 <code>bundleURL</code> 的文件中增加如下代码。RN 0.88 起，新建项目的 iOS 模板改用 UIScene 生命周期（使用 iOS 27 SDK 构建的应用必须采用），React Native 的启动入口和 <code>bundleURL</code> 方法从 <code>AppDelegate.swift</code> 移到了 <code>SceneDelegate.swift</code>；更早的版本则在 <code>AppDelegate.mm</code>、<code>AppDelegate.m</code> 或 <code>AppDelegate.swift</code> 中（不同 RN 版本可能后缀名不同）。不论在哪个文件里，需要修改的都是同一个 <code>bundleURL</code> 方法。</p><div class="rp-callout rp-callout--warning"><div class="rp-callout__title">Warning</div><div class="rp-callout__content"><p>
 注意：如果你是混编原生的项目，务必注意<strong>不能直接指定 bundleURL 来初始化</strong>
 rootView，需要先使用<code>initWithDelegate</code>方法来初始化
 bridge，然后使用<code>initWithBridge</code>方法来初始化
