@@ -3,7 +3,7 @@
   "product": "Pushy",
   "baseUrl": "https://pushy.reactnative.cn",
   "resourceScheme": "pushy-docs",
-  "sourceCommit": "14699d922d5fe6c1924ca4c06b75c3e00aec6513",
+  "sourceCommit": "030d6ff11d90008c81935ee34b31c5be22f0b4be",
   "documents": [
     {
       "slug": "analytics",
@@ -2930,69 +2930,69 @@
       "path": "pages/docs/skills.mdx",
       "url": "https://pushy.reactnative.cn/docs/skills",
       "resourceUri": "pushy-docs://docs/skills",
-      "content": "# 推荐：先安装 Skill，再让 AI 自动集成\n\n首次接入 Pushy 时，推荐先安装 `react-native-update` Skill，再让支持 Skills 的 AI 编程工具根据你的项目结构自动完成大部分集成改动。只有当工程结构特殊、需要精细控制，或者想逐项校对生成代码时，再回到后续手动文档。\n\n:::tip AI 模型服务\n本站同时提供 [AI 模型转发服务](https://ai.cresc.dev/model-plaza)：提供纯正官方 GPT 和 Claude 最前沿模型，价格实惠、服务稳定、绝不掺水、数据安全。\n:::\n\n## Skill 信息\n\n- Skill 名称：`react-native-update`\n- 源仓库：`reactnativecn/react-native-update-skill`\n\n## 推荐工作流\n\n1. 安装 `react-native-update` Skill。\n2. 在 AI 工具中打开你的 React Native / Expo 项目根目录。\n3. 直接提出接入需求，让 AI 根据现有工程自动改造。\n4. 用 [安装配置](https://pushy.reactnative.cn/docs/getting-started.md) 和 [代码集成](https://pushy.reactnative.cn/docs/integration.md) 作为校对基线。\n\n## 安装（推荐优先）\n\n安装到当前环境支持的所有 Agent：\n\n```bash\nnpx skills add reactnativecn/react-native-update-skill --skill react-native-update -a '*'\n```\n\n仅安装到 Claude Code：\n\n```bash\nnpx skills add reactnativecn/react-native-update-skill --skill react-native-update -a claude-code\n```\n\n## 更新 Skill\n\n```bash\nnpx skills check\nnpx skills update\n```\n\n## 可以直接这样对 AI 说\n\n安装后，可以直接向 AI 助手提出接入需求，例如：\n\n- 在 Expo 项目中接入 `react-native-update`\n- 在 class 组件根节点中完成接入改造\n- 保留当前导航和状态管理结构，自动包裹 `UpdateProvider`\n- 配置白名单灰度发布策略\n- 排查“热更新未生效”问题\n\n## Skill 可自动协助的内容\n\n- RN CLI / Expo 接入流程\n- `update.json` 与 `appKey` 配置检查\n- iOS / Android 关键改动提示\n- 更新策略建议（`checkStrategy` / `updateStrategy`）\n- 常见冲突排查（如 `expo-updates`）\n- class 组件与白名单示例\n\n## 何时改用手动文档\n\n- 工程是混编原生项目、monorepo 或目录结构高度定制\n- 自动 link 或原生构建本身已经异常，需要逐项定位\n- 团队希望将 AI 生成结果与手动基线逐行比对\n\n## 相关链接\n\n- ClawHub 页面（可选）：\n  <a href=\"https://clawhub.ai/skills/react-native-update\" target=\"_blank\" rel=\"noopener noreferrer\">\n    [https://clawhub.ai/skills/react-native-update](https://clawhub.ai/skills/react-native-update)\n  </a>\n\n\n[reactnativecn/react-native-update-skillSkill 已在 GitHub 开源，欢迎提 Issue 或 PR 一起完善；用得顺手的话，也请点个 Star 支持一下。\n](https://github.com/reactnativecn/react-native-update-skill)[Star](https://github.com/reactnativecn/react-native-update-skill)\n",
+      "content": "# 推荐：先安装 Skill，再让 AI 自动集成\n\n首次接入 Pushy 时，推荐先安装 `react-native-update` Skill，再让支持 Skills 的 AI 编程工具根据你的项目结构自动完成大部分集成改动。只有当工程结构特殊、需要精细控制，或者想逐项校对生成代码时，再回到后续手动文档。\n\n:::tip AI 模型服务\n本站同时提供 [AI 模型转发服务](https://36k.ai/model-plaza)：提供纯正官方 GPT 和 Claude 最前沿模型，价格实惠、服务稳定、绝不掺水、数据安全。\n:::\n\n## Skill 信息\n\n- Skill 名称：`react-native-update`\n- 源仓库：`reactnativecn/react-native-update-skill`\n\n## 推荐工作流\n\n1. 安装 `react-native-update` Skill。\n2. 在 AI 工具中打开你的 React Native / Expo 项目根目录。\n3. 直接提出接入需求，让 AI 根据现有工程自动改造。\n4. 用 [安装配置](https://pushy.reactnative.cn/docs/getting-started.md) 和 [代码集成](https://pushy.reactnative.cn/docs/integration.md) 作为校对基线。\n\n## 安装（推荐优先）\n\n安装到当前环境支持的所有 Agent：\n\n```bash\nnpx skills add reactnativecn/react-native-update-skill --skill react-native-update -a '*'\n```\n\n仅安装到 Claude Code：\n\n```bash\nnpx skills add reactnativecn/react-native-update-skill --skill react-native-update -a claude-code\n```\n\n## 更新 Skill\n\n```bash\nnpx skills check\nnpx skills update\n```\n\n## 可以直接这样对 AI 说\n\n安装后，可以直接向 AI 助手提出接入需求，例如：\n\n- 在 Expo 项目中接入 `react-native-update`\n- 在 class 组件根节点中完成接入改造\n- 保留当前导航和状态管理结构，自动包裹 `UpdateProvider`\n- 配置白名单灰度发布策略\n- 排查“热更新未生效”问题\n\n## Skill 可自动协助的内容\n\n- RN CLI / Expo 接入流程\n- `update.json` 与 `appKey` 配置检查\n- iOS / Android 关键改动提示\n- 更新策略建议（`checkStrategy` / `updateStrategy`）\n- 常见冲突排查（如 `expo-updates`）\n- class 组件与白名单示例\n\n## 何时改用手动文档\n\n- 工程是混编原生项目、monorepo 或目录结构高度定制\n- 自动 link 或原生构建本身已经异常，需要逐项定位\n- 团队希望将 AI 生成结果与手动基线逐行比对\n\n## 相关链接\n\n- ClawHub 页面（可选）：\n  <a href=\"https://clawhub.ai/skills/react-native-update\" target=\"_blank\" rel=\"noopener noreferrer\">\n    [https://clawhub.ai/skills/react-native-update](https://clawhub.ai/skills/react-native-update)\n  </a>\n\n\n[reactnativecn/react-native-update-skillSkill 已在 GitHub 开源，欢迎提 Issue 或 PR 一起完善；用得顺手的话，也请点个 Star 支持一下。\n](https://github.com/reactnativecn/react-native-update-skill)[Star](https://github.com/reactnativecn/react-native-update-skill)\n",
       "sections": [
         {
           "heading": "推荐：先安装 Skill，再让 AI 自动集成",
           "level": 1,
           "anchor": "推荐先安装-skill再让-ai-自动集成",
           "offset": 0,
-          "length": 277
+          "length": 271
         },
         {
           "heading": "Skill 信息",
           "level": 2,
           "anchor": "skill-信息",
-          "offset": 277,
+          "offset": 271,
           "length": 95
         },
         {
           "heading": "推荐工作流",
           "level": 2,
           "anchor": "推荐工作流",
-          "offset": 372,
+          "offset": 366,
           "length": 251
         },
         {
           "heading": "安装（推荐优先）",
           "level": 2,
           "anchor": "安装推荐优先",
-          "offset": 623,
+          "offset": 617,
           "length": 267
         },
         {
           "heading": "更新 Skill",
           "level": 2,
           "anchor": "更新-skill",
-          "offset": 890,
+          "offset": 884,
           "length": 61
         },
         {
           "heading": "可以直接这样对 AI 说",
           "level": 2,
           "anchor": "可以直接这样对-ai-说",
-          "offset": 951,
+          "offset": 945,
           "length": 172
         },
         {
           "heading": "Skill 可自动协助的内容",
           "level": 2,
           "anchor": "skill-可自动协助的内容",
-          "offset": 1123,
+          "offset": 1117,
           "length": 185
         },
         {
           "heading": "何时改用手动文档",
           "level": 2,
           "anchor": "何时改用手动文档",
-          "offset": 1308,
+          "offset": 1302,
           "length": 99
         },
         {
           "heading": "相关链接",
           "level": 2,
           "anchor": "相关链接",
-          "offset": 1407,
+          "offset": 1401,
           "length": 466
         }
       ]

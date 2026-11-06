@@ -5,12 +5,12 @@
 <title>场景实践 - Pushy 极速热更新</title>
 <script>(function(){var h=location.hostname;if(h!=='localhost'&&h!=='127.0.0.1'&&h!=='::1'&&h!=='[::1]')return;if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})})}if('caches' in window){caches.keys().then(function(ks){caches.forEach(function(k){caches.delete(k)})})}})();</script>
 <link href="/static/css/styles.211d5bb3a1.css" rel="stylesheet">
-<link rel="preload" href="/static/js/async/route-d5d47889a2d9.43e395c773.js" as="script">
+<link rel="preload" href="/static/js/async/route-d5d47889a2d9.bb70eec9cf.js" as="script">
 <script defer src="/static/js/styles.301c2c8092.js"></script>
 <script defer src="/static/js/lib-react.f4fd419a75.js"></script>
 <script defer src="/static/js/lib-router.95a7d2bcd9.js"></script>
 <script defer src="/static/js/y1.5404490104.js"></script>
-<script defer src="/static/js/index.18b4c72a8a.js"></script>
+<script defer src="/static/js/index.f3fc3b379b.js"></script>
 <script src="/register-pwa.js" defer></script>
 <meta property="og:type" content="article">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -125,8 +125,7 @@
 <p>在每次往发布包发起热更新之前，先对<strong>测试包</strong><code>1001.6.0</code>进行更新操作，基本测试通过之后，再在网页后台上将热更包重新绑定到<strong>正式包</strong><code>1.6.0</code>上。如果在测试包中发现了重大问题，你就可以先进行修复，更新测试确认通过后再部署到正式线上环境。这样，可以最大程度的避免发生线上事故。</p>
 </details>
 <p>若您用来测试的原生包当前已经有发布的热更版本且更新策略是立即应用，那么和扫码测试之间可能产生策略冲突，比如扫码更新后又立即强制更新到发布版本，对测试带来不便。此时可以考虑在扫码更新之后，利用 beforeCheckUpdate 回调临时禁止更新检查，直到下次启动再恢复。</p>
-<div class="rp-codeblock language-js"><div class="rp-codeblock__content"><div class="rp-codeblock__content__scroll-container rp-scrollbar rp-scrollbar--always"><pre class="shiki css-variables" style="background-color:var(--shiki-background);color:var(--shiki-foreground)" tabindex="0" data-lang="js"><code><span class="line"></span>
-<span class="line"><span style="color:var(--shiki-token-comment)">// isFirstTimeDebug 这个标志位需要 v10.37.0+ 版本，表示当前是扫码热更后的第一次启动</span></span>
+<div class="rp-codeblock language-js"><div class="rp-codeblock__content"><div class="rp-codeblock__content__scroll-container rp-scrollbar rp-scrollbar--always"><pre class="shiki css-variables" style="background-color:var(--shiki-background);color:var(--shiki-foreground)" tabindex="0" data-lang="js"><code><span class="line"><span style="color:var(--shiki-token-comment)">// isFirstTimeDebug 这个标志位需要 v10.37.0+ 版本，表示当前是扫码热更后的第一次启动</span></span>
 <span class="line"><span style="color:var(--shiki-token-keyword)">import</span><span style="color:var(--shiki-foreground)"> { isFirstTimeDebug } </span><span style="color:var(--shiki-token-keyword)">from</span><span style="color:var(--shiki-token-string-expression)"> &#x27;react-native-update/src/core&#x27;</span><span style="color:var(--shiki-foreground)">;</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:var(--shiki-token-keyword)">const</span><span style="color:var(--shiki-token-constant)"> pushyClient</span><span style="color:var(--shiki-token-keyword)"> =</span><span style="color:var(--shiki-token-keyword)"> new</span><span style="color:var(--shiki-token-function)"> Pushy</span><span style="color:var(--shiki-foreground)">({</span></span>
