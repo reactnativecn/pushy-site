@@ -205,6 +205,52 @@ pushy — zsh
 
 ❯
 
+Scenarios & Migration
+
+## 适配你的工程架构与发布场景
+
+无论你是从 CodePush 或 EAS Update 迁移，还是维护多渠道安卓包、混编宿主与鸿蒙客户端，都有现成的实战指南。
+
+[查看各主流热更新方案横评→](/codepush-alternative)
+
+[迁移指南
+
+### 从 CodePush 迁移到 Pushy
+
+App Center 停服后的完整替代路径：概念映射、CLI 命令替换与 AI Skill 自动改造。
+
+阅读指南→](/docs/migrate-from-codepush)[Expo 生态
+
+### Expo Prebuild 项目接入
+
+保留 Expo 开发体验与原生插件生态，同时获得国内秒级 CDN 与无流量附加费的差量更新。
+
+阅读指南→](/docs/expo)[架构演进
+
+### React Native 新架构与 Hermes
+
+完整支持 RN 0.82+ ReactHost 与 RN 0.88 SceneDelegate，字节码感知差分将单行改动压至 3.4 KB。
+
+阅读指南→](/docs/new-architecture)[国产系统
+
+### 鸿蒙 HarmonyOS NEXT 支持
+
+第一方适配 RNOH TurboModule 与沙盒 Bundle 加载，一套流水线统一管理 iOS、Android 与鸿蒙。
+
+阅读指南→](/docs/harmony)[安卓分发
+
+### Android 多渠道与 Google Play AAB
+
+覆盖美团 Walle、腾讯 VasDolly、Gradle Flavor 内容指纹对齐与单次构建 APK + AAB 双格式分发。
+
+阅读指南→](/docs/android-channels-and-aab)[工程化
+
+### CI/CD 自动发布与灰度放量
+
+使用 PUSHY_API_TOKEN 在 GitHub Actions、GitLab CI 与 Jenkins 中无人值守打包、归档 Sourcemap 与灰度发布。
+
+阅读指南→](/docs/cicd)
+
 ## 下一次发布，不再等待
 
 注册即可免费开始使用，几分钟内完成接入，把更新的主动权握在自己手里。
@@ -215,21 +261,44 @@ pushy — zsh
 
 - [邮箱 hi@charmlot.com](mailto:hi@charmlot.com)
 - QQ群 729013783
-
-### 用户协议
-
 - [用户协议](/agreement/)
 - [隐私政策](/agreement/#privacy)
 
-### 帮助
+### 选型与对比
 
+- [CodePush 停服替代方案](/codepush-alternative)
+- [Expo / EAS Update 价格对比](/expo-pricing-vs-pushy)
+- [自建 Expo Updates 服务对比](/expo-updates-self-hosted-vs-pushy)
+- [hot-updater vs Pushy](/hot-updater-vs-pushy)
+- [Revopush vs Pushy](/revopush-vs-pushy)
+- [Stallion vs Pushy](/stallion-vs-pushy)
+
+### 核心指南
+
+- [React Native 热更新全面指南](/react-native-ota-updates)
+- [从 CodePush 迁移](/docs/migrate-from-codepush)
+- [Expo 项目热更新接入](/docs/expo)
+- [React Native 新架构（0.82+）](/docs/new-architecture)
+- [鸿蒙 HarmonyOS 热更新](/docs/harmony)
+- [Android 多渠道与 AAB 热更新](/docs/android-channels-and-aab)
+- [原生 App 混编（Brownfield）](/docs/brownfield)
+
+### 文档与支持
+
+- [快速开始](/docs/getting-started)
+- [CI/CD 自动发布](/docs/cicd)
+- [热更新排障指南](/docs/troubleshooting)
+- [数据分析与报错监控](/docs/analytics)
 - [常见问题](/docs/faq)
+- [更新日志](/docs/changelog)
 - [Issue 讨论区](https://github.com/reactnativecn/react-native-update/issues)
+- [llms.txt](/llms.txt)
 
-### 链接
+### 生态链接
 
 - [React Native 中文网](https://reactnative.cn/)
-- [ReactJS](https://zh-hans.react.dev/)
+- [Cresc（全球国际版）](https://cresc.dev/)
+- [ReactJS 中文文档](https://zh-hans.react.dev/)
 
 React Native 中文网 © 2026 武汉青罗网络科技有限公司
 

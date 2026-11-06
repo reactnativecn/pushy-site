@@ -4,15 +4,15 @@
 
 如果本页面没能回答您的疑问，您可以去[issues 区](https://github.com/reactnativecn/react-native-update/issues)或 QQ 群 729013783 提问，或给我们发[邮件](mailto:hi@charmlot.com)。
 
-### 关于 Pushy
+## 关于 Pushy
 
-#### Pushy 是什么？
+### Pushy 是什么？
 
 Pushy（npm 包名 `react-native-update`）是专为 React Native 应用打造的热更新服务，由 React Native 中文网自 2016 年起运营。修改 JS 代码或图片等资源后，用一条命令即可把更新下发到用户手机，无需重新提交应用商店审核。下发的是 bsdiff/hdiff 增量包，通常只有几十 KB；国内走阿里云 CDN、海外走 Cloudflare；新版本启动崩溃会自动回滚。详见[产品简介](https://pushy.reactnative.cn/docs/intro.md)。
 
 ***
 
-#### React Native 有哪些热更新方案？Pushy 和 CodePush、Expo Updates 有什么区别？
+### React Native 有哪些热更新方案？Pushy 和 CodePush、Expo Updates 有什么区别？
 
 常见方案有三类：Microsoft CodePush（App Center）、Expo 官方的 EAS Update（`expo-updates`），以及 Pushy 这类第三方热更新服务。主要区别：
 
@@ -20,11 +20,11 @@ Pushy（npm 包名 `react-native-update`）是专为 React Native 应用打造�
 - **EAS Update**：SDK 55 起支持 bsdiff 增量（56 起默认开启），补丁不够小时仍下发完整 bundle，基于安装包内置 bundle 的增量需 SDK 58+ 配合 EAS Build；服务器在海外，国内访问较慢，不支持鸿蒙，超出额度的流量另行计费。
 - **Pushy**：下发增量包（通常几十 KB，针对 Hermes 字节码优化后一行改动可小至 3.4 KB），国内外均有 CDN 节点且流量不单独计费，第一方支持 iOS、Android 和鸿蒙，同时兼容 Expo 项目。
 
-详细对比见[产品简介中的性价比对比](https://pushy.reactnative.cn/docs/intro.md#-%E6%80%A7%E4%BB%B7%E6%AF%94%E4%B9%8B%E9%80%89)和 [Expo 项目热更新](https://pushy.reactnative.cn/docs/expo.md)。
+详细对比见[产品简介中的性价比对比](https://pushy.reactnative.cn/docs/intro.md#-%E6%80%A7%E4%BB%B7%E6%AF%94%E4%B9%8B%E9%80%89)、[React Native 热更新全面指南](https://pushy.reactnative.cn/react-native-ota-updates.md)、[CodePush 停服替代方案对比](https://pushy.reactnative.cn/codepush-alternative.md)以及 [Expo 项目热更新](https://pushy.reactnative.cn/docs/expo.md)。
 
 ***
 
-#### CodePush 停服了，用什么替代？如何迁移到 Pushy？
+### CodePush 停服了，用什么替代？如何迁移到 Pushy？
 
 Microsoft App Center（含 CodePush）已于 2025 年 3 月 31 日停止服务，可以改用 Pushy。迁移步骤：
 
@@ -39,37 +39,37 @@ Microsoft App Center（含 CodePush）已于 2025 年 3 月 31 日停止服务�
 
 ***
 
-#### Pushy 支持 Expo、鸿蒙和 React Native 新架构吗？
+### Pushy 支持 Expo、鸿蒙和 React Native 新架构吗？
 
 都支持。
 
 - **Expo**：要求 Expo 50 或更高版本，通过 `npx expo prebuild` 预构建后接入；请勿同时安装 `expo-updates`。使用新架构时建议 Expo 51 及以上。
-- **鸿蒙（HarmonyOS）**：第一方支持，原生配置见[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)中的 Harmony 部分。
-- **新架构与 Hermes**：均已支持，并针对 Hermes 字节码做了专门的增量优化。
+- **鸿蒙（HarmonyOS）**：第一方支持，原生配置见[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)中的 Harmony 部分与[鸿蒙接入指南](https://pushy.reactnative.cn/docs/harmony.md)。
+- **新架构与 Hermes**：均已支持，并针对 Hermes 字节码做了专门的增量优化，详见 [React Native 新架构热更新](https://pushy.reactnative.cn/docs/new-architecture.md)。
 
 ***
 
-#### Pushy 免费吗？
+### Pushy 免费吗？
 
 有免费版：可创建 3 个应用，每个应用可上传 30 个原生包和 30 个热更包，所有应用每天累计 1000 次更新检查，CDN 流量不额外收费。付费版从标准版 960 元/年起，新用户注册验证后自动获得 7 天专业版试用。具体配额以[价格页](https://pushy.reactnative.cn/pricing.md)为准。
 
 ***
 
-#### Pushy 是开源的吗？
+### Pushy 是开源的吗？
 
 是的。Pushy 的客户端 SDK、命令行工具和管理界面代码都在 [GitHub](https://github.com/reactnativecn) 上开源，接受社区审计。
 
 ***
 
-### 业务问题
+## 业务问题
 
-#### 热更新会被苹果拒审吗？能否上架 App Store？
+### 热更新会被苹果拒审吗？能否上架 App Store？
 
 通常不会，可以正常上架。大量实践表明，接入热更新的应用能够顺利上架 App Store 和国内各大应用市场。唯一需要注意的是：在审核期间不要发布热更新，不要让审核人员看到更新相关的提示和弹窗。
 
 ***
 
-#### 是否可以在海外使用？
+### 是否可以在海外使用？
 
 可以。Pushy 本身在国内外都部署有可用的 CDN 节点，能够满足大多数出海应用的热更新分发要求。
 
@@ -77,7 +77,7 @@ Microsoft App Center（含 CodePush）已于 2025 年 3 月 31 日停止服务�
 
 ***
 
-#### 哪些修改可以热更新？哪些不能？
+### 哪些修改可以热更新？哪些不能？
 
 我们把对应用的修改分为两类：
 
@@ -93,18 +93,19 @@ Microsoft App Center（含 CodePush）已于 2025 年 3 月 31 日停止服务�
 
 ***
 
-#### 热更新成功完成，但是重启后又回滚了是怎么回事？
+### 热更新成功完成，但是重启后又回滚了是怎么回事？
 
 可以正常更新，但是重启后回滚，一般有两种可能的情况：
 
-- 没有正确[配置 bundleUrl](https://pushy.reactnative.cn/docs/getting-started.md#%E9%85%8D%E7%BD%AE-bundle-url)
+- 没有正确[配置 bundleUrl](https://pushy.reactnative.cn/docs/getting-started.md#%E9%85%8D%E7%BD%AE-bundle-url)（特别注意 RN 0.88 升级 `SceneDelegate` 或 RN 0.82+ Android `ReactHost` 的配置位置）
+- 新热更版本在首屏初始化阶段抛出了未捕获异常触发了崩溃保护回滚（可在后台[JS 报错监控](https://pushy.reactnative.cn/docs/errors.md)查看源码堆栈）
 - （仅有 v10 以下版本存在此可能性，v10 及更高版本不存在此情况）没有正确[调用 markSuccess](https://v9--pushy-site.netlify.app/docs/integration#%E9%A6%96%E6%AC%A1%E5%90%AF%E5%8A%A8%E5%9B%9E%E6%BB%9A)
 
-如果你确定上述两个步骤都正确无误，请在[issues 区](https://github.com/reactnativecn/react-native-update/issues)给我们留言反馈。
+更完整的分阶段诊断清单请查阅[热更新不生效与回滚排查](https://pushy.reactnative.cn/docs/troubleshooting.md)。如果你确定上述步骤都正确无误，请在[issues 区](https://github.com/reactnativecn/react-native-update/issues)给我们留言反馈。
 
 ***
 
-#### 热更新报错：“热更新已暂停，原因：编译时间戳与服务器记录不一致。”
+### 热更新报错：“热更新已暂停，原因：编译时间戳与服务器记录不一致。”
 
 当您每次编译产生一个原生包时，其中都会记录一个编译时间戳`buildTime`(可以使用`pushy parseIpa a.ipa`或是`pushy parseApk a.apk`命令来查看)。如果您需要把这个包发给客户并希望使用热更新功能，那么就需要使用 upload 命令来上传到我们的服务器，而服务器端会记录这个包的版本号和编译时间戳以便后续比对记录。
 
@@ -116,7 +117,7 @@ Microsoft App Center（含 CodePush）已于 2025 年 3 月 31 日停止服务�
 
 请谨记，任何时候生成原生包，请 1)先修改原生版本号，2)并上传到 pushy 服务器，才可以正常获得热更新。
 
-为什么对不上就拿不到差量，可以看[发布流程中的演示](https://pushy.reactnative.cn/docs/publish.md#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%87%8D%E6%96%B0%E6%89%93%E5%8C%85%E5%90%8E%E8%A6%81%E5%85%88%E4%B8%8A%E4%BC%A0)。
+为什么对不上就拿不到差量，可以看[发布流程中的演示](https://pushy.reactnative.cn/docs/publish.md#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%87%8D%E6%96%B0%E6%89%93%E5%8C%85%E5%90%8E%E8%A6%81%E5%85%88%E4%B8%8A%E4%BC%A0)；安卓多渠道与 Google Play AAB 双格式构建的最佳实践见 [Android 多渠道打包与 AAB 热更新](https://pushy.reactnative.cn/docs/android-channels-and-aab.md)。
 
 :::info
 如果您是`高级版`、`专业版`或`大客户VIP版`客户，也可以考虑在管理后台的应用设置中启用`忽略编译时间戳`。此选项仅对比版本号，不校验时间戳，可提供更宽容的热更策略，但可能消耗更多流量，适合需要管理多个分发渠道的客户。
@@ -124,7 +125,7 @@ Microsoft App Center（含 CodePush）已于 2025 年 3 月 31 日停止服务�
 
 ***
 
-#### 后台已经显示了原生包的「内容指纹」，为什么还是提示编译时间戳不匹配？
+### 后台已经显示了原生包的「内容指纹」，为什么还是提示编译时间戳不匹配？
 
 服务端记录的每个原生包有两个身份信息：
 
@@ -142,9 +143,9 @@ Microsoft App Center（含 CodePush）已于 2025 年 3 月 31 日停止服务�
 
 ***
 
-### 付费问题
+## 付费问题
 
-#### 我应该选择哪个业务版本呢？
+### 我应该选择哪个业务版本呢？
 
 其实完全无需考虑，先从最高配额的`专业版`开始体验（新用户注册验证通过后，将自动获得 7 天`专业版`试用），各个版本的使用流程完全一致！当试用时间到期后，若当前版本的配额不能满足需求，可随时补差价升级到更高配额的版本。升级自动按天数计算差价，绝无额外费用。
 
@@ -152,7 +153,7 @@ Microsoft App Center（含 CodePush）已于 2025 年 3 月 31 日停止服务�
 
 ***
 
-#### 年付赠送的 Token 如何领取？
+### 年付赠送的 Token 如何领取？
 
 年付购买（含续费）`标准版`、`高级版`、`专业版`，分别赠送 $30、$100、$360 的 Token，可用于 GPT、Claude、DeepSeek、GLM、Kimi 等主流模型，官方直连、按量计费。领取步骤：
 
@@ -166,19 +167,19 @@ Microsoft App Center（含 CodePush）已于 2025 年 3 月 31 日停止服务�
 
 ***
 
-#### 我可以试用付费版本先评估一下效果吗？
+### 我可以试用付费版本先评估一下效果吗？
 
 新用户注册验证通过后，将自动获得 7 天`专业版`试用。如您需要更长的评估时间，可将注册用户名、邮箱、公司（或个人）名称发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，标题注明“pushy 评估试用延长”，我们会为您酌情延长评估时间。
 试用期间只能选择续费专业版或升级到更高版本，如需购买其他版本，请等待试用期过期，或者联系客服去除试用。
 
 ***
 
-#### 配额具体如何计算？
+### 配额具体如何计算？
 
 配额主要分为 4 种：
 
 1. 可创建的应用数量，注意 iOS 和 Android 版本记做不同的应用。
-2. 原生包数量及大小，不同应用分开计算。原生包指通过`pushy uploadIpa/uploadApk`命令上传到 Pushy 服务器上作为热更新起始版本的完整 apk/ipa 安装包。
+2. 原生包数量及大小，不同应用分开计算。原生包指通过`pushy uploadIpa/uploadApk/uploadAab/uploadApp`命令上传到 Pushy 服务器上作为热更新起始版本的基准包。新版 `react-native-update-cli`（v2.20.0+，建议保持最新）在上传时会自动剥离 `.so`、`Frameworks`、`.dex` 等无关原生二进制，仅提取差量计算所需的 JS Bundle 与静态资源上传，因此实际计入配额的体积通常只有几 MB，远小于本地完整安装包大小。
 3. 热更包数量及大小，不同应用分开计算。热更包指通过`pushy bundle`所命令生成的 ppk 文件。注意这不是用户实际下载的更新文件，用户下载的是通过比对生成的增量 diff 文件（比 ppk 文件要小得多）。
 4. 每日总热更查询次数，所有应用累加计算。每次用户打开应用时，会向服务器查询是否有新的热更新。这个查询次数会被计入每日总热更查询次数。当日超过限额次数后，接口将不再返回新的热更新信息，直到次日重置。
 
@@ -188,40 +189,40 @@ Microsoft App Center（含 CodePush）已于 2025 年 3 月 31 日停止服务�
 
 ***
 
-#### 达到配额后还可以正常使用吗？
+### 达到配额后还可以正常使用吗？
 
 当应用、原生包、热更包数量达到配额限制后，您将无法执行相应的新增操作。但用户端仍可正常检查更新，下载已发布的更新。您可选择升级到更高配额，或是通过删除已不再使用的应用、原生包、热更包来使数量降低到配额以内，以便继续执行新增操作。\
-若原生包、热更包大小超过限额，则会导致上传失败。您可以选择升级到更高配额，或是想办法进行[精简优化](https://pushy.reactnative.cn/docs/bestpractice.md#%E4%BC%98%E5%8C%96%E5%8E%9F%E7%94%9F%E5%92%8C%E7%83%AD%E6%9B%B4%E5%8C%85%E4%BD%93%E7%A7%AF)。
+若原生包、热更包大小超过限额，则会导致上传失败。遇到原生包超限时，请先升级 `react-native-update-cli` 到最新版本（会自动精简剥离原生二进制后再上传），也可以选择升级到更高配额，或参考[包大小的优化建议](https://pushy.reactnative.cn/docs/bestpractice.md#%E4%BC%98%E5%8C%96%E5%8E%9F%E7%94%9F%E5%92%8C%E7%83%AD%E6%9B%B4%E5%8C%85%E4%BD%93%E7%A7%AF)精简静态资源。
 若当日热更检查次数超过限额，则会导致接口返回空数据。您可以选择升级到更高配额，或是优化热更策略，减少用户端检查更新的频率。
 
 ***
 
-#### 我可以单独升级某项配额吗？
+### 我可以单独升级某项配额吗？
 
 如果您需要单独升级某些配额（需要达到高级版以上），请通过邮件 [hi@charmlot.com](mailto:hi@charmlot.com) 或 QQ 34731408 与我们联系，我们将根据您的个性化需求为您定制方案和报价。
 
 ***
 
-#### 付费业务到期后不续费，现有应用还能否正常使用？
+### 付费业务到期后不续费，现有应用还能否正常使用？
 
 到期后按免费版额度执行。如您现有应用已超出配额，则必须通过删除操作降低到配额以内，方可执行新的操作（如创建应用，上传热更等），但不影响用户获取之前已发布的热更。
 
 ***
 
-#### 如何获取付费的专人技术支持？
+### 如何获取付费的专人技术支持？
 
 请将您的用户名和订单截图发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，同时提供您希望的技术联系方式（QQ、微信等），核实后会有技术专员添加您为好友。
 
 ***
 
-#### 如何开具发票？
+### 如何开具发票？
 
 请将具体开票需求发送至 [hi@charmlot.com](mailto:hi@charmlot.com) ，并附上注册邮箱和订单截图。我们默认会回复普通电子发票到`注册邮箱`，类目为软件服务。如需指定接受邮箱或手机，请在`邮件正文`中注明。如需要邮寄纸质发票请注明邮寄地址，邮费为到付。
 如邮件发送后三个工作日内未收到回复，请联系 QQ 客服 34731408。
 
 ***
 
-#### 可以使用银行转账付款吗？
+### 可以使用银行转账付款吗？
 
 可以的。请对照[价格表](https://pushy.reactnative.cn/pricing.md)，将对应版本的款项转账至：
 
@@ -239,7 +240,7 @@ Microsoft App Center（含 CodePush）已于 2025 年 3 月 31 日停止服务�
 
 ***
 
-#### 可以按月付款吗？
+### 可以按月付款吗？
 
 需要月付的客户请联系 QQ 客服 34731408，月付价格为年付价格 / 8。如标准版当前价格为 960 元每年，则月付价格为 120 元每月。
 月付客户需累计支付满 500 元后才能开具发票。`大客户VIP版`不支持月付。
@@ -248,7 +249,7 @@ Microsoft App Center（含 CodePush）已于 2025 年 3 月 31 日停止服务�
 
 ***
 
-#### 大客户方案
+### 大客户方案
 
 如果您的应用有大规模的活跃用户，日均所有应用累计总查询次数超过 100 万次，则建议选择我们专门针对大规模应用优化的`大客户VIP版`。
 `大客户VIP版`在应用数量、原生包数量、热更包数量等方面配额与`专业版`相同。

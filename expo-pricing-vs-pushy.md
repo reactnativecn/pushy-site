@@ -1,0 +1,155 @@
+> For AI agents: the complete documentation index is available at https://pushy.reactnative.cn/llms.txt, the full documentation bundle is available at https://pushy.reactnative.cn/llms-full.txt.
+
+# Expo（EAS Update）热更新价格详解与 Pushy 成本对比（2026）
+
+Expo 官方云服务付费套餐起步价为 **$19/月（Starter）**&#x548C; **$199/月（Production）**，外加按量超额费用：热更新同时按**月度更新活跃设备数（额外每 MAU $0.005 起）**&#x548C;**全球边缘带宽（额外每 GiB $0.10）**&#x53CC;向计费。相比之下，Pushy 按每日更新检查次数采用**固定人民币套餐**（标准版 ¥960/年，折合 **¥80/月**），国内外 CDN 流量全包，不会产生自动超额账单。
+
+> 本文中 Expo 一侧的价格与配额核对自 Expo 官方 [Pricing 页面](https://expo.dev/pricing)与 [Usage-based pricing 文档](https://docs.expo.dev/billing/usage-based-pricing/)（截至 **2026 年 11 月**，美元折算人民币按汇率 `1 USD ≈ 7.2 CNY` 估算以便直观参考）。Expo 近期已将文档中的 EAS Update 更名为 **Expo Update**，但 `eas` CLI 与 `eas.json` 仍保留原名，下文混用两者指代同一服务。预算决策前请以官方最新挂牌价为准。
+
+## Expo（EAS Update）官方套餐一览
+
+| 套餐             | 基础月费         | 包含热更新 MAU             | 包含边缘带宽  | 包含 EAS Build 构建抵扣金              |
+| -------------- | ------------ | --------------------- | ------- | ------------------------------- |
+| **Free**       | $0           | 1,000（不可超额使用）         | 100 GiB | 无（含 Android / iOS 各 15 次低优先级构建） |
+| **Starter**    | $19 + 超额使用费  | 3,000                 | 100 GiB | $45                             |
+| **Production** | $199 + 超额使用费 | 50,000                | 1 TiB   | $225                            |
+| **Enterprise** | 商务定制         | 从第 1 个 MAU 起按协议优惠单价计费 | 40 TiB  | $1,000                          |
+
+需要客观说明的是：Expo SDK 本身免费开源，上述费用针对 Expo 云平台（同时涵盖云端打包 EAS Build、商店提交 EAS Submit 与工作流），套餐内赠送的构建抵扣金可抵扣云端编译费用。而 Pushy 专注于热更新分发与监控，若你重度依赖 EAS Build 云端编译，对比总成本时可将构建抵扣金一并纳入考量（注：**保留 EAS Build 打包的同时，完全可以单独把热更新切换到 Pushy**，两者互不冲突）。
+
+## EAS Update 超额计费单价
+
+当当月下载过至少一次热更新的独立设备数（Update MAU）或 CDN 流量超出套餐内含额度后，Starter 与 Production 套餐按以下阶梯单价自动累加账单：
+
+| 计费项                             | Starter / Production 超额单价 |
+| ------------------------------- | ------------------------- |
+| 热更新 MAU（200,000 以内超出部分）         | **$0.005 / 设备 / 月**       |
+| 热更新 MAU（200,001 – 500,000 部分）   | **$0.00375 / 设备 / 月**     |
+| 热更新 MAU（500,001 – 1,000,000 部分） | **$0.0034 / 设备 / 月**      |
+| 全球边缘带宽（超出免费额度部分）                | **$0.10 / GiB**           |
+| 热更新存储空间（超出额度部分）                 | **$0.05 / GiB**           |
+
+每多支付 1 个超额 MAU，Expo 会同步附赠 40 MiB 的带宽额度。同一自然月内，一台设备无论下载 1 次还是 10 次热更新都只记作 1 个 MAU；当月未下载任何热更新的设备不计入 MAU。
+
+## Pushy 套餐一览
+
+| 套餐               | 年付价格（折合月均）                                       | 按月购买价  | 每日更新检查总配额       | 单热更包上限 | CDN 流量与超额费                        |
+| ---------------- | ------------------------------------------------ | ------ | --------------- | ------ | --------------------------------- |
+| **免费版**          | ¥0                                               | ¥0     | 1,000 次/天       | 3 MB   | **全包，¥0 超额费**                     |
+| **标准版**          | **¥960/年**（¥80/月）                                | ¥120/月 | 10,000 次/天      | 15 MB  | **全包，¥0 超额费**（年付另赠 $30 AI Token）  |
+| **高级版**          | **¥2,400/年**（¥200/月）                             | ¥300/月 | 100,000 次/天     | 50 MB  | **全包，¥0 超额费**（年付另赠 $100 AI Token） |
+| **专业版**          | **¥7,200/年**（¥600/月）                             | ¥900/月 | 1,000,000 次/天   | 200 MB | **全包，¥0 超额费**（年付另赠 $360 AI Token） |
+| **加购 / 大客户 VIP** | 高级版起可按 ¥100/月/10万次日查加购；VIP1（1,000 万次/天）¥30,000/年 | —      | 100 万 – 1 亿次+/天 | 200 MB | **全包，¥0 超额费**                     |
+
+完整应用数与原生包配额详见 [Pushy 价格页](https://pushy.reactnative.cn/pricing.md)。
+
+## 不同用户规模下的真实月度成本测算
+
+两边采用不同的计量维度：**Expo 统计每月下载过更新的独立设备数（MAU）与下载带宽**，而 **Pushy 统计每日客户端发起更新检查的请求次数（无论是否有新版本），下载流量不计费**。
+
+以下测算假设当月活跃用户至少收到一次热更新、Expo 带宽未超套餐赠送上限，Pushy 按年付折算月均成本：
+
+| 月活跃更新用户规模      | Expo（EAS Update）月费                                                                | Pushy 匹配档位与月均成本                                                             | 成本差异             |
+| -------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ---------------- |
+| **10,000 月活**  | Starter：$19 + 7,000 × $0.005 = **$54/月**（约 ¥389）                                  | **高级版 ¥200/月**（10 万次日查，相当于每用户每天可打开 10 次；若配置仅冷启动检查且日查 ≤ 1 万次，**标准版仅 ¥80/月**） | **节省 49% – 79%** |
+| **100,000 月活** | Production：$199 + 50,000 × $0.005 = **$449/月**（约 ¥3,233）                          | **专业版 ¥600/月**（100 万次日查，支持 10 万用户日均 10 次检查）                                 | **节省约 81%**      |
+| **500,000 月活** | Production：$199 + 150,000 × $0.005 + 300,000 × $0.00375 = **$2,074/月**（约 ¥14,933） | **VIP1 ¥2,500/月**（¥30,000/年，1,000 万次日查，支持 50 万用户日均 20 次检查）                  | **节省约 83%**      |
+
+如果发版频繁或包体较大，Expo 账单还会叠加带宽超额费。以 Expo 官方计费文档自己给出的 Starter 套餐算例为例：**10,000 名用户在一个月内接收 20 次各 5 MiB 的全量更新**：
+
+- 超额 MAU 费用：7,000 × $0.005 = $35.00
+- 超额边缘带宽费用：603.13 GiB × $0.10 = $60.31
+- 当月总账单：$19 + $35.00 + $60.31 = **$114.31（约 ¥823/月）**（开启 SDK 56+ 的 bsdiff 后带宽部分会有所下降）
+- 同等场景在 Pushy 上：**高级版固定 ¥200/月**（或标准版 ¥80/月），Hermes 增量补丁将单次热修复压缩至几 KB 至几十 KB，且无论发版 2 次还是 20 次，CDN 流量费用始终为 **¥0**。
+
+## 价格之外，国内团队还需要考虑的三点差异
+
+1. **中国大陆下载速度与到达率**：Pushy 国内节点采用阿里云 CDN，弱网下几 KB 的增量包秒级下发；EAS Update 托管在海外边缘网络，国内直连延迟与失败率明显偏高。
+2. **绝不产生突发天价账单**：Pushy 采用硬配额封顶机制——即便某天遭遇异常流量峰值，超出当日查询限额后接口仅返回“无新更新”直至次日零点自动恢复，已发版本不影响客户端正常运行，财务上永远不会收到意外超额扣款；需要更高额度时可随时按剩余天数补差价平滑升级。
+3. **付款与财务合规**：Pushy 支持支付宝、对公银行转账（网商银行企业户）并开具国内增值税电子发票，省去海外双币信用卡绑定与跨境报销流程。
+
+## 如何在 Expo 项目中保留 EAS Build、仅把热更新换成 Pushy？
+
+`expo-updates` 只是 Expo 的一个可选模块，移除它不会影响你继续使用 Expo SDK、Expo Router 或 EAS Build：
+
+1. 在项目中执行 `npm uninstall expo-updates`，安装 `react-native-update`；
+2. 执行 `npx expo prebuild`（Expo SDK 50+ 会通过内置 Expo Module 自动接管 iOS 与 Android 的 Bundle URL，无需手改原生代码）；
+3. 将 EAS Build 编译产出的 `.ipa` / `.apk` / `.aab` 下载后用 `pushy uploadIpa / uploadApk / uploadAab` 登记为基准包，并用同一份产物上架；
+4. 日常修改 JS 后运行 `pushy bundle` 秒级下发增量热更新。
+
+详细配置与注意事项请参阅 **[Expo 项目热更新：Pushy 与 EAS Update 对比及接入](https://pushy.reactnative.cn/docs/expo.md)**。
+
+## 常见问题
+
+### Expo 本身收费吗？EAS Update 怎么收费？
+
+Expo 框架与客户端 SDK 完全免费开源。收费的是 Expo 官方托管云服务：EAS Update（现亦称 Expo Update）在 Free 档包含每月 1,000 个更新 MAU，Starter（$19/月）包含 3,000 MAU，Production（$199/月）包含 50,000 MAU；超出后按每额外 MAU $0.005 起及每额外 GiB 带宽 $0.10 计费。
+
+### 什么叫一个 EAS Update MAU？
+
+在一个账单月内**至少下载过一次热更新**的独立应用安装实例记为 1 个 Update MAU。同一台手机当月下载多次更新只算 1 次；当月打开过 App 但没有下载任何热更新的设备不计费。
+
+### Pushy 的“每日更新检查次数”怎么估算？怎样节省配额？
+
+估算公式约为：`日活跃用户数（DAU） × 人均每日检查次数`。Pushy 默认 `checkStrategy: "both"`（冷启动和从后台切回前台时都检查）；如果希望用更低档位的套餐承载更多用户，只需将其设为 `checkStrategy: "onAppStart"`（仅冷启动检查一次），即可大幅降低每日请求量。
+
+### 海外出海项目想用美元结算怎么办？
+
+若团队面向海外市场、希望使用美元按月结算并与新加坡独立公司主体签约，可直接选用同源技术栈的全球版 [Cresc](https://cresc.dev/pricing)（Standard $19/月、Premium $39/月、Pro $99/月含 100 万次日查与全球 CDN）。
+
+## 相关阅读
+
+- [Expo 项目热更新：Pushy 与 EAS Update 对比及接入](https://pushy.reactnative.cn/docs/expo.md)
+- [自建 Expo Updates 服务器 vs Pushy](https://pushy.reactnative.cn/expo-updates-self-hosted-vs-pushy.md)
+- [CodePush 停服替代方案对比](https://pushy.reactnative.cn/codepush-alternative.md)
+- [Pushy 价格方案](https://pushy.reactnative.cn/pricing.md)
+
+
+### 联系我们
+
+- [邮箱 hi@charmlot.com](mailto:hi@charmlot.com)
+- QQ群 729013783
+- [用户协议](/agreement/)
+- [隐私政策](/agreement/#privacy)
+
+### 选型与对比
+
+- [CodePush 停服替代方案](/codepush-alternative)
+- [Expo / EAS Update 价格对比](/expo-pricing-vs-pushy)
+- [自建 Expo Updates 服务对比](/expo-updates-self-hosted-vs-pushy)
+- [hot-updater vs Pushy](/hot-updater-vs-pushy)
+- [Revopush vs Pushy](/revopush-vs-pushy)
+- [Stallion vs Pushy](/stallion-vs-pushy)
+
+### 核心指南
+
+- [React Native 热更新全面指南](/react-native-ota-updates)
+- [从 CodePush 迁移](/docs/migrate-from-codepush)
+- [Expo 项目热更新接入](/docs/expo)
+- [React Native 新架构（0.82+）](/docs/new-architecture)
+- [鸿蒙 HarmonyOS 热更新](/docs/harmony)
+- [Android 多渠道与 AAB 热更新](/docs/android-channels-and-aab)
+- [原生 App 混编（Brownfield）](/docs/brownfield)
+
+### 文档与支持
+
+- [快速开始](/docs/getting-started)
+- [CI/CD 自动发布](/docs/cicd)
+- [热更新排障指南](/docs/troubleshooting)
+- [数据分析与报错监控](/docs/analytics)
+- [常见问题](/docs/faq)
+- [更新日志](/docs/changelog)
+- [Issue 讨论区](https://github.com/reactnativecn/react-native-update/issues)
+- [llms.txt](/llms.txt)
+
+### 生态链接
+
+- [React Native 中文网](https://reactnative.cn/)
+- [Cresc（全球国际版）](https://cresc.dev/)
+- [ReactJS 中文文档](https://zh-hans.react.dev/)
+
+React Native 中文网 © 2026 武汉青罗网络科技有限公司
+
+|
+
+[鄂ICP备20002031号-3](https://beian.miit.gov.cn/)[![公安备案图标](https://img.alicdn.com/tfs/TB1..50QpXXXXX7XpXXXXXXXXXX-40-40.png)鄂公网安备 42011202001821号](http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=42011202001821)

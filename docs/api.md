@@ -2,11 +2,11 @@
 
 # API参考
 
-### JavaScript 方法
+## JavaScript 方法
 
 原生端主动配置、检测与下载的接口和完整首启顺序，参见[原生配置、检测与更新](https://pushy.reactnative.cn/docs/native-api.md)。原生主导配置时，请在 JS 实例首次创建时设置 `nativeConfigSource: "native"`，避免 JS 初始化覆盖原生配置。
 
-#### new Pushy(options: PushyOptions)
+### new Pushy(options: PushyOptions)
 
 创建 Pushy 热更新服务实例，其构造参数如下：
 
@@ -179,7 +179,7 @@ interface EventData {
 }
 ```
 
-#### 版本健康度事件上报
+### 版本健康度事件上报
 
 自 v10.47.0 起，SDK 会在更新流程的关键节点向更新服务自动上报少量生命周期事件，用于在管理端展示每个热更版本的健康度（下载失败率、patch 失败率、回滚率等），帮助你在发版后第一时间发现有问题的版本：
 
@@ -201,7 +201,7 @@ const pushyClient = new Pushy({
 
 注意：关闭后管理端将无法统计该客户端的版本健康度，也无法在版本发生大面积异常时为你提供预警。
 
-#### JS 报错上报
+### JS 报错上报
 
 自 v10.55.0 起，SDK 会把热更版本中发生的 JavaScript 异常上报给更新服务，管理后台用发布时归档的 sourcemap 把堆栈还原回原始源码位置。未捕获异常会自动上报（在 React Native 现有的全局 `ErrorUtils` 处理器之上追加一层，不影响 Sentry 等已有集成），也可以在 `catch` 中手动调用 `captureException`：
 
@@ -213,7 +213,7 @@ pushyClient.captureException(error, {
 
 如不希望上报，可在初始化时设置 `disableErrorReporting: true`。完整说明（包括后台界面、sourcemap 归档要求与手动上报用法）见 [JS 报错监控](https://pushy.reactnative.cn/docs/errors.md)。
 
-#### 原生冷启动检测
+### 原生冷启动检测
 
 自 v10.52.1 起，客户端会在每次冷启动几秒后，由**原生代码**独立发起一次后台检查更新（完全不依赖 JS）。它的意义在于救砖：如果某次热更把 JS 打死，设备再也无法运行 JS 侧的检查逻辑，此时只有这条原生通道还能把修复版本拉回来（配合管理后台的[强制启动](https://pushy.reactnative.cn/docs/publish.md#%E5%BC%BA%E5%88%B6%E5%90%AF%E5%8A%A8%E6%95%91%E7%A0%96)标记激活）。
 
@@ -234,7 +234,7 @@ const pushyClient = new Pushy({
 
 注意：关闭后该客户端将失去强制启动救砖能力——一旦被坏热更卡死只能重装应用。
 
-#### beforeReload 示例：重启前清理原生 SDK
+### beforeReload 示例：重启前清理原生 SDK
 
 `beforeReload` 会在 `switchVersion()` 和 `restartApp()` 真正重启前执行。返回 `false` 会取消本次重启；抛出异常或 Promise reject 时也不会继续重启。`switchVersionLater()` 不会立即销毁当前 RN 实例，因此不会触发此钩子。
 
@@ -263,7 +263,7 @@ const pushyClient = new Pushy({
 });
 ```
 
-#### useUpdate()
+### useUpdate()
 
 热更相关的工具函数。此方法也可使用别名 `usePushy` 引入。
 
@@ -378,7 +378,7 @@ interface UpdateContext {
 
 ***
 
-#### async function checkUpdate()
+### async function checkUpdate()
 
 触发更新检查，返回`updateInfo`（注意在 v10.26.0 版本之前，`checkUpdate`方法本身没有返回值，只能从`useUpdate()`返回的`updateInfo`中获取，且我们仍然推荐优先使用`useUpdate()`来获取），返回值有三种情形：
 
@@ -409,13 +409,13 @@ interface UpdateContext {
 
 ***
 
-#### async function downloadUpdate()
+### async function downloadUpdate()
 
 下载热更包。仅当`update:true`时实际进行下载。会更新`progress`数据。v10.16.0+ 版本返回值为`boolean`，表示是否下载成功。
 
 ***
 
-#### async function downloadAndInstallApk(url)
+### async function downloadAndInstallApk(url)
 
 下载更新的 apk 包，并通过 Android 系统的 `PackageInstaller` 发起安装。`url` 必须为可直接下载到 apk 文件的地址。此功能仅支持 Android 5.0（API 21）及以上版本。
 
@@ -437,13 +437,13 @@ APK 下载到应用私有目录后会直接写入 `PackageInstaller.Session`，�
 
 ***
 
-#### function markSuccess()
+### function markSuccess()
 
 **一般情况下请勿手动调用此函数**。调用此函数作为更新成功的标记（否则下次启动会默认失败自动回滚）。
 
 ***
 
-#### currentVersionInfo
+### currentVersionInfo
 
 当前已热更版本的信息（如尚未热更过则为空对象）。需 v10.31.2+ 版本。
 
@@ -467,7 +467,7 @@ console.log(currentVersionInfo.name);
 
 ***
 
-#### function captureException(error, context?)
+### function captureException(error, context?)
 
 手动上报一个 JavaScript 异常，需 v10.55.0+ 版本。`context` 可选 `fatal`（是否致命，默认 false）、`componentStack`（React 组件堆栈）与 `extra`（自定义上下文，仅接受字符串、数字、布尔与 null，最多 32 个字段）。
 
@@ -483,7 +483,7 @@ try {
 
 ***
 
-#### async function getCurrentVersionInfo()
+### async function getCurrentVersionInfo()
 
 获取当前已热更版本的信息（如尚未热更过则返回空对象）。v10.31.2 版本之后可以直接用 `currentVersionInfo` 代替。
 
@@ -499,7 +499,7 @@ try {
 
 ***
 
-#### function restartApp()
+### function restartApp()
 
 立即重启应用。v10.28.2+ 版本可用。
 
@@ -507,7 +507,7 @@ try {
 
 ***
 
-#### async function resetToPackagedBundle(options?)
+### async function resetToPackagedBundle(options?)
 
 恢复到原生包内置的 bundle，返回 `boolean` 表示是否成功。v10.48.0+ 版本可用。
 
@@ -536,7 +536,7 @@ const ok = await pushyClient.resetToPackagedBundle();
 
 ***
 
-#### function switchVersion()
+### function switchVersion()
 
 立即重启应用，并加载已经下载完毕的版本。
 
@@ -546,7 +546,7 @@ const ok = await pushyClient.resetToPackagedBundle();
 
 ***
 
-#### function switchVersionLater()
+### function switchVersionLater()
 
 在下一次启动应用的时候加载已经下载完毕的版本。
 
@@ -556,10 +556,10 @@ const ok = await pushyClient.resetToPackagedBundle();
 
 ***
 
-#### function parseTestQrCode(qrCode: string)
+### function parseTestQrCode(qrCode: string)
 
 解析测试二维码，一般用于给 QA 人员测试热更新。如果在应用中已有扫码功能，则可以在应用中扫描 pushy 后台的测试二维码来测试任意版本的热更包。
-注意如果你使用自定义的(更新策略（updateStrategy）)\[[https://pushy.reactnative.cn/docs/integration#updatestrategy%E6%9B%B4%E6%96%B0%E5%BA%94%E7%94%A8%E7%AD%96%E7%95%A5\]，请务必从](https://pushy.reactnative.cn/docs/integration#updatestrategy%E6%9B%B4%E6%96%B0%E5%BA%94%E7%94%A8%E7%AD%96%E7%95%A5]，请务必从) `useUpdate()` 中获取 `updateInfo` ，而不要依赖 checkUpdate 方法的返回值，否则扫码不会有后续动作。
+注意如果你使用自定义的[更新策略（updateStrategy）](https://pushy.reactnative.cn/docs/integration.md#updatestrategy%E6%9B%B4%E6%96%B0%E5%BA%94%E7%94%A8%E7%AD%96%E7%95%A5)，请务必从 `useUpdate()` 中获取 `updateInfo` ，而不要依赖 checkUpdate 方法的返回值，否则扫码不会有后续动作。
 
 ![testqrcode](/static/image/testqrcode.24c22c1ebe.png)
 注意使用此方法，上述界面中的"使用 Deep Link"选项 **请不要
@@ -583,9 +583,9 @@ const ok = await pushyClient.resetToPackagedBundle();
 
 ***
 
-### Android 方法
+## Android 方法
 
-#### UpdateContext.setCustomInstanceManager(ReactInstanceManager instanceManager)
+### UpdateContext.setCustomInstanceManager(ReactInstanceManager instanceManager)
 
 如果是集成/混编 Android 方案，则可以使用此方法传入你自行创建的 ReactInstanceManager。自`v5.5.8`版本起可用。
 

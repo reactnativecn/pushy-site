@@ -9,7 +9,7 @@
 
 🎁年付限时福利
 
-### 年付即送 Token，最高 $360
+## 年付即送 Token，最高 $360
 
 标准版送 $30、高级版送 $100、专业版送 $360，可用于 GPT、Claude、DeepSeek、GLM、Kimi 等主流模型，官方直连、按量计费、不掺水。适合 AI 编程、智能客服、内容生产等场景。
 
@@ -31,6 +31,8 @@ $360
 
 [先去 36k.ai 看看模型](https://36k.ai/model-plaza)
 
+## 套餐方案对比
+
 ### 免费版
 
 适用于小型应用或个人项目，满足轻度热更新需求
@@ -48,7 +50,7 @@ $360
 可按需提升
 
 
-[开始使用](docs/getting-started)
+[开始使用](/docs/getting-started)
 
 ### 标准版
 
@@ -147,14 +149,14 @@ GPT、Claude、DeepSeek、GLM、Kimi 等主流模型通用
 ¥100/ 月
 
 * **注：**iOS 和 Android 版本记做不同的应用。原生包和热更包的数量限制均为**单个应用**维度。
-原生包指完整的 apk/ipa 安装包。热更包指 pushy bundle 命令生成的 ppk 文件（非用户实际下载的增量更新文件）。
+原生包指上传作为差量基准的安装包（新版 CLI 会自动剥离无关原生二进制，实际上传占用通常仅几 MB）。热更包指 pushy bundle 命令生成的 ppk 文件（非用户实际下载的增量更新文件）。
 **所有版本均包含 CDN 流量费用，无需额外付费。**
 为了最大化利用您的定额，您可随时在控制台删除已不再使用的应用、原生包和热更包。
 
 * **Token 赠送规则：**仅整单年付（含续费年付）赠送，月付、升级补差价、加购更新查询额度、试用均不赠送。额度充入[36k.ai](https://36k.ai)账户后永久有效，仅限平台内使用，不可提现或转让。大客户方案请与商务另行约定。
 GPT、Claude 等模型计价参考官方美元挂牌价，但充值和消费时 1 元人民币等值 1 美元。
 
-对于付费业务还有其他疑问？请参考我们的[常见问题解答](docs/faq#%E4%BB%98%E8%B4%B9%E9%97%AE%E9%A2%98)。
+对于付费业务还有其他疑问？请参考我们的[常见问题解答](/docs/faq#%E4%BB%98%E8%B4%B9%E9%97%AE%E9%A2%98)。
 
 
 
@@ -162,21 +164,44 @@ GPT、Claude 等模型计价参考官方美元挂牌价，但充值和消费时 
 
 - [邮箱 hi@charmlot.com](mailto:hi@charmlot.com)
 - QQ群 729013783
-
-### 用户协议
-
 - [用户协议](/agreement/)
 - [隐私政策](/agreement/#privacy)
 
-### 帮助
+### 选型与对比
 
+- [CodePush 停服替代方案](/codepush-alternative)
+- [Expo / EAS Update 价格对比](/expo-pricing-vs-pushy)
+- [自建 Expo Updates 服务对比](/expo-updates-self-hosted-vs-pushy)
+- [hot-updater vs Pushy](/hot-updater-vs-pushy)
+- [Revopush vs Pushy](/revopush-vs-pushy)
+- [Stallion vs Pushy](/stallion-vs-pushy)
+
+### 核心指南
+
+- [React Native 热更新全面指南](/react-native-ota-updates)
+- [从 CodePush 迁移](/docs/migrate-from-codepush)
+- [Expo 项目热更新接入](/docs/expo)
+- [React Native 新架构（0.82+）](/docs/new-architecture)
+- [鸿蒙 HarmonyOS 热更新](/docs/harmony)
+- [Android 多渠道与 AAB 热更新](/docs/android-channels-and-aab)
+- [原生 App 混编（Brownfield）](/docs/brownfield)
+
+### 文档与支持
+
+- [快速开始](/docs/getting-started)
+- [CI/CD 自动发布](/docs/cicd)
+- [热更新排障指南](/docs/troubleshooting)
+- [数据分析与报错监控](/docs/analytics)
 - [常见问题](/docs/faq)
+- [更新日志](/docs/changelog)
 - [Issue 讨论区](https://github.com/reactnativecn/react-native-update/issues)
+- [llms.txt](/llms.txt)
 
-### 链接
+### 生态链接
 
 - [React Native 中文网](https://reactnative.cn/)
-- [ReactJS](https://zh-hans.react.dev/)
+- [Cresc（全球国际版）](https://cresc.dev/)
+- [ReactJS 中文文档](https://zh-hans.react.dev/)
 
 React Native 中文网 © 2026 武汉青罗网络科技有限公司
 

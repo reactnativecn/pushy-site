@@ -256,6 +256,8 @@ CodePush 发布时可加 `--mandatory`，客户端据此跳过用户确认。Pus
 
 ## 下一步
 
+- [CodePush 停服替代方案对比](https://pushy.reactnative.cn/codepush-alternative.md)：自建 `code-push-server`、EAS Update、Revopush 与 Pushy 横向对比
+- [React Native 新架构（0.82+）热更新指南](https://pushy.reactnative.cn/docs/new-architecture.md)：移除 CodePush 后升级 RN 0.82+ 的注意事项
 - [安装配置](https://pushy.reactnative.cn/docs/getting-started.md)：完整的原生配置步骤
 - [代码集成](https://pushy.reactnative.cn/docs/integration.md)：`UpdateProvider`、更新策略和自定义界面
 - [发布热更新](https://pushy.reactnative.cn/docs/publish.md)：原生包上传、热更新发布、灰度与强制启动

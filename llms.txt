@@ -2,13 +2,23 @@
 
 > Pushy —— 为 React Native 打造的热更新服务。KB 级增量包、CDN 秒级分发、崩溃自动回滚，让每一次发布秒级抵达用户，无需等待应用商店审核。
 
+## 选型对比
+
+- [App Center 与 CodePush 停服后的替代方案对比（2026）](https://pushy.reactnative.cn/codepush-alternative.md): Visual Studio App Center 与 CodePush 已于 2025 年 3 月停服，且客户端不支持 React Native 0.82+ 新架构。全面对比四条替代路线与平滑迁移方案。
+- [Expo（EAS Update）热更新价格详解与 Pushy 成本对比（2026）](https://pushy.reactnative.cn/expo-pricing-vs-pushy.md): 详细拆解 2026 年 Expo（EAS Update）Free、Starter、Production 套餐与按月活用户（MAU）、边缘带宽超额计费规则，并与 Pushy 固定人民币套餐进行多规模月度成本实算对比。
+- [自建 Expo Updates 服务器 vs Pushy：成本与工程量对比](https://pushy.reactnative.cn/expo-updates-self-hosted-vs-pushy.md): 想通过自建 expo-updates 协议服务端避开 EAS Update 高昂账单或解决国内下载慢？全面对比自研 Expo Updates 服务端与直接使用 Pushy 的工程投入、差量能力与综合成本。
+- [hot-updater vs Pushy：开源自建与托管式 React Native 热更新对比](https://pushy.reactnative.cn/hot-updater-vs-pushy.md): 对比开源自托管方案 hot-updater 与 Pushy 在云基础设施运维、Hermes 增量补丁体积（93.7 KB vs 3.4 KB）、国内 CDN 网络、鸿蒙支持及真实总拥有成本上的差异。
+- [React Native 热更新（OTA）全面指南：原理、Hermes 增量与审核合规](https://pushy.reactnative.cn/react-native-ota-updates.md): 详解 React Native 热更新工作原理、可更新边界、Hermes 字节码 KB 级增量补丁机制、崩溃自动回滚、App Store 与国内应用市场合规实践及 2026 主流方案对比。
+- [Revopush vs Pushy：CodePush 替代方案价格与功能对比](https://pushy.reactnative.cn/revopush-vs-pushy.md): 对比兼容 CodePush 协议的海外托管服务 Revopush 与 Pushy 在计费模式、Hermes 增量体积、国内 CDN 速度、React Native 版本兼容及鸿蒙支持上的差异。
+- [Stallion vs Pushy：React Native 热更新价格与增量能力对比](https://pushy.reactnative.cn/stallion-vs-pushy.md): 对比海外 React Native OTA 服务 Stallion 与 Pushy 在首次热更新差量机制、Hermes 补丁体积、套餐档位、国内 CDN 网络与鸿蒙支持上的核心差异。
+
 ## 文档
 
 - [产品简介](https://pushy.reactnative.cn/docs/intro.md): Pushy（react-native-update）是专为 React Native 打造的热更新服务：bsdiff/hdiff 增量包通常仅几十 KB，国内外 CDN 分发，崩溃自动回滚，支持 iOS、Android、鸿蒙与新架构。
 - [推荐：先安装 Skill，再让 AI 自动集成](https://pushy.reactnative.cn/docs/skills.md): 安装 react-native-update Skill，让支持 Skills 的 AI 编程工具根据项目结构自动完成 Pushy 热更新的依赖安装、原生配置与代码集成。
 - [安装配置](https://pushy.reactnative.cn/docs/getting-started.md): 在 React Native 或 Expo 项目中安装 react-native-update 与命令行工具，完成 iOS、Android、鸿蒙的原生配置，为接入 Pushy 热更新做好准备。
 - [代码集成](https://pushy.reactnative.cn/docs/integration.md): 在 React Native 应用中获取 appKey、初始化 Pushy 客户端并用 UpdateProvider 包裹应用，配置检查、下载和应用热更新的策略。
-- [发布热更新](https://pushy.reactnative.cn/docs/publish.md): Pushy 热更新发布流程：上传 apk/aab/ipa 原生基准包、打包并发布热更新版本，以及灰度发布与强制启动（救砖）的使用方法。
+- [发布热更新](https://pushy.reactnative.cn/docs/publish.md): Pushy 热更新发布流程：上传 apk/aab/ipa/app 原生基准包、打包并发布热更新版本，以及灰度发布与强制启动（救砖）的使用方法。
 - [API参考](https://pushy.reactnative.cn/docs/api.md): react-native-update JavaScript API 参考：Pushy 构造参数、检查更新策略、下载与切换版本、事件回调等接口说明。
 - [原生主动检测与更新](https://pushy.reactnative.cn/docs/native-api.md): 在 Android、iOS、鸿蒙原生层调用 configure 与 prepareBundle，不经过 JS Bridge 主动配置、检查和下载 Pushy 热更新（需 v10.59.0+）。
 - [API Key](https://pushy.reactnative.cn/docs/api-token.md): 创建和使用 Pushy API Key，在 GitHub Actions、GitLab CI、Jenkins 等 CI/CD 流程或自动化脚本中安全地发布热更新。
@@ -19,10 +29,14 @@
 - [场景实践](https://pushy.reactnative.cn/docs/bestpractice.md): React Native 热更新场景实践：优化 ipa、apk 原生包与 ppk 热更包体积，多渠道包热更、aab 支持、测试回滚与元信息的推荐做法。
 - [从 CodePush 迁移到 Pushy](https://pushy.reactnative.cn/docs/migrate-from-codepush.md): Microsoft CodePush 随 App Center 停服后的 React Native 热更新迁移指南：概念、API 与命令对照，移除 CodePush 原生配置，上传原生包、发布首个热更新并灰度验证。
 - [Expo 项目热更新：Pushy 与 EAS Update 对比及接入](https://pushy.reactnative.cn/docs/expo.md): Expo 热更新怎么选？对比 Pushy 与 EAS Update 的增量包、国内 CDN、计费、灰度回滚与鸿蒙支持，并介绍 Expo SDK 50+ 通过 prebuild 接入 Pushy、处理 expo-updates 冲突的步骤。
+- [React Native 新架构热更新指南](https://pushy.reactnative.cn/docs/new-architecture.md): React Native 0.82 起全面强制启用新架构，CodePush 已不再兼容。详解 TurboModules、Bridgeless 模式与 Hermes 字节码下的热更新变化及 Pushy 接入方式。
 - [鸿蒙 React Native 热更新](https://pushy.reactnative.cn/docs/harmony.md): 在鸿蒙 HarmonyOS NEXT 上为 React Native（RNOH）应用接入 Pushy 热更新：react-native-update 的 har 包与 CMake 配置、打包 bundle.harmony.js、上传 .app 原生包、发布增量更新与常见问题。
+- [Android 多渠道打包与 AAB 热更新](https://pushy.reactnative.cn/docs/android-channels-and-aab.md): React Native Android 多渠道包（美团 Walle、腾讯 VasDolly、Gradle Flavor）与 Google Play AAB 热更新实战：编译时间戳对齐、内容指纹匹配与单次构建双格式分发。
 - [原生 App 混编集成（Brownfield）](https://pushy.reactnative.cn/docs/brownfield.md): 原生 App 接入 React Native 热更新：在以 AAR 引入 RN 的 Android brownfield 混编项目中接入 Pushy，配置 ReactHost 与热更新 bundle 路径。
+- [CI/CD 自动发布热更新](https://pushy.reactnative.cn/docs/cicd.md): 在 GitHub Actions、GitLab CI、Jenkins 与 Fastlane 中使用 PUSHY_API_TOKEN 非交互式自动上传原生基准包、打包发布热更新、灰度放量与 --dryRun 预览。
+- [热更新不生效与回滚排查](https://pushy.reactnative.cn/docs/troubleshooting.md): 系统排查 React Native 热更新常见问题：检查不到更新、编译时间戳不匹配、热更重启后回滚、Android 白屏、图片资源不显示以及强制启动救砖。
 - [常见问题](https://pushy.reactnative.cn/docs/faq.md): Pushy 热更新常见问题：能否上架 App Store、海外能否使用、哪些修改可以热更新、回滚原因排查，以及配额、付费与发票等问题解答。
-- [更新日志](https://pushy.reactnative.cn/docs/changelog.md): react-native-update（Pushy 热更新 React Native SDK）版本更新日志：新功能、行为变更、问题修复与升级注意事项，最新版本 v10.62.1。
+- [更新日志](https://pushy.reactnative.cn/docs/changelog.md): react-native-update（Pushy 热更新 React Native SDK）版本更新日志：新功能、行为变更、问题修复与升级注意事项，最新版本 v10.63.0。
 
 ## 价格
 

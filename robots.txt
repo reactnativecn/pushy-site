@@ -1,25 +1,36 @@
+# Pushy welcomes search engines and AI assistants.
+# Content-Signal: https://contentsignals.org/
 User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 Allow: /
 
-User-agent: OAI-SearchBot
-Allow: /
-
-User-agent: GPTBot
-Allow: /
-
-User-agent: Claude-SearchBot
-Allow: /
-
-User-agent: ClaudeBot
-Allow: /
-
-User-agent: PerplexityBot
-Allow: /
-
+# Domestic & global search engines
+User-agent: Baiduspider
+User-agent: Googlebot
+User-agent: Bingbot
 User-agent: Bytespider
+User-agent: ToutiaoSpider
+User-agent: Sogou web spider
+User-agent: 360Spider
+User-agent: YisouSpider
+User-agent: Applebot
 Allow: /
 
-User-agent: ToutiaoSpider
+# AI search & user-initiated chat fetches
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: DuckAssistBot
+Allow: /
+
+# Model grounding
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
 Allow: /
 
 Sitemap: https://pushy.reactnative.cn/sitemap.xml

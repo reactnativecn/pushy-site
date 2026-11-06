@@ -1,0 +1,118 @@
+> For AI agents: the complete documentation index is available at https://pushy.reactnative.cn/llms.txt, the full documentation bundle is available at https://pushy.reactnative.cn/llms-full.txt.
+
+# React Native 新架构热更新指南
+
+React Native 0.82 是第一个**仅运行在新架构（New Architecture）**&#x4E0A;的版本：在配置中将 `newArchEnabled` 设为 `false` 已不再生效。这意味着你依赖的每一个热更新（OTA）库都必须兼容 **TurboModules** 与 **Bridgeless（无桥）模式**。
+
+这也彻底堵死了继续沿用 `react-native-code-push` 的路线。已归档的 `react-native-code-push` 仓库在 README 中明确声明不会支持新架构，仍在使用它的项目会被锁死在 React Native 0.81 或更早版本。本文将说明新架构给热更新带来了哪些底层变化，以及如何通过 Pushy（`react-native-update`）平滑接入。
+
+## 新架构对热更新带来了哪些改变
+
+一个 React Native 热更新库在原生层主要做两件事：**在启动时告诉宿主加载哪一份 JS Bundle**，以及**向 JS 暴露检查、下载与切换版本的原生模块**。新架构同时改变了这两处机制：
+
+- **原生模块升级为 TurboModules**：模块通过带类型的规范（Codegen Spec）声明并生成桥接代码，由 `TurboModuleRegistry` 按需加载，取代了旧版的 `NativeModules`。没有提供 TurboModule 规范的旧库只能依赖兼容层，甚至直接失效。
+- **Bridgeless 模式移除了 `RCTBridge`**：宿主不再创建 `RCTBridge` 实例，无法再通过旧的 Bridge 生命周期读取 Bundle 路径或触发 `bridge.reload()` 重载。依赖旧 Bridge 重启机制的热更新库在新架构下无法完成版本切换。
+- **Bundle 入口位置发生变化**：
+  - **Android**：React Native 0.82+ 模板改用 `getDefaultReactHost(...)` 创建 `ReactHost`，取代了在 `DefaultReactNativeHost` 中重写 `getJSBundleFile()` 的写法。
+  - **iOS**：React Native 0.88+ 模板改用 `UIScene` 生命周期，启动入口和 `bundleURL()` 方法从 `AppDelegate` 迁移到了 `SceneDelegate`。
+- **Hermes 成为默认引擎**：产物默认编译为 Hermes 字节码（`.hbc`），而对字节码直接做普通二进制 diff 会因字符串表重排和偏移量位移产生体积膨胀。
+
+## Pushy 如何支持新架构
+
+Pushy 客户端 SDK [`react-native-update`](https://github.com/reactnativecn/react-native-update) 自 **v9.0.0（2023 年）**&#x8D77;即支持新架构，同一份包同时兼容旧架构与新架构：
+
+- **内置 Codegen TurboModule 规范**（`codegenConfig` 名称为 `RCTPushySpec`）：开启新架构时，Android 通过 `TurboReactPackage` 注册，iOS 实现 `getTurboModule:`。
+- **运行时自动识别 Bridgeless**：JS 层检测到 `__turboModuleProxy` 或 `RN$Bridgeless` 时自动调用 TurboModule，在旧架构工程中则回退到 `NativeModules`，业务代码零配置切换。
+- **适配新版宿主模板的入口辅助方法**：Android 提供 `UpdateContext.getBundleUrl(context)`，iOS 提供 `RCTPushy.bundleURL()`；对于自行创建 `ReactHost` 的原生混编工程，还提供不经过 JS Bridge 的 [`prepareBundle` 原生接口](https://pushy.reactnative.cn/docs/native-api.md)。
+- **针对 Hermes 字节码的专项差量优化**：CLI 在构建与比对阶段固定字符串表 ID 并执行 HBC 结构感知可逆变换，消除偏移量级联变化。在 React Native 0.86 的[公开可复现基准测试](https://github.com/sunnylqm/hbc-diff-benchmark)中，修改一行代码的补丁仅 **3.4 KB**（普通 bsdiff 为 93.7 KB，全量包约 1.5 MB）。
+
+:::warning 已知版本限制
+在 Android 平台上，React Native **0.73.0 至 0.76.0** 存在上游新架构兼容缺陷，会影响热更新模块运行。使用新架构时，请选用 **0.76.1 及以上版本**（或 0.73 以下旧架构）。
+:::
+
+## 新架构接入配置要点
+
+完整的安装、Deep Link 配置与 `crunchPngs` 关闭步骤请以[安装配置](https://pushy.reactnative.cn/docs/getting-started.md)为准，以下列出新架构工程中最关键的原生入口配置。
+
+### Android（React Native 0.82 及以上）
+
+在 `MainApplication.kt` 中向 `getDefaultReactHost` 传入 `jsBundleFilePath`：
+
+```kotlin
+import cn.reactnative.modules.update.UpdateContext
+
+class MainApplication : Application(), ReactApplication {
+
+  override val reactHost: ReactHost by lazy {
+    getDefaultReactHost(
+      context = applicationContext,
+      packageList = PackageList(this).packages,
+      jsBundleFilePath = UpdateContext.getBundleUrl(this),
+    )
+  }
+}
+```
+
+如果是 React Native 0.81 及以下版本，则仍在 `DefaultReactNativeHost` 中重写 `getJSBundleFile()` 返回 `UpdateContext.getBundleUrl(this@MainApplication)`。
+
+### iOS（React Native 0.88 及以上）
+
+在 `SceneDelegate.swift` 的 `bundleURL()` 中返回 `RCTPushy.bundleURL()`（保留 `DEBUG` 模式下从 Metro 加载）：
+
+```swift
+import react_native_update
+
+class SceneDelegate: RCTDefaultReactNativeFactoryDelegate, UIWindowSceneDelegate {
+  override func bundleURL() -> URL? {
+    #if DEBUG
+    RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+    #else
+    RCTPushy.bundleURL()
+    #endif
+  }
+}
+```
+
+React Native 0.87 及以下版本中，相同的 `bundleURL()` 方法位于 `AppDelegate`（或 `ReactNativeDelegate`）。从 0.87 升级到 0.88 并按官方 Upgrade Helper 迁移到 `SceneDelegate` 时，**务必把 `RCTPushy.bundleURL()` 一并迁过去**，否则 Release 包会一直加载内置 bundle，热更新不会生效。
+
+### Expo 项目
+
+使用 **Expo SDK 50 及以上**（启用新架构建议使用 **Expo SDK 51+**）时，执行 `npx expo prebuild` 后，`react-native-update` 内置的 Expo Module 会自动接管 iOS 和 Android 两端的 Bundle URL，无需手动修改 `SceneDelegate` 或 `MainApplication`。注意不要同时安装 `expo-updates`，详见 [Expo 项目热更新](https://pushy.reactnative.cn/docs/expo.md)。
+
+### 鸿蒙 HarmonyOS NEXT 与原生混编（Brownfield）
+
+- **鸿蒙（RNOH）**：RNOH 本身基于 React Native 新架构（C++ TurboModule + Fabric）构建，Pushy 通过 `PushyTurboModule` 与 `PushyFileJSBundleProvider` 原生支持，详见[鸿蒙 React Native 热更新](https://pushy.reactnative.cn/docs/harmony.md)。
+- **原生混编（Brownfield）**：当 React Native 被打包为 AAR 嵌入原生宿主，或宿主自行管理 `ReactHost` 时，请参考[原生 App 混编集成](https://pushy.reactnative.cn/docs/brownfield.md)及[原生主动检测与更新](https://pushy.reactnative.cn/docs/native-api.md)。
+
+## 从 CodePush 升级到 React Native 0.82+ 的推荐顺序
+
+不要在同一次发版里同时替换热更新 SDK 和跨大版本升级 React Native，建议分两步推进：
+
+1. **先在当前 RN 版本上将 `react-native-code-push` 替换为 `react-native-update`**，对照[从 CodePush 迁移](https://pushy.reactnative.cn/docs/migrate-from-codepush.md)完成 API 与 CLI 改造，随应用商店发一版原生包并验证热更新链路正常。
+2. **再升级到 React Native 0.82+**。此时依赖树中已移除不支持新架构的 CodePush，升级完成后记得修改原生版本号并重新执行 `pushy uploadIpa` / `pushy uploadApk` 上传新的原生基准包（见[发布热更新](https://pushy.reactnative.cn/docs/publish.md)）。
+
+## 常见问题
+
+### CodePush 支持 React Native 新架构吗？
+
+不支持。已归档的 `react-native-code-push` 官方仓库明确说明不会适配新架构，而 React Native 0.82 起已移除关闭新架构的开关。因此要升级到 RN 0.82 及以上版本，必须先替换掉 CodePush 客户端 SDK。
+
+### Pushy 支持 Bridgeless（无桥）模式吗？
+
+支持。`react-native-update` 会在运行时自动检测 Bridgeless 环境并通过 TurboModule 工作，无需额外开关；同一套代码在旧架构工程中同样可用。
+
+### 新架构下启用 Hermes 后，热更新包会变大吗？
+
+如果直接使用通用二进制 diff 工具对比两份 Hermes 字节码（`.hbc`），补丁确实会比纯 JS 文本大很多。Pushy 在编译与差分阶段针对 Hermes 字节码做了字符串表固定和结构感知变换，一行代码改动生成的补丁约 **3.4 KB**，比普通 bsdiff（93.7 KB）小 28 倍。
+
+### 升级 React Native 版本后可以直接发热更新吗？
+
+不能。升级 React Native 版本属于原生层变更，原生二进制与 Hermes 字节码版本都可能变化，必须重新编译安装包、提升原生版本号并上传为新的原生基准版本，之后再针对该基准版本发布热更新。
+
+## 相关阅读
+
+- [安装配置](https://pushy.reactnative.cn/docs/getting-started.md)
+- [从 CodePush 迁移到 Pushy](https://pushy.reactnative.cn/docs/migrate-from-codepush.md)
+- [CodePush 停服替代方案对比](https://pushy.reactnative.cn/codepush-alternative.md)
+- [鸿蒙（HarmonyOS NEXT）React Native 热更新](https://pushy.reactnative.cn/docs/harmony.md)
+- [原生 App 混编集成（Brownfield）](https://pushy.reactnative.cn/docs/brownfield.md)

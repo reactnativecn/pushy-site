@@ -57,7 +57,7 @@ Expo 项目要做热更新（OTA），常见的选择有两个：Expo 官方的 
 | **JS bundle 增量**   | 基于 hdiff 的差量补丁，并针对 Hermes 字节码做了专项优化；首次热更新即可基于安装包内置的 bundle 计算差量                                                                                                   | 支持基于 bsdiff 的 bundle diffing（需 SDK 55+，SDK 56 起默认开启）；仅在补丁明显更小时下发补丁，否则下发完整 bundle；基于安装包内置 bundle 的补丁在 SDK 58+ 配合 EAS Build 自动启用，SDK 57 及以下为实验性选项 |
 | **图片等资源**          | 只下发有变化的资源                                                                                                                                                         | 只下载设备上尚未拥有的资源                                                                                                                                   |
 | **分发网络**           | 国内使用阿里云 CDN，海外使用 Cloudflare                                                                                                                                       | Expo 托管的全球服务；官方文档未针对中国大陆网络做专门说明，建议在目标用户网络下实测                                                                                                    |
-| **计费方式**           | 提供免费版，按套餐计费，CDN 流量不单独计费，详见[价格页](https://pushy.reactnative.cn/pricing.md)                                                                                          | 提供免费额度；付费套餐按月活用户（MAU）计费，超出套餐带宽另行计费，详见 [Expo 价格页](https://expo.dev/pricing)                                                                      |
+| **计费方式**           | 提供免费版，按套餐计费，CDN 流量不单独计费，详见[价格页](https://pushy.reactnative.cn/pricing.md)与 [EAS Update 价格对比](https://pushy.reactnative.cn/expo-pricing-vs-pushy.md)                | 提供免费额度；付费套餐按月活用户（MAU）计费，超出套餐带宽另行计费，详见 [Expo 价格页](https://expo.dev/pricing)                                                                      |
 | **灰度发布**           | 按比例灰度，按设备 UUID 哈希稳定分组，可与全量版本并存，见[灰度发布](https://pushy.reactnative.cn/docs/publish.md#%E7%81%B0%E5%BA%A6%E5%8F%91%E5%B8%83)                                         | 支持按百分比灰度单个更新，也支持按分支（branch）灰度                                                                                                                   |
 | **出错回滚**           | 新版本启动崩溃自动回滚；可在后台暂停热更、改绑到旧版本；JS 无法运行时还可通过[强制启动（救砖）](https://pushy.reactnative.cn/docs/publish.md#%E5%BC%BA%E5%88%B6%E5%90%AF%E5%8A%A8%E6%95%91%E7%A0%96)由原生侧拉取修复版本 | 首屏渲染前出错时会标记该更新失败并回退到之前成功的更新；首屏渲染后出错则不再回退、只能向前修复；服务端可回滚灰度或回退到内置版本                                                                                |
 | **是否需要 EAS Build** | 不需要，本地编译、EAS Build 或其他 CI 均可                                                                                                                                      | 不强制，官方说明可脱离 EAS Build 单独使用，但需自行配置 channel，部分依赖构建信息的功能不可用                                                                                        |
@@ -145,3 +145,7 @@ import "expo-router/entry";
 #### 接入后热更新没有生效怎么办？
 
 先确认测试的是 release 包而非 DEBUG 包，再检查是否残留了 `expo-updates`、原生包是否已上传为基准版本。其他报错可查阅[错误码说明](https://pushy.reactnative.cn/docs/errors.md)与[常见问题](https://pushy.reactnative.cn/docs/faq.md)，也可以到 [GitHub Issues](https://github.com/reactnativecn/react-native-update/issues) 提问。
+
+#### 如果考虑自建 `expo-updates` 协议服务器来省钱，划算吗？
+
+`expo-updates` 客户端虽然支持指向自定义协议服务器，但公开协议规范未定义二进制差量补丁下发，且需自行研发和值守 Manifest 服务、代码签名、缓存治理与灰度后台。详细工程量拆解见 [自建 Expo Updates 服务器 vs Pushy](https://pushy.reactnative.cn/expo-updates-self-hosted-vs-pushy.md)。

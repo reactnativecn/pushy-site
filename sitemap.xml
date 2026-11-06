@@ -2,35 +2,75 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://pushy.reactnative.cn/</loc>
-    <lastmod>2026-10-22</lastmod>
+    <lastmod>2026-11-06</lastmod>
+  </url>
+  <url>
+    <loc>https://pushy.reactnative.cn/codepush-alternative</loc>
+    <lastmod>2026-11-06</lastmod>
+  </url>
+  <url>
+    <loc>https://pushy.reactnative.cn/expo-pricing-vs-pushy</loc>
+    <lastmod>2026-11-06</lastmod>
+  </url>
+  <url>
+    <loc>https://pushy.reactnative.cn/expo-updates-self-hosted-vs-pushy</loc>
+    <lastmod>2026-11-06</lastmod>
+  </url>
+  <url>
+    <loc>https://pushy.reactnative.cn/hot-updater-vs-pushy</loc>
+    <lastmod>2026-11-06</lastmod>
+  </url>
+  <url>
+    <loc>https://pushy.reactnative.cn/pricing</loc>
+    <lastmod>2026-11-06</lastmod>
+  </url>
+  <url>
+    <loc>https://pushy.reactnative.cn/react-native-ota-updates</loc>
+    <lastmod>2026-11-06</lastmod>
+  </url>
+  <url>
+    <loc>https://pushy.reactnative.cn/revopush-vs-pushy</loc>
+    <lastmod>2026-11-06</lastmod>
+  </url>
+  <url>
+    <loc>https://pushy.reactnative.cn/stallion-vs-pushy</loc>
+    <lastmod>2026-11-06</lastmod>
   </url>
   <url>
     <loc>https://pushy.reactnative.cn/docs/analytics</loc>
     <lastmod>2026-09-12</lastmod>
   </url>
   <url>
+    <loc>https://pushy.reactnative.cn/docs/android-channels-and-aab</loc>
+    <lastmod>2026-11-06</lastmod>
+  </url>
+  <url>
     <loc>https://pushy.reactnative.cn/docs/api</loc>
-    <lastmod>2026-10-08</lastmod>
+    <lastmod>2026-11-06</lastmod>
   </url>
   <url>
     <loc>https://pushy.reactnative.cn/docs/api-token</loc>
-    <lastmod>2026-10-09</lastmod>
+    <lastmod>2026-11-06</lastmod>
   </url>
   <url>
     <loc>https://pushy.reactnative.cn/docs/bestpractice</loc>
-    <lastmod>2026-10-08</lastmod>
+    <lastmod>2026-11-06</lastmod>
   </url>
   <url>
     <loc>https://pushy.reactnative.cn/docs/brownfield</loc>
-    <lastmod>2026-10-22</lastmod>
+    <lastmod>2026-11-06</lastmod>
   </url>
   <url>
     <loc>https://pushy.reactnative.cn/docs/changelog</loc>
     <lastmod>2026-10-22</lastmod>
   </url>
   <url>
+    <loc>https://pushy.reactnative.cn/docs/cicd</loc>
+    <lastmod>2026-11-06</lastmod>
+  </url>
+  <url>
     <loc>https://pushy.reactnative.cn/docs/cli</loc>
-    <lastmod>2026-10-08</lastmod>
+    <lastmod>2026-11-06</lastmod>
   </url>
   <url>
     <loc>https://pushy.reactnative.cn/docs/errors</loc>
@@ -38,15 +78,15 @@
   </url>
   <url>
     <loc>https://pushy.reactnative.cn/docs/expo</loc>
-    <lastmod>2026-10-22</lastmod>
+    <lastmod>2026-11-06</lastmod>
   </url>
   <url>
     <loc>https://pushy.reactnative.cn/docs/faq</loc>
-    <lastmod>2026-10-22</lastmod>
+    <lastmod>2026-11-06</lastmod>
   </url>
   <url>
     <loc>https://pushy.reactnative.cn/docs/getting-started</loc>
-    <lastmod>2026-10-30</lastmod>
+    <lastmod>2026-11-06</lastmod>
   </url>
   <url>
     <loc>https://pushy.reactnative.cn/docs/harmony</loc>
@@ -54,34 +94,38 @@
   </url>
   <url>
     <loc>https://pushy.reactnative.cn/docs/integration</loc>
-    <lastmod>2026-10-08</lastmod>
+    <lastmod>2026-11-06</lastmod>
   </url>
   <url>
     <loc>https://pushy.reactnative.cn/docs/intro</loc>
-    <lastmod>2026-10-22</lastmod>
+    <lastmod>2026-11-06</lastmod>
   </url>
   <url>
     <loc>https://pushy.reactnative.cn/docs/mcp</loc>
-    <lastmod>2026-10-08</lastmod>
+    <lastmod>2026-11-06</lastmod>
   </url>
   <url>
     <loc>https://pushy.reactnative.cn/docs/migrate-from-codepush</loc>
-    <lastmod>2026-10-22</lastmod>
+    <lastmod>2026-11-06</lastmod>
   </url>
   <url>
     <loc>https://pushy.reactnative.cn/docs/native-api</loc>
     <lastmod>2026-10-13</lastmod>
   </url>
   <url>
+    <loc>https://pushy.reactnative.cn/docs/new-architecture</loc>
+    <lastmod>2026-11-06</lastmod>
+  </url>
+  <url>
     <loc>https://pushy.reactnative.cn/docs/publish</loc>
-    <lastmod>2026-10-09</lastmod>
+    <lastmod>2026-11-06</lastmod>
   </url>
   <url>
     <loc>https://pushy.reactnative.cn/docs/skills</loc>
     <lastmod>2026-10-08</lastmod>
   </url>
   <url>
-    <loc>https://pushy.reactnative.cn/pricing</loc>
-    <lastmod>2026-10-22</lastmod>
+    <loc>https://pushy.reactnative.cn/docs/troubleshooting</loc>
+    <lastmod>2026-11-06</lastmod>
   </url>
 </urlset>

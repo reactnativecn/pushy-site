@@ -2,7 +2,7 @@
 
 # 发布热更新
 
-现在你的应用已经具备了检测更新的功能，下面我们来尝试发布并更新它。流程可参考下图：
+现在你的应用已经具备了检测更新的功能，下面我们来尝试发布并更新它。如果你正在把原有的 `appcenter codepush release-react` 流水线迁移过来，可以直接对照[从 CodePush 迁移](https://pushy.reactnative.cn/docs/migrate-from-codepush.md#%E5%91%BD%E4%BB%A4%E8%A1%8C)或 [CI/CD 自动发布指南](https://pushy.reactnative.cn/docs/cicd.md)。整体流程可参考下图：
 
 ```mermaid
 flowchart TD
@@ -32,6 +32,20 @@ flowchart TD
 1. 我们需要先打包一个原生 release 版本，在打包前请确保已集成了`react-native-update`并在调试过程中运行正常，安卓端[关闭了`crunchPngs`设置](https://pushy.reactnative.cn/docs/getting-started.md#%E7%A6%81%E7%94%A8-android-%E7%9A%84-crunch-%E4%BC%98%E5%8C%96)，打包说明可参考[iOS 打包](https://reactnative.cn/docs/publishing-to-app-store)和[android 打包](https://reactnative.cn/docs/signed-apk-android)。打包完成后请使用`pushy uploadIpa`、`pushy uploadApk`或`pushy uploadAab`命令来把这个安装包上传到 pushy 服务器端，以作为之后热更差量对比的基准。同时请保留好这个安装包，上架和分发给用户所使用的安装包`需要和服务器端完全一致`。建议使用 git tag 功能来标记原生版本号（例如`v1.0.0`）。
 2. 然后在基准版本之上迭代业务逻辑（增删 js 代码，增删图片等静态资源），使用`pushy bundle`命令来生成和发布热更新版本，而不需要重新打包。建议使用 git tag 功能来标记热更版本号（例如`v1.0.1`）。
 3. 如果迭代过程中有原生方面的修改，则需要发布并上传新的原生基准版本（重复步骤 1，但需要设置不同的原生版本号）。可以只保留一个原生基准版本，也可以多版本同时维护。
+
+## 发布命令速查表
+
+| 发布目标             | 执行命令                                                                                                      |
+| ---------------- | --------------------------------------------------------------------------------------------------------- |
+| 上传 iOS 原生基准包     | `pushy uploadIpa <file.ipa>`                                                                              |
+| 上传 Android 原生基准包 | `pushy uploadApk <file.apk>` 或 `pushy uploadAab <file.aab>`                                               |
+| 上传鸿蒙原生基准包        | `pushy uploadApp <file.app>`                                                                              |
+| 打包并发布热更新版本       | `pushy bundle --platform <ios\|android\|harmony>`                                                         |
+| 上传已生成的 `.ppk` 包  | `pushy publish <file.ppk> --platform <ios\|android\|harmony>`                                             |
+| 批量绑定原生版本范围       | `pushy update --platform <ios\|android\|harmony> --versionId <id> --packageVersionRange ">=1.0.0 <2.0.0"` |
+| 按 10% 设备灰度放量     | 在 `pushy bundle` 或 `pushy update` 后追加 `--rollout 10`                                                      |
+
+完整的命令参数见[命令行工具](https://pushy.reactnative.cn/docs/cli.md)，在流水线中无人值守执行见 [CI/CD 自动发布热更新](https://pushy.reactnative.cn/docs/cicd.md)。
 
 ## 发布原生基准版本
 
@@ -269,3 +283,25 @@ Would you like to bind packages to this version?(Y/N)
 - **仅作用于原生检测**：JS 侧的交互式检查更新流程不受此标记影响
 - **安全护栏依然生效**：设备本地的回滚保护（rolledBack 记录）优先于强制启动；首次启动崩溃保护（first_time）也依然生效，激活后如果再次崩溃仍会自动回滚
 - **标记随绑定存在**：重新发布（重新绑定）会替换绑定并清除强制启动标记；也可在包名菜单中选择「取消强制启动」
+
+## 常见问题
+
+### 为什么热更版本发布成功后，客户端却收不到更新？
+
+刚上传的热更版本默认没有关联任何原生包，不会下发给任何用户。请在 CLI 提示时输入 `Y` 绑定、执行 `pushy update`，或在网页管理后台将原生包拖拽绑定到目标热更版本下；同时请确认分发给用户的安装包与 `uploadApk` / `uploadIpa` / `uploadApp` 登记的基准包一致。更多原因可按[热更新不生效与回滚排查](https://pushy.reactnative.cn/docs/troubleshooting.md)逐项定位。
+
+### 什么改动可以直接发热更新，什么改动必须重发原生包？
+
+纯 JavaScript / TypeScript 业务代码、纯 JS 第三方库以及 JS 通过 `require` / `import` 引用的图片等静态资源改动，均可直接执行 `pushy bundle` 热更新；涉及 `ios/`、`android/`、`harmony/` 原生代码、权限配置或新增含原生代码的第三方库时，必须递增原生版本号重新编译并上传新的基准包。
+
+### 如何对 React Native 热更新进行按比例灰度发布？
+
+在管理后台发布时选择灰度比例，或在命令行使用 `pushy update --rollout 10`（1–100）。服务端按每台设备 UUID 的稳定哈希分桶，同一设备多次检查结果一致；验证稳定后将比例设为 `100` 即可自动提升为全量版本（要求客户端 `react-native-update >= 10.32.0`）。
+
+### 如果发出去的热更新引起启动崩溃怎么办？
+
+Pushy 内置首次启动崩溃保护：若新版本激活后在完成首启标记前崩溃，下次启动会自动回滚到上一稳定版本，并记录坏版本 `hash` 避免反复重装。若某次更新把 JS 层彻底打死导致无法再走 JS 检查，可对 `v10.52.1+` 客户端发布修复包并开启上文的「强制启动（救砖）」。
+
+### 可以在 GitHub Actions 或 Jenkins 等 CI/CD 中自动发布吗？
+
+可以。在管理后台创建 [API Key](https://pushy.reactnative.cn/docs/api-token.md) 并注入环境变量 `PUSHY_API_TOKEN`，执行 `pushy bundle` 时显式传入 `--name` 与 `--packageVersionRange` 等绑定参数即可完成无人值守打包、上传与绑定。完整流水线模板见 [CI/CD 自动发布热更新](https://pushy.reactnative.cn/docs/cicd.md)。

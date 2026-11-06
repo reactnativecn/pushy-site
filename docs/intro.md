@@ -63,14 +63,16 @@ Hermes 字节码在两个层面上都对通用二进制 diff 极不友好，Push
 
 | 对比项      | Pushy                                           | EAS Update                                                                              |
 | -------- | ----------------------------------------------- | --------------------------------------------------------------------------------------- |
-| **起步价**  | ¥66/月                                           | \~¥136/月                                                                                |
+| **起步价**  | ¥80/月（年付 ¥960）                                  | \~¥136/月（$19 + 超额计费）                                                                    |
 | **流量计费** | 不单独计费                                           | 超出需额外付费                                                                                 |
 | **增量更新** | hdiff 差量并针对 Hermes 字节码专项优化，首次热更新即基于内置 bundle 计算 | SDK 55 起支持 bsdiff 增量（56 起默认开启），补丁不够小时仍下发完整 bundle；基于内置 bundle 的增量需 SDK 58+ 配合 EAS Build |
 | **国内速度** | ⭐⭐⭐⭐⭐ 极快                                        | ⭐⭐ 较慢                                                                                   |
 | **鸿蒙支持** | ✅ 支持                                            | ❌ 不支持                                                                                   |
 
+更完整的月活与流量账单测算可参考 [Expo（EAS Update）热更新价格与 Pushy 成本对比](https://pushy.reactnative.cn/expo-pricing-vs-pushy.md)。
+
 :::warning
-**注意**：Microsoft App Center（Code Push）已于 2025 年 3 月 31 日正式停止服务。如果你正在使用 Code Push，现在正是迁移到 Pushy 的最佳时机！迁移步骤见[从 CodePush 迁移](https://pushy.reactnative.cn/docs/migrate-from-codepush.md)。
+**注意**：Microsoft App Center（Code Push）已于 2025 年 3 月 31 日正式停止服务。如果你正在评估替代路线，可先阅读 [CodePush 停服替代方案对比](https://pushy.reactnative.cn/codepush-alternative.md)，再按 [从 CodePush 迁移](https://pushy.reactnative.cn/docs/migrate-from-codepush.md) 逐步接入。
 :::
 
 使用 Pushy 后，你的团队将获得：

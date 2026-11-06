@@ -2,9 +2,51 @@
 
 # 更新日志
 
-本页由 [GitHub Releases](https://github.com/reactnativecn/react-native-update/releases) 自动生成，列出最近的 19 个版本。更早的版本请查看 GitHub Releases。
+本页由 [GitHub Releases](https://github.com/reactnativecn/react-native-update/releases) 自动生成，列出最近的 22 个版本。更早的版本请查看 GitHub Releases。
 
 升级原生依赖后需要重新打包并上传原生包，参见[发布热更新](https://pushy.reactnative.cn/docs/publish.md)。
+
+## v10.63.0
+
+发布于 2026-11-04
+
+### 改进
+
+- **下载改为遵循服务端的线路顺序。** 之前 SDK 会同时向所有线路发 HEAD 请求，并从最先响应的线路下载，所以线路只凭距离近就能胜出，不考虑容量和成本。现在先探测第一条线路，1 秒内没有响应再探测下一条；探测失败时立即换下一条。
+
+第一条线路正常时只需一次 HEAD 请求，不再每条线路各发一次。所有线路仍可作为备用，探测和下载失败时都会切换。
+
+这次只改了 JavaScript，应用使用这个 SDK 版本后可通过热更新生效，不需要重新打原生包，也不需要改服务端或 CLI。
+
+## v10.62.3
+
+发布于 2026-11-03
+
+### 修复
+
+- **Android：无界面启动后的误回滚。** 推送消息、HeadlessJS 任务等无界面启动会创建 React Native 实例，但不会挂载 `UpdateProvider`，因此无法标记成功。如果此时有更新在等待首次加载，这次启动会把机会用掉，下次启动就会回滚一个并没有出错的版本，客户端之后也会忽略该版本。
+
+现在无界面启动不再消耗首次加载。首次加载从下一次前台启动开始计入，或在同一进程里第一个 Activity 启动时开始计入。打开后未标记成功的版本仍然会回滚。
+
+只在后台崩溃的版本，现在要等用户打开 App 并再次失败后才会回滚，不再因为后台崩溃一次就回滚。
+
+本次修改了 Android 原生代码，需要重新构建原生包才会生效。服务端和 CLI 无需改动。
+
+[完整变更](https://github.com/reactnativecn/react-native-update/compare/v10.62.2...v10.62.3)
+
+## v10.62.2
+
+发布于 2026-11-03
+
+### 修复
+
+- **Android：密度分包安装下的差量更新。** 通过 App Bundle 安装（Google Play 或 `bundletool`）时，设备上只有所在分包的图片密度。其他密度的拷贝条目会被当成内容漂移，导致整个补丁以 `Bundled resource content mismatch (crc32)` 失败，然后回退全量包；没有全量包时更新失败。现在这些目标文件用该资源已安装的变体填充，补丁可以成功，之后设备密度变化时图片也能正常加载。
+
+真正的内容漂移仍然失败：已安装密度上内容不符的拷贝、安装包里已不存在的资源，以及带其他限定符的目标（如 `drawable-night-hdpi`）。
+
+本次修改了 Android 原生代码，需要重新构建原生包才会生效。服务端和 CLI 无需改动。
+
+[完整变更](https://github.com/reactnativecn/react-native-update/compare/v10.62.1...v10.62.2)
 
 ## v10.62.1
 
