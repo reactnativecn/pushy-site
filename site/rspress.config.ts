@@ -228,11 +228,116 @@ function articleJsonLd(routePath: string, absolutePath?: string) {
   ]).replace(/</g, '\\u003c');
 }
 
+/**
+ * Rspress v2.1+ rehypeHeaderAnchor emits real HTML `id` attributes for headings
+ * nested inside `<Steps>`, whereas remarkToc only inspects top-level children
+ * when registering anchor IDs for dead-anchor checks. Collect only real
+ * `<Steps>` heading slugs so `checkAnchors` stays active everywhere else.
+ */
+const STEPS_ANCHORS = (() => {
+  const pagesDir = path.join(__dirname, 'pages');
+  const byRoute = new Map<string, Set<string>>();
+  const allStepsIds = new Set<string>();
+
+  const walk = (dir: string): string[] => {
+    const out: string[] = [];
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) out.push(...walk(fullPath));
+      else if (/\.(?:md|mdx)$/.test(entry.name)) out.push(fullPath);
+    }
+    return out;
+  };
+
+  for (const filePath of walk(pagesDir)) {
+    const source = fs.readFileSync(filePath, 'utf8').replace(/```[\s\S]*?```/g, '');
+    if (!source.includes('<Steps>')) continue;
+    const rel = path
+      .relative(pagesDir, filePath)
+      .replace(/\\/g, '/')
+      .replace(/\.(?:md|mdx)$/, '')
+      .replace(/\/index$/, '');
+    const routePath = `/${rel}`;
+    const seen = new Map<string, number>();
+    const stepsIds = new Set<string>();
+    let stepsDepth = 0;
+
+    for (const line of source.split(/\r?\n/)) {
+      if (/^\s*<Steps>\s*$/.test(line)) {
+        stepsDepth += 1;
+        continue;
+      }
+      if (/^\s*<\/Steps>\s*$/.test(line)) {
+        stepsDepth = Math.max(0, stepsDepth - 1);
+        continue;
+      }
+      const heading = line.match(/^#{1,6}\s+(.+)$/);
+      if (!heading) continue;
+      const text = heading[1]
+        .replace(/`([^`]*)`/g, '$1')
+        .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+        .replace(/\*\*([^*]*)\*\*/g, '$1')
+        .replace(/\*([^*]*)\*/g, '$1')
+        .trim();
+      const base = text
+        .toLowerCase()
+        .replace(/[^\p{L}\p{M}\p{N}_\- ]/gu, '')
+        .replace(/ /g, '-');
+      const count = seen.get(base) ?? 0;
+      seen.set(base, count + 1);
+      const id = count === 0 ? base : `${base}-${count}`;
+      if (stepsDepth > 0 && id) {
+        stepsIds.add(id);
+        allStepsIds.add(id);
+      }
+    }
+
+    if (stepsIds.size > 0) {
+      byRoute.set(routePath, stepsIds);
+    }
+  }
+
+  return {
+    isValidStepsAnchor(nodeUrl: string): boolean {
+      const hashIdx = nodeUrl.indexOf('#');
+      if (hashIdx === -1) return false;
+      const rawPath = nodeUrl.slice(0, hashIdx);
+      const rawHash = nodeUrl.slice(hashIdx + 1);
+      if (!rawHash) return false;
+      let hash = rawHash;
+      try {
+        hash = decodeURIComponent(rawHash);
+      } catch {}
+      if (!rawPath) return allStepsIds.has(hash);
+      const cleanPath = rawPath
+        .replace(/\.(?:html|mdx|md)$/, '')
+        .replace(/\/+$/, '');
+      if (cleanPath.startsWith('/')) {
+        return Boolean(byRoute.get(cleanPath)?.has(hash));
+      }
+      const suffix = `/${cleanPath.replace(/^\.\//, '')}`;
+      for (const [routePath, ids] of byRoute) {
+        if ((routePath === suffix || routePath.endsWith(suffix)) && ids.has(hash)) {
+          return true;
+        }
+      }
+      return false;
+    },
+  };
+})();
+
 export default defineConfig({
   llms: true,
   outDir: 'out',
   lang: 'zh-CN',
   siteOrigin: SITE_ORIGIN,
+  markdown: {
+    link: {
+      checkAnchors: {
+        excludes: (url) => STEPS_ANCHORS.isValidStepsAnchor(url),
+      },
+    },
+  },
   // Map Rspress built-in 'zh' strings onto 'zh-CN' so <html lang="zh-CN"> stays
   // standard BCP 47 while outline/pagination/search UI renders in Chinese.
   i18nSource: (value) => {

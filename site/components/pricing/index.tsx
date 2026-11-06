@@ -9,30 +9,54 @@ import {
 import { ReactNode } from "react";
 import { PAID_PLANS } from "./plans";
 
+declare global {
+  interface ImportMeta {
+    readonly env: {
+      readonly SSG_MD?: boolean;
+    };
+  }
+}
+
+// Rspress SSG-MD renders React trees to Markdown in Node without DOM globals;
+// antd Tooltip attaches a DOM ref (HTMLElement check) in layout effects, so
+// render plain children when generating .md / llms.txt output.
+const SafeTooltip = ({
+  title,
+  children,
+}: {
+  title: ReactNode;
+  children: ReactNode;
+}) =>
+  import.meta.env.SSG_MD ? (
+    <>{children}</>
+  ) : (
+    <Tooltip title={title}>{children}</Tooltip>
+  );
+
 const AppText = () => (
-  <Tooltip title="iOS 和 Android 版本记做不同的应用。您可删除已不再使用的应用来有效利用配额。">
+  <SafeTooltip title="iOS 和 Android 版本记做不同的应用。您可删除已不再使用的应用来有效利用配额。">
     <span className="text-blue-500 hover:text-blue-400 cursor-help border-b border-dashed border-blue-300">应用</span>
-  </Tooltip>
+  </SafeTooltip>
 );
 const PackageText = () => (
-  <Tooltip title="原生包指通过 pushy uploadApk/uploadAab/uploadIpa/uploadApp 上传的热更基准包。新版 CLI 会在上传前自动剥离无关原生二进制，仅提取 JS Bundle 与静态资源上传（实际占用体积通常仅几 MB）。您可随时删除不再使用的原生包来释放配额。">
+  <SafeTooltip title="原生包指通过 pushy uploadApk/uploadAab/uploadIpa/uploadApp 上传的热更基准包。新版 CLI 会在上传前自动剥离无关原生二进制，仅提取 JS Bundle 与静态资源上传（实际占用体积通常仅几 MB）。您可随时删除不再使用的原生包来释放配额。">
     <span className="text-blue-500 hover:text-blue-400 cursor-help border-b border-dashed border-blue-300">原生包</span>
-  </Tooltip>
+  </SafeTooltip>
 );
 const HotUpdateText = () => (
-  <Tooltip
+  <SafeTooltip
     title={`热更包指 "pushy bundle" 命令生成的 ppk 文件（其中包含 jsbundle、图片等业务逻辑文件）。
 注意这不是用户实际下载的文件，用户实际下载的是经过服务器运算后生成的极小差量补丁包。您可删除已不再使用的热更包来有效利用配额。`}
   >
     <span className="text-blue-500 hover:text-blue-400 cursor-help border-b border-dashed border-blue-300">热更包</span>
-  </Tooltip>
+  </SafeTooltip>
 );
 const CheckLimitText = ({ children }: { children: ReactNode }) => (
   <div className="py-2 !mt-auto border-t border-slate-200/50">
     <p className="text-slate-500 text-sm mb-1">所有应用累加</p>
     <div className="flex items-center gap-1 font-medium text-slate-700">
       每天
-      <Tooltip
+      <SafeTooltip
         title={
           <div>
             指每次客户端向服务器端发起更新检查请求，无论检查结果是否存在新版本。如日更新检查次数超过百万次，请点此查看
@@ -49,7 +73,7 @@ const CheckLimitText = ({ children }: { children: ReactNode }) => (
         }
       >
         <span className="text-blue-600 hover:text-blue-500 cursor-help font-extrabold text-lg border-b border-blue-200 border-dashed">{children}次</span>
-      </Tooltip>
+      </SafeTooltip>
       更新查询
     </div>
     <p className="mt-1 text-sm text-slate-500 font-medium">可按需提升</p>
@@ -184,9 +208,9 @@ function Pricing() {
           </h1>
           <p className="text-lg text-slate-600 leading-relaxed">
             新注册用户将自动获得
-            <Tooltip title="您可将注册用户名、公司（或个人）名称发送至<hi@charmlot.com>，申请延长评估时间">
+            <SafeTooltip title="您可将注册用户名、公司（或个人）名称发送至<hi@charmlot.com>，申请延长评估时间">
               <span className="text-indigo-600 font-bold cursor-help mx-1">7 天</span>
-            </Tooltip>
+            </SafeTooltip>
             的<strong className="text-slate-900 mx-1">专业版</strong>试用评估。
             <br />
             到期后转为免费版。年付较按月购买享约 6.7 折优惠，
