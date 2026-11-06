@@ -1,0 +1,83 @@
+---
+title: Stallion vs Pushy：React Native 热更新价格与增量能力对比
+seoTitle: Stallion vs Pushy：React Native 热更新计费、首更增量与平台支持对比
+description: 对比海外 React Native OTA 服务 Stallion 与 Pushy 在首次热更新差量机制、Hermes 补丁体积、套餐档位、国内 CDN 网络与鸿蒙支持上的核心差异。
+pageType: doc-wide
+sidebar: false
+footer: false
+head:
+  - - meta
+    - name: keywords
+      content: Stallion,Stallion vs Pushy,react-native-stallion 对比,React Native OTA 对比,CodePush 替代方案
+---
+
+import Footer from "../components/Footer";
+
+# Stallion vs Pushy：React Native 热更新价格与增量能力对比
+
+[Stallion](https://stalliontech.io) 与 Pushy 都是提供增量补丁、崩溃自动回滚与可视化控制台的托管式 React Native 热更新服务。两者的核心差异集中在三个地方：**应用商店发版后的第一次紧急热更新能否走增量补丁、Hermes 字节码下的补丁压缩率，以及面向中国大陆与鸿蒙生态的基础设施支持**。
+
+> 本文关于 Stallion 的信息核对自其官方价格页、文档与 SDK 仓库（截至 2026 年 10 月）。如有变动欢迎发邮件至 `hi@charmlot.com` 指正。
+
+## 一句话选型建议
+
+- **选择 Stallion**：如果你的应用纯海外分发、运行在 React Native 0.76+，且刚好偏好单一档位按月活（MAU）计费的美元套餐。
+- **选择 Pushy**：如果你希望**新原生包上架后的第一次热修复就能只下发几 KB 差量包**、看重国内阿里云 CDN 下载速度与人民币固定套餐（免流量费、可开发票），或者需要支持**鸿蒙 HarmonyOS NEXT** 及 React Native 0.76 以下存量工程。
+
+## 核心能力逐项对比
+
+| 对比维度 | Stallion | Pushy（`react-native-update`） |
+| --- | --- | --- |
+| **客户端 SDK** | `react-native-stallion`（MIT） | `react-native-update`（MIT） |
+| **计费模型** | 月活跃用户（MAU）+ 上传/下载带宽（美元） | 每日更新检查总次数（人民币固定套餐，**CDN 流量全包**） |
+| **免费档额度** | 10,000 MAU，每月 50 GB 下载流量（不可超额） | 1,000 次日检查，最多 3 个应用，**CDN 流量不限** |
+| **付费档位** | 单一 Pro 档：$64/月（年付折 $51/月），含 10 万 MAU 与 2 TB 流量；企业版与私有化定制报价 | 阶梯更细：**标准版 ¥960/年（¥80/月）**、**高级版 ¥2,400/年（¥200/月）**、**专业版 ¥7,200/年（¥600/月，100 万次日查）**；支持私有化部署定制 |
+| **超额费用** | Pro 档允许超额使用（公开页面未列明超额单价） | **¥0 超额费**；超日查限额仅暂停返回新更新，次日零点恢复 |
+| **差量补丁范围** | 仅在 Stallion 热更版本之间按需生成差量：**商店安装包内置的初始 bundle 不做差量，且新基线首个请求下发完整包** | **针对每个已上传的原生安装包预计算 Hermes 结构感知差量**：商店发版后的第一次热修复同样只需 **3.4 KB**（[基准测试](https://github.com/sunnylqm/hbc-diff-benchmark)） |
+| **国内网络与财务** | 海外节点、美元结算 | **国内阿里云 CDN + 海外 Cloudflare**；支持支付宝、对公转账与国内增值税发票 |
+| **架构与 RN 版本** | 仅支持 RN 0.76 及以上 | 同时支持旧架构存量版本与 **RN 0.82+ 新架构** |
+| **支持平台** | iOS、Android | **iOS、Android、鸿蒙 HarmonyOS NEXT** |
+| **Expo 兼容** | SDK 52+（通过 plugin） | **SDK 50+**（通过 prebuild 自动接管双端 Bundle URL） |
+| **崩溃回滚与救砖** | 支持启动防崩溃循环回滚 | 启动崩溃自动回滚 + **原生冷启动强制启动（救砖）** |
+| **JS 报错监控** | 未提供内置源码还原 | **免费内置**，自动通过归档 Sourcemap 还原报错源码行 |
+
+## 最关键的技术细节：商店发版后的“第一次热修复”
+
+在线上真实研发节奏里，**最重要、最紧急的那次热更新，往往就是应用商店新版本刚过审放量后发现漏测 Bug 的第一次热修复**。
+
+- 在 **Stallion** 的机制中，服务端只对上传到 Stallion 的热更包之间按需算差量，应用商店安装包里内置的那份初始 Bundle 不参与差量计算——这意味着**每一个刚从应用商店安装或升级的用户，在接收第一次热更新时都必须下载完整的数 MB Bundle**；此后热更版本之间的迭代才会走差量。
+- 在 **Pushy** 的工作流中，每次打完正式 `.ipa` / `.apk` / `.aab` / `.app` 后都会先上传登记为原生基准版本。服务端直接提取安装包内的初始 Bundle 预先算好补丁，因此**哪怕只改了一行代码做首日紧急止损，全量用户下载的依然是一个 3.4 KB 左右的极小补丁**，下载耗时更短、弱网成功率更高。
+
+而在后续热更版本迭代中，Pushy 还额外对 Hermes 字节码做了字符串表固定与 HBC 结构感知变换，一行改动的补丁体积（3.4 KB）比普通通用二进制 diff（93.7 KB）小 28 倍。
+
+## 套餐阶梯与成本对比
+
+Stallion 没有入门付费档，免费档之上直接跳到 **$64/月（年付 $51/月，约 ¥367/月）** 的 Pro 档；而 Pushy 提供了 **¥80/月（标准版年付）** 和 **¥200/月（高级版年付）** 两档轻量套餐，中小型商业应用无需为用不完的配额买单。
+
+到了中大型规模（例如 10 万月活用户、人均每天打开 3 次，约 30 万次日检查）：
+
+- **Pushy 专业版**为 **¥7,200/年（折合 ¥600/月）**，提供高达 **100 万次/天**的检查空间（仍有 3 倍以上增长余量），且国内阿里云与海外 Cloudflare CDN 流量完全不限。
+- 若团队是海外主体并希望使用美元按月结算，也可了解与 Pushy 同源的全球服务 **[Cresc](https://cresc.dev/stallion-vs-cresc)**（提供 $19、$39、$99 多档固定月付套餐）。
+
+## 常见问题
+
+### Stallion 支持差量热更新吗？
+
+支持，但仅限于两个 Stallion 热更版本之间，且采用按需生成策略（首个命中新基线的请求会收到全量包）。商店原生安装包内置的初始 Bundle 不会被打补丁，因此原生发版后的第一次热更新需要全量下载。
+
+### Pushy 为什么能对商店安装包里的内置 Bundle 直接打补丁？
+
+因为在每次发布应用商店版本时，你会通过 `pushy uploadIpa / uploadApk / uploadAab` 把最终分发的安装包上传登记给 Pushy。服务端提前提取其中的内置 Bundle，每当你绑定新的热更新版本时就会在几秒内预先算好差量包并推送至 CDN。
+
+### Stallion 支持鸿蒙 HarmonyOS NEXT 吗？
+
+Stallion 目前仅支持 iOS 和 Android。Pushy 第一方支持 iOS、Android 以及基于 RNOH 的鸿蒙 HarmonyOS NEXT，三端共用同一套发布流与监控台，详见[鸿蒙接入指南](/docs/harmony)。
+
+## 相关阅读
+
+- [App Center 与 CodePush 停服替代方案对比](/codepush-alternative)
+- [Revopush vs Pushy](/revopush-vs-pushy) · [hot-updater vs Pushy](/hot-updater-vs-pushy)
+- [Expo（EAS Update）价格与 Pushy 成本对比](/expo-pricing-vs-pushy)
+- [Pushy 价格方案](/pricing)
+
+<Footer />

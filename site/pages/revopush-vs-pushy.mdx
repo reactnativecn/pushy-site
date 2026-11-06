@@ -1,0 +1,79 @@
+---
+title: Revopush vs Pushy：CodePush 替代方案价格与功能对比
+seoTitle: Revopush vs Pushy：CodePush 替代方案计费、国内网络与增量能力对比
+description: 对比兼容 CodePush 协议的海外托管服务 Revopush 与 Pushy 在计费模式、Hermes 增量体积、国内 CDN 速度、React Native 版本兼容及鸿蒙支持上的差异。
+pageType: doc-wide
+sidebar: false
+footer: false
+head:
+  - - meta
+    - name: keywords
+      content: Revopush,Revopush vs Pushy,Revopush 价格,CodePush 兼容服务,CodePush 替代方案对比
+---
+
+import Footer from "../components/Footer";
+
+# Revopush vs Pushy：CodePush 替代方案价格与功能对比
+
+[Revopush](https://revopush.org) 与 Pushy 都是微软 App Center CodePush 停服后团队常评估的托管式热更新服务。两者的切入点截然不同：**Revopush 基于 `react-native-code-push` 的分支构建，主打保留原有 CodePush JS API；Pushy 则采用自主演进近十年的 `react-native-update` SDK，专注于 Hermes 超小增量补丁、国内外双 CDN 全包计费、全版本 RN 兼容与鸿蒙三端统一支持**，并提供清晰的 [CodePush 一对一迁移指南](/docs/migrate-from-codepush)。
+
+> 本文关于 Revopush 的信息核对自其官方价格页与文档（截至 2026 年 10 月）。如有变动欢迎发邮件至 `hi@charmlot.com` 指正。
+
+## 一句话选型建议
+
+- **选择 Revopush**：如果你的应用完全面向海外市场、已升级到 React Native 0.76 及以上，且最高优先级是一行不改地保留 `codePush.sync()` 调用。
+- **选择 Pushy**：如果你希望采用**固定人民币套餐（免流量与超额账单、可开国内发票）**、需要中国大陆阿里云高速 CDN、希望获得极小的 Hermes 增量补丁（一行修复 3.4 KB）、需要支持鸿蒙 HarmonyOS NEXT，或者工程仍在 React Native 0.76 以下版本。
+
+## 逐项对比一览
+
+| 对比维度 | Revopush | Pushy（`react-native-update`） |
+| --- | --- | --- |
+| **客户端 SDK** | `react-native-code-push` 分支（MIT） | `react-native-update`（MIT，2016 年持续维护至今） |
+| **CodePush API 关系** | 保持原 API 不变 | 现代化 Hook / Provider API，附[逐行对照迁移指南](/docs/migrate-from-codepush)与 [AI 自动迁移 Skill](/docs/skills) |
+| **计费单位** | 月活更新用户（MAU）+ 出网流量（美元） | 每日更新检查总次数（人民币固定套餐，**CDN 流量全包**） |
+| **付费档位** | $25/月（5 万 MAU / 100 GB）、$100/月（30 万 MAU / 1 TB）、$250/月（50 万 MAU / 2 TB）、$500/月（100 万 MAU / 5 TB） | **¥960/年**（折 ¥80/月，1 万日查）、**¥2,400/年**（折 ¥200/月，10 万日查）、**¥7,200/年**（折 ¥600/月，100 万日查） |
+| **超额计费** | 每超出 1,000 MAU 收 $1，每超出 1 GB 流量收 $0.03 | **¥0 超额费**；当日超出检查限额后仅暂停返回新更新，次日零点自动恢复 |
+| **增量更新能力** | 字节级 bundle diff（Revopush 2.0，要求 RN 0.76+，需按商店包上传基准） | **Hermes 字节码结构感知差量**：一行代码修复仅 **3.4 KB**（[公开基准测试](https://github.com/sunnylqm/hbc-diff-benchmark)） |
+| **中国大陆网络与结算** | 海外节点、美元信用卡结算 | **国内阿里云 CDN + 海外 Cloudflare**；支持支付宝、对公转账与国内增值税发票 |
+| **React Native 版本支持** | 仅支持 **0.76 及以上** | 同时支持旧架构老版本（低至 0.60 乃至更早）与 **RN 0.82+ 新架构** |
+| **支持平台** | iOS、Android | **iOS、Android、鸿蒙 HarmonyOS NEXT** |
+| **Expo 支持** | SDK 52+（通过 config plugin + prebuild） | **SDK 50+**（通过 prebuild 自动配置双端 Bundle URL） |
+| **崩溃回滚与救砖** | 沿用 CodePush 模型：未调用 `notifyAppReady()` 则回滚 | 默认启动后自动标记成功，启动崩溃自动回滚 + **原生冷启动强制启动（救砖）** |
+| **JS 报错监控** | 需对接外部 Sentry | **免费内置**，自动通过归档 Sourcemap 还原源码行 |
+
+## 同等业务规模下的费用对比
+
+两家服务的计量方式不同：
+
+- **Revopush** 同时统计每月收到更新的独立用户数和下载总流量——发版越频繁、包体越大，两项指标涨得越快，超出后自动按量扣费。
+- **Pushy** 只看所有应用每天累计发起多少次更新检查请求，**更新包的 CDN 下载流量完全免费**。
+
+举个实际例子：一个拥有 **30 万月活用户**、人均每天打开应用约 3 次的团队，日检查量约为 90 万次：
+
+- 在 **Pushy** 上，直接匹配**专业版 ¥7,200/年（折合 ¥600/月）**，无任何流量后顾之忧；若将策略调整为仅冷启动检查（`checkStrategy: "onAppStart"`），甚至可以用更低档位承接。
+- 在 **Revopush** 上，30 万 MAU 对应 **$100/月（约 ¥720/月，年付约 ¥8,640）**的 Growing 档，前提是当月总下载流量不超过 1 TB，否则每超 1 GB 另加 $0.03。
+
+如果是纯出海项目、需要与海外独立主体签约并以美元按月支付，也可以直接对比与 Pushy 同源的国际版服务 **[Cresc](https://cresc.dev/revopush-vs-cresc)**（Pro 档 $99/月含 100 万次日查与全球 CDN，零超额费）。
+
+## 常见问题
+
+### 从 CodePush 迁移到 Pushy 代码改动大吗？
+
+非常小。核心改动只有三处：替换原生侧一行 Bundle URL 入口、把根组件的 `codePush()` 高阶组件换成 `<UpdateProvider>`、将发布脚本中的 `release-react` 换成 `pushy bundle`。使用 [`react-native-update` AI Skill](/docs/skills) 通常几分钟即可自动完成代码替换，人工只需对照[迁移指南](/docs/migrate-from-codepush)校对一遍。
+
+### 老项目还在 React Native 0.72 / 0.74，能用哪一个？
+
+Revopush 要求 React Native 0.76 及以上版本；而 Pushy 同时兼容旧架构老版本工程与 RN 0.82+ 新架构工程，你可以在不强行升级 RN 版本的前提下先安全替换掉停服的 CodePush。
+
+### Revopush 支持鸿蒙 HarmonyOS NEXT 吗？
+
+Revopush 文档仅覆盖 iOS 与 Android。Pushy 原生支持 iOS、Android 以及基于 RNOH 的鸿蒙 HarmonyOS NEXT 应用，详见[鸿蒙接入指南](/docs/harmony)。
+
+## 相关阅读
+
+- [App Center 与 CodePush 停服替代方案对比](/codepush-alternative)
+- [从 CodePush 迁移到 Pushy 完整指南](/docs/migrate-from-codepush)
+- [Stallion vs Pushy](/stallion-vs-pushy) · [hot-updater vs Pushy](/hot-updater-vs-pushy)
+- [Pushy 价格方案](/pricing)
+
+<Footer />

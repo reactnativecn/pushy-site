@@ -1,0 +1,126 @@
+---
+title: React Native 热更新（OTA）全面指南：原理、Hermes 增量与审核合规
+seoTitle: React Native 热更新（OTA）指南：原理、增量算法、App Store 审核与方案选型 - Pushy
+description: 详解 React Native 热更新工作原理、可更新边界、Hermes 字节码 KB 级增量补丁机制、崩溃自动回滚、App Store 与国内应用市场合规实践及 2026 主流方案对比。
+pageType: doc-wide
+sidebar: false
+footer: false
+head:
+  - - meta
+    - name: keywords
+      content: React Native 热更新,RN 热更新,React Native OTA,React Native 热更新原理,Hermes 增量更新,React Native 热更新审核,react-native-update
+---
+
+import Footer from "../components/Footer";
+
+# React Native 热更新（OTA）全面指南：原理、Hermes 增量与审核合规
+
+React Native 将应用拆分为**原生宿主（iOS / Android / 鸿蒙二进制代码）**与**业务层（JavaScript / Hermes 字节码与静态资源）**两部分。热更新（Over-The-Air，简称 OTA）正是利用这一架构特性：在不改动原生二进制代码的前提下，直接向用户设备下发新的 JS Bundle 与资源变更，无需每次修复 Bug 或调整文案都经历漫长的应用商店审核与用户手动升级。
+
+Pushy（npm 包名 [`react-native-update`](https://www.npmjs.com/package/react-native-update)）自 2016 年起由 React Native 中文网持续研发与运营，围绕热更新链路构建了**原生基准比对、Hermes 字节码级增量差分、国内外双 CDN 分发、崩溃自动回滚、强制启动（救砖）以及 Sourcemap 报错还原**的完整工程闭环。
+
+## 哪些内容可以热更新，哪些必须发原生包
+
+在规划发布流程前，必须明确热更新的技术边界——所有判断只看一条标准：**这次改动是否需要重新编译原生工程**。
+
+| 可直接通过热更新下发 | 必须重新编译并上架原生包 |
+| --- | --- |
+| JavaScript / TypeScript 业务逻辑、页面与样式变更 | `ios/`、`android/`、`harmony/` 目录下的任何原生代码与工程配置修改 |
+| 新增、升级或移除**纯 JS** 第三方依赖包 | 新增、移除或升级**包含原生代码**的第三方库（如相机、蓝牙、地图 SDK） |
+| 通过 JS `import` 或 `require()` 引用的图片、字体等静态资源 | 修改应用权限声明（`Info.plist`、`AndroidManifest.xml`、`module.json5`）、应用图标或启动屏 |
+| 开关控制、活动页改版、线上异常紧急修复 | 升级 React Native 核心版本、Expo SDK 版本或切换 Hermes 字节码版本 |
+
+:::info 静态资源协议说明
+热更新后的图片等资源在本地会通过 `file://` 协议加载，React Native 官方 `<Image>` 组件原生支持；若使用自定义原生组件读取资源，请确认其兼容 `file://` 路径。
+:::
+
+## React Native 热更新是如何工作的
+
+一套生产可用的热更新系统并不是简单地“把新 bundle 下载到本地”，而是由以下五个环节紧密配合：
+
+1. **接管 Bundle 启动路径**：客户端在原生入口处将默认的内置 Bundle 路径替换为热更新 SDK 管理的路径（iOS 的 `RCTPushy.bundleURL()`、Android 的 `UpdateContext.getBundleUrl()`、鸿蒙的 `PushyFileJSBundleProvider`）。若本地尚无热更版本，直接零开销读取安装包内置 Bundle。
+2. **登记原生基准包**：每次编译出上架用的 `.ipa`、`.apk`、`.aab` 或 `.app` 安装包后，通过 `pushy uploadIpa / uploadApk / uploadAab / uploadApp` 上传至服务端登记。服务端提取包内的内置 Bundle、编译时间戳（`buildTime`）与内容指纹（`bundleHash`），作为后续差分计算的精确基准。
+3. **打包并绑定热更新版本**：修改 JS 代码后执行 `pushy bundle`，CLI 自动打包出 `.ppk` 归档（含编译后的字节码、变更资源与用于异常还原的 Sourcemap），上传并绑定到目标原生版本号（支持单版本或 SemVer 版本范围）。
+4. **计算并下发 KB 级差量补丁**：服务端针对每一个绑定的原生基准版本以及历史热更版本，预先计算二进制增量补丁，并通过国内阿里云 CDN、海外 Cloudflare CDN 分发。客户端只下载自己当前状态到目标版本之间的最小差异包，以及真正发生变化的图片资源。
+5. **校验、应用与崩溃保护**：客户端在后台完成完整性校验与补丁合并，按配置的策略（下次冷启动静默生效、立即重启生效或弹窗确认后生效）切换版本；若新版本在启动阶段发生崩溃，自动触发回滚。
+
+## 为什么 Hermes 字节码热更新需要专项增量算法
+
+现代 React Native 默认将 JS 预编译为 Hermes 字节码（`.hbc`）以加快冷启动。但 `.hbc` 二进制格式对通用差分算法（如传统 bsdiff）极不友好，原因有两点：
+
+- **字符串表重排**：Hermes 编译器每次构建都会按出现频次等因素重新排列全局字符串表，哪怕只改了一行文案，成千上万个字符串 ID 都会重排，导致两份字节码几乎处处不同。
+- **偏移量表级联位移**：字节码中包含大量跳转偏移与函数地址表，中间多出几个字节就会导致后续所有偏移值整体变化，大幅放大二进制 diff 体积。
+
+Pushy 在构建期与差分期同时解决了这两个问题：**以同应用历史字节码为基准固定字符串 ID**，并在差分前执行**可逆的 HBC 结构感知变换**。在基于 React Native 0.86（Hermes HBC v98，内置字节码约 3.5 MB）的[公开基准测试](https://github.com/sunnylqm/hbc-diff-benchmark)中，实测包体积对比如下：
+
+| 真实迭代场景 | 全量更新（gzip） | 传统二进制增量（bsdiff） | Pushy 增量（Hermes 专项优化） |
+| --- | --- | --- | --- |
+| 修改一行文案 | 1.5 MB | 93.7 KB | **3.4 KB**（比 bsdiff 小 28 倍） |
+| 新增小型功能（约 60 行） | 1.5 MB | 411.6 KB | **50.2 KB**（比 bsdiff 小 8.2 倍） |
+| 新增中等功能（约 300 行） | 1.6 MB | 551.6 KB | **97.8 KB**（比 bsdiff 小 5.6 倍） |
+
+更重要的是，由于 Pushy 登记了原生安装包本身，**新版本上架后的第一次紧急热修复同样只需下载几 KB 的补丁**，无需先让用户拉取一次完整 Bundle。
+
+## 生产环境必须具备的四道安全防线
+
+热更新越快，一旦推错代码的波及速度也越快。选型或自研时建议重点考察以下四项安全能力：
+
+1. **发版前真机扫码验证**：通过配置[测试用 Deep Link](/docs/getting-started#添加测试用的-deep-link)，测试人员直接扫描后台热更版本的二维码，即可在与线上完全一致的 Release 包中定向加载该版本，无需提前绑定，零线上污染。
+2. **按比例灰度发布**：支持按设备 UUID 哈希稳定分桶（如先放量 5% → 20% → 100%），灰度版本可与当前全量稳定版本并存，配合[数据分析](/docs/analytics)实时观察激活漏斗与版本健康度。
+3. **启动崩溃自动回滚 + 原生冷启动「救砖」**：新热更版本若在启动阶段崩溃，客户端自动回退至上一可用版本且不再重复安装坏包；万一坏版本导致 JS 线程彻底卡死或白屏，Pushy v10.52.1+ 内置了不依赖 JS 的原生冷启动检测，可在后台开启[强制启动（救砖）](/docs/publish#强制启动救砖)拉取修复包恢复应用。
+4. **Sourcemap 源码级报错还原**：自 v10.55.0 起，Pushy 自动聚合热更版本的 JS 异常，并利用发布时归档的 Sourcemap 将压缩堆栈直接还原到原始源码行（见 [JS 报错监控](/docs/errors)），无需额外部署付费监控服务。
+
+## App Store 与国内应用市场合规指南
+
+“接入 React Native 热更新会不会被苹果拒审？”是国内团队最关心的问题之一。
+
+根据《Apple Developer Program License Agreement》第 **3.3.2** 条，苹果禁止通过动态下发原生可执行代码来绕过审核或彻底改变应用与送审时截然不同的核心用途，但**允许通过内置 WebKit 或 JavaScriptCore / Hermes 解释执行下发的脚本代码来修复问题与迭代既有功能**（这也是微软 CodePush、Expo EAS Update 与 Pushy 长期合规运行的基础）。
+
+在实际提审与日常运营中，遵守以下三条规范即可顺利上架 App Store 及国内各大安卓、鸿蒙应用市场：
+
+- **审核期间不要对提审版本绑定热更新**，更不要弹出“发现新版本，请立即更新”的弹窗，避免审核人员误以为应用内置了绕过商店的整包自升级通道；
+- **优选静默更新策略**（如 `silentAndLater` 下次启动静默生效），既符合苹果对用户体验的要求，又不会打断用户当前操作；
+- **不要用热更新切换应用形态**（例如送审时是工具类应用，过审后通过热更新变成违规内容应用），任何平台都严厉禁止此类马甲包行为。
+
+## 2026 年主流 React Native 热更新方案横评
+
+自微软 App Center CodePush 于 2025 年 3 月底正式停服后，当前主流替代路线对比如下：
+
+| 维度 | Pushy（`react-native-update`） | Expo EAS Update | 自建 `code-push-server` | `hot-updater`（开源自建） |
+| --- | --- | --- | --- | --- |
+| **服务形态** | 全托管（支持私有化部署定制） | Expo 官方全托管 | 自行运维 API / DB / 存储 / CDN | 在自有云账号部署存储与边缘函数 |
+| **维护与新架构** | 持续活跃维护，全面支持 RN 0.82+ 新架构 | 活跃维护，支持新架构 | **官方已归档只读，不支持新架构** | 社区活跃维护，支持新架构 |
+| **增量包体积** | **Hermes 结构感知差量（一行改 3.4 KB）**，首更即增量 | SDK 55+ 支持 bsdiff（首更需 SDK 58+ 配合 EAS Build） | 传统文件比对，Hermes 下体积较大 | Hermes 默认使用普通 bsdiff（约 93.7 KB） |
+| **国内网络体验** | **国内阿里云 CDN + 海外 Cloudflare 智能分流** | 海外边缘节点，国内直连较慢 | 取决于自购 CDN 与备案情况 | 取决于自建云厂商（Cloudflare 国内波动大） |
+| **计费模式** | 免费版起步；付费版 ¥960/年起，**CDN 流量全包无超额账单** | 按月活更新用户（MAU）+ 边缘带宽超额计费（美元） | 云服务器、数据库、存储与 CDN 流量成本 + 人力 | 云基础设施与出网流量费 + 团队值班运维人力 |
+| **支持平台** | **iOS、Android、鸿蒙 HarmonyOS NEXT** | iOS、Android | iOS、Android | iOS、Android |
+| **内置 JS 报错还原** | **免费内置 Sourcemap 还原** | 需另接 Sentry 等第三方服务 | 无 | 无 |
+
+想针对特定方案做深入对比，可继续阅读：
+
+- [App Center 与 CodePush 停服替代方案对比](/codepush-alternative)
+- [Expo（EAS Update）价格详解与 Pushy 成本对比](/expo-pricing-vs-pushy)
+- [Expo 项目热更新接入与 EAS Update 对比](/docs/expo)
+- [自建 Expo Updates 服务器 vs Pushy](/expo-updates-self-hosted-vs-pushy)
+- [hot-updater vs Pushy](/hot-updater-vs-pushy)
+- [Revopush vs Pushy](/revopush-vs-pushy) · [Stallion vs Pushy](/stallion-vs-pushy)
+
+## 常见问题
+
+### React Native 热更新能完全替代应用商店发版吗？
+
+不能。热更新解决的是 JS 业务逻辑、界面与静态资源的分钟级交付和线上紧急止损；一旦涉及原生代码修改、新增原生 SDK、修改系统权限或升级 React Native 版本，仍然需要正常打包提交应用商店审核。成熟团队通常采用“按节奏发原生大版本 + 日常高频小改动与紧急修复走热更新”的双轨模式。
+
+### 为什么发布热更新前一定要先上传原生包？
+
+因为 Pushy 下发的是针对用户手机上那一份安装包精确计算的增量补丁。服务端需要提取安装包内的内置 Bundle，并通过编译时间戳（`buildTime`）或内容指纹（`bundleHash`）确认设备上的安装包与登记基准完全一致，才能安全打上补丁。可视化原理演示见[发布热更新](/docs/publish#为什么重新打包后要先上传)。
+
+### 出海应用或需要海外独立合规主体怎么办？
+
+Pushy 海外请求自动分流至 Cloudflare 全球节点，可直接满足大多数出海应用需求。若项目对海外数据驻留、独立海外公司主体签约或美元结算有严格合规要求，可使用同源技术栈、由新加坡主体独立运营的国际版服务 [Cresc](https://cresc.dev/)。
+
+### 现在如何快速上手接入？
+
+最快的方式是先阅读 [安装与使用 Skill](/docs/skills)，让 Claude Code、Cursor 等 AI 编程工具自动完成依赖与原生入口改造；也可以直接按 [安装配置](/docs/getting-started) → [代码集成](/docs/integration) → [发布流程](/docs/publish) 逐步接入，新注册账号自动赠送 7 天专业版试用。
+
+<Footer />

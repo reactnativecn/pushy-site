@@ -6,6 +6,7 @@ import Page2 from "./Page2";
 import Showcase from "./Showcase";
 import HealthSection from "./HealthSection";
 import AnalyticsSection from "./AnalyticsSection";
+import GuidesSection from "./GuidesSection";
 import CtaBand from "./CtaBand";
 import Footer from "../Footer";
 
@@ -61,6 +62,7 @@ function Home(props: HomeProps) {
 			<HealthSection />
 			<Page1 />
 			<Page2 />
+			<GuidesSection />
 			<CtaBand />
 			<Footer />
 		</div>

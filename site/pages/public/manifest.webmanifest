@@ -1,7 +1,7 @@
 {
   "name": "Pushy 极速热更新",
   "short_name": "Pushy",
-  "description": "Pushy 极速热更新",
+  "description": "为 React Native 打造的热更新服务：KB 级增量包、CDN 秒级分发、崩溃自动回滚。",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -9,10 +9,22 @@
   "theme_color": "#0f5fff",
   "icons": [
     {
+      "src": "/images/logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
       "src": "/images/logo.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }

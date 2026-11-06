@@ -21,6 +21,8 @@ import { Steps } from "@rspress/core/theme";
 宿主也可以不经过 JS Bridge，直接在原生层配置并触发热更新。`PushyRuntime.configure(...)`、`prepareBundle(...)` 与 `nativeConfigSource: "native"` 的用法请参阅[原生主动检测与更新](/docs/native-api)；原生配置省略 `endpoints` 时即使用 Pushy 内置服务地址。请在 RN 正常启动之前完成配置，或在本次启动已完成 bundle 解析之后再检查；不要仅为了触发检查而再次调用 `getBundleUrl`。React Native AAR 和宿主 APK／AAB 都需要使用 v10.59.0 或更高版本重新编译。下文的 JS 示例沿用默认的由 JS 管理配置的方式；如需由宿主原生端掌控配置，请使用原生文档中的配置归属选项。
 :::
 
+## 混编接入步骤
+
 <Steps>
 ### 安装依赖
 

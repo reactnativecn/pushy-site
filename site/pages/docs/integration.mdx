@@ -18,7 +18,7 @@ import { Steps, Tabs, Tab } from "@rspress/core/theme";
 优先使用 [安装与使用 Skill](/docs/skills) 让 AI 自动完成 `UpdateProvider` 包裹、客户端初始化与常见策略配置。本页保留为手动接入参考，也适合用来校对 AI 生成的改动。
 :::
 
-### 获取 appKey
+## 获取 appKey
 
 检查更新时必须提供你的`appKey`，这个值保存在`update.json`中（使用`pushy createApp`或`pushy selectApp`命令后会自动生成），并且根据平台不同而不同。你可以用如下的代码获取`appKey`：
 
@@ -31,7 +31,7 @@ const { appKey } = _updateConfig[Platform.OS];
 
 也可以在网页端的应用设置中查看应用的 appKey。
 
-### 初始化服务
+## 初始化服务
 
 ```js
 import { UpdateProvider, Pushy } from "react-native-update";
@@ -62,7 +62,7 @@ export default function Root() {
 
 如需简单调整检查和更新策略，可参考以下内置的策略参数：
 
-#### checkStrategy（检查更新策略）
+### checkStrategy（检查更新策略）
 
 用于控制自动检查更新的触发时机：
 
@@ -80,7 +80,7 @@ const pushyClient = new Pushy({
 });
 ```
 
-#### updateStrategy（更新应用策略）
+### updateStrategy（更新应用策略）
 
 用于控制检测到更新后的自动下载和应用行为：
 
@@ -103,7 +103,7 @@ const pushyClient = new Pushy({
 
 下面的章节提供了一个自定义更新策略和界面交互的参考实现。
 
-### 自定义更新界面
+## 自定义更新界面
 
 默认配置下，pushy 会以系统 alert 的形式来弹出更新提示，如需自定义更新界面，首先请关闭默认的 updateStrategy 更新策略，并打开 debug 选项以便调试：
 
@@ -214,7 +214,7 @@ function App() {
 
 当返回的`updateInfo`中`update`字段为 true 时，即可调用`downloadUpdate`方法来下载更新，此时可以获取到下载的进度数据`progress`。下载完成后（注意!不可依赖`progress`来判断下载完成，必须要`await downloadUpdate()`之后）可以调用`switchVersion`来立即重启更新，也可以使用`switchVersionLater`来标记下次启动时更新。
 
-### 统计数据
+## 统计数据
 
 初始化 Pushy 客户端时可以传入自定义的 logger 函数，其中可以自己记录日志或上报统计数据，比如下面的例子使用 Google Analytics 来上报事件：
 

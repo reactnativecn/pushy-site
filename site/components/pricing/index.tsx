@@ -15,7 +15,7 @@ const AppText = () => (
   </Tooltip>
 );
 const PackageText = () => (
-  <Tooltip title="原生包指完整的 apk 或 ipa 格式的安装包。您可删除已不再使用的原生包来有效利用配额。">
+  <Tooltip title="原生包指通过 pushy uploadApk/uploadAab/uploadIpa/uploadApp 上传的热更基准包。新版 CLI 会在上传前自动剥离无关原生二进制，仅提取 JS Bundle 与静态资源上传（实际占用体积通常仅几 MB）。您可随时删除不再使用的原生包来释放配额。">
     <span className="text-blue-500 hover:text-blue-400 cursor-help border-b border-dashed border-blue-300">原生包</span>
   </Tooltip>
 );
@@ -40,7 +40,7 @@ const CheckLimitText = ({ children }: { children: ReactNode }) => (
               target="_blank"
               rel="noopener noreferrer"
               className="text-white underline ml-1 font-bold"
-              href="docs/faq#大客户方案"
+              href="/docs/faq#大客户方案"
             >
               大客户方案
             </a>
@@ -119,10 +119,10 @@ function AIBonusBanner() {
             <span aria-hidden>🎁</span>
             年付限时福利
           </div>
-          {/* rspress 主题会覆盖 h3 的颜色和外边距，这里用 ! 强制，否则深色底上看不清、和徽标贴在一起 */}
-          <h3 className="!mt-5 !mb-0 !text-white text-2xl font-extrabold leading-tight sm:text-3xl">
+          {/* rspress 主题会覆盖 h2 的颜色和外边距，这里用 ! 强制，否则深色底上看不清、和徽标贴在一起 */}
+          <h2 className="!mt-5 !mb-0 !border-0 !pt-0 !text-white text-2xl font-extrabold leading-tight sm:text-3xl">
             年付即送 Token，最高 <span className="!text-amber-300">$360</span>
-          </h3>
+          </h2>
           <p className="!mt-4 !mb-0 max-w-3xl text-slate-300 leading-relaxed">
             {`标准版送 $30、高级版送 $100、专业版送 $360，可用于 ${AI_MODELS} 等主流模型，官方直连、按量计费、不掺水。适合 AI 编程、智能客服、内容生产等场景。`}
           </p>
@@ -196,6 +196,7 @@ function Pricing() {
 
         <AIBonusBanner />
 
+        <h2 className="sr-only">套餐方案对比</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 xl:gap-10 items-stretch">
           
           {/* Card 1: 免费版 */}
@@ -225,7 +226,7 @@ function Pricing() {
             </ul>
 
             <a
-              href="docs/getting-started"
+              href="/docs/getting-started"
               className="mt-auto block w-full py-4 px-6 rounded-xl font-bold text-center bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors"
             >
               开始使用
@@ -381,7 +382,7 @@ function Pricing() {
         <div className="mt-16 text-center text-slate-500 text-sm md:text-base max-w-4xl mx-auto p-6 bg-slate-100/50 rounded-2xl border border-slate-200/60">
           <p className="mb-3 leading-relaxed">
             * <strong>注：</strong>iOS 和 Android 版本记做不同的应用。原生包和热更包的数量限制均为<strong className="text-slate-700">单个应用</strong>维度。<br className="hidden sm:block" />
-            原生包指完整的 apk/ipa 安装包。热更包指 pushy bundle 命令生成的 ppk 文件（非用户实际下载的增量更新文件）。<br className="hidden sm:block" />
+            原生包指上传作为差量基准的安装包（新版 CLI 会自动剥离无关原生二进制，实际上传占用通常仅几 MB）。热更包指 pushy bundle 命令生成的 ppk 文件（非用户实际下载的增量更新文件）。<br className="hidden sm:block" />
             <strong className="text-slate-700">所有版本均包含 CDN 流量费用，无需额外付费。</strong><br className="hidden sm:block" />
             为了最大化利用您的定额，您可随时在控制台删除已不再使用的应用、原生包和热更包。
           </p>
@@ -395,7 +396,7 @@ function Pricing() {
             对于付费业务还有其他疑问？请参考我们的
             <a
               className="text-indigo-600 font-bold ml-1 hover:underline underline-offset-4"
-              href="docs/faq#%E4%BB%98%E8%B4%B9%E9%97%AE%E9%A2%98"
+              href="/docs/faq#%E4%BB%98%E8%B4%B9%E9%97%AE%E9%A2%98"
             >
               常见问题解答
             </a>

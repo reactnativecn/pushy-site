@@ -5,22 +5,52 @@ description: React Native 热更新场景实践：优化 ipa、apk 原生包与 
 type: 开发指南
 ---
 
-#### 优化原生和热更包体积
+## 优化原生和热更包体积
 
-##### iOS 原生包优化(ipa)
+### 升级新版 CLI：上传时自动精简原生包（首选）
 
-对于同一份 archive（其版本号、编译时间和内置 bundle 已固定，不会受导出方式所影响），可以用不同选项多次导出 ipa，选择其中最小的上传到 pushy 服务器作为热更基准包。
+自 `react-native-update-cli` **v2.20.0** 起（建议直接升级到最新版本：`npm i -g react-native-update-cli@latest`），执行 `pushy uploadIpa`、`pushy uploadApk`、`pushy uploadAab` 或 `pushy uploadApp` 时，CLI 会在本地临时目录中**自动抽取热更新差量计算所需的最小文件集**再上传，**不会修改你本地用于应用商店上架的原始安装包**。
+
+各平台自动剥离与保留的内容如下：
+
+- **iOS（`.ipa`）**：自动剥离体积占比最大的 Mach-O 可执行文件、`Frameworks/*.framework` 动态库（如 `hermes.framework`）与签名信息，仅保留 `Payload/<App>.app/main.jsbundle` 与 `assets/` 静态资源。
+- **Android（`.apk` / `.aab`）**：自动剥离所有 `lib/**/*.so` 原生库、`classes*.dex` 字节码与签名块，仅保留 `assets/index.android.bundle`、`assets/`、`res/` 以及压缩后的 `resources.arsc` 资源索引表（建议 `v2.29.4+`）。
+- **HarmonyOS（`.app`）**：自动递归精简内嵌的 `.hap` 包，仅保留 `resources/rawfile/bundle.harmony.js` 与 `resources/rawfile/assets/`。
+
+:::tip 实际瘦身效果
+本地动辄 **80 MB～300 MB** 的完整安装包，大部分体积来自原生二进制与架构库；经新版 CLI 自动精简后，实际上传并计入 Pushy「原生包大小配额」的基准包通常只有 **几 MB 到十几 MB**，上传速度也大幅提升。如果遇到原生包超出配额体积限制的报错，**请优先检查并升级全局 `react-native-update-cli` 版本**。
+:::
+
+如果升级最新 CLI 后上传体积仍然偏大，说明包内的 **JS Bundle 或静态资源（图片、字体、音视频、Android `res/` 资源）** 本身体积较大，可进一步参考下方建议优化。
+
+### iOS 原生包优化(ipa)
+
+- **优先升级 CLI**：使用 `react-native-update-cli >= 2.20.0` 时，导出方式（App Store / Ad Hoc / Development）包含的符号表或架构差异都已在上传前被自动剥离，无需再手动调整导出选项。
+- **排查包内大体积静态资源**：若精简后体积仍大，请检查 Xcode `Copy Bundle Resources` 或 JS 代码 `require` 中是否打入了未压缩的大图、离线视频或冗余字体文件；大体积音视频建议改为线上 CDN 按需加载。
+- 若因特殊原因仍在使用低于 `v2.20.0` 的旧版 CLI，对于同一份 Archive（其版本号、编译时间和内置 Bundle 已固定），可用不同选项多次导出 `.ipa`，选择体积最小的一份上传作为热更基准包：
 
 ![bitcode](./assets/exportipa.png)
 
-##### Android 原生包优化(apk)
+### Android 原生包优化(apk)
 
-apk 的优化主要考虑两个方向：
+- **优先升级 CLI**：使用新版 CLI（建议 `>= 2.29.4`）上传 APK 或 AAB 时，`.so` 动态库与 `.dex` 代码均已自动剔除，无需仅为了满足 Pushy 上传配额而手动拆分 ABI 上传。
+- **启用 R8 / ProGuard 与资源压缩（同时减小分发包与上传基准包）**：由于 Android 精简基准包仍需保留 `res/` 目录以供资源比对，开启代码混淆与 `shrinkResources true` 可以自动移除未使用的第三方库图片与布局资源，同时减小用户下载的安装包和上传到 Pushy 的基准包体积（参考[启用 ProGuard 减少 APK 大小](https://reactnative.cn/docs/signed-apk-android#%E5%90%AF%E7%94%A8proguard%E6%9D%A5%E5%87%8F%E5%B0%91apk%E7%9A%84%E5%A4%A7%E5%B0%8F%EF%BC%88%E5%8F%AF%E9%80%89%EF%BC%89)）：
 
-- [启用 proguard 压缩混淆源码](https://reactnative.cn/docs/signed-apk-android#%E5%90%AF%E7%94%A8proguard%E6%9D%A5%E5%87%8F%E5%B0%91apk%E7%9A%84%E5%A4%A7%E5%B0%8F%EF%BC%88%E5%8F%AF%E9%80%89%EF%BC%89)。但这一步可能导致一些使用反射的代码运行时报错，启用后需要充分测试每个页面和功能，以及需要阅读一些第三方关于 proguard 的特别设置说明。
-- 更新 react-native-update-cli 到 v2.22.7 以上，会自动抽取原生包的最小所需部分上传。
+```groovy
+android {
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            crunchPngs false // 热更新必须保持关闭 PNG 重压缩
+        }
+    }
+}
+```
 
-##### 热更新包优化(ppk)
+> 启用混淆后可能导致部分使用反射的原生代码在运行时报错，请务必充分测试核心流程并按第三方库文档补充 ProGuard 规则。
+
+### 热更新包优化(ppk)
 
 热更新包的主要内容是 js 包和其所引用的静态资源（主要是图片）。
 
@@ -30,13 +60,15 @@ apk 的优化主要考虑两个方向：
   - 如不需要图片的透明像素，可以考虑将 png 格式转为 jpg 格式。
   - 还可以进一步考虑压缩比更高的图片格式，例如 webp 格式（需要第三方原生插件例如[react-native-webp-format](https://github.com/Aleksefo/react-native-webp-format#readme)），heif 格式（iOS 11 和 Android 10 以上原生支持）等。这里有个图片格式对比可供参考 <https://compare.rokka.io/_compare/#heif=40&jpeg=80&webp=80&av1=40&width=800>。
 
-#### 有很多渠道包需要热更，如何操作比较方便？
+## 有很多渠道包需要热更，如何操作比较方便？
 
 1. 如果渠道包的`js代码和初始资源`有差别（无论多么细微的差别都会生成不同的 jsbundle），那么只能单独生成 apk，分别上传和绑定。可以考虑写一些脚本自动调用 cli 来执行批量操作。
 2. 如果渠道包的`js代码和初始资源`完全一致，可以考虑使用[Flavor 构建](https://developer.android.com/studio/build/build-variants?hl=zh-cn)，或其他一些动态生成渠道包的方案（比如[腾讯的 VasDolly](https://github.com/Tencent/VasDolly)，[美团的 walle](https://github.com/Meituan-Dianping/walle)等），这样所有的渠道包基于同一个基础 apk 生成（因而会有相同的编译时间戳和 jsbundle）。这样可以只用上传一个基础 apk，对此 apk 的热更操作可以对所有渠道包生效。
 3. 如果您是`高级版`、`专业版`或`大客户VIP版`客户，也可以考虑在管理后台的应用设置中启用`忽略编译时间戳`。此选项仅对比版本号，不校验时间戳，可提供更宽容的热更策略，但可能消耗更多流量。
 
-#### 如何支持 aab 格式的原生包？
+更完整的内容指纹匹配（`bundleHash`）、Walle/VasDolly 与 Flavor 配置实战，请参阅 [Android 多渠道打包与 AAB 热更新](/docs/android-channels-and-aab)。
+
+## 如何支持 aab 格式的原生包？
 
 将 react-native-update-cli 更新到 v2.6.0 以上版本，即可使用 pushy parseAab 和 pushy uploadAab 命令来支持 aab 格式的原生包。
 
@@ -56,7 +88,7 @@ $ npm run package:android:release
 
 这样生成的`android/app/build/outputs/apk/release/app-release.apk`和`android/app/build/outputs/bundle/release/app-release.aab`来自同一次 release 构建，编译时间戳保持一致。之后按渠道分发对应格式即可：Google Play 使用 AAB，直装包或第三方渠道使用 APK。如果项目使用 flavor，请把 npm script 中的任务名改为实际 variant，例如`assembleProdRelease`和`bundleProdRelease`。
 
-#### 测试与回滚
+## 测试与回滚
 
 自 v10.11.2 版本开始，可以使用以下两种快捷扫码方案来测试热更，而无需提前进行绑定：
 
@@ -99,9 +131,9 @@ const pushyClient = new Pushy({
 })
 ```
 
-万一确实发生线上事故需要回滚的话，先立即对原生包或者整个应用设置暂停热更，然后更改绑定到之前正常的版本，或者利用版本控制系统回滚代码到正常的状态，然后重新生成热更包并推送。
+万一确实发生线上事故需要回滚的话，先立即对原生包或者整个应用设置暂停热更，然后更改绑定到之前正常的版本，或者利用版本控制系统回滚代码到正常的状态，然后重新生成热更包并推送。如果遇到热更不生效、重启自动回滚或白屏异常，可按[热更新不生效与回滚排查](/docs/troubleshooting)逐项检查。
 
-#### 元信息(Meta Info)的使用
+## 元信息(Meta Info)的使用
 
 在发布热更新版本时，或者在网页端，你可以编辑版本的元信息。这是一段在检查更新时可以获得的字符串，你可以在其中按你所想的格式（一般建议用[JSON 格式](https://developer.mozilla.org/zh-CN/docs/Learn/JavaScript/Objects/JSON)）保存一些信息。
 
