@@ -2047,6 +2047,42 @@ public class MainActivity extends ReactActivity {
 
 请参考 [React Native 的文档](https://reactnative.cn/docs/next/linking#%E5%90%AF%E7%94%A8-deep-links)
 
+
+**Harmony**
+
+在 `harmony/entry/src/main/module.json5` 中，给 `EntryAbility` 的 `skills` 增加一项（注意和原有的 `action.system.home` 是不同的一项）：
+```json5
+{
+  "module": {
+    "abilities": [
+      {
+        "name": "EntryAbility",
+        // 其他配置
+        "skills": [
+          {
+            "entities": ["entity.system.home"],
+            "actions": ["action.system.home"]
+          },
+          // ↓↓↓ 添加如下配置
+          {
+            "actions": ["ohos.want.action.viewData"],
+            "uris": [
+              {
+                // 你自定义的协议名，请不要和常见协议名或其他app冲突
+                "scheme": "你自定义的协议名"
+              }
+            ]
+          }
+          // ↑↑↑
+        ]
+      }
+    ]
+  }
+}
+```
+RNOH 的 `RNAbility` 会把启动时的 `want.uri` 和之后 `onNewWant` 收到的链接转交给 RN 的 `Linking`，`UpdateProvider` 会自动解析，JS 代码无需改动。如果你的 `EntryAbility` 没有继承 `RNAbility`，需要自行把 `want.uri` 作为 `launchURI` 传给 `RNInstancesCoordinator`，并在 `onNewWant` 中转发给它。
+如果系统扫一扫无法拉起应用，也可以在应用内自带的扫码功能中调用 [parseTestQrCode](https://pushy.reactnative.cn/docs/api.md#function-parsetestqrcodeqrcode-string)。
+
 ***
 在完成上述配置并编译，并且日后上传了热更包，在后台能看到热更版本之后，你就可以将鼠标移到网页后台的二维码图标上，如下图所示：
 <img alt="Deep Link二维码" src={image0} />
